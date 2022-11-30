@@ -1,0 +1,337 @@
+{
+	"info": {
+		"_postman_id": "0d12eb0e-ca5c-4ed3-a9a0-3ef59d0054ae",
+		"name": "Actuator",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "actuator",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/beans",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/beans",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"beans"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/caches",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/caches",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"caches"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/conditions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/conditions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"conditions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/configprops",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/configprops",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"configprops"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/env",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/env",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"env"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/heapdump",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/heapdump",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"heapdump"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/info",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/info",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/loggers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/loggers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"loggers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/mappings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/mappings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"mappings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/metrics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/metrics",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"metrics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/scheduledtasks",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/scheduledtasks",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"scheduledtasks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator/threaddump",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/csl-service/manage/threaddump",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"csl-service",
+						"manage",
+						"threaddump"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "csl-service-security-password",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "csl-service-security-user",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

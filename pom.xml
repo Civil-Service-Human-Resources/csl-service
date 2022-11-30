@@ -125,7 +125,17 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>build-info</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
+					<additionalProperties>
+						<custom.additional-info-1>additional-info-1</custom.additional-info-1>
+					</additionalProperties>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
@@ -136,5 +146,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
