@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.cslservice;
+package uk.gov.cabinetoffice.csl;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
