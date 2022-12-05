@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "0d12eb0e-ca5c-4ed3-a9a0-3ef59d0054ae",
-		"name": "Actuator",
+		"name": "csl-service-actuator",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -11,15 +11,9 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage",
-					"protocol": "http",
+					"raw": "{{base-url}}",
 					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"csl-service",
-						"manage"
+						"{{base-url}}"
 					]
 				}
 			},
@@ -31,15 +25,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/beans",
-					"protocol": "http",
+					"raw": "{{base-url}}/beans",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"beans"
 					]
 				}
@@ -52,15 +42,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/caches",
-					"protocol": "http",
+					"raw": "{{base-url}}/caches",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"caches"
 					]
 				}
@@ -73,15 +59,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/conditions",
-					"protocol": "http",
+					"raw": "{{base-url}}/conditions",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"conditions"
 					]
 				}
@@ -94,15 +76,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/configprops",
-					"protocol": "http",
+					"raw": "{{base-url}}/configprops",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"configprops"
 					]
 				}
@@ -115,15 +93,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/env",
-					"protocol": "http",
+					"raw": "{{base-url}}/env",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"env"
 					]
 				}
@@ -136,15 +110,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/health",
-					"protocol": "http",
+					"raw": "{{base-url}}/health",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"health"
 					]
 				}
@@ -157,15 +127,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/heapdump",
-					"protocol": "http",
+					"raw": "{{base-url}}/heapdump",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"heapdump"
 					]
 				}
@@ -178,15 +144,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/info",
-					"protocol": "http",
+					"raw": "{{base-url}}/info",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"info"
 					]
 				}
@@ -199,15 +161,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/loggers",
-					"protocol": "http",
+					"raw": "{{base-url}}/loggers",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"loggers"
 					]
 				}
@@ -220,15 +178,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/mappings",
-					"protocol": "http",
+					"raw": "{{base-url}}/mappings",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"mappings"
 					]
 				}
@@ -241,15 +195,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/metrics",
-					"protocol": "http",
+					"raw": "{{base-url}}/metrics",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"metrics"
 					]
 				}
@@ -262,15 +212,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/scheduledtasks",
-					"protocol": "http",
+					"raw": "{{base-url}}/scheduledtasks",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"scheduledtasks"
 					]
 				}
@@ -283,15 +229,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/csl-service/manage/threaddump",
-					"protocol": "http",
+					"raw": "{{base-url}}/threaddump",
 					"host": [
-						"localhost"
+						"{{base-url}}"
 					],
-					"port": "8080",
 					"path": [
-						"csl-service",
-						"manage",
 						"threaddump"
 					]
 				}
@@ -332,6 +274,18 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "local-base-url",
+			"value": "http://localhost:9003/csl-service/manage",
+			"type": "default"
+		},
+		{
+			"key": "base-url",
+			"value": "{{local-base-url}}",
+			"type": "default"
 		}
 	]
 }
