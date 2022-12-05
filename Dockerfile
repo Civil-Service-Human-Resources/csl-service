@@ -1,4 +1,4 @@
-FROM amazoncorretto:17
+FROM amazoncorretto:17.0.5-alpine3.16
 
 ENV SPRING_PROFILES_ACTIVE production
 
