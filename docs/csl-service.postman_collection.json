@@ -14,11 +14,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{csl-base-url}}/test/abc",
+							"raw": "{{csl-base-url}}/csl/test/abc",
 							"host": [
 								"{{csl-base-url}}"
 							],
 							"path": [
+								"csl",
 								"test",
 								"abc"
 							]
