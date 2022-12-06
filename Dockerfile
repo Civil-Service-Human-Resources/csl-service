@@ -1,13 +1,28 @@
-FROM amazoncorretto:17.0.5-alpine3.16
+FROM maven:3.8.6-amazoncorretto-17 as debug
 
-ENV SPRING_PROFILES_ACTIVE production
+WORKDIR /workspace/app
 
-EXPOSE 9003
+COPY . .
 
+FROM debug as develop
+
+USER root
+RUN chown -R maven /workspace/app
+USER maven
+
+RUN mvn clean package -Dmaven.test.skip
+
+CMD java -jar /workspace/app/target/csl-service-0.0.1-SNAPSHOT.jar
+
+FROM amazoncorretto:17.0.5-alpine3.16 as production
+
+ARG JAR_DIR=/workspace/app/target
+
+COPY --from=develop ${JAR_DIR}/classes/META-INF /data/META-INF
+COPY --from=develop ${JAR_DIR}/csl-service-0.0.1-SNAPSHOT.jar /data/app.jar
+
+# Add AppInsights config and agent jar
 ADD lib/AI-Agent.xml /opt/appinsights/AI-Agent.xml
-
 ADD https://github.com/microsoft/ApplicationInsights-Java/releases/download/3.4.4/applicationinsights-agent-3.4.4.jar /opt/appinsights/applicationinsights-agent-3.4.4.jar
-
-ADD build/libs/csl-service.jar /data/app.jar
 
 CMD java -javaagent:/opt/appinsights/applicationinsights-agent-3.4.4.jar -jar /data/app.jar
