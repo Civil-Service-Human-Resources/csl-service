@@ -1,9 +1,3 @@
-mvn
-mvnw
-mvnw.cmd
-src
-*.mvn
 *.iml
 .idea
 .DS_Store
-README.md

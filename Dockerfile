@@ -6,11 +6,11 @@ COPY . .
 
 FROM debug as develop
 
-USER root
-RUN chown -R maven /workspace/app
-USER maven
+# USER root
+# RUN chown -R nobody /workspace/app
+# USER nobody
 
-RUN mvn clean package -Dmaven.test.skip
+RUN mvn clean package -Dmaven.test.skip=true
 
 CMD java -jar /workspace/app/target/csl-service-0.0.1-SNAPSHOT.jar
 
