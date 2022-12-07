@@ -16,7 +16,7 @@ public class CslServiceController {
 
     @GetMapping(path = "/test/{input}", produces = "application/json")
     public ResponseEntity<String> test(@PathVariable("input") String input) {
-        log.info("Input, {}", input);
+        log.info("Input: {}", input);
         return new ResponseEntity<>(input, OK);
     }
 }
