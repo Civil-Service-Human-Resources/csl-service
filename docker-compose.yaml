@@ -1,0 +1,8 @@
+version: '3.9'
+services:
+  csl-service:
+    build:
+      dockerfile: Dockerfile
+      target: develop
+    ports:
+      - "9003:9003"
