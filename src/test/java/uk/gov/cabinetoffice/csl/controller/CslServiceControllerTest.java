@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.controller;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(value = CslServiceController.class)
+@WebMvcTest(CslServiceController.class)
 @WithMockUser
 public class CslServiceControllerTest {
 
@@ -27,7 +26,7 @@ public class CslServiceControllerTest {
         String input = "abc";
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/csl/test/" + input).accept(MediaType.APPLICATION_JSON);
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-        assertEquals(input, result.getResponse().getContentAsString());
+        Assertions.assertEquals(input, result.getResponse().getContentAsString());
     }
 }
 
