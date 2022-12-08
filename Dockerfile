@@ -6,10 +6,6 @@ COPY . .
 
 FROM debug as develop
 
-# USER root
-# RUN chown -R nobody /workspace/app
-# USER nobody
-
 RUN mvn clean package -Dmaven.test.skip=true
 
 CMD java -jar /workspace/app/target/csl-service-0.0.1-SNAPSHOT.jar
@@ -18,7 +14,6 @@ FROM amazoncorretto:17.0.5-alpine3.16 as production
 
 ARG JAR_DIR=/workspace/app/target
 
-COPY --from=develop ${JAR_DIR}/classes/META-INF /data/META-INF
 COPY --from=develop ${JAR_DIR}/csl-service-0.0.1-SNAPSHOT.jar /data/app.jar
 
 # Add AppInsights config and agent jar
