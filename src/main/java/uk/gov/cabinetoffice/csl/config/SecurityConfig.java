@@ -34,70 +34,70 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        log.info("filterChain: http: {}", http.toString());
+        log.debug("filterChain: http: {}", http.toString());
         http.cors().and().csrf().disable()
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers(HttpMethod.OPTIONS, "/oauth/token").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/manage").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/manage","/manage/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults());
         DefaultSecurityFilterChain defaultSecurityFilterChain = http.build();
-        log.info("filterChain: defaultSecurityFilterChain: {}", defaultSecurityFilterChain.toString());
+        log.debug("filterChain: defaultSecurityFilterChain: {}", defaultSecurityFilterChain.toString());
         return defaultSecurityFilterChain;
     }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        log.info("webSecurityCustomizer()");
-        return (web) -> web.ignoring().requestMatchers("/manage");
+        log.debug("webSecurityCustomizer()");
+        return (web) -> web.ignoring().requestMatchers("/manage","/manage/*");
     }
 
     @Bean
     public TokenStore getTokenStore(OAuthProperties oAuthProperties) {
-        log.info("getTokenStore: oAuthProperties: {}", oAuthProperties.toString());
+        log.debug("getTokenStore: oAuthProperties: {}", oAuthProperties.toString());
         JwtTokenStore jwtTokenStore = new JwtTokenStore(accessTokenConverter(oAuthProperties));
-        log.info("getTokenStore: jwtTokenStore: {}", oAuthProperties.toString());
+        log.debug("getTokenStore: jwtTokenStore: {}", oAuthProperties.toString());
         return jwtTokenStore;
     }
 
     @Bean
     public JwtAccessTokenConverter accessTokenConverter(OAuthProperties oAuthProperties) {
-        log.info("accessTokenConverter: oAuthProperties: {}", oAuthProperties.toString());
+        log.debug("accessTokenConverter: oAuthProperties: {}", oAuthProperties.toString());
         JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
         jwtAccessTokenConverter.setSigningKey(oAuthProperties.getJwtKey());
-        log.info("accessTokenConverter: jwtAccessTokenConverter: {}", jwtAccessTokenConverter.toString());
+        log.debug("accessTokenConverter: jwtAccessTokenConverter: {}", jwtAccessTokenConverter.toString());
         return jwtAccessTokenConverter;
     }
 
     @Bean
     public OAuth2ProtectedResourceDetails resourceDetails(OAuthProperties oAuthProperties) {
-        log.info("resourceDetails: oAuthProperties: {}", oAuthProperties.toString());
+        log.debug("resourceDetails: oAuthProperties: {}", oAuthProperties.toString());
         ClientCredentialsResourceDetails resource = new ClientCredentialsResourceDetails();
         resource.setId("identity");
         resource.setAccessTokenUri(oAuthProperties.getTokenUrl());
         resource.setClientId(oAuthProperties.getClientId());
         resource.setClientSecret(oAuthProperties.getClientSecret());
-        log.info("resourceDetails: resource: {}", resource.toString());
+        log.debug("resourceDetails: resource: {}", resource.toString());
         return resource;
     }
 
     @Bean
     public PoolingHttpClientConnectionManager httpClientConnectionManager(OAuthProperties oAuthProperties) throws Exception {
-        log.info("httpClientConnectionManager: oAuthProperties: {}", oAuthProperties.toString());
+        log.debug("httpClientConnectionManager: oAuthProperties: {}", oAuthProperties.toString());
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(oAuthProperties.getMaxTotalConnections());
         connectionManager.setDefaultMaxPerRoute(oAuthProperties.getDefaultMaxConnectionsPerRoute());
         HttpHost host = HttpHost.create(oAuthProperties.getServiceUrl());
         connectionManager.setMaxPerRoute(new HttpRoute(host), oAuthProperties.getMaxPerServiceUrl());
-        log.info("httpClientConnectionManager: connectionManager: {}", connectionManager.toString());
+        log.debug("httpClientConnectionManager: connectionManager: {}", connectionManager.toString());
         return connectionManager;
     }
 
     @Bean
     public OAuth2RestOperations oAuthRestTemplate(OAuth2ProtectedResourceDetails resourceDetails, PoolingHttpClientConnectionManager connectionManager) {
-        log.info("oAuthRestTemplate: resourceDetails: {}", resourceDetails.toString());
-        log.info("oAuthRestTemplate: connectionManager: {}", connectionManager.toString());
+        log.debug("oAuthRestTemplate: resourceDetails: {}", resourceDetails.toString());
+        log.debug("oAuthRestTemplate: connectionManager: {}", connectionManager.toString());
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setConnectionManager(connectionManager)
                 .build();
@@ -108,13 +108,13 @@ public class SecurityConfig {
         AccessTokenRequest atr = new DefaultAccessTokenRequest();
         OAuth2RestTemplate oAuthRestTemplate = new OAuth2RestTemplate(resourceDetails, new DefaultOAuth2ClientContext(atr));
         oAuthRestTemplate.setRequestFactory(requestFactory);
-        log.info("oAuthRestTemplate: oAuthRestTemplate: {}", oAuthRestTemplate.toString());
+        log.debug("oAuthRestTemplate: oAuthRestTemplate: {}", oAuthRestTemplate.toString());
         return oAuthRestTemplate;
     }
 
     @Bean
     public RestTemplate restTemplate() {
-        log.info("restTemplate");
+        log.debug("restTemplate");
         return new RestTemplate();
     }
 }
