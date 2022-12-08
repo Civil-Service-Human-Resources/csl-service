@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.config;
+package uk.gov.cabinetoffice.csl.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.HttpRoute;

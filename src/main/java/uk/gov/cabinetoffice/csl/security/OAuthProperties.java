@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.config;
+package uk.gov.cabinetoffice.csl.security;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
