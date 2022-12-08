@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
@@ -20,8 +19,6 @@ import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResour
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
@@ -32,25 +29,16 @@ import org.springframework.web.client.RestTemplate;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-@EnableWebSecurity
-@EnableResourceServer
-@EnableOAuth2Client
 @Slf4j
 public class SecurityConfig {
-
-    @Bean
-    public RestTemplate restTemplate() {
-        log.info("restTemplate");
-        return new RestTemplate();
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("filterChain: http: {}", http.toString());
         http.cors().and().csrf().disable()
                 .authorizeHttpRequests((authz) -> authz
-                        .antMatchers(HttpMethod.OPTIONS, "/oauth/token").permitAll()
-                        .antMatchers(HttpMethod.GET, "/manage").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/oauth/token").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/manage").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults());
@@ -62,7 +50,7 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         log.info("webSecurityCustomizer()");
-        return (web) -> web.ignoring().antMatchers("/manage");
+        return (web) -> web.ignoring().requestMatchers("/manage");
     }
 
     @Bean
@@ -95,12 +83,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PoolingHttpClientConnectionManager httpClientConnectionManager(OAuthProperties oAuthProperties) {
+    public PoolingHttpClientConnectionManager httpClientConnectionManager(OAuthProperties oAuthProperties) throws Exception {
         log.info("httpClientConnectionManager: oAuthProperties: {}", oAuthProperties.toString());
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(oAuthProperties.getMaxTotalConnections());
         connectionManager.setDefaultMaxPerRoute(oAuthProperties.getDefaultMaxConnectionsPerRoute());
-        HttpHost host = new HttpHost(oAuthProperties.getServiceUrl());
+        HttpHost host = HttpHost.create(oAuthProperties.getServiceUrl());
         connectionManager.setMaxPerRoute(new HttpRoute(host), oAuthProperties.getMaxPerServiceUrl());
         log.info("httpClientConnectionManager: connectionManager: {}", connectionManager.toString());
         return connectionManager;
@@ -122,5 +110,11 @@ public class SecurityConfig {
         oAuthRestTemplate.setRequestFactory(requestFactory);
         log.info("oAuthRestTemplate: oAuthRestTemplate: {}", oAuthRestTemplate.toString());
         return oAuthRestTemplate;
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        log.info("restTemplate");
+        return new RestTemplate();
     }
 }
