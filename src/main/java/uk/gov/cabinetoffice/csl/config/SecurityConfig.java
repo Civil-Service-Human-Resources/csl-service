@@ -11,9 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
@@ -26,35 +25,44 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.web.DefaultSecurityFilterChain;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.client.RestTemplate;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
 @EnableResourceServer
 @EnableOAuth2Client
 @Slf4j
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
     @Bean
     public RestTemplate restTemplate() {
+        log.info("restTemplate");
         return new RestTemplate();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        log.info("configure(HttpSecurity http): {}", http.toString());
-        http.cors().and().csrf().disable().authorizeRequests()
-                .and().authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/oauth/token").permitAll()
-                //.antMatchers(HttpMethod.GET, "/manage").authenticated()
-                .antMatchers(HttpMethod.GET, "/manage").permitAll()
-                .anyRequest().authenticated();
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        log.info("filterChain: http: {}", http.toString());
+        http.cors().and().csrf().disable()
+                .authorizeHttpRequests((authz) -> authz
+                        .antMatchers(HttpMethod.OPTIONS, "/oauth/token").permitAll()
+                        .antMatchers(HttpMethod.GET, "/manage").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(withDefaults());
+        DefaultSecurityFilterChain defaultSecurityFilterChain = http.build();
+        log.info("filterChain: defaultSecurityFilterChain: {}", defaultSecurityFilterChain.toString());
+        return defaultSecurityFilterChain;
     }
 
-    @Override
-    public void configure(WebSecurity webSecurity) throws  Exception {
-        log.info("configure(WebSecurity webSecurity): {}", webSecurity.toString());
-        webSecurity.ignoring().antMatchers(HttpMethod.GET, "/manage");
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        log.info("webSecurityCustomizer()");
+        return (web) -> web.ignoring().antMatchers("/manage");
     }
 
     @Bean
