@@ -1,6 +1,5 @@
 package uk.gov.cabinetoffice.csl.config;
 
-
 import org.apache.http.HttpHost;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -34,11 +33,6 @@ import org.springframework.web.client.RestTemplate;
 @EnableWebSecurity
 @EnableOAuth2Client
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -97,5 +91,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         oAuthRestTemplate.setRequestFactory(requestFactory);
         return oAuthRestTemplate;
     }
-}
 
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
