@@ -1,12 +1,12 @@
 package uk.gov.cabinetoffice.csl.config;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 
 @Data
-@Configuration
+@Component
 @ConfigurationProperties(prefix = "oauth")
 public class OAuthProperties implements Serializable {
 
