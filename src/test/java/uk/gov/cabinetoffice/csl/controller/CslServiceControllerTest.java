@@ -11,7 +11,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(CslServiceController.class)
@@ -24,9 +28,15 @@ public class CslServiceControllerTest {
     @Test
     public void testTest() throws Exception {
         String input = "abc";
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/csl/test/" + input).accept(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        RequestBuilder requestBuilder = buildGet(input);
+        MvcResult result = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
         Assertions.assertEquals(input, result.getResponse().getContentAsString());
+    }
+
+    MockHttpServletRequestBuilder buildGet(String input) {
+        return get("/csl/test/" + input)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON);
     }
 }
 
