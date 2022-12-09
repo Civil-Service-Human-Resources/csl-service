@@ -7,6 +7,7 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -36,11 +37,15 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Value("${management.endpoints.web.base-path}")
+    private String actuatorBasePath;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         log.debug("configure(HttpSecurity http): http: {}", http.toString());
+        log.debug("configure(HttpSecurity http): actuatorBasePath: {}", actuatorBasePath);
         http.csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/health").permitAll()
+                .antMatchers(HttpMethod.GET, actuatorBasePath, actuatorBasePath + "/**").permitAll()
                 .anyRequest().authenticated();
         log.debug("configure(HttpSecurity http): End");
     }
@@ -48,7 +53,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity webSecurity) throws Exception{
         log.debug("configure(WebSecurity webSecurity): webSecurity: {}", webSecurity.toString());
-        webSecurity.ignoring().antMatchers(HttpMethod.GET, "/health");
+        log.debug("configure(WebSecurity webSecurity): actuatorBasePath: {}", actuatorBasePath);
+        webSecurity.ignoring().antMatchers(HttpMethod.GET, actuatorBasePath, actuatorBasePath + "/**");
         log.debug("configure(WebSecurity webSecurity): webSecurity: End");
     }
 
