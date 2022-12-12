@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -19,7 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(CslServiceController.class)
-@WithMockUser
 public class CslServiceControllerTest {
 
     @Autowired
@@ -35,7 +33,7 @@ public class CslServiceControllerTest {
 
     MockHttpServletRequestBuilder buildGet(String input) {
         return get("/csl/test/" + input)
-                .with(csrf())
+                //.with(csrf())
                 .contentType(MediaType.APPLICATION_JSON);
     }
 }

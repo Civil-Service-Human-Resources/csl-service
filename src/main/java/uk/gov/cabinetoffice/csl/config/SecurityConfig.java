@@ -1,8 +1,6 @@
 package uk.gov.cabinetoffice.csl.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpHost;
-import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -40,6 +38,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${management.endpoints.web.base-path}")
     private String actuatorBasePath;
 
+    @Value("${oauth.tokenUrl}")
+    private String tokenUrl;
+
+    @Value("${oauth.clientId}")
+    private String clientId;
+
+    @Value("${oauth.clientSecret}")
+    private String clientSecret;
+
+    @Value("${oauth.jwtKey}")
+    private String jwtKey;
+
+    @Value("${oauth.maxTotalConnections}")
+    private int maxTotalConnections;
+
+    @Value("${oauth.defaultMaxConnectionsPerRoute}")
+    private int defaultMaxConnectionsPerRoute;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         log.debug("configure(HttpSecurity http): http: {}", http.toString());
@@ -59,42 +75,40 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public TokenStore getTokenStore(OAuthProperties oAuthProperties) {
-        log.debug("getTokenStore: oAuthProperties: {}", oAuthProperties.toString());
-        JwtTokenStore jwtTokenStore = new JwtTokenStore(accessTokenConverter(oAuthProperties));
-        log.debug("getTokenStore: jwtTokenStore: {}", oAuthProperties.toString());
+    public TokenStore getTokenStore() {
+        log.debug("getTokenStore: start");
+        JwtTokenStore jwtTokenStore = new JwtTokenStore(accessTokenConverter());
+        log.debug("getTokenStore: jwtTokenStore: {}", jwtTokenStore.toString());
         return jwtTokenStore;
     }
 
     @Bean
-    public JwtAccessTokenConverter accessTokenConverter(OAuthProperties oAuthProperties) {
-        log.debug("accessTokenConverter: oAuthProperties: {}", oAuthProperties.toString());
+    public JwtAccessTokenConverter accessTokenConverter() {
+        log.debug("accessTokenConverter: start");
         JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
-        jwtAccessTokenConverter.setSigningKey(oAuthProperties.getJwtKey());
+        jwtAccessTokenConverter.setSigningKey(this.jwtKey);
         log.debug("accessTokenConverter: jwtAccessTokenConverter: {}", jwtAccessTokenConverter.toString());
         return jwtAccessTokenConverter;
     }
 
     @Bean
-    public OAuth2ProtectedResourceDetails resourceDetails(OAuthProperties oAuthProperties) {
-        log.debug("resourceDetails: oAuthProperties: {}", oAuthProperties.toString());
+    public OAuth2ProtectedResourceDetails resourceDetails() {
+        log.debug("resourceDetails: start");
         ClientCredentialsResourceDetails resource = new ClientCredentialsResourceDetails();
         resource.setId("identity");
-        resource.setAccessTokenUri(oAuthProperties.getTokenUrl());
-        resource.setClientId(oAuthProperties.getClientId());
-        resource.setClientSecret(oAuthProperties.getClientSecret());
+        resource.setAccessTokenUri(tokenUrl);
+        resource.setClientId(clientId);
+        resource.setClientSecret(clientSecret);
         log.debug("resourceDetails: resource: {}", resource.toString());
         return resource;
     }
 
     @Bean
-    public PoolingHttpClientConnectionManager httpClientConnectionManager(OAuthProperties oAuthProperties) {
-        log.debug("httpClientConnectionManager: oAuthProperties: {}", oAuthProperties.toString());
+    public PoolingHttpClientConnectionManager httpClientConnectionManager() {
+        log.debug("httpClientConnectionManager: start");
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(oAuthProperties.getMaxTotalConnections());
-        connectionManager.setDefaultMaxPerRoute(oAuthProperties.getDefaultMaxConnectionsPerRoute());
-        HttpHost host = new HttpHost(oAuthProperties.getServiceUrl());
-        connectionManager.setMaxPerRoute(new HttpRoute(host), oAuthProperties.getMaxPerServiceUrl());
+        connectionManager.setMaxTotal(this.maxTotalConnections);
+        connectionManager.setDefaultMaxPerRoute(this.defaultMaxConnectionsPerRoute);
         log.debug("httpClientConnectionManager: connectionManager: {}", connectionManager.toString());
         return connectionManager;
     }
