@@ -24,7 +24,7 @@ steps:
       publishJUnitResults: false
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
       goals: 'package'
-    displayName: 'Clean and Install Maven and Java 17'
+    displayName: 'Install Maven@4 and Java@17 and package'
 
   - task: Docker@2
     inputs:
@@ -36,4 +36,3 @@ steps:
       command: 'buildAndPush'
       Dockerfile: '**/Dockerfile'
       tags: '$(Build.SourceBranchName)'
-
