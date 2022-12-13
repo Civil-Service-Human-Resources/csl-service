@@ -1,0 +1,330 @@
+{
+	"info": {
+		"_postman_id": "0d12eb0e-ca5c-4ed3-a9a0-3ef59d0054ae",
+		"name": "csl-service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "api",
+			"item": [
+				{
+					"name": "test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{csl-base-url}}/csl/test/abc",
+							"host": [
+								"{{csl-base-url}}"
+							],
+							"path": [
+								"csl",
+								"test",
+								"abc"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "actuator",
+			"item": [
+				{
+					"name": "actuator",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/beans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/beans",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"beans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/caches",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/caches",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"caches"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/conditions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/conditions",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"conditions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/configprops",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/configprops",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"configprops"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/env",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/env",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"env"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/health",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/heapdump",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/heapdump",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"heapdump"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/info",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/loggers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/loggers",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"loggers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/mappings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/mappings",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"mappings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/metrics",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"metrics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/scheduledtasks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/scheduledtasks",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"scheduledtasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/threaddump",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/threaddump",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"threaddump"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "csl-service-security-password",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "csl-service-security-user",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "local-csl-base-url",
+			"value": "http://localhost:9003/csl-service",
+			"type": "default"
+		},
+		{
+			"key": "remote-csl-base-url",
+			"value": "http://remote-host:remote-port/csl-service",
+			"type": "default"
+		},
+		{
+			"key": "csl-base-url",
+			"value": "{{local-csl-base-url}}",
+			"type": "default"
+		},
+		{
+			"key": "actuator-csl-base-url",
+			"value": "{{csl-base-url}}/manage",
+			"type": "default"
+		}
+	]
+}
