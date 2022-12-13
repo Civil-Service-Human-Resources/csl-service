@@ -1,0 +1,39 @@
+trigger:
+  branches:
+    include:
+      - master
+      - idt-develop
+      - idt-feature-LC-*
+      - idt-release-v*
+      - idt-hotfix-v*
+  tags:
+    include:
+      - '*'
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: Maven@4
+    inputs:
+      mavenPOMFile: 'pom.xml'
+      mavenVersionOption: 'Default'
+      jdkVersionOption: '1.17'
+      javaHomeOption: 'JDKVersion'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: false
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      goals: 'package'
+    displayName: 'Clean and Install Maven and Java 17'
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'lpgregistry ACR'
+      ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags') }}:
+        repository: 'csl-service/prod'
+      ${{ else }}:
+        repository: 'csl-service/test'
+      command: 'buildAndPush'
+      Dockerfile: '**/Dockerfile'
+      tags: '$(Build.SourceBranchName)'
+
