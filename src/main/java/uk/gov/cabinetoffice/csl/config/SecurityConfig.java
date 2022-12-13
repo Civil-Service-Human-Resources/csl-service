@@ -8,10 +8,8 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
@@ -61,17 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         log.debug("configure(HttpSecurity http): http: {}", http.toString());
         log.debug("configure(HttpSecurity http): actuatorBasePath: {}", actuatorBasePath);
         http.csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.GET, actuatorBasePath, actuatorBasePath + "/**").permitAll()
                 .anyRequest().authenticated();
         log.debug("configure(HttpSecurity http): End");
-    }
-
-    @Override
-    public void configure(WebSecurity webSecurity) throws Exception{
-        log.debug("configure(WebSecurity webSecurity): webSecurity: {}", webSecurity.toString());
-        log.debug("configure(WebSecurity webSecurity): actuatorBasePath: {}", actuatorBasePath);
-        webSecurity.ignoring().antMatchers(HttpMethod.GET, actuatorBasePath, actuatorBasePath + "/**");
-        log.debug("configure(WebSecurity webSecurity): webSecurity: End");
     }
 
     @Bean
