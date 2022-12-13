@@ -12,32 +12,24 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = CslServiceController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 @AutoConfigureMockMvc(addFilters = false)
 @RunWith(SpringRunner.class)
-//@AutoConfigureMockMvc(secure = false)
 public class CslServiceControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     public void testTest() throws Exception {
         String input = "abc";
-        RequestBuilder requestBuilder = buildGet(input);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/csl/test/" + input).accept(MediaType.APPLICATION_JSON);
         MvcResult result = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
         Assertions.assertEquals(input, result.getResponse().getContentAsString());
-    }
-
-    MockHttpServletRequestBuilder buildGet(String input) {
-        return get("/csl/test/" + input)
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON);
     }
 }
 
