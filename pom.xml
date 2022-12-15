@@ -101,19 +101,9 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.5.14</version>
-		</dependency>
-		<dependency>
-			<groupId>jakarta.xml.bind</groupId>
-			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>2.3.3</version>
-		</dependency>
-		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-ri</artifactId>
-			<version>2.3.3</version>
+			<version>2.3.7</version>
 			<type>pom</type>
 		</dependency>
 		<dependency>

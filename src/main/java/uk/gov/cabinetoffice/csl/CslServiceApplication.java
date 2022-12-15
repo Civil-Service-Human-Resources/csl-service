@@ -9,5 +9,4 @@ public class CslServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CslServiceApplication.class, args);
 	}
-
 }

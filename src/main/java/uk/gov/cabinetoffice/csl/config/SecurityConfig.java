@@ -1,17 +1,13 @@
 package uk.gov.cabinetoffice.csl.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
@@ -48,17 +44,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${oauth.jwtKey}")
     private String jwtKey;
 
-    @Value("${oauth.maxTotalConnections}")
-    private int maxTotalConnections;
-
-    @Value("${oauth.defaultMaxConnectionsPerRoute}")
-    private int defaultMaxConnectionsPerRoute;
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         log.debug("configure(HttpSecurity http): http: {}", http.toString());
         log.debug("configure(HttpSecurity http): actuatorBasePath: {}", actuatorBasePath);
-        http.csrf().disable().authorizeRequests()
+        http.csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
                 .anyRequest().authenticated();
         log.debug("configure(HttpSecurity http): End");
     }
@@ -93,30 +86,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PoolingHttpClientConnectionManager httpClientConnectionManager() {
-        log.debug("httpClientConnectionManager: start");
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(this.maxTotalConnections);
-        connectionManager.setDefaultMaxPerRoute(this.defaultMaxConnectionsPerRoute);
-        log.debug("httpClientConnectionManager: connectionManager: {}", connectionManager.toString());
-        return connectionManager;
-    }
-
-    @Bean
-    public OAuth2RestOperations oAuthRestTemplate(OAuth2ProtectedResourceDetails resourceDetails, PoolingHttpClientConnectionManager connectionManager) {
-        log.debug("oAuthRestTemplate: resourceDetails: {}", resourceDetails.toString());
-        log.debug("oAuthRestTemplate: connectionManager: {}", connectionManager.toString());
-        CloseableHttpClient httpClient = HttpClients.custom()
-                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                .setConnectionManager(connectionManager)
-                .build();
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setHttpClient(httpClient);
+    public OAuth2RestOperations oAuthRestTemplate(OAuth2ProtectedResourceDetails resourceDetails) {
         AccessTokenRequest atr = new DefaultAccessTokenRequest();
-        OAuth2RestTemplate oAuthRestTemplate = new OAuth2RestTemplate(resourceDetails, new DefaultOAuth2ClientContext(atr));
-        oAuthRestTemplate.setRequestFactory(requestFactory);
-        log.debug("oAuthRestTemplate: oAuthRestTemplate: {}", oAuthRestTemplate.toString());
-        return oAuthRestTemplate;
+        return new OAuth2RestTemplate(resourceDetails, new DefaultOAuth2ClientContext(atr));
     }
 
     @Bean

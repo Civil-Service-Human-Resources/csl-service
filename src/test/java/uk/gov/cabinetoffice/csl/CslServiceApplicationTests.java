@@ -17,11 +17,7 @@ class CslServiceApplicationTests {
 	private ConfigurableApplicationContext context;
 
 	@Test
-	void contextLoads() {
-	}
-
-	@Test
-	public void test() {
+	void testApplicationContextActive() {
 		assertTrue(context.isActive());
 	}
 }
