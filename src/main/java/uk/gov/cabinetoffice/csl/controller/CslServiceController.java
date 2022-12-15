@@ -27,12 +27,12 @@ public class CslServiceController {
             log.debug("Is authenticated?: {}", authentication.isAuthenticated());
             log.debug("Authentication principal: {}", authentication.getPrincipal());
             log.debug("Authentication name: {}", authentication.getName());
-            OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails)authentication.getDetails();
-            log.debug("Token Type: {}", details.getTokenType());
-            log.debug("Token Value: {}", details.getTokenValue());
-            List<GrantedAuthority> authorities = (List<GrantedAuthority>)authentication.getAuthorities();
-            log.debug("Authorities: {}", authorities);
-            authorities.forEach(a -> log.debug("Authority: {}", a.getAuthority()));
+            OAuth2AuthenticationDetails authenticationDetails = (OAuth2AuthenticationDetails)authentication.getDetails();
+            log.debug("Token Type: {}", authenticationDetails.getTokenType());
+            log.debug("Token Value: {}", authenticationDetails.getTokenValue());
+            List<GrantedAuthority> grantedAuthorities = (List<GrantedAuthority>)authentication.getAuthorities();
+            log.debug("Authorities: {}", grantedAuthorities);
+            grantedAuthorities.forEach(ga -> log.debug("Authority: {}", ga.getAuthority()));
         }
         return new ResponseEntity<>(input, OK);
     }
