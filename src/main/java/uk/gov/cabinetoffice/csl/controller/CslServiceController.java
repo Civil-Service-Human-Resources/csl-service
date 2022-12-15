@@ -30,6 +30,7 @@ public class CslServiceController {
             OAuth2AuthenticationDetails authenticationDetails = (OAuth2AuthenticationDetails)authentication.getDetails();
             log.debug("Token Type: {}", authenticationDetails.getTokenType());
             log.debug("Token Value: {}", authenticationDetails.getTokenValue());
+            log.debug("Decoded Details: {}", authenticationDetails.getDecodedDetails());
             List<GrantedAuthority> grantedAuthorities = (List<GrantedAuthority>)authentication.getAuthorities();
             log.debug("Authorities: {}", grantedAuthorities);
             grantedAuthorities.forEach(ga -> log.debug("Authority: {}", ga.getAuthority()));
