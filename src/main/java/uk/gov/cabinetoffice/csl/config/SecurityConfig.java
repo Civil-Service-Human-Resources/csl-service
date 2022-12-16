@@ -1,126 +1,51 @@
 package uk.gov.cabinetoffice.csl.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
-import org.springframework.security.oauth2.client.OAuth2RestOperations;
-import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
-import org.springframework.security.oauth2.client.token.AccessTokenRequest;
-import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
-import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.web.DefaultSecurityFilterChain;
+import org.springframework.security.web.SecurityFilterChain;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
-@EnableResourceServer
-@EnableWebSecurity
-@EnableOAuth2Client
 @Slf4j
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Value("${management.endpoints.web.base-path}")
-    private String actuatorBasePath;
-
-    @Value("${oauth.tokenUrl}")
-    private String tokenUrl;
-
-    @Value("${oauth.clientId}")
-    private String clientId;
-
-    @Value("${oauth.clientSecret}")
-    private String clientSecret;
+public class SecurityConfig {
 
     @Value("${oauth.jwtKey}")
     private String jwtKey;
 
-    @Value("${oauth.maxTotalConnections}")
-    private int maxTotalConnections;
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        log.debug("filterChain: http: {}", http.toString());
+        http.cors().and().csrf().disable()
+                .authorizeHttpRequests((authz) -> authz
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .oauth2ResourceServer()
+                .jwt(jwtSpec -> {jwtSpec.decoder(jwtDecoder());});
 
-    @Value("${oauth.defaultMaxConnectionsPerRoute}")
-    private int defaultMaxConnectionsPerRoute;
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        log.debug("configure(HttpSecurity http): http: {}", http.toString());
-        log.debug("configure(HttpSecurity http): actuatorBasePath: {}", actuatorBasePath);
-        http.csrf().disable().authorizeRequests()
-                .anyRequest().authenticated();
-        log.debug("configure(HttpSecurity http): End");
+        DefaultSecurityFilterChain defaultSecurityFilterChain = http.build();
+        log.debug("filterChain: defaultSecurityFilterChain: {}", defaultSecurityFilterChain.toString());
+        return defaultSecurityFilterChain;
     }
 
     @Bean
-    public TokenStore getTokenStore() {
-        log.debug("getTokenStore: start");
-        JwtTokenStore jwtTokenStore = new JwtTokenStore(accessTokenConverter());
-        log.debug("getTokenStore: jwtTokenStore: {}", jwtTokenStore.toString());
-        return jwtTokenStore;
-    }
-
-    @Bean
-    public JwtAccessTokenConverter accessTokenConverter() {
-        log.debug("accessTokenConverter: start");
-        JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
-        jwtAccessTokenConverter.setSigningKey(this.jwtKey);
-        log.debug("accessTokenConverter: jwtAccessTokenConverter: {}", jwtAccessTokenConverter.toString());
-        return jwtAccessTokenConverter;
-    }
-
-    @Bean
-    public OAuth2ProtectedResourceDetails resourceDetails() {
-        log.debug("resourceDetails: start");
-        ClientCredentialsResourceDetails resource = new ClientCredentialsResourceDetails();
-        resource.setId("identity");
-        resource.setAccessTokenUri(tokenUrl);
-        resource.setClientId(clientId);
-        resource.setClientSecret(clientSecret);
-        log.debug("resourceDetails: resource: {}", resource.toString());
-        return resource;
-    }
-
-    @Bean
-    public PoolingHttpClientConnectionManager httpClientConnectionManager() {
-        log.debug("httpClientConnectionManager: start");
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(this.maxTotalConnections);
-        connectionManager.setDefaultMaxPerRoute(this.defaultMaxConnectionsPerRoute);
-        log.debug("httpClientConnectionManager: connectionManager: {}", connectionManager.toString());
-        return connectionManager;
-    }
-
-    @Bean
-    public OAuth2RestOperations oAuthRestTemplate(OAuth2ProtectedResourceDetails resourceDetails, PoolingHttpClientConnectionManager connectionManager) {
-        log.debug("oAuthRestTemplate: resourceDetails: {}", resourceDetails.toString());
-        log.debug("oAuthRestTemplate: connectionManager: {}", connectionManager.toString());
-        CloseableHttpClient httpClient = HttpClients.custom()
-                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                .setConnectionManager(connectionManager)
+    public JwtDecoder jwtDecoder() {
+        SecretKey secretKey = new SecretKeySpec(jwtKey.getBytes(), "HMACSHA256");
+        return NimbusJwtDecoder
+                .withSecretKey(secretKey)
+                .macAlgorithm(MacAlgorithm.HS256)
                 .build();
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setHttpClient(httpClient);
-        AccessTokenRequest atr = new DefaultAccessTokenRequest();
-        OAuth2RestTemplate oAuthRestTemplate = new OAuth2RestTemplate(resourceDetails, new DefaultOAuth2ClientContext(atr));
-        oAuthRestTemplate.setRequestFactory(requestFactory);
-        log.debug("oAuthRestTemplate: oAuthRestTemplate: {}", oAuthRestTemplate.toString());
-        return oAuthRestTemplate;
-    }
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
     }
 }
