@@ -32,4 +32,3 @@ public class CslServiceControllerTest {
         Assertions.assertEquals(input, result.getResponse().getContentAsString());
     }
 }
-
