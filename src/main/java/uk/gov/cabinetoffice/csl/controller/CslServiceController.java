@@ -18,10 +18,10 @@ public class CslServiceController {
     @GetMapping(path = "/test/{input}", produces = "application/json")
     public ResponseEntity<String> test(@PathVariable("input") String input, Authentication authentication) {
         log.debug("Input: {}", input);
-        log.debug("authentication: {}", authentication);
+        log.debug("Authentication: {}", authentication);
         if(authentication != null) {
             Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-            log.debug("Is authenticated?: {}", authentication.isAuthenticated());
+            log.debug("Authenticated?: {}", authentication.isAuthenticated());
             log.debug("Authentication jwtPrincipal: {}", jwtPrincipal);
             log.debug("Authentication jwtPrincipal Claims: {}", jwtPrincipal.getClaims());
             log.debug("Authentication jwtPrincipal Headers: {}",  jwtPrincipal.getHeaders());
