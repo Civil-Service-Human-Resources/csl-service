@@ -9,7 +9,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.SecretKey;
@@ -24,20 +23,15 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        log.debug("filterChain: http: {}", http.toString());
-        http.cors().and().csrf().disable()
-                .authorizeHttpRequests((authz) -> authz
-                        .anyRequest().authenticated()
-                )
+        return http.cors().and().csrf().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .oauth2ResourceServer()
-                .jwt(jwtSpec -> {jwtSpec.decoder(jwtDecoder());});
-
-        DefaultSecurityFilterChain defaultSecurityFilterChain = http.build();
-        log.debug("filterChain: defaultSecurityFilterChain: {}", defaultSecurityFilterChain.toString());
-        return defaultSecurityFilterChain;
+                .jwt(jwtSpec -> jwtSpec.decoder(jwtDecoder()))
+                .and()
+                .build();
     }
 
     @Bean
