@@ -13,6 +13,7 @@ For further reference, please consider the following sections:
 * [Spring Session](https://docs.spring.io/spring-session/reference/)
 * [Spring HATEOAS](https://docs.spring.io/spring-boot/docs/3.0.0/reference/htmlsingle/#web.spring-hateoas)
 * [Spring Security](https://docs.spring.io/spring-boot/docs/3.0.0/reference/htmlsingle/#web.security)
+* [OAuth2 Resource Server](https://docs.spring.io/spring-boot/docs/3.0.0/reference/htmlsingle/#web.security.oauth2.server)
 * [OAuth2 Client](https://docs.spring.io/spring-boot/docs/3.0.0/reference/htmlsingle/#web.security.oauth2.client)
 * [Spring Boot Actuator](https://docs.spring.io/spring-boot/docs/3.0.0/reference/htmlsingle/#actuator)
 * [Spring REST Docs](https://docs.spring.io/spring-restdocs/docs/current/reference/htmlsingle/)
