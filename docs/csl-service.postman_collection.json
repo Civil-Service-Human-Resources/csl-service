@@ -51,7 +51,7 @@
 								},
 								{
 									"key": "username",
-									"value": "neeraj.jain1@cabinetoffice.gov.uk",
+									"value": "test@cabinetoffice.gov.uk",
 									"type": "text"
 								},
 								{
@@ -84,7 +84,7 @@
 							"formdata": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNjI2MzUxODk4LCJhdXRob3JpdGllcyI6WyJDTElFTlQiXSwianRpIjoiMzdiNTgxNTQtYmVmNy00NTFmLTk0ZGMtMDg4ZGJiZDg0OWQ2IiwiY2xpZW50X2lkIjoiOWZiZDRhZTItMmRiMy00NGM4LTk1NDQtODhlODAyNTViNTZlIn0.svXvpVQW9QVnXvxUXPciBp8oVNj0g6bc-nYQvlxgrPo",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzExOTg2MjksInVzZXJfbmFtZSI6ImY0MDY2NDNiLTg1NzgtMTFlYS1hMTlmLTljYjljYmNkYTFjMSIsImF1dGhvcml0aWVzIjpbIklERU5USVRZX01BTkFHRVIiLCJMRUFSTkVSIiwiQ1NIUl9SRVBPUlRFUiIsIlBST0ZFU1NJT05fTUFOQUdFUiIsIkRPV05MT0FEX0JPT0tJTkdfRkVFRCIsIk9SR0FOSVNBVElPTl9NQU5BR0VSIiwiTEVBUk5JTkdfTUFOQUdFUiJdLCJqdGkiOiI0YzdmNWRmNC1kZjdjLTRlNWUtOTM4MC1hYzU0ZTliNjc5ODciLCJjbGllbnRfaWQiOiI5ZmJkNGFlMi0yZGIzLTQ0YzgtOTU0NC04OGU4MDI1NWI1NmUiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXX0.MxN3LtWwVIAtUMfAhU373be1VFyol_7lg9amYmrOP8U",
 									"type": "text"
 								}
 							]
@@ -103,48 +103,7 @@
 					"response": []
 				},
 				{
-					"name": "4. Resolve Token",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjY0MzMwNTMsInVzZXJfbmFtZSI6ImY0MDY2NDNiLTg1NzgtMTFlYS1hMTlmLTljYjljYmNkYTFjMSIsImF1dGhvcml0aWVzIjpbIklERU5USVRZX01BTkFHRVIiLCJMRUFSTkVSIiwiQ1NIUl9SRVBPUlRFUiIsIlBST0ZFU1NJT05fTUFOQUdFUiIsIkRPV05MT0FEX0JPT0tJTkdfRkVFRCIsIk9SR0FOSVNBVElPTl9NQU5BR0VSIiwiTEVBUk5JTkdfTUFOQUdFUiJdLCJqdGkiOiJlOThhZDJjMC0yNDRiLTQ2YzQtYTgyYS04YmNjZmVlMzc3MzEiLCJjbGllbnRfaWQiOiI5ZmJkNGFlMi0yZGIzLTQ0YzgtOTU0NC04OGU4MDI1NWI1NmUiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXX0.YsEZt19OY3JLULKg0VL_3WjatC6USNCvsArvrDYGdJU",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNjI2MzUyMTM3LCJhdXRob3JpdGllcyI6WyJDTElFTlQiXSwianRpIjoiNzA1MGVhNGItNGI0MS00MTQwLTkzMjYtYzUzNDA5YWE3YWViIiwiY2xpZW50X2lkIjoiOWZiZDRhZTItMmRiMy00NGM4LTk1NDQtODhlODAyNTViNTZlIn0.7jL_yWnourzjDbq_lhoGOMe50C2rk9NSI4BAQa_sde4",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{identity-base-url}}/oauth/resolve",
-							"host": [
-								"{{identity-base-url}}"
-							],
-							"path": [
-								"oauth",
-								"resolve"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "5. Revoke Token",
+					"name": "4. Revoke Token",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -166,34 +125,6 @@
 							"path": [
 								"oauth",
 								"revoke"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "6. Logout",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjY0MzU1NTAsInVzZXJfbmFtZSI6ImY0MDY2NDNiLTg1NzgtMTFlYS1hMTlmLTljYjljYmNkYTFjMSIsImF1dGhvcml0aWVzIjpbIklERU5USVRZX01BTkFHRVIiLCJMRUFSTkVSIiwiQ1NIUl9SRVBPUlRFUiIsIlBST0ZFU1NJT05fTUFOQUdFUiIsIkRPV05MT0FEX0JPT0tJTkdfRkVFRCIsIkxFQVJOSU5HX01BTkFHRVIiLCJPUkdBTklTQVRJT05fTUFOQUdFUiJdLCJqdGkiOiJiNjkzNjJlYS1iZmQyLTRkOGUtYTMwNy00ZDAxNjdhZGM5MDciLCJjbGllbnRfaWQiOiI5ZmJkNGFlMi0yZGIzLTQ0YzgtOTU0NC04OGU4MDI1NWI1NmUiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXX0.wqtjGTvNNaHlc3DOfiu29rlCeDYjQpovzQprB0ESVyE1234",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{identity-base-url}}/oauth/logout",
-							"host": [
-								"{{identity-base-url}}"
-							],
-							"path": [
-								"oauth",
-								"logout"
 							]
 						}
 					},
