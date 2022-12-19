@@ -24,11 +24,11 @@ Run the application either using IDE e.g. Intellij or Maven or Docker as follows
 * Intellij: Use any one of the following option:
   * `` Run -> Run 'CslServiceApplication' ``
   * `` Run -> Debug 'CslServiceApplication' ``
- 
+
 * Maven:
   * `` ./mvnw clean install ``
   * `` ./mvnw spring-boot:run ``
- 
+
 * Docker:
     * `` docker build -t csl-service-tag . ``
     * `` docker run -it --rm -p 9003:9003 csl-service-tag ``
@@ -36,7 +36,7 @@ Run the application either using IDE e.g. Intellij or Maven or Docker as follows
 ### REST Endpoints:
 
 * A postman collection is [available here](docs/csl-service.postman_collection.json) for the following:
-  
+
   * Generating oAuth2.0 token using identity-service.
   * Actuator Endpoints.
   * Test Endpoint.
