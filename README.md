@@ -5,7 +5,7 @@ CSL Business logic API service which:
 * Exposes secured endpoints (Endpoints are secured using oAuth2.0 token created using csl identity-service).
 * Actuator is included to monitor the application health and other runtime parameters.
 * Accepts requests from CSL UI.
-* Calls Rustici engine and other CSL backend applications to creat the business response.
+* Calls Rustici engine and other CSL backend applications to create the business response.
 
 ### Build using:
 
@@ -13,7 +13,7 @@ CSL Business logic API service which:
 * [Spring Boot 3.0](docs/HELP.md)
 * Maven Wrapper 3.8.6
 * Docker 4.15.0
-* Other dependencies are [available here](pom.xml).
+* Other dependencies are [available here](pom.xml)
 
 ### Running Locally:
 
