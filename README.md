@@ -2,9 +2,10 @@
 
 CSL Business logic API service which:
 
-* Accepts requests from CSL UI
-* Exposes secured endpoints (Endpoints are secured using oAuth2.0 token created using csl identity-service)
-* Actuator is included to monitor the application health and other runtime parameters
+* Exposes secured endpoints (Endpoints are secured using oAuth2.0 token created using csl identity-service).
+* Actuator is included to monitor the application health and other runtime parameters.
+* Accepts requests from CSL UI.
+* Calls Rustici engine and other CSL backend applications to creat the business response.
 
 ### Build using:
 
@@ -20,7 +21,7 @@ The application requires Java 17 installed to build and run.
 
 Run the application either using IDE e.g. Intellij or Maven or Docker as follows:
 
-* Intellij: Use any one of the following option
+* Intellij: Use any one of the following option:
   * `` Run -> Run 'CslServiceApplication' ``
   * `` Run -> Debug 'CslServiceApplication' ``
  
@@ -36,11 +37,11 @@ Run the application either using IDE e.g. Intellij or Maven or Docker as follows
 
 * A postman collection is [available here](docs/csl-service.postman_collection.json) for the following:
   
-  * Generating oAuth2.0 token using identity-service
-  * Actuator Endpoints
-  * Test Endpoint
+  * Generating oAuth2.0 token using identity-service.
+  * Actuator Endpoints.
+  * Test Endpoint.
 
 ### Azure Build Pipeline:
 
-Azure build pipeline is used for the docker container build for the deployment in higher environment.
-Azure build pipeline configuration is [included here](azure-pipelines.yml).
+* Azure build pipeline is used for the docker container build for the deployment in higher environment.
+* Azure build pipeline configuration is [included here](azure-pipelines.yml).
