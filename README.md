@@ -1,11 +1,14 @@
 # csl-service
 
-CSL Business logic API service which:
+CSL service is a a business logic API service. It is intended to be a singular point for managing all of the data coming into and
+going out of the learner record API; as well as business logic related to Rustici.
+
+This service includes the following technical implementation:
 
 * Exposes secured endpoints (Endpoints are secured using oAuth2.0 token created using csl identity-service).
 * Actuator is included to monitor the application health and other runtime parameters.
 * Accepts requests from CSL UI.
-* Calls Rustici engine and other CSL backend applications to create the business response.
+* Calls Rustici engine and other CSL backend applications to process the data and create the business response.
 
 ### Build using:
 

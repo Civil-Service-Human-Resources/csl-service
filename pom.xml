@@ -157,7 +157,7 @@
 				</executions>
 				<configuration>
 					<additionalProperties>
-						<custom.additional-info-1>additional-info-1</custom.additional-info-1>
+						<custom.additional-build-info>Additional build info here</custom.additional-build-info>
 					</additionalProperties>
 					<excludes>
 						<exclude>
