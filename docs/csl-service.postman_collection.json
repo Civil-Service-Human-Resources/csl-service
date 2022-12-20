@@ -6,31 +6,169 @@
 	},
 	"item": [
 		{
-			"name": "api",
+			"name": "1. bearer-token",
 			"item": [
 				{
-					"name": "test",
+					"name": "1. Generate Service Token",
 					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{identity-base-url}}/oauth/token",
+							"host": [
+								"{{identity-base-url}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Generate User Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "test@cabinetoffice.gov.uk",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Password123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{identity-base-url}}/oauth/token",
+							"host": [
+								"{{identity-base-url}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Check Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzEyODI2NDgsInVzZXJfbmFtZSI6Ijg0NTE5MDdiLTUwMWQtNDk0Ni1hNWFiLWQ3Mzc2YTJhNGZmOSIsImF1dGhvcml0aWVzIjpbIkxFQVJORVIiXSwianRpIjoiZmE5MzI5MjUtMzY2Mi00ZWNkLTg5ZmItMzQzMTY2MmIwZWZjIiwiY2xpZW50X2lkIjoiOWZiZDRhZTItMmRiMy00NGM4LTk1NDQtODhlODAyNTViNTZlIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl19.ygEheQLMSKstJCue9b-Eh5Gy9A8W8W74y6rMCz1L5rM",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{identity-base-url}}/oauth/check_token",
+							"host": [
+								"{{identity-base-url}}"
+							],
+							"path": [
+								"oauth",
+								"check_token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Revoke Token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNjI2NDM1Njg4LCJhdXRob3JpdGllcyI6WyJDTElFTlQiXSwianRpIjoiNGU4NTAzOTItOGY5My00ZTYxLTk5NmMtOWU4MTQ2ODViODdmIiwiY2xpZW50X2lkIjoiOWZiZDRhZTItMmRiMy00NGM4LTk1NDQtODhlODAyNTViNTZlIn0.AZRABZtL1QL-y-GfnxSG90waHzlmZLDErpfHW3jJSGA",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{csl-base-url}}/csl/test/abc",
+							"raw": "{{identity-base-url}}/oauth/revoke",
 							"host": [
-								"{{csl-base-url}}"
+								"{{identity-base-url}}"
 							],
 							"path": [
-								"csl",
-								"test",
-								"abc"
+								"oauth",
+								"revoke"
 							]
 						}
 					},
 					"response": []
 				}
+			],
+			"auth": {
+				"type": "basic",
+				"basic": [
+					{
+						"key": "password",
+						"value": "test",
+						"type": "string"
+					},
+					{
+						"key": "username",
+						"value": "9fbd4ae2-2db3-44c8-9544-88e80255b56e",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
 			]
 		},
 		{
-			"name": "actuator",
+			"name": "2. actuator",
 			"item": [
 				{
 					"name": "actuator",
@@ -267,20 +405,59 @@
 					},
 					"response": []
 				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "3. api",
+			"item": [
+				{
+					"name": "test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{csl-base-url}}/csl/test/abc",
+							"host": [
+								"{{csl-base-url}}"
+							],
+							"path": [
+								"csl",
+								"test",
+								"abc"
+							]
+						}
+					},
+					"response": []
+				}
 			]
 		}
 	],
 	"auth": {
-		"type": "basic",
-		"basic": [
+		"type": "oauth2",
+		"oauth2": [
 			{
-				"key": "password",
-				"value": "csl-service-security-password",
-				"type": "string"
-			},
-			{
-				"key": "username",
-				"value": "csl-service-security-user",
+				"key": "addTokenTo",
+				"value": "header",
 				"type": "string"
 			}
 		]
@@ -307,23 +484,33 @@
 	],
 	"variable": [
 		{
-			"key": "local-csl-base-url",
-			"value": "http://localhost:9003/csl-service",
-			"type": "default"
-		},
-		{
-			"key": "remote-csl-base-url",
-			"value": "http://remote-host:remote-port/csl-service",
-			"type": "default"
-		},
-		{
 			"key": "csl-base-url",
-			"value": "{{local-csl-base-url}}",
+			"value": "{{local-csl-base-url}}/csl-service",
 			"type": "default"
 		},
 		{
 			"key": "actuator-csl-base-url",
 			"value": "{{csl-base-url}}/manage",
+			"type": "default"
+		},
+		{
+			"key": "local-csl-base-url",
+			"value": "http://localhost:9003",
+			"type": "default"
+		},
+		{
+			"key": "identity-base-url",
+			"value": "{{remote-identity-base-url}}",
+			"type": "default"
+		},
+		{
+			"key": "local-identity-base-url",
+			"value": "http://localhost:8080",
+			"type": "default"
+		},
+		{
+			"key": "remote-identity-base-url",
+			"value": "https://identity.performance.learn.civilservice.gov.uk",
 			"type": "default"
 		}
 	]
