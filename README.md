@@ -16,7 +16,7 @@ This service includes the following technical implementation:
 * [Spring Boot 3.0](docs/HELP.md)
 * Maven Wrapper 3.8.6
 * Docker 4.15.0
-* Other dependencies are [available here](pom.xml)
+* Other dependencies are available in [pom.xml](pom.xml)
 
 ### Running Locally:
 
@@ -38,7 +38,7 @@ Run the application either using IDE e.g. Intellij or Maven or Docker as follows
 
 ### REST Endpoints:
 
-* A postman collection is [available here](docs/csl-service.postman_collection.json) for the following:
+* A postman collection is available in [docs/csl-service.postman_collection.json file](docs/csl-service.postman_collection.json) for the following:
 
   * Generating oAuth2.0 token using identity-service.
   * Actuator Endpoints.
@@ -47,4 +47,4 @@ Run the application either using IDE e.g. Intellij or Maven or Docker as follows
 ### Azure Build Pipeline:
 
 * Azure build pipeline is used for the docker container build for the deployment in higher environment.
-* Azure build pipeline configuration is [included here](azure-pipelines.yml).
+* Azure build pipeline configuration is available in [azure-pipeline.yml file](azure-pipelines.yml).
