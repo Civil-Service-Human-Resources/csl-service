@@ -38,7 +38,7 @@ Run the application either using IDE e.g. Intellij or Maven or Docker as follows
 
 ### REST Endpoints:
 
-* A postman collection is available in [docs/csl-service.postman_collection.json file](docs/csl-service.postman_collection.json) for the following:
+* A postman collection is available in [docs/csl-service.postman_collection.json](docs/csl-service.postman_collection.json) file for the following:
 
   * Generating oAuth2.0 token using identity-service.
   * Actuator Endpoints.
@@ -47,4 +47,4 @@ Run the application either using IDE e.g. Intellij or Maven or Docker as follows
 ### Azure Build Pipeline:
 
 * Azure build pipeline is used for the docker container build for the deployment in higher environment.
-* Azure build pipeline configuration is available in [azure-pipeline.yml file](azure-pipelines.yml).
+* Azure build pipeline configuration is available in [azure-pipeline.yml](azure-pipelines.yml) file.
