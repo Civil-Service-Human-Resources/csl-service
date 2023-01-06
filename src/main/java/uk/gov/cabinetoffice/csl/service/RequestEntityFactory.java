@@ -20,6 +20,7 @@ import java.util.List;
 @Slf4j
 @Component
 public class RequestEntityFactory {
+
     @Value("${oauth.clientId}")
     private String clientId;
 
