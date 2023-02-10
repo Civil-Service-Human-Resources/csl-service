@@ -1,34 +1,19 @@
 package uk.gov.cabinetoffice.csl.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CourseRecordIdentity {
 
     private String courseId;
 
     private String userId;
-
-    public CourseRecordIdentity() {
-    }
-
-    public CourseRecordIdentity(String courseId, String userId) {
-        this.courseId = courseId;
-        this.userId = userId;
-    }
-
-    public String getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
     @Override
     public boolean equals(Object o) {
