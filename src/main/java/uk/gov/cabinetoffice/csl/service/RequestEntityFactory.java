@@ -52,34 +52,34 @@ public class RequestEntityFactory {
         return jwtPrincipal.getTokenValue();
     }
 
-    public RequestEntity<?> createGetRequestWithBasicAuth(String strUri, String apiUsername, String apiPassword) {
+    public RequestEntity<?> createGetRequestWithBasicAuth(String strUri, String username, String password) {
             URI uri = UriComponentsBuilder.fromUriString(strUri)
                     .build()
                     .toUri();
-            return createGetRequestWithBasicAuth(uri, apiUsername, apiPassword);
+            return createGetRequestWithBasicAuth(uri, username, password);
     }
 
-    public RequestEntity<?> createGetRequestWithBasicAuth(URI uri, String apiUsername, String apiPassword) {
-        HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword);
+    public RequestEntity<?> createGetRequestWithBasicAuth(URI uri, String username, String password) {
+        HttpHeaders headers = createHttpHeadersWithBasicAuth(username, password);
         return RequestEntity.get(uri).headers(headers).build();
     }
 
-    public RequestEntity<?> createPostRequestWithBasicAuth(String strUri, Object body, String apiUsername, String apiPassword) {
+    public RequestEntity<?> createPostRequestWithBasicAuth(String strUri, Object body, String username, String password) {
             URI uri = UriComponentsBuilder.fromUriString(strUri)
                     .build()
                     .toUri();
-            return createPostRequestWithBasicAuth(uri, body, apiUsername, apiPassword);
+            return createPostRequestWithBasicAuth(uri, body, username, password);
     }
 
-    public RequestEntity<?> createPostRequestWithBasicAuth(URI uri, Object body, String apiUsername, String apiPassword) {
-        HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword);
+    public RequestEntity<?> createPostRequestWithBasicAuth(URI uri, Object body, String username, String password) {
+        HttpHeaders headers = createHttpHeadersWithBasicAuth(username, password);
         return RequestEntity.post(uri).headers(headers).body(body);
     }
 
-    private HttpHeaders createHttpHeadersWithBasicAuth(String apiUsername, String apiPassword) {
+    private HttpHeaders createHttpHeadersWithBasicAuth(String username, String password) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        headers.setBasicAuth(apiUsername, apiPassword);
+        headers.setBasicAuth(username, password);
         return headers;
     }
 }
