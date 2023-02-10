@@ -19,7 +19,7 @@ public class LearnerRecordService {
         this.courseRecordForLearnersUrl = courseRecordForLearnersUrl;
     }
 
-    //TODO: Implement this
+    //TODO: Implement to invoke learner-record service
     public CourseRecordOutput getCourseRecordForLearner(String learnerId, String courseId) {
         return new CourseRecordOutput(new ArrayList<>());
     }
