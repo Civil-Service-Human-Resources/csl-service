@@ -11,12 +11,12 @@ public class LearnerRecordService {
 
     private final RequestEntityFactory requestEntityFactory;
 
-    private final String courseRecordForLearnersUrl;
+    private final String courseRecordsForLearnerUrl;
 
     public LearnerRecordService(RequestEntityFactory requestEntityFactory,
-                                @Value("${learnerRecord.courseRecordForLearnersUrl}") String courseRecordForLearnersUrl) {
+                                @Value("${learnerRecord.courseRecordsForLearnerUrl}") String courseRecordsForLearnerUrl) {
         this.requestEntityFactory = requestEntityFactory;
-        this.courseRecordForLearnersUrl = courseRecordForLearnersUrl;
+        this.courseRecordsForLearnerUrl = courseRecordsForLearnerUrl;
     }
 
     //TODO: Implement to invoke learner-record service
