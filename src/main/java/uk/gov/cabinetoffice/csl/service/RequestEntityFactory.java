@@ -1,9 +1,8 @@
 package uk.gov.cabinetoffice.csl.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.codec.binary.Base64;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -13,47 +12,37 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
-@Slf4j
 @Component
 public class RequestEntityFactory {
 
-    public RequestEntity<?> createGetRequestWithBearerToken(String strUri) {
-        try {
+    public RequestEntity<?> createGetRequestWithBearerAuth(String strUri) {
             URI uri = UriComponentsBuilder.fromUriString(strUri)
                     .build()
                     .toUri();
-            return createGetRequestWithBearerToken(uri);
-        } catch (JSONException e) {
-            throw new RequestEntityException(e);
-        }
+            return createGetRequestWithBearerAuth(uri);
     }
 
-    public RequestEntity<?> createGetRequestWithBearerToken(URI uri) throws JSONException {
-        HttpHeaders headers = createHttpHeadersWithBearerToken();
+    public RequestEntity<?> createGetRequestWithBearerAuth(URI uri) {
+        HttpHeaders headers = createHttpHeadersWithBearerAuth();
         return RequestEntity.get(uri).headers(headers).build();
     }
 
-    public RequestEntity<?> createPostRequestWithBearerToken(String strUri, Object body) {
-        try {
+    public RequestEntity<?> createPostRequestWithBearerAuth(String strUri, Object body) {
             URI uri = UriComponentsBuilder.fromUriString(strUri)
                     .build()
                     .toUri();
-            return createPostRequestWithBearerToken(uri, body);
-        } catch (JSONException e) {
-            throw new RequestEntityException(e);
-        }
+            return createPostRequestWithBearerAuth(uri, body);
     }
 
-    public RequestEntity<?> createPostRequestWithBearerToken(URI uri, Object body) throws JSONException {
-        HttpHeaders headers = createHttpHeadersWithBearerToken();
+    public RequestEntity<?> createPostRequestWithBearerAuth(URI uri, Object body) {
+        HttpHeaders headers = createHttpHeadersWithBearerAuth();
         return RequestEntity.post(uri).headers(headers).body(body);
     }
 
-    private HttpHeaders createHttpHeadersWithBearerToken() throws JSONException {
+    private HttpHeaders createHttpHeadersWithBearerAuth() {
         String bearerToken = getBearerTokenFromSecurityContext();
-        log.debug("Bearer Token Value: {}", bearerToken);
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + bearerToken);
+        headers.setBearerAuth(bearerToken);
         return headers;
     }
 
@@ -63,45 +52,34 @@ public class RequestEntityFactory {
         return jwtPrincipal.getTokenValue();
     }
 
-    public RequestEntity<?> createGetRequestWithCredentials(String strUri, String apiUsername, String apiPassword) {
-        try {
+    public RequestEntity<?> createGetRequestWithBasicAuth(String strUri, String apiUsername, String apiPassword) {
             URI uri = UriComponentsBuilder.fromUriString(strUri)
                     .build()
                     .toUri();
-            return createGetRequestWithCredentials(uri, apiUsername, apiPassword);
-        } catch (JSONException e) {
-            throw new RequestEntityException(e);
-        }
+            return createGetRequestWithBasicAuth(uri, apiUsername, apiPassword);
     }
 
-    public RequestEntity<?> createGetRequestWithCredentials(URI uri, String apiUsername, String apiPassword) throws JSONException {
-        HttpHeaders headers = createHttpHeadersWithCredentials(apiUsername, apiPassword);
+    public RequestEntity<?> createGetRequestWithBasicAuth(URI uri, String apiUsername, String apiPassword) {
+        HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword);
         return RequestEntity.get(uri).headers(headers).build();
     }
 
-    public RequestEntity<?> createPostRequestWithCredentials(String strUri, Object body, String apiUsername, String apiPassword) {
-        try {
+    public RequestEntity<?> createPostRequestWithBasicAuth(String strUri, Object body, String apiUsername, String apiPassword) {
             URI uri = UriComponentsBuilder.fromUriString(strUri)
                     .build()
                     .toUri();
-            return createPostRequestWithCredentials(uri, body, apiUsername, apiPassword);
-        } catch (JSONException e) {
-            throw new RequestEntityException(e);
-        }
+            return createPostRequestWithBasicAuth(uri, body, apiUsername, apiPassword);
     }
 
-    public RequestEntity<?> createPostRequestWithCredentials(URI uri, Object body, String apiUsername, String apiPassword) throws JSONException {
-        HttpHeaders headers = createHttpHeadersWithCredentials(apiUsername, apiPassword);
+    public RequestEntity<?> createPostRequestWithBasicAuth(URI uri, Object body, String apiUsername, String apiPassword) {
+        HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword);
         return RequestEntity.post(uri).headers(headers).body(body);
     }
 
-    private HttpHeaders createHttpHeadersWithCredentials(String apiUsername, String apiPassword) throws JSONException {
-        String apiCredentials = apiUsername + ":" + apiPassword;
-        String encodedApiCredentials = new String(Base64.encodeBase64(apiCredentials.getBytes(), false));
-
+    private HttpHeaders createHttpHeadersWithBasicAuth(String apiUsername, String apiPassword) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        headers.add("Authorization", "Basic " + encodedApiCredentials);
+        headers.setBasicAuth(apiUsername, apiPassword);
         return headers;
     }
 }
