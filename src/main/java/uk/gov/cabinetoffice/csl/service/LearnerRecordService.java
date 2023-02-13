@@ -6,7 +6,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.cabinetoffice.csl.domain.CourseRecordOutput;
+import uk.gov.cabinetoffice.csl.domain.CourseRecords;
 
 @Slf4j
 @Service
@@ -28,11 +28,11 @@ public class LearnerRecordService {
     public ResponseEntity<?> getCourseRecordForLearner(String learnerId, String courseId) {
         RequestEntity<?> getRequestWithBearerAuth = requestEntityFactory.createGetRequestWithBearerAuth(
                 courseRecordsForLearnerUrl + "?userId=" + learnerId + "&courseId=" + courseId);
-        ResponseEntity<CourseRecordOutput> response = restTemplate.exchange(getRequestWithBearerAuth, CourseRecordOutput.class);
+        ResponseEntity<CourseRecords> response = restTemplate.exchange(getRequestWithBearerAuth, CourseRecords.class);
         if(response.getStatusCode().is2xxSuccessful()) {
-            CourseRecordOutput courseRecordOutput = response.getBody();
-            assert courseRecordOutput != null;
-            courseRecordOutput.getCourseRecords().forEach(c -> log.debug("Course Title: {}", c.getCourseTitle()));
+            CourseRecords courseRecords = response.getBody();
+            assert courseRecords != null;
+            courseRecords.getCourseRecords().forEach(c -> log.debug("Course Title: {}", c.getCourseTitle()));
         }
         return response;
     }

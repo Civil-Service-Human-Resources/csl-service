@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CourseRecordOutput {
+public class CourseRecords {
     public List<CourseRecord> courseRecords;
 }
