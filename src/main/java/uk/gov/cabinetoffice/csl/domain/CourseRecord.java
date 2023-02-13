@@ -5,24 +5,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.*;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.HashSet;
 
 import static java.util.Collections.unmodifiableCollection;
-import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CourseRecord {
 
-    @JsonIgnore
-    private CourseRecordIdentity identity;
+    private String courseId;
+
+    private String userId;
 
     private String courseTitle;
 
@@ -43,23 +39,6 @@ public class CourseRecord {
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime lastUpdated;
-
-    public CourseRecord(String courseId, String userId) {
-        checkArgument(courseId != null);
-        checkArgument(userId != null);
-        this.identity = new CourseRecordIdentity(courseId, userId);
-        this.moduleRecords = new HashSet<>();
-    }
-
-    @JsonProperty("courseId")
-    public String getCourseId() {
-        return identity.getCourseId();
-    }
-
-    @JsonProperty("userId")
-    public String getUserId() {
-        return identity.getUserId();
-    }
 
     @JsonProperty("modules")
     public Collection<ModuleRecord> getModuleRecords() {
@@ -83,25 +62,5 @@ public class CourseRecord {
             }
         }
         return mostRecentCompletionDate;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        CourseRecord that = (CourseRecord) o;
-
-        return new EqualsBuilder()
-                .append(identity, that.identity)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(identity)
-                .toHashCode();
     }
 }

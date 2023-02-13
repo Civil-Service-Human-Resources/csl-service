@@ -4,21 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
-
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModuleRecord {
@@ -69,31 +61,4 @@ public class ModuleRecord {
 
     @JsonIgnore
     private CourseRecord courseRecord;
-
-    public ModuleRecord(String moduleId) {
-        checkArgument(moduleId != null);
-        this.moduleId = moduleId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ModuleRecord that = (ModuleRecord) o;
-
-        return new EqualsBuilder()
-                .append(moduleId, that.moduleId)
-                .append(eventId, that.eventId)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(moduleId)
-                .append(eventId)
-                .toHashCode();
-    }
 }
