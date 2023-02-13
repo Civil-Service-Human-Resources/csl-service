@@ -10,6 +10,9 @@ import uk.gov.cabinetoffice.csl.domain.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.LaunchLinkRequest;
 import uk.gov.cabinetoffice.csl.domain.RegistrationRequest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @Service
 public class RusticiService {
@@ -38,8 +41,11 @@ public class RusticiService {
     public ResponseEntity<?> getRegistrationLaunchLink(String registrationId, LaunchLinkRequest launchLinkRequest) {
         String url = rusticiRegistrationUrl + "/" + registrationId + "/launchLink";
 
+        Map<String, String> additionalHeaderParams = new HashMap<>();
+        additionalHeaderParams.put("EngineTenantName", "default");
+
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
-                url, launchLinkRequest, rusticiUsername, rusticiPassword);
+                url, launchLinkRequest, rusticiUsername, rusticiPassword, additionalHeaderParams);
 
         return getLaunchLink(postRequestWithBasicAuth);
     }
@@ -47,8 +53,11 @@ public class RusticiService {
     public ResponseEntity<?> createRegistrationAndLaunchLink(RegistrationRequest registrationRequest) {
         String url = rusticiRegistrationUrl + "/withLaunchLink";
 
+        Map<String, String> additionalHeaderParams = new HashMap<>();
+        additionalHeaderParams.put("EngineTenantName", "default");
+
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
-                url, registrationRequest, rusticiUsername, rusticiPassword);
+                url, registrationRequest, rusticiUsername, rusticiPassword, additionalHeaderParams);
 
         return getLaunchLink(postRequestWithBasicAuth);
     }

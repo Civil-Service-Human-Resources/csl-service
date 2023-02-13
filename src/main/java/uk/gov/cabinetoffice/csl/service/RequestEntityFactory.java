@@ -11,38 +11,44 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class RequestEntityFactory {
 
-    public RequestEntity<?> createGetRequestWithBearerAuth(String strUri) {
+    public RequestEntity<?> createGetRequestWithBearerAuth(String strUri, Map<String, String> additionalHeaderParams) {
         URI uri = UriComponentsBuilder.fromUriString(strUri)
                 .build()
                 .toUri();
-        return createGetRequestWithBearerAuth(uri);
+        return createGetRequestWithBearerAuth(uri, additionalHeaderParams);
     }
 
-    public RequestEntity<?> createGetRequestWithBearerAuth(URI uri) {
-        HttpHeaders headers = createHttpHeadersWithBearerAuth();
+    public RequestEntity<?> createGetRequestWithBearerAuth(URI uri, Map<String, String> additionalHeaderParams) {
+        HttpHeaders headers = createHttpHeadersWithBearerAuth(additionalHeaderParams);
         return RequestEntity.get(uri).headers(headers).build();
     }
 
-    public RequestEntity<?> createPostRequestWithBearerAuth(String strUri, Object body) {
+    public RequestEntity<?> createPostRequestWithBearerAuth(String strUri, Object body,
+                                                            Map<String, String> additionalHeaderParams) {
         URI uri = UriComponentsBuilder.fromUriString(strUri)
                 .build()
                 .toUri();
-        return createPostRequestWithBearerAuth(uri, body);
+        return createPostRequestWithBearerAuth(uri, body, additionalHeaderParams);
     }
 
-    public RequestEntity<?> createPostRequestWithBearerAuth(URI uri, Object body) {
-        HttpHeaders headers = createHttpHeadersWithBearerAuth();
+    public RequestEntity<?> createPostRequestWithBearerAuth(URI uri, Object body,
+                                                            Map<String, String> additionalHeaderParams) {
+        HttpHeaders headers = createHttpHeadersWithBearerAuth(additionalHeaderParams);
         return RequestEntity.post(uri).headers(headers).body(body);
     }
 
-    private HttpHeaders createHttpHeadersWithBearerAuth() {
+    private HttpHeaders createHttpHeadersWithBearerAuth(Map<String, String> additionalHeaderParams) {
         String bearerToken = getBearerTokenFromSecurityContext();
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(bearerToken);
+        if(additionalHeaderParams != null && !additionalHeaderParams.isEmpty()) {
+            headers.setAll(additionalHeaderParams);
+        }
         return headers;
     }
 
@@ -52,35 +58,43 @@ public class RequestEntityFactory {
         return jwtPrincipal.getTokenValue();
     }
 
-    public RequestEntity<?> createGetRequestWithBasicAuth(String strUri, String apiUsername, String apiPassword) {
+    public RequestEntity<?> createGetRequestWithBasicAuth(String strUri, String apiUsername, String apiPassword,
+                                                          Map<String, String> additionalHeaderParams) {
         URI uri = UriComponentsBuilder.fromUriString(strUri)
                 .build()
                 .toUri();
-        return createGetRequestWithBasicAuth(uri, apiUsername, apiPassword);
+        return createGetRequestWithBasicAuth(uri, apiUsername, apiPassword, additionalHeaderParams);
     }
 
-    public RequestEntity<?> createGetRequestWithBasicAuth(URI uri, String apiUsername, String apiPassword) {
-        HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword);
+    public RequestEntity<?> createGetRequestWithBasicAuth(URI uri, String apiUsername, String apiPassword,
+                                                          Map<String, String> additionalHeaderParams) {
+        HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword, additionalHeaderParams);
         return RequestEntity.get(uri).headers(headers).build();
     }
 
-    public RequestEntity<?> createPostRequestWithBasicAuth(String strUri, Object body, String apiUsername, String apiPassword) {
+    public RequestEntity<?> createPostRequestWithBasicAuth(String strUri, Object body, String apiUsername,
+                                                           String apiPassword,
+                                                           Map<String, String> additionalHeaderParams) {
         URI uri = UriComponentsBuilder.fromUriString(strUri)
                 .build()
                 .toUri();
-        return createPostRequestWithBasicAuth(uri, body, apiUsername, apiPassword);
+        return createPostRequestWithBasicAuth(uri, body, apiUsername, apiPassword, additionalHeaderParams);
     }
 
-    public RequestEntity<?> createPostRequestWithBasicAuth(URI uri, Object body, String apiUsername, String apiPassword) {
-        HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword);
+    public RequestEntity<?> createPostRequestWithBasicAuth(URI uri, Object body, String apiUsername, String apiPassword,
+                                                           Map<String, String> additionalHeaderParams) {
+        HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword, additionalHeaderParams);
         return RequestEntity.post(uri).headers(headers).body(body);
     }
 
-    private HttpHeaders createHttpHeadersWithBasicAuth(String apiUsername, String apiPassword) {
+    private HttpHeaders createHttpHeadersWithBasicAuth(String apiUsername, String apiPassword,
+                                                       Map<String, String> additionalHeaderParams) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBasicAuth(apiUsername, apiPassword);
-        headers.set("EngineTenantName", "default");
+        if(additionalHeaderParams != null && !additionalHeaderParams.isEmpty()) {
+            headers.setAll(additionalHeaderParams);
+        }
         return headers;
     }
 
