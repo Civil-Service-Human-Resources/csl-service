@@ -10,6 +10,10 @@ trigger:
     include:
       - '*'
 
+variables:
+  - name: acr_repo
+    value: csl-service
+
 pool:
   vmImage: ubuntu-latest
 
@@ -28,11 +32,11 @@ steps:
 
   - task: Docker@2
     inputs:
-      containerRegistry: 'lpgregistry ACR'
       ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags') }}:
-        repository: 'csl-service/prod'
+        containerRegistry: 'csl production ACR'
       ${{ else }}:
-        repository: 'csl-service/test'
+        containerRegistry: 'csl staging ACR'
+      repository: '${{ variables.acr_repo }}'
       command: 'buildAndPush'
       Dockerfile: '**/Dockerfile'
       tags: '$(Build.SourceBranchName)'
