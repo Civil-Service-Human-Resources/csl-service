@@ -25,17 +25,21 @@ public class RusticiService {
 
     private final String rusticiPassword;
 
+    private final String rusticiEngineTenantName;
+
     private final RestTemplate restTemplate;
 
     public RusticiService(RequestEntityFactory requestEntityFactory, RestTemplate restTemplate,
                           @Value("${rustici.registrationUrl}") String rusticiRegistrationUrl,
                           @Value("${rustici.username}") String rusticiUsername,
-                          @Value("${rustici.password}") String rusticiPassword) {
+                          @Value("${rustici.password}") String rusticiPassword,
+                          @Value("${rustici.engineTenantName}") String rusticiEngineTenantName) {
         this.requestEntityFactory = requestEntityFactory;
         this.restTemplate = restTemplate;
         this.rusticiRegistrationUrl = rusticiRegistrationUrl;
         this.rusticiUsername = rusticiUsername;
         this.rusticiPassword = rusticiPassword;
+        this.rusticiEngineTenantName = rusticiEngineTenantName;
     }
 
     public ResponseEntity<?> getRegistrationLaunchLink(String registrationId, LaunchLinkRequest launchLinkRequest) {
@@ -54,7 +58,7 @@ public class RusticiService {
         String url = rusticiRegistrationUrl + "/withLaunchLink";
 
         Map<String, String> additionalHeaderParams = new HashMap<>();
-        additionalHeaderParams.put("EngineTenantName", "default");
+        additionalHeaderParams.put("EngineTenantName", rusticiEngineTenantName);
 
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
                 url, registrationRequest, rusticiUsername, rusticiPassword, additionalHeaderParams);
