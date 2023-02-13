@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.cabinetoffice.csl.domain.LaunchLink;
+import uk.gov.cabinetoffice.csl.domain.LaunchLinkRequest;
 import uk.gov.cabinetoffice.csl.domain.RegistrationRequest;
 
 @Slf4j
@@ -34,20 +35,25 @@ public class RusticiService {
         this.rusticiPassword = rusticiPassword;
     }
 
-    public ResponseEntity<?> getRegistrationLaunchLink(String registrationId, RegistrationRequest registrationRequest) {
+    public ResponseEntity<?> getRegistrationLaunchLink(String registrationId, LaunchLinkRequest launchLinkRequest) {
         String url = rusticiRegistrationUrl + "/" + registrationId + "/launchLink";
-        return getLaunchLink(url, registrationRequest);
+
+        RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
+                url, launchLinkRequest, rusticiUsername, rusticiPassword);
+
+        return getLaunchLink(postRequestWithBasicAuth);
     }
 
     public ResponseEntity<?> createRegistrationAndLaunchLink(RegistrationRequest registrationRequest) {
         String url = rusticiRegistrationUrl + "/withLaunchLink";
-        return getLaunchLink(url, registrationRequest);
-    }
-
-    private ResponseEntity<?> getLaunchLink(String url, RegistrationRequest registrationRequest) {
 
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
                 url, registrationRequest, rusticiUsername, rusticiPassword);
+
+        return getLaunchLink(postRequestWithBasicAuth);
+    }
+
+    private ResponseEntity<?> getLaunchLink(RequestEntity<?> postRequestWithBasicAuth) {
 
         ResponseEntity<LaunchLink> response = restTemplate.exchange(postRequestWithBasicAuth, LaunchLink.class);
 

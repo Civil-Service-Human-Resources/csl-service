@@ -80,6 +80,7 @@ public class RequestEntityFactory {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBasicAuth(apiUsername, apiPassword);
+        headers.set("EngineTenantName", "default");
         return headers;
     }
 

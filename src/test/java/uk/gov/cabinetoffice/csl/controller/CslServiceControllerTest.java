@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
+import uk.gov.cabinetoffice.csl.service.RusticiService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,6 +26,9 @@ public class CslServiceControllerTest {
 
     @MockBean
     private LearnerRecordService learnerRecordService;
+
+    @MockBean
+    private RusticiService rusticiService;
 
     @Autowired
     private MockMvc mockMvc;
