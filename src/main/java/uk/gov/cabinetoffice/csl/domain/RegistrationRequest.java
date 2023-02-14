@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegistrationRequest {
-    private String courseId;
-    private Learner learner;
-    private String registrationId;
+    private Registration registration;
     @JsonProperty("launchLink")
     private LaunchLinkRequest launchLinkRequest;
 }
