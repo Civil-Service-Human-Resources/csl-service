@@ -1,9 +1,11 @@
-package uk.gov.cabinetoffice.csl;
+package uk.gov.cabinetoffice.csl.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -40,6 +42,26 @@ public class CslServiceUtil {
         Map<String, String> additionalHeaderParams = new HashMap<>();
         additionalHeaderParams.put(key, value);
         return additionalHeaderParams;
+    }
+
+    public static String getLearnerIdFromAuth(Authentication authentication) {
+        log.debug("Authentication: {}", authentication);
+        String learnerId = null;
+        if(authentication != null) {
+            Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
+            learnerId = (String)jwtPrincipal.getClaims().get("user_name");
+
+            log.debug("Authenticated?: {}", authentication.isAuthenticated());
+            log.debug("Authentication jwtPrincipal: {}", jwtPrincipal);
+            log.debug("Authentication jwtPrincipal Claims: {}", jwtPrincipal.getClaims());
+            log.debug("Authentication jwtPrincipal Headers: {}",  jwtPrincipal.getHeaders());
+            log.debug("Authentication jwtPrincipal ExpiresAt: {}", jwtPrincipal.getExpiresAt());
+            log.debug("Authentication jwtPrincipal Id: {}", jwtPrincipal.getId());
+            log.debug("Authentication jwtPrincipal IssuedAt: {}", jwtPrincipal.getIssuedAt());
+            log.debug("Authentication jwtPrincipal TokenValue: {}", jwtPrincipal.getTokenValue());
+        }
+        log.debug("Learner Id from authentication token: {}", learnerId);
+        return learnerId;
     }
 
     @Bean

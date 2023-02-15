@@ -9,7 +9,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.cabinetoffice.csl.domain.*;
 
-import static uk.gov.cabinetoffice.csl.CslServiceUtil.returnError;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 
 @Slf4j
 @Service

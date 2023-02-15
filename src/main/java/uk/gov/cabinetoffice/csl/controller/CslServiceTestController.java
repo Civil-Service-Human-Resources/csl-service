@@ -6,15 +6,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.cabinetoffice.csl.domain.CourseRecordInput;
-import uk.gov.cabinetoffice.csl.domain.ModuleRecordInput;
-import uk.gov.cabinetoffice.csl.domain.RegistrationInput;
+import uk.gov.cabinetoffice.csl.domain.*;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.RusticiService;
 
-import static uk.gov.cabinetoffice.csl.CslServiceUtil.returnError;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.getLearnerIdFromAuth;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 
 @Slf4j
 @RestController
@@ -33,19 +31,7 @@ public class CslServiceTestController {
     @GetMapping(path = "/test/{input}", produces = "application/json")
     public ResponseEntity<String> test(@PathVariable("input") String input, Authentication authentication) {
         log.debug("Input: {}", input);
-        log.debug("Authentication: {}", authentication);
-        if(authentication != null) {
-            Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-            log.debug("Authenticated?: {}", authentication.isAuthenticated());
-            log.debug("Authentication jwtPrincipal: {}", jwtPrincipal);
-            log.debug("Authentication jwtPrincipal Claims: {}", jwtPrincipal.getClaims());
-            log.debug("Authentication jwtPrincipal user_name: {}", jwtPrincipal.getClaims().get("user_name"));
-            log.debug("Authentication jwtPrincipal Headers: {}",  jwtPrincipal.getHeaders());
-            log.debug("Authentication jwtPrincipal ExpiresAt: {}", jwtPrincipal.getExpiresAt());
-            log.debug("Authentication jwtPrincipal Id: {}", jwtPrincipal.getId());
-            log.debug("Authentication jwtPrincipal IssuedAt: {}", jwtPrincipal.getIssuedAt());
-            log.debug("Authentication jwtPrincipal TokenValue: {}", jwtPrincipal.getTokenValue());
-        }
+        getLearnerIdFromAuth(authentication);
         return new ResponseEntity<>(input, HttpStatus.OK);
     }
 
@@ -65,9 +51,21 @@ public class CslServiceTestController {
         return learnerRecordService.createCourseRecordForLearner(courseRecordInput);
     }
 
+    @PatchMapping(path = "/course-record", consumes = "application/json-patch+json", produces = "application/json")
+    public ResponseEntity<?> patchCourseRecordForLearner(@RequestParam String learnerId, @RequestParam String courseId,
+                                                         @Valid @RequestBody PatchCourseRecordInput patchCourseRecordInput) {
+        return learnerRecordService.updateCourseRecordForLearner(learnerId, courseId, patchCourseRecordInput);
+    }
+
     @PostMapping(path = "/module-record", produces = "application/json")
     public ResponseEntity<?> createModuleRecordForLearner(@Valid @RequestBody ModuleRecordInput moduleRecordInput) {
         return learnerRecordService.createModuleRecordForLearner(moduleRecordInput);
+    }
+
+    @PatchMapping(path = "/module-record/{moduleRecordId}", consumes = "application/json-patch+json", produces = "application/json")
+    public ResponseEntity<?> patchModuleRecordForLearner(@PathVariable("moduleRecordId") Long moduleRecordId,
+                                                         @Valid @RequestBody PatchModuleRecordInput patchModuleRecordInput) {
+        return learnerRecordService.updateModuleRecordForLearner(moduleRecordId, patchModuleRecordInput);
     }
 
     //Only three inputs are required: registrationId, courseId and moduleId
@@ -89,15 +87,5 @@ public class CslServiceTestController {
                     "/registration-launch-link");
         }
         return rusticiService.createRegistrationAndLaunchLink(registrationInput);
-    }
-
-    private String getLearnerIdFromAuth(Authentication authentication) {
-        String learnerId = null;
-        if(authentication != null) {
-            Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-            learnerId = (String)jwtPrincipal.getClaims().get("user_name");
-        }
-        log.debug("Learner Id from authentication token: {}", learnerId);
-        return learnerId;
     }
 }
