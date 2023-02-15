@@ -27,6 +27,8 @@ public class RusticiService {
 
     private final String rusticiRedirectOnExitUrl;
 
+    private final int rusticiLaunchLinkExpiry;
+
     private final RestTemplate restTemplate;
 
     public RusticiService(RequestEntityFactory requestEntityFactory, RestTemplate restTemplate,
@@ -34,7 +36,8 @@ public class RusticiService {
                           @Value("${rustici.username}") String rusticiUsername,
                           @Value("${rustici.password}") String rusticiPassword,
                           @Value("${rustici.engineTenantName}") String rusticiEngineTenantName,
-                          @Value("${rustici.redirectOnExitUrl}") String rusticiRedirectOnExitUrl) {
+                          @Value("${rustici.redirectOnExitUrl}") String rusticiRedirectOnExitUrl,
+                          @Value("${rustici.launchLinkExpiry}") int rusticiLaunchLinkExpiry) {
         this.requestEntityFactory = requestEntityFactory;
         this.restTemplate = restTemplate;
         this.rusticiRegistrationUrl = rusticiRegistrationUrl;
@@ -42,6 +45,7 @@ public class RusticiService {
         this.rusticiPassword = rusticiPassword;
         this.rusticiEngineTenantName = rusticiEngineTenantName;
         this.rusticiRedirectOnExitUrl = rusticiRedirectOnExitUrl;
+        this.rusticiLaunchLinkExpiry = rusticiLaunchLinkExpiry;
     }
 
     public ResponseEntity<?> getRegistrationLaunchLink(String registrationId, String courseId, String moduleId) {
@@ -68,7 +72,7 @@ public class RusticiService {
     private LaunchLinkRequest createLaunchLinkRequest(String redirectOnExitUrl) {
 
         LaunchLinkRequest launchLinkRequest = new LaunchLinkRequest();
-        launchLinkRequest.setExpiry(0);
+        launchLinkRequest.setExpiry(rusticiLaunchLinkExpiry);
         launchLinkRequest.setRedirectOnExitUrl(redirectOnExitUrl);
 
         return launchLinkRequest;

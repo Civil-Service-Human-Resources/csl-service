@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.domain.CourseRecordInput;
+import uk.gov.cabinetoffice.csl.domain.ModuleRecordInput;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.RusticiService;
 
@@ -56,6 +59,16 @@ public class CslServiceController {
         return learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
     }
 
+    @PostMapping(path = "/course-record", produces = "application/json")
+    public ResponseEntity<?> createCourseRecordForLearner(@Valid @RequestBody CourseRecordInput courseRecordInput) {
+        return learnerRecordService.createCourseRecordForLearner(courseRecordInput);
+    }
+
+    @PostMapping(path = "/module-record", produces = "application/json")
+    public ResponseEntity<?> createModuleRecordForLearner(@Valid @RequestBody ModuleRecordInput moduleRecordInput) {
+        return learnerRecordService.createModuleRecordForLearner(moduleRecordInput);
+    }
+
     @GetMapping(path = "/launch-link", produces = "application/json")
     public ResponseEntity<?> getRegistrationLaunchLink(@RequestParam String registrationId,
                                                        @RequestParam String courseId,
@@ -68,8 +81,7 @@ public class CslServiceController {
     public ResponseEntity<?> createRegistrationAndLaunchLink(@RequestParam String registrationId,
                                                              @RequestParam String courseId,
                                                              @RequestParam String moduleId,
-                                                             @RequestParam String learnerFirstName,
-                                                             @RequestParam String learnerLastName,
+                                                             @RequestParam String fullName,
                                                              Authentication authentication) {
         log.debug("registrationId: {}", registrationId);
         String learnerId = getLearnerIdFromAuth(authentication);
@@ -77,7 +89,7 @@ public class CslServiceController {
             return returnError(HttpStatus.BAD_REQUEST,"Learner Id is missing from authentication token",
                     "/registration-launch-link");
         }
-        return rusticiService.createRegistrationAndLaunchLink(registrationId, courseId, moduleId, learnerFirstName, learnerLastName, learnerId);
+        return rusticiService.createRegistrationAndLaunchLink(registrationId, courseId, moduleId, fullName, "", learnerId);
     }
 
     private String getLearnerIdFromAuth(Authentication authentication) {
