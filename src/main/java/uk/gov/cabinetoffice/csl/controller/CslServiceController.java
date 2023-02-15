@@ -69,6 +69,7 @@ public class CslServiceController {
                                                              @RequestParam String courseId,
                                                              @RequestParam String moduleId,
                                                              @RequestParam String learnerFirstName,
+                                                             @RequestParam String learnerLastName,
                                                              Authentication authentication) {
         log.debug("registrationId: {}", registrationId);
         String learnerId = getLearnerIdFromAuth(authentication);
@@ -76,7 +77,7 @@ public class CslServiceController {
             return returnError(HttpStatus.BAD_REQUEST,"Learner Id is missing from authentication token",
                     "/registration-launch-link");
         }
-        return rusticiService.createRegistrationAndLaunchLink(registrationId, courseId, moduleId, learnerFirstName, learnerId);
+        return rusticiService.createRegistrationAndLaunchLink(registrationId, courseId, moduleId, learnerFirstName, learnerLastName, learnerId);
     }
 
     private String getLearnerIdFromAuth(Authentication authentication) {

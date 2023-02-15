@@ -55,10 +55,11 @@ public class RusticiService {
     }
 
     public ResponseEntity<?> createRegistrationAndLaunchLink(String registrationId, String courseId, String moduleId,
-                                                             String learnerFirstName, String learnerId) {
+                                                             String learnerFirstName, String learnerLastName,
+                                                             String learnerId) {
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
                 rusticiRegistrationUrl + "/withLaunchLink",
-                createRegistrationRequest(registrationId, courseId, moduleId, learnerFirstName, learnerId),
+                createRegistrationRequest(registrationId, courseId, moduleId, learnerFirstName, learnerLastName, learnerId),
                 rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
 
         return getLaunchLink(postRequestWithBasicAuth);
@@ -74,14 +75,16 @@ public class RusticiService {
     }
 
     private RegistrationRequest createRegistrationRequest(String registrationId, String courseId, String moduleId,
-                                                          String learnerFirstName, String learnerId) {
+                                                          String learnerFirstName, String learnerLastName,
+                                                          String learnerId) {
         Learner learner = new Learner();
         learner.setId(learnerId);
         learner.setFirstName(learnerFirstName);
+        learner.setLastName(learnerLastName);
 
         Registration registration = new Registration();
         registration.setRegistrationId(registrationId);
-        registration.setCourseId(courseId);
+        registration.setCourseId(courseId + "." + moduleId);
         registration.setLearner(learner);
 
         RegistrationRequest registrationRequest = new RegistrationRequest();

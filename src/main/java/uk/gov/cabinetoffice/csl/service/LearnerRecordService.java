@@ -30,7 +30,8 @@ public class LearnerRecordService {
 
     public ResponseEntity<?> getCourseRecordForLearner(String learnerId, String courseId) {
         RequestEntity<?> getRequestWithBearerAuth = requestEntityFactory.createGetRequestWithBearerAuth(
-                courseRecordsForLearnerUrl + "?userId=" + learnerId + "&courseId=" + courseId, null);
+                courseRecordsForLearnerUrl + "?userId=" + learnerId + "&courseId=" + courseId,
+                null);
         ResponseEntity<?> response = null;
         try {
             response = restTemplate.exchange(getRequestWithBearerAuth, CourseRecords.class);

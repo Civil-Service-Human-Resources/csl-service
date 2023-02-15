@@ -70,8 +70,8 @@ public class RequestEntityFactory {
         return RequestEntity.get(uri).headers(headers).build();
     }
 
-    public RequestEntity<?> createPostRequestWithBasicAuth(String strUri, Object body, String apiUsername,
-                                                           String apiPassword,
+    public RequestEntity<?> createPostRequestWithBasicAuth(String strUri, Object body,
+                                                           String apiUsername, String apiPassword,
                                                            Map<String, String> additionalHeaderParams) {
         URI uri = UriComponentsBuilder.fromUriString(strUri)
                 .build()
@@ -79,7 +79,8 @@ public class RequestEntityFactory {
         return createPostRequestWithBasicAuth(uri, body, apiUsername, apiPassword, additionalHeaderParams);
     }
 
-    public RequestEntity<?> createPostRequestWithBasicAuth(URI uri, Object body, String apiUsername, String apiPassword,
+    public RequestEntity<?> createPostRequestWithBasicAuth(URI uri, Object body,
+                                                           String apiUsername, String apiPassword,
                                                            Map<String, String> additionalHeaderParams) {
         HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword, additionalHeaderParams);
         return RequestEntity.post(uri).headers(headers).body(body);
