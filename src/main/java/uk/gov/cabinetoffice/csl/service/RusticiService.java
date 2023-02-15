@@ -8,9 +8,8 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.cabinetoffice.csl.domain.*;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import static uk.gov.cabinetoffice.csl.CslServiceUtil.addAdditionalHeaderParams;
+import static uk.gov.cabinetoffice.csl.CslServiceUtil.returnError;
 
 @Slf4j
 @Service
@@ -103,20 +102,8 @@ public class RusticiService {
                 log.debug("launchLink: {}", launchLink.getLaunchLink());
             }
         } catch (HttpStatusCodeException ex) {
-            response = returnError(ex.getStatusCode(), ex.getResponseBodyAsString(), postRequestWithBasicAuth.getUrl().toString());
+            response = returnError(ex, postRequestWithBasicAuth.getUrl().getPath());
         }
         return response;
-    }
-
-    private Map<String, String> addAdditionalHeaderParams(String key, String value) {
-        Map<String, String> additionalHeaderParams = new HashMap<>();
-        additionalHeaderParams.put(key, value);
-        return additionalHeaderParams;
-    }
-
-    private ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String errorMessage, String path) {
-        ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), String.valueOf(httpStatusCode.value()),
-                errorMessage, path);
-        return new ResponseEntity<>(errorResponse, httpStatusCode);
     }
 }

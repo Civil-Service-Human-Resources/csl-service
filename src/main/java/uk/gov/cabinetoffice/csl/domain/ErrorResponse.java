@@ -15,6 +15,6 @@ public class ErrorResponse {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime timestamp;
     String status;
-    String error;
+    String message;
     String path;
 }

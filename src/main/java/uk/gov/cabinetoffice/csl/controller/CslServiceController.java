@@ -3,16 +3,14 @@ package uk.gov.cabinetoffice.csl.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.cabinetoffice.csl.domain.ErrorResponse;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.RusticiService;
 
-import java.time.LocalDateTime;
+import static uk.gov.cabinetoffice.csl.CslServiceUtil.returnError;
 
 @Slf4j
 @RestController
@@ -89,11 +87,5 @@ public class CslServiceController {
         }
         log.debug("Learner Id from authentication token: {}", learnerId);
         return learnerId;
-    }
-
-    private ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String errorMessage, String path) {
-        ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), String.valueOf(httpStatusCode.value()),
-                errorMessage, path);
-        return new ResponseEntity<>(errorResponse, httpStatusCode);
     }
 }
