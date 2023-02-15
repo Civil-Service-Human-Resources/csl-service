@@ -40,6 +40,20 @@ public class RequestEntityFactory {
         return RequestEntity.post(uri).headers(headers).body(body);
     }
 
+    public RequestEntity<?> createPatchRequestWithBearerAuth(String strUri, Object body,
+                                                            Map<String, String> additionalHeaderParams) {
+        URI uri = UriComponentsBuilder.fromUriString(strUri)
+                .build()
+                .toUri();
+        return createPatchRequestWithBearerAuth(uri, body, additionalHeaderParams);
+    }
+
+    public RequestEntity<?> createPatchRequestWithBearerAuth(URI uri, Object body,
+                                                            Map<String, String> additionalHeaderParams) {
+        HttpHeaders headers = createHttpHeadersWithBearerAuth(additionalHeaderParams);
+        return RequestEntity.patch(uri).headers(headers).body(body);
+    }
+
     private HttpHeaders createHttpHeadersWithBearerAuth(Map<String, String> additionalHeaderParams) {
         String bearerToken = getBearerTokenFromSecurityContext();
         HttpHeaders headers = new HttpHeaders();

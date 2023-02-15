@@ -33,55 +33,75 @@ public class LearnerRecordService {
     }
 
     public ResponseEntity<?> getCourseRecordForLearner(String learnerId, String courseId) {
-        RequestEntity<?> getRequestWithBearerAuth = requestEntityFactory.createGetRequestWithBearerAuth(
+        RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createGetRequestWithBearerAuth(
                 courseRecordsForLearnerUrl + "?userId=" + learnerId + "&courseId=" + courseId,
                 null);
         ResponseEntity<?> response = null;
         try {
-            response = restTemplate.exchange(getRequestWithBearerAuth, CourseRecords.class);
+            response = restTemplate.exchange(requestWithBearerAuth, CourseRecords.class);
             if(response.getStatusCode().is2xxSuccessful()) {
                 CourseRecords courseRecords = (CourseRecords)response.getBody();
                 assert courseRecords != null;
                 courseRecords.getCourseRecords().forEach(c -> log.debug("Course Title: {}", c.getCourseTitle()));
             }
         } catch (HttpStatusCodeException ex) {
-            response = returnError(ex, getRequestWithBearerAuth.getUrl().getPath());
+            response = returnError(ex, requestWithBearerAuth.getUrl().getPath());
         }
         return response;
     }
 
     public ResponseEntity<?> createCourseRecordForLearner(CourseRecordInput courseRecordInput) {
-        RequestEntity<?> postRequestWithBearerAuth = requestEntityFactory.createPostRequestWithBearerAuth(
+        RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPostRequestWithBearerAuth(
                 courseRecordsForLearnerUrl, courseRecordInput, null);
+        return courseRecordForLearner(requestWithBearerAuth);
+    }
 
+    public ResponseEntity<?> updateCourseRecordForLearner(String learnerId, String courseId,
+                                                          PatchCourseRecordInput patchCourseRecordInput) {
+        RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
+                courseRecordsForLearnerUrl + "?userId=" + learnerId + "&courseId=" + courseId,
+                patchCourseRecordInput, null);
+        return courseRecordForLearner(requestWithBearerAuth);
+    }
+
+    private ResponseEntity<?> courseRecordForLearner(RequestEntity<?> requestWithBearerAuth) {
         ResponseEntity<?> response = null;
         try {
-            response = restTemplate.exchange(postRequestWithBearerAuth, CourseRecord.class);
+            response = restTemplate.exchange(requestWithBearerAuth, CourseRecord.class);
             if(response.getStatusCode().is2xxSuccessful()) {
                 CourseRecord courseRecord = (CourseRecord)response.getBody();
                 assert courseRecord != null;
                 log.debug("Course Title: {}", courseRecord.getCourseTitle());
             }
         } catch (HttpStatusCodeException ex) {
-            response = returnError(ex, postRequestWithBearerAuth.getUrl().getPath());
+            response = returnError(ex, requestWithBearerAuth.getUrl().getPath());
         }
         return response;
     }
 
     public ResponseEntity<?> createModuleRecordForLearner(ModuleRecordInput moduleRecordInput) {
-        RequestEntity<?> postRequestWithBearerAuth = requestEntityFactory.createPostRequestWithBearerAuth(
+        RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPostRequestWithBearerAuth(
                 moduleRecordsForLearnerUrl, moduleRecordInput, null);
+        return moduleRecordForLearner(requestWithBearerAuth);
+    }
 
+    public ResponseEntity<?> updateModuleRecordForLearner(Long moduleRecordId, PatchModuleRecordInput patchModuleRecordInput) {
+        RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
+                moduleRecordsForLearnerUrl + "/" + moduleRecordId, patchModuleRecordInput, null);
+        return moduleRecordForLearner(requestWithBearerAuth);
+    }
+
+    private ResponseEntity<?> moduleRecordForLearner(RequestEntity<?> requestWithBearerAuth) {
         ResponseEntity<?> response = null;
         try {
-            response = restTemplate.exchange(postRequestWithBearerAuth, ModuleRecord.class);
+            response = restTemplate.exchange(requestWithBearerAuth, ModuleRecord.class);
             if(response.getStatusCode().is2xxSuccessful()) {
                 ModuleRecord moduleRecord = (ModuleRecord)response.getBody();
                 assert moduleRecord != null;
                 log.debug("ModuleRecord Title: {}", moduleRecord.getModuleTitle());
             }
         } catch (HttpStatusCodeException ex) {
-            response = returnError(ex, postRequestWithBearerAuth.getUrl().getPath());
+            response = returnError(ex, requestWithBearerAuth.getUrl().getPath());
         }
         return response;
     }
