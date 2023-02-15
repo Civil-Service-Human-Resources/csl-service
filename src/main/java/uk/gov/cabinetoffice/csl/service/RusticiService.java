@@ -48,22 +48,21 @@ public class RusticiService {
         this.rusticiLaunchLinkExpiry = rusticiLaunchLinkExpiry;
     }
 
-    public ResponseEntity<?> getRegistrationLaunchLink(String registrationId, String courseId, String moduleId) {
+    public ResponseEntity<?> getRegistrationLaunchLink(RegistrationInput registrationInput) {
 
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
-                rusticiRegistrationUrl + "/" + registrationId + "/launchLink",
-                createLaunchLinkRequest(rusticiRedirectOnExitUrl + "/" + courseId + "/" + moduleId),
+                rusticiRegistrationUrl + "/" + registrationInput.getRegistrationId() + "/launchLink",
+                createLaunchLinkRequest(rusticiRedirectOnExitUrl + "/"
+                        + registrationInput.getCourseId() + "/" + registrationInput.getModuleId()),
                 rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
 
         return getLaunchLink(postRequestWithBasicAuth);
     }
 
-    public ResponseEntity<?> createRegistrationAndLaunchLink(String registrationId, String courseId, String moduleId,
-                                                             String learnerFirstName, String learnerLastName,
-                                                             String learnerId) {
+    public ResponseEntity<?> createRegistrationAndLaunchLink(RegistrationInput registrationInput) {
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
                 rusticiRegistrationUrl + "/withLaunchLink",
-                createRegistrationRequest(registrationId, courseId, moduleId, learnerFirstName, learnerLastName, learnerId),
+                createRegistrationRequest(registrationInput),
                 rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
 
         return getLaunchLink(postRequestWithBasicAuth);
@@ -78,23 +77,22 @@ public class RusticiService {
         return launchLinkRequest;
     }
 
-    private RegistrationRequest createRegistrationRequest(String registrationId, String courseId, String moduleId,
-                                                          String learnerFirstName, String learnerLastName,
-                                                          String learnerId) {
+    private RegistrationRequest createRegistrationRequest(RegistrationInput registrationInput) {
         Learner learner = new Learner();
-        learner.setId(learnerId);
-        learner.setFirstName(learnerFirstName);
-        learner.setLastName(learnerLastName);
+        learner.setId(registrationInput.getLearnerId());
+        learner.setFirstName(registrationInput.getLearnerFirstName());
+        learner.setLastName(registrationInput.getLearnerLastName());
 
         Registration registration = new Registration();
-        registration.setRegistrationId(registrationId);
-        registration.setCourseId(courseId + "." + moduleId);
+        registration.setRegistrationId(registrationInput.getRegistrationId());
+        registration.setCourseId(registrationInput.getCourseId() + "." + registrationInput.getModuleId());
         registration.setLearner(learner);
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
         registrationRequest.setRegistration(registration);
         registrationRequest.setLaunchLinkRequest(createLaunchLinkRequest(
-                rusticiRedirectOnExitUrl + "/" + courseId + "/" + moduleId));
+                rusticiRedirectOnExitUrl + "/" + registrationInput.getCourseId()
+                        + "/" + registrationInput.getModuleId()));
 
         return registrationRequest;
     }
