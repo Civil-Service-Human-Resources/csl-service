@@ -17,14 +17,14 @@ import static uk.gov.cabinetoffice.csl.CslServiceUtil.returnError;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/csl")
-public class CslServiceController {
+@RequestMapping(path = "/csl-test")
+public class CslServiceTestController {
 
     private final LearnerRecordService learnerRecordService;
 
     private final RusticiService rusticiService;
 
-    public CslServiceController(LearnerRecordService learnerRecordService, RusticiService rusticiService) {
+    public CslServiceTestController(LearnerRecordService learnerRecordService, RusticiService rusticiService) {
         this.learnerRecordService = learnerRecordService;
         this.rusticiService = rusticiService;
     }

@@ -19,10 +19,10 @@ import uk.gov.cabinetoffice.csl.service.RusticiService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = CslServiceController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
+@WebMvcTest(controllers = CslServiceTestController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 @AutoConfigureMockMvc(addFilters = false)
 @RunWith(SpringRunner.class)
-public class CslServiceControllerTest {
+public class CslServiceTestControllerTest {
 
     @MockBean
     private LearnerRecordService learnerRecordService;
@@ -36,7 +36,7 @@ public class CslServiceControllerTest {
     @Test
     public void testTest() throws Exception {
         String input = "abc";
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/csl/test/" + input).accept(MediaType.APPLICATION_JSON);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/csl-test/test/" + input).accept(MediaType.APPLICATION_JSON);
         MvcResult result = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
         Assertions.assertEquals(input, result.getResponse().getContentAsString());
     }
