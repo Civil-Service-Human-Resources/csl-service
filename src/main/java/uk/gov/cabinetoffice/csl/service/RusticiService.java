@@ -2,12 +2,13 @@ package uk.gov.cabinetoffice.csl.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.cabinetoffice.csl.domain.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public class RusticiService {
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
                 rusticiRegistrationUrl + "/" + registrationId + "/launchLink",
                 createLaunchLinkRequest(rusticiRedirectOnExitUrl + "/" + courseId + "/" + moduleId),
-                rusticiUsername, rusticiPassword, addAdditionalHeaderParams());
+                rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
 
         return getLaunchLink(postRequestWithBasicAuth);
     }
@@ -59,7 +60,7 @@ public class RusticiService {
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
                 rusticiRegistrationUrl + "/withLaunchLink",
                 createRegistrationRequest(registrationId, courseId, moduleId, learnerFirstName, learnerId),
-                rusticiUsername, rusticiPassword, addAdditionalHeaderParams());
+                rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
 
         return getLaunchLink(postRequestWithBasicAuth);
     }
@@ -93,20 +94,29 @@ public class RusticiService {
     }
 
     private ResponseEntity<?> getLaunchLink(RequestEntity<?> postRequestWithBasicAuth) {
-
-        ResponseEntity<?> response = restTemplate.exchange(postRequestWithBasicAuth, LaunchLink.class);
-        if(response.getStatusCode().is2xxSuccessful()) {
-            LaunchLink launchLink = (LaunchLink)response.getBody();
-            assert launchLink != null;
-            log.debug("launchLink: {}", launchLink.getLaunchLink());
+        ResponseEntity<?> response = null;
+        try {
+            response = restTemplate.exchange(postRequestWithBasicAuth, LaunchLink.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                LaunchLink launchLink = (LaunchLink) response.getBody();
+                assert launchLink != null;
+                log.debug("launchLink: {}", launchLink.getLaunchLink());
+            }
+        } catch (HttpStatusCodeException ex) {
+            response = returnError(ex.getStatusCode(), ex.getResponseBodyAsString(), postRequestWithBasicAuth.getUrl().toString());
         }
-
         return response;
     }
 
-    private Map<String, String> addAdditionalHeaderParams() {
+    private Map<String, String> addAdditionalHeaderParams(String key, String value) {
         Map<String, String> additionalHeaderParams = new HashMap<>();
-        additionalHeaderParams.put("EngineTenantName", rusticiEngineTenantName);
+        additionalHeaderParams.put(key, value);
         return additionalHeaderParams;
+    }
+
+    private ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String errorMessage, String path) {
+        ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), String.valueOf(httpStatusCode.value()),
+                errorMessage, path);
+        return new ResponseEntity<>(errorResponse, httpStatusCode);
     }
 }

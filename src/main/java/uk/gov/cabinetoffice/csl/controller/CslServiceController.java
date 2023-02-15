@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -51,7 +52,7 @@ public class CslServiceController {
         log.debug("courseId: {}", courseId);
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
-            return returnError(HttpStatus.BAD_REQUEST, "Authentication token is missing from the request",
+            return returnError(HttpStatus.BAD_REQUEST, "Learner Id is missing from authentication token",
                     "/course-records");
         }
         return learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
@@ -74,7 +75,7 @@ public class CslServiceController {
         log.debug("registrationId: {}", registrationId);
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
-            return returnError(HttpStatus.BAD_REQUEST,"Authentication token is missing from the request",
+            return returnError(HttpStatus.BAD_REQUEST,"Learner Id is missing from authentication token",
                     "/registration-launch-link");
         }
         return rusticiService.createRegistrationAndLaunchLink(registrationId, courseId, moduleId, learnerFirstName, learnerId);
@@ -86,13 +87,13 @@ public class CslServiceController {
             Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
             learnerId = (String)jwtPrincipal.getClaims().get("user_name");
         }
-        log.debug("learnerId from Authentication: {}", learnerId);
+        log.debug("Learner Id from authentication token: {}", learnerId);
         return learnerId;
     }
 
-    private ResponseEntity<?> returnError(HttpStatus httpStatus, String errorMessage, String path) {
-        ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST.toString(),
+    private ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String errorMessage, String path) {
+        ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), String.valueOf(httpStatusCode.value()),
                 errorMessage, path);
-        return new ResponseEntity<>(errorResponse, httpStatus);
+        return new ResponseEntity<>(errorResponse, httpStatusCode);
     }
 }
