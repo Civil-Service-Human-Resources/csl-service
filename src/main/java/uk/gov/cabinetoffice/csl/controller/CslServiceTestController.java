@@ -56,6 +56,7 @@ public class CslServiceTestController {
                     "/course-records");
         }
         courseRecordInput.setUserId(learnerId);
+        courseRecordInput.getModuleRecords().forEach(m -> m.setUserId(learnerId));
         return learnerRecordService.createCourseRecordForLearner(courseRecordInput);
     }
 
