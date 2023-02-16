@@ -19,10 +19,7 @@ import org.apache.hc.client5.http.classic.HttpClient;
 import java.time.LocalDateTime;
 import java.util.*;
 
-//import com.fasterxml.jackson.databind.SerializationFeature;
-//import org.springframework.http.MediaType;
-//import org.springframework.http.converter.HttpMessageConverter;
-//import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+
 
 @Slf4j
 @Component
@@ -82,17 +79,6 @@ public class CslServiceUtil {
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
         restTemplate.setRequestFactory(requestFactory);
-
-//        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
-//        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-//        converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
-//        messageConverters.add(converter);
-//        restTemplate.setMessageConverters(messageConverters);
-//
-//        MappingJackson2HttpMessageConverter jsonHttpMessageConverter = new MappingJackson2HttpMessageConverter();
-//        jsonHttpMessageConverter.getObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-//        restTemplate.getMessageConverters().add(jsonHttpMessageConverter);
-
         return restTemplate;
     }
 }
