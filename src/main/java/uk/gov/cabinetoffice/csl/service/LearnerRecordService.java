@@ -95,8 +95,12 @@ public class LearnerRecordService {
         return moduleRecordForLearner(requestWithBearerAuth);
     }
 
-    public ResponseEntity<?> updateModuleRecordForLearner(Long moduleRecordId, Map<String, String> updateValues) {
+    public ResponseEntity<?> updateModuleRecordForLearner(Long moduleRecordId,
+                                                          Map<String, String> updateFields) {
         List<PatchOp> jsonPatch = new ArrayList<>();
+        jsonPatch.add(new PatchOp("replace", "/updatedAt", LocalDateTime.now().toString()));
+        updateFields.forEach((key, value) ->
+                jsonPatch.add(new PatchOp("replace", "/" + key, value)));
 
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
                 moduleRecordsForLearnerUrl + "/" + moduleRecordId, jsonPatch, null);
