@@ -1,9 +1,5 @@
 package uk.gov.cabinetoffice.csl.service;
 
-import jakarta.json.Json;
-import jakarta.json.JsonPatch;
-import jakarta.json.JsonPatchBuilder;
-import jakarta.json.JsonStructure;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -11,11 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.domain.*;
 
-import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
@@ -66,10 +62,12 @@ public class LearnerRecordService {
     }
 
     public ResponseEntity<?> updateCourseRecordForLearner(String learnerId, String courseId) {
-        JsonPatchBuilder jsonPatchBuilder = Json.createPatchBuilder();
-        //jsonPatchBuilder = jsonPatchBuilder.replace("/lastUpdated", LocalDateTime.now().toString());
-        jsonPatchBuilder = jsonPatchBuilder.replace("/state", State.COMPLETED.toString());
-        JsonPatch jsonPatch = jsonPatchBuilder.build();
+        PatchOp patchOp1 = new PatchOp("replace", "/state", State.COMPLETED.toString());
+        PatchOp patchOp2 = new PatchOp("replace", "/lastUpdated", LocalDateTime.now().toString());
+
+        List<PatchOp> jsonPatch = new ArrayList<>();
+        jsonPatch.add(patchOp1);
+        jsonPatch.add(patchOp2);
 
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
                 courseRecordsForLearnerUrl + "?userId=" + learnerId + "&courseId=" + courseId,
@@ -80,8 +78,7 @@ public class LearnerRecordService {
     private ResponseEntity<?> courseRecordForLearner(RequestEntity<?> requestWithBearerAuth) {
         ResponseEntity<?> response = null;
         try {
-            //response = restTemplate.exchange(requestWithBearerAuth, CourseRecord.class);
-            response = restTemplate.exchange(requestWithBearerAuth, JsonStructure.class);
+            response = restTemplate.exchange(requestWithBearerAuth, CourseRecord.class);
             if(response.getStatusCode().is2xxSuccessful()) {
                 CourseRecord courseRecord = (CourseRecord)response.getBody();
                 assert courseRecord != null;
@@ -100,23 +97,12 @@ public class LearnerRecordService {
     }
 
     public ResponseEntity<?> updateModuleRecordForLearner(Long moduleRecordId, Map<String, String> updateValues) {
-        JsonPatchBuilder jsonPatchBuilder = Json.createPatchBuilder();
-
-        jsonPatchBuilder = jsonPatchBuilder.replace("/postalCode", "500072");
-        jsonPatchBuilder = jsonPatchBuilder.replace("/postalCode", 500072);
-
-        JsonPatch jsonPatch = jsonPatchBuilder.build();
+        List<PatchOp> jsonPatch = new ArrayList<>();
 
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
                 moduleRecordsForLearnerUrl + "/" + moduleRecordId, jsonPatch, null);
         return moduleRecordForLearner(requestWithBearerAuth);
     }
-
-//    public ResponseEntity<?> updateModuleRecordForLearner1(Long moduleRecordId, PatchModuleRecordInput patchModuleRecordInput) {
-//        RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
-//                moduleRecordsForLearnerUrl + "/" + moduleRecordId, patchModuleRecordInput, null);
-//        return moduleRecordForLearner(requestWithBearerAuth);
-//    }
 
     private ResponseEntity<?> moduleRecordForLearner(RequestEntity<?> requestWithBearerAuth) {
         ResponseEntity<?> response = null;
