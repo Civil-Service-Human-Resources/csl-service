@@ -40,8 +40,8 @@ public class CslServiceTestController {
         log.debug("courseId: {}", courseId);
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
-            return returnError(HttpStatus.BAD_REQUEST, "Learner Id is missing from authentication token",
-                    "/course-records");
+            return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    "Learner Id is missing from authentication token","/course-records");
         }
         return learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
     }
@@ -52,8 +52,8 @@ public class CslServiceTestController {
         log.debug("courseId: {}", courseRecordInput.getCourseId());
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
-            return returnError(HttpStatus.BAD_REQUEST, "Learner Id is missing from authentication token",
-                    "/course-record");
+            return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    "Learner Id is missing from authentication token","/course-record");
         }
         courseRecordInput.setUserId(learnerId);
         courseRecordInput.getModuleRecords().forEach(m -> m.setUserId(learnerId));
@@ -67,8 +67,8 @@ public class CslServiceTestController {
         log.debug("courseId: {}", courseId);
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
-            return returnError(HttpStatus.BAD_REQUEST, "Learner Id is missing from authentication token",
-                    "/course-record");
+            return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    "Learner Id is missing from authentication token","/course-record");
         }
         return learnerRecordService.updateCourseRecordForLearner(learnerId, courseId, patchCourseRecordInput);
     }
@@ -79,8 +79,8 @@ public class CslServiceTestController {
         log.debug("courseId: {}", moduleRecordInput.getCourseId());
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
-            return returnError(HttpStatus.BAD_REQUEST, "Learner Id is missing from authentication token",
-                    "/module-record");
+            return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    "Learner Id is missing from authentication token","/module-record");
         }
         moduleRecordInput.setUserId(learnerId);
         return learnerRecordService.createModuleRecordForLearner(moduleRecordInput);
@@ -101,8 +101,8 @@ public class CslServiceTestController {
         String learnerId = getLearnerIdFromAuth(authentication);
         registrationInput.setLearnerId(learnerId);
         if(StringUtils.isBlank(learnerId)) {
-            return returnError(HttpStatus.BAD_REQUEST,"Learner Id is missing from authentication token",
-                    "/launch-link");
+            return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    "Learner Id is missing from authentication token","/launch-link");
         }
         return rusticiService.getRegistrationLaunchLink(registrationInput);
     }
@@ -115,8 +115,8 @@ public class CslServiceTestController {
         String learnerId = getLearnerIdFromAuth(authentication);
         registrationInput.setLearnerId(learnerId);
         if(StringUtils.isBlank(learnerId)) {
-            return returnError(HttpStatus.BAD_REQUEST,"Learner Id is missing from authentication token",
-                    "/registration-launch-link");
+            return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    "Learner Id is missing from authentication token","/registration-launch-link");
         }
         return rusticiService.createRegistrationAndLaunchLink(registrationInput);
     }

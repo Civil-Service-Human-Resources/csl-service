@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +27,18 @@ public class CslServiceUtil {
             errorResponse.setMessage(ex.getResponseBodyAsString());
         }
         errorResponse.setStatus(String.valueOf(ex.getStatusCode().value()));
+        if(StringUtils.isBlank(errorResponse.getError())) {
+            errorResponse.setError(ex.getStatusText());
+        }
         errorResponse.setTimestamp(LocalDateTime.now().toString());
         errorResponse.setPath(path);
         log.debug("errorResponse.getMessage(): {}", errorResponse.getMessage());
         return new ResponseEntity<>(errorResponse, ex.getStatusCode());
     }
 
-    public static  ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String errorMessage, String path) {
+    public static  ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String error, String message, String path) {
         ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now().toString(), String.valueOf(httpStatusCode.value()),
-                errorMessage, "", path);
+                error, message, path);
         return new ResponseEntity<>(errorResponse, httpStatusCode);
     }
 
