@@ -29,9 +29,9 @@ public class CslServiceTestController {
     }
 
     @GetMapping(path = "/test/{input}", produces = "application/json")
-    public ResponseEntity<String> test(@PathVariable("input") String input, Authentication authentication) {
+    public ResponseEntity<?> test(@PathVariable("input") String input, Authentication authentication) {
         log.debug("Input: {}", input);
-        getLearnerIdFromAuth(authentication);
+        log.debug("learnerId: {}", getLearnerIdFromAuth(authentication));
         return new ResponseEntity<>(input, HttpStatus.OK);
     }
 
@@ -53,7 +53,7 @@ public class CslServiceTestController {
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, "Learner Id is missing from authentication token",
-                    "/course-records");
+                    "/course-record");
         }
         courseRecordInput.setUserId(learnerId);
         courseRecordInput.getModuleRecords().forEach(m -> m.setUserId(learnerId));
@@ -68,7 +68,7 @@ public class CslServiceTestController {
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, "Learner Id is missing from authentication token",
-                    "/course-records");
+                    "/course-record");
         }
         return learnerRecordService.updateCourseRecordForLearner(learnerId, courseId, patchCourseRecordInput);
     }
@@ -80,7 +80,7 @@ public class CslServiceTestController {
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, "Learner Id is missing from authentication token",
-                    "/course-records");
+                    "/module-record");
         }
         moduleRecordInput.setUserId(learnerId);
         return learnerRecordService.createModuleRecordForLearner(moduleRecordInput);
@@ -102,7 +102,7 @@ public class CslServiceTestController {
         registrationInput.setLearnerId(learnerId);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST,"Learner Id is missing from authentication token",
-                    "/registration-launch-link");
+                    "/launch-link");
         }
         return rusticiService.getRegistrationLaunchLink(registrationInput);
     }
