@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.service;
 import jakarta.json.Json;
 import jakarta.json.JsonPatch;
 import jakarta.json.JsonPatchBuilder;
+import jakarta.json.JsonStructure;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -10,8 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.domain.*;
 
+import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
@@ -61,18 +65,23 @@ public class LearnerRecordService {
         return courseRecordForLearner(requestWithBearerAuth);
     }
 
-    public ResponseEntity<?> updateCourseRecordForLearner(String learnerId, String courseId,
-                                                          PatchCourseRecordInput patchCourseRecordInput) {
+    public ResponseEntity<?> updateCourseRecordForLearner(String learnerId, String courseId) {
+        JsonPatchBuilder jsonPatchBuilder = Json.createPatchBuilder();
+        //jsonPatchBuilder = jsonPatchBuilder.replace("/lastUpdated", LocalDateTime.now().toString());
+        jsonPatchBuilder = jsonPatchBuilder.replace("/state", State.COMPLETED.toString());
+        JsonPatch jsonPatch = jsonPatchBuilder.build();
+
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
                 courseRecordsForLearnerUrl + "?userId=" + learnerId + "&courseId=" + courseId,
-                patchCourseRecordInput, null);
+                jsonPatch, null);
         return courseRecordForLearner(requestWithBearerAuth);
     }
 
     private ResponseEntity<?> courseRecordForLearner(RequestEntity<?> requestWithBearerAuth) {
         ResponseEntity<?> response = null;
         try {
-            response = restTemplate.exchange(requestWithBearerAuth, CourseRecord.class);
+            //response = restTemplate.exchange(requestWithBearerAuth, CourseRecord.class);
+            response = restTemplate.exchange(requestWithBearerAuth, JsonStructure.class);
             if(response.getStatusCode().is2xxSuccessful()) {
                 CourseRecord courseRecord = (CourseRecord)response.getBody();
                 assert courseRecord != null;

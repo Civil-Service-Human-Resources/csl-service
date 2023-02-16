@@ -60,17 +60,15 @@ public class CslServiceTestController {
         return learnerRecordService.createCourseRecordForLearner(courseRecordInput);
     }
 
-    @PatchMapping(path = "/course-record", consumes = "application/json-patch+json", produces = "application/json")
-    public ResponseEntity<?> patchCourseRecordForLearner(@RequestParam String courseId,
-                                                         @Valid @RequestBody PatchCourseRecordInput patchCourseRecordInput,
-                                                         Authentication authentication) {
+    @PostMapping(path = "/course-record/update", produces = "application/json")
+    public ResponseEntity<?> updateCourseRecordForLearner(@RequestParam String courseId, Authentication authentication) {
         log.debug("courseId: {}", courseId);
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     "Learner Id is missing from authentication token","/course-record");
         }
-        return learnerRecordService.updateCourseRecordForLearner(learnerId, courseId, patchCourseRecordInput);
+        return learnerRecordService.updateCourseRecordForLearner(learnerId, courseId);
     }
 
     @PostMapping(path = "/module-record", produces = "application/json")

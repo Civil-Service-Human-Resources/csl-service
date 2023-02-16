@@ -58,6 +58,7 @@ public class RequestEntityFactory {
         String bearerToken = getBearerTokenFromSecurityContext();
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(bearerToken);
+        headers.setContentType(new MediaType("application", "json-patch+json"));
         if(additionalHeaderParams != null && !additionalHeaderParams.isEmpty()) {
             headers.setAll(additionalHeaderParams);
         }
