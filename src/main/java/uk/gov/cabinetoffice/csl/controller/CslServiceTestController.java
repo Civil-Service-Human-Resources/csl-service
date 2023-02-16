@@ -74,7 +74,7 @@ public class CslServiceTestController {
         Map<String, String> updateFields = new HashMap<>();
         updateFields.put("state", State.COMPLETED.toString());
         updateFields.put("preference", Preference.LIKED.toString());
-        updateFields.put("isRequired", "true");
+        updateFields.put("required", "true");
         return learnerRecordService.updateCourseRecordForLearner(learnerId, courseId, updateFields);
     }
 
