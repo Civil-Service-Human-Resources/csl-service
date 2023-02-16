@@ -12,9 +12,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ErrorResponse {
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime timestamp;
-    String status;
-    String message;
-    String path;
+//    @JsonSerialize(using = LocalDateTimeSerializer.class)
+//    private LocalDateTime timestamp;
+    private String timestamp;
+    private String status;
+    private String message;
+    private String error;
+    private String path;
 }

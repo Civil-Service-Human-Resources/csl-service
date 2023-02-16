@@ -47,31 +47,62 @@ public class CslServiceTestController {
     }
 
     @PostMapping(path = "/course-record", produces = "application/json")
-    public ResponseEntity<?> createCourseRecordForLearner(@Valid @RequestBody CourseRecordInput courseRecordInput) {
+    public ResponseEntity<?> createCourseRecordForLearner(@Valid @RequestBody CourseRecordInput courseRecordInput,
+                                                          Authentication authentication) {
+        log.debug("courseId: {}", courseRecordInput.getCourseId());
+        String learnerId = getLearnerIdFromAuth(authentication);
+        if(StringUtils.isBlank(learnerId)) {
+            return returnError(HttpStatus.BAD_REQUEST, "Learner Id is missing from authentication token",
+                    "/course-records");
+        }
+        courseRecordInput.setUserId(learnerId);
         return learnerRecordService.createCourseRecordForLearner(courseRecordInput);
     }
 
     @PatchMapping(path = "/course-record", consumes = "application/json-patch+json", produces = "application/json")
-    public ResponseEntity<?> patchCourseRecordForLearner(@RequestParam String learnerId, @RequestParam String courseId,
-                                                         @Valid @RequestBody PatchCourseRecordInput patchCourseRecordInput) {
+    public ResponseEntity<?> patchCourseRecordForLearner(@RequestParam String courseId,
+                                                         @Valid @RequestBody PatchCourseRecordInput patchCourseRecordInput,
+                                                         Authentication authentication) {
+        log.debug("courseId: {}", courseId);
+        String learnerId = getLearnerIdFromAuth(authentication);
+        if(StringUtils.isBlank(learnerId)) {
+            return returnError(HttpStatus.BAD_REQUEST, "Learner Id is missing from authentication token",
+                    "/course-records");
+        }
         return learnerRecordService.updateCourseRecordForLearner(learnerId, courseId, patchCourseRecordInput);
     }
 
     @PostMapping(path = "/module-record", produces = "application/json")
-    public ResponseEntity<?> createModuleRecordForLearner(@Valid @RequestBody ModuleRecordInput moduleRecordInput) {
+    public ResponseEntity<?> createModuleRecordForLearner(@Valid @RequestBody ModuleRecordInput moduleRecordInput,
+                                                          Authentication authentication) {
+        log.debug("courseId: {}", moduleRecordInput.getCourseId());
+        String learnerId = getLearnerIdFromAuth(authentication);
+        if(StringUtils.isBlank(learnerId)) {
+            return returnError(HttpStatus.BAD_REQUEST, "Learner Id is missing from authentication token",
+                    "/course-records");
+        }
+        moduleRecordInput.setUserId(learnerId);
         return learnerRecordService.createModuleRecordForLearner(moduleRecordInput);
     }
 
-    @PatchMapping(path = "/module-record/{moduleRecordId}", consumes = "application/json-patch+json", produces = "application/json")
-    public ResponseEntity<?> patchModuleRecordForLearner(@PathVariable("moduleRecordId") Long moduleRecordId,
-                                                         @Valid @RequestBody PatchModuleRecordInput patchModuleRecordInput) {
-        return learnerRecordService.updateModuleRecordForLearner(moduleRecordId, patchModuleRecordInput);
-    }
+//    @PatchMapping(path = "/module-record/{moduleRecordId}", consumes = "application/json-patch+json", produces = "application/json")
+//    public ResponseEntity<?> patchModuleRecordForLearner(@PathVariable("moduleRecordId") Long moduleRecordId,
+//                                                         @Valid @RequestBody AdditionalValue additionalValue) {
+//        Map<>
+//        return learnerRecordService.updateModuleRecordForLearner(moduleRecordId, patchModuleRecordInput);
+//    }
 
     //Only three inputs are required: registrationId, courseId and moduleId
     @PostMapping(path = "/launch-link", produces = "application/json")
-    public ResponseEntity<?> getRegistrationLaunchLink(@Valid @RequestBody RegistrationInput registrationInput) {
+    public ResponseEntity<?> getRegistrationLaunchLink(@Valid @RequestBody RegistrationInput registrationInput,
+                                                       Authentication authentication) {
         log.debug("registrationId: {}", registrationInput.getRegistrationId());
+        String learnerId = getLearnerIdFromAuth(authentication);
+        registrationInput.setLearnerId(learnerId);
+        if(StringUtils.isBlank(learnerId)) {
+            return returnError(HttpStatus.BAD_REQUEST,"Learner Id is missing from authentication token",
+                    "/registration-launch-link");
+        }
         return rusticiService.getRegistrationLaunchLink(registrationInput);
     }
 

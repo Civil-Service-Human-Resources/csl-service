@@ -26,15 +26,15 @@ public class CslServiceUtil {
             errorResponse.setMessage(ex.getResponseBodyAsString());
         }
         errorResponse.setStatus(String.valueOf(ex.getStatusCode().value()));
-        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setTimestamp(LocalDateTime.now().toString());
         errorResponse.setPath(path);
         log.debug("errorResponse.getMessage(): {}", errorResponse.getMessage());
         return new ResponseEntity<>(errorResponse, ex.getStatusCode());
     }
 
     public static  ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String errorMessage, String path) {
-        ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), String.valueOf(httpStatusCode.value()),
-                errorMessage, path);
+        ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now().toString(), String.valueOf(httpStatusCode.value()),
+                errorMessage, "", path);
         return new ResponseEntity<>(errorResponse, httpStatusCode);
     }
 

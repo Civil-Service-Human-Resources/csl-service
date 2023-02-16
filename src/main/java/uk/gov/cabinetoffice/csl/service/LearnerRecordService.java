@@ -1,5 +1,8 @@
 package uk.gov.cabinetoffice.csl.service;
 
+import jakarta.json.Json;
+import jakarta.json.JsonPatch;
+import jakarta.json.JsonPatchBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -8,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.cabinetoffice.csl.domain.*;
+
+import java.util.Map;
 
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 
@@ -85,11 +90,24 @@ public class LearnerRecordService {
         return moduleRecordForLearner(requestWithBearerAuth);
     }
 
-    public ResponseEntity<?> updateModuleRecordForLearner(Long moduleRecordId, PatchModuleRecordInput patchModuleRecordInput) {
+    public ResponseEntity<?> updateModuleRecordForLearner(Long moduleRecordId, Map<String, String> updateValues) {
+        JsonPatchBuilder jsonPatchBuilder = Json.createPatchBuilder();
+
+        jsonPatchBuilder = jsonPatchBuilder.replace("/postalCode", "500072");
+        jsonPatchBuilder = jsonPatchBuilder.replace("/postalCode", 500072);
+
+        JsonPatch jsonPatch = jsonPatchBuilder.build();
+
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
-                moduleRecordsForLearnerUrl + "/" + moduleRecordId, patchModuleRecordInput, null);
+                moduleRecordsForLearnerUrl + "/" + moduleRecordId, jsonPatch, null);
         return moduleRecordForLearner(requestWithBearerAuth);
     }
+
+//    public ResponseEntity<?> updateModuleRecordForLearner1(Long moduleRecordId, PatchModuleRecordInput patchModuleRecordInput) {
+//        RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
+//                moduleRecordsForLearnerUrl + "/" + moduleRecordId, patchModuleRecordInput, null);
+//        return moduleRecordForLearner(requestWithBearerAuth);
+//    }
 
     private ResponseEntity<?> moduleRecordForLearner(RequestEntity<?> requestWithBearerAuth) {
         ResponseEntity<?> response = null;
