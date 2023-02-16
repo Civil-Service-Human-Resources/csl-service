@@ -22,7 +22,7 @@ public class RequestEntityFactory {
     }
 
     public RequestEntity<?> createGetRequestWithBearerAuth(URI uri, Map<String, String> additionalHeaderParams) {
-        HttpHeaders headers = createHttpHeadersWithBearerAuth(additionalHeaderParams);
+        HttpHeaders headers = createHttpHeadersWithBearerAuth(additionalHeaderParams, MediaType.APPLICATION_JSON);
         return RequestEntity.get(uri).headers(headers).build();
     }
 
@@ -36,7 +36,7 @@ public class RequestEntityFactory {
 
     public RequestEntity<?> createPostRequestWithBearerAuth(URI uri, Object body,
                                                             Map<String, String> additionalHeaderParams) {
-        HttpHeaders headers = createHttpHeadersWithBearerAuth(additionalHeaderParams);
+        HttpHeaders headers = createHttpHeadersWithBearerAuth(additionalHeaderParams, MediaType.APPLICATION_JSON);
         return RequestEntity.post(uri).headers(headers).body(body);
     }
 
@@ -50,15 +50,17 @@ public class RequestEntityFactory {
 
     public RequestEntity<?> createPatchRequestWithBearerAuth(URI uri, Object body,
                                                             Map<String, String> additionalHeaderParams) {
-        HttpHeaders headers = createHttpHeadersWithBearerAuth(additionalHeaderParams);
+        HttpHeaders headers = createHttpHeadersWithBearerAuth(additionalHeaderParams,
+                new MediaType("application", "json-patch+json"));
         return RequestEntity.patch(uri).headers(headers).body(body);
     }
 
-    private HttpHeaders createHttpHeadersWithBearerAuth(Map<String, String> additionalHeaderParams) {
+    private HttpHeaders createHttpHeadersWithBearerAuth(Map<String, String> additionalHeaderParams,
+                                                        MediaType mediaType) {
         String bearerToken = getBearerTokenFromSecurityContext();
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(bearerToken);
-        headers.setContentType(new MediaType("application", "json-patch+json"));
+        headers.setContentType(mediaType);
         if(additionalHeaderParams != null && !additionalHeaderParams.isEmpty()) {
             headers.setAll(additionalHeaderParams);
         }
@@ -81,7 +83,8 @@ public class RequestEntityFactory {
 
     public RequestEntity<?> createGetRequestWithBasicAuth(URI uri, String apiUsername, String apiPassword,
                                                           Map<String, String> additionalHeaderParams) {
-        HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword, additionalHeaderParams);
+        HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword, additionalHeaderParams,
+                MediaType.APPLICATION_JSON);
         return RequestEntity.get(uri).headers(headers).build();
     }
 
@@ -97,14 +100,16 @@ public class RequestEntityFactory {
     public RequestEntity<?> createPostRequestWithBasicAuth(URI uri, Object body,
                                                            String apiUsername, String apiPassword,
                                                            Map<String, String> additionalHeaderParams) {
-        HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword, additionalHeaderParams);
+        HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword, additionalHeaderParams,
+                MediaType.APPLICATION_JSON);
         return RequestEntity.post(uri).headers(headers).body(body);
     }
 
     private HttpHeaders createHttpHeadersWithBasicAuth(String apiUsername, String apiPassword,
-                                                       Map<String, String> additionalHeaderParams) {
+                                                       Map<String, String> additionalHeaderParams, MediaType mediaType) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(mediaType));
+        headers.setContentType(mediaType);
         headers.setBasicAuth(apiUsername, apiPassword);
         if(additionalHeaderParams != null && !additionalHeaderParams.isEmpty()) {
             headers.setAll(additionalHeaderParams);

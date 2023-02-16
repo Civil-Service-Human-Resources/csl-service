@@ -11,6 +11,9 @@ import uk.gov.cabinetoffice.csl.domain.*;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.RusticiService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.getLearnerIdFromAuth;
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 
@@ -68,7 +71,11 @@ public class CslServiceTestController {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     "Learner Id is missing from authentication token","/course-record");
         }
-        return learnerRecordService.updateCourseRecordForLearner(learnerId, courseId);
+        Map<String, String> updateFields = new HashMap<>();
+        updateFields.put("state", State.COMPLETED.toString());
+        updateFields.put("preference", Preference.LIKED.toString());
+        updateFields.put("isRequired", "true");
+        return learnerRecordService.updateCourseRecordForLearner(learnerId, courseId, updateFields);
     }
 
     @PostMapping(path = "/module-record", produces = "application/json")

@@ -41,7 +41,7 @@ public class LearnerRecordService {
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createGetRequestWithBearerAuth(
                 courseRecordsForLearnerUrl + "?userId=" + learnerId + "&courseId=" + courseId,
                 null);
-        ResponseEntity<?> response = null;
+        ResponseEntity<?> response;
         try {
             response = restTemplate.exchange(requestWithBearerAuth, CourseRecords.class);
             if(response.getStatusCode().is2xxSuccessful()) {
@@ -61,13 +61,12 @@ public class LearnerRecordService {
         return courseRecordForLearner(requestWithBearerAuth);
     }
 
-    public ResponseEntity<?> updateCourseRecordForLearner(String learnerId, String courseId) {
-        PatchOp patchOp1 = new PatchOp("replace", "/state", State.COMPLETED.toString());
-        PatchOp patchOp2 = new PatchOp("replace", "/lastUpdated", LocalDateTime.now().toString());
-
+    public ResponseEntity<?> updateCourseRecordForLearner(String learnerId, String courseId,
+                                                          Map<String, String> updateFields) {
         List<PatchOp> jsonPatch = new ArrayList<>();
-        jsonPatch.add(patchOp1);
-        jsonPatch.add(patchOp2);
+        jsonPatch.add(new PatchOp("replace", "/lastUpdated", LocalDateTime.now().toString()));
+        updateFields.forEach((key, value) ->
+                jsonPatch.add(new PatchOp("replace", "/" + key, value)));
 
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
                 courseRecordsForLearnerUrl + "?userId=" + learnerId + "&courseId=" + courseId,
@@ -76,7 +75,7 @@ public class LearnerRecordService {
     }
 
     private ResponseEntity<?> courseRecordForLearner(RequestEntity<?> requestWithBearerAuth) {
-        ResponseEntity<?> response = null;
+        ResponseEntity<?> response;
         try {
             response = restTemplate.exchange(requestWithBearerAuth, CourseRecord.class);
             if(response.getStatusCode().is2xxSuccessful()) {
@@ -105,7 +104,7 @@ public class LearnerRecordService {
     }
 
     private ResponseEntity<?> moduleRecordForLearner(RequestEntity<?> requestWithBearerAuth) {
-        ResponseEntity<?> response = null;
+        ResponseEntity<?> response;
         try {
             response = restTemplate.exchange(requestWithBearerAuth, ModuleRecord.class);
             if(response.getStatusCode().is2xxSuccessful()) {
