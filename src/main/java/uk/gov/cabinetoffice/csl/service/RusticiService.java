@@ -97,7 +97,7 @@ public class RusticiService {
     }
 
     private ResponseEntity<?> getLaunchLink(RequestEntity<?> postRequestWithBasicAuth) {
-        ResponseEntity<?> response = null;
+        ResponseEntity<?> response;
         try {
             response = restTemplate.exchange(postRequestWithBasicAuth, LaunchLink.class);
         } catch (HttpStatusCodeException ex) {

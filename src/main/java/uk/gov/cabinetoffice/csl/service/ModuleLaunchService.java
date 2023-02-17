@@ -76,7 +76,6 @@ public class ModuleLaunchService {
                     }
 
                     if(moduleRecord != null) {
-
                         if(StringUtils.isBlank(moduleRecord.getUid())) {
                             //5. If the uid is not present in the module record then update the module record to assign the uid
                             Map<String, String> updateFields = new HashMap<>();
@@ -99,43 +98,31 @@ public class ModuleLaunchService {
                             registrationInput.setModuleId(moduleId);
                             ResponseEntity<?> registrationLaunchLinkResponse =
                                     rusticiService.getRegistrationLaunchLink(registrationInput);
-                            if(registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
-                                return registrationLaunchLinkResponse;
-                            } else {
+                            if(!registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
                                 registrationInput.setLearnerFirstName(learnerFirstName);
                                 registrationInput.setLearnerLastName(
                                         learnerLastName == null ? "" : learnerLastName);
                                 //7. If no launch link present then create the registration and launch link using withLaunchLink
-                                return rusticiService.createRegistrationAndLaunchLink(registrationInput);
+                                registrationLaunchLinkResponse = rusticiService.createRegistrationAndLaunchLink(registrationInput);
                             }
-                        } else {
-                            return returnError(HttpStatus.INTERNAL_SERVER_ERROR,
-                                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                                    "Unable to update module record for the learnerId: " + learnerId + ", courseId: "
-                                            + courseId + ", moduleId: " + moduleId,
-                                    "/courses/" + courseId + "/modules/" +  moduleId + " /launch", null);
+                            if(registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
+                                //8. Update launchLink with disabledBookmarking param
+                                //TODO: Implement rustici.disabledBookmarkingModuleIDs
+                                //9. Update the course and module records for the last updated timestamp
+                                //TODO: Update the course and module records for the last updated timestamp here
+
+                                //TODO: Write test for the new controller
+                                //TODO: Cleanup code - Delete controller and its test
+                            }
+                            return registrationLaunchLinkResponse;
                         }
-                    } else {
-                        return returnError(HttpStatus.INTERNAL_SERVER_ERROR,
-                                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                                "Unable to create module record for the learnerId: " + learnerId + ", courseId: "
-                                        + courseId + ", moduleId: " + moduleId,
-                                "/courses/" + courseId + "/modules/" +  moduleId + " /launch", null);
                     }
-                } else {
-                    return returnError(HttpStatus.INTERNAL_SERVER_ERROR,
-                            HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                            "Unable to create course record for the learnerId: " + learnerId + ", courseId: "
-                                    + courseId + ", moduleId: " + moduleId,
-                            "/courses/" + courseId + "/modules/" +  moduleId + " /launch", null);
                 }
-            } else {
-                return returnError(HttpStatus.INTERNAL_SERVER_ERROR,
-                        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                        "Unable to retrieve course record for the learnerId: " + learnerId + ", courseId: "
-                         + courseId, "/courses/" + courseId + "/modules/" +  moduleId + " /launch", null);
             }
         }
-        return courseRecordForLearnerResponse;
+        return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "Unable to retrieve module launch link for the learnerId: " + learnerId + ", courseId: "
+                        + courseId + ", modules/" +  moduleId,
+                "/courses/" + courseId + "/modules/" +  moduleId + " /launch", null);
     }
 }
