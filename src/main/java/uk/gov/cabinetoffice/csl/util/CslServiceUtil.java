@@ -17,9 +17,8 @@ import uk.gov.cabinetoffice.csl.domain.ErrorResponse;
 import org.apache.hc.client5.http.classic.HttpClient;
 
 import java.time.LocalDateTime;
-import java.util.*;
-
-
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component

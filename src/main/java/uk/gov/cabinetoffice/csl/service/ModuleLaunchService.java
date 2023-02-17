@@ -40,6 +40,7 @@ public class ModuleLaunchService {
                 learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
         if(courseRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
             CourseRecords courseRecords = (CourseRecords)courseRecordForLearnerResponse.getBody();
+            log.debug("courseRecords: {}", courseRecords);
             if(courseRecords != null) {
                 CourseRecord courseRecord = courseRecords.getCourseRecord(courseId);
                 if(courseRecord == null) {
@@ -50,6 +51,7 @@ public class ModuleLaunchService {
                     courseRecordForLearnerResponse = learnerRecordService.createCourseRecordForLearner(courseRecordInput);
                     if(courseRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
                         courseRecord = (CourseRecord)courseRecordForLearnerResponse.getBody();
+                        log.debug("courseRecord: {}", courseRecord);
                     }
                 }
 
@@ -69,6 +71,7 @@ public class ModuleLaunchService {
 
                         if(moduleRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
                             moduleRecord = (ModuleRecord)moduleRecordForLearnerResponse.getBody();
+                            log.debug("moduleRecord: {}", moduleRecord);
                         }
                     }
 
@@ -83,6 +86,7 @@ public class ModuleLaunchService {
 
                             if(moduleRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
                                 moduleRecord = (ModuleRecord)moduleRecordForLearnerResponse.getBody();
+                                log.debug("moduleRecord: {}", moduleRecord);
                             }
                         }
 
@@ -95,7 +99,7 @@ public class ModuleLaunchService {
                             registrationInput.setModuleId(moduleId);
                             ResponseEntity<?> registrationLaunchLinkResponse =
                                     rusticiService.getRegistrationLaunchLink(registrationInput);
-                            if (registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
+                            if(registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
                                 return registrationLaunchLinkResponse;
                             } else {
                                 registrationInput.setLearnerFirstName(learnerFirstName);

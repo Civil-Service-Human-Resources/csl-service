@@ -1,6 +1,5 @@
 package uk.gov.cabinetoffice.csl.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,6 @@ import java.util.Map;
 
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 
-@Slf4j
 @Service
 public class LearnerRecordService {
 
@@ -44,11 +42,6 @@ public class LearnerRecordService {
         ResponseEntity<?> response;
         try {
             response = restTemplate.exchange(requestWithBearerAuth, CourseRecords.class);
-            if(response.getStatusCode().is2xxSuccessful()) {
-                CourseRecords courseRecords = (CourseRecords)response.getBody();
-                assert courseRecords != null;
-                courseRecords.getCourseRecords().forEach(c -> log.debug("Course Title: {}", c.getCourseTitle()));
-            }
         } catch (HttpStatusCodeException ex) {
             response = returnError(ex, requestWithBearerAuth.getUrl().getPath());
         }
@@ -78,11 +71,6 @@ public class LearnerRecordService {
         ResponseEntity<?> response;
         try {
             response = restTemplate.exchange(requestWithBearerAuth, CourseRecord.class);
-            if(response.getStatusCode().is2xxSuccessful()) {
-                CourseRecord courseRecord = (CourseRecord)response.getBody();
-                assert courseRecord != null;
-                log.debug("Course Title: {}", courseRecord.getCourseTitle());
-            }
         } catch (HttpStatusCodeException ex) {
             response = returnError(ex, requestWithBearerAuth.getUrl().getPath());
         }
@@ -111,11 +99,6 @@ public class LearnerRecordService {
         ResponseEntity<?> response;
         try {
             response = restTemplate.exchange(requestWithBearerAuth, ModuleRecord.class);
-            if(response.getStatusCode().is2xxSuccessful()) {
-                ModuleRecord moduleRecord = (ModuleRecord)response.getBody();
-                assert moduleRecord != null;
-                log.debug("ModuleRecord Title: {}", moduleRecord.getModuleTitle());
-            }
         } catch (HttpStatusCodeException ex) {
             response = returnError(ex, requestWithBearerAuth.getUrl().getPath());
         }
