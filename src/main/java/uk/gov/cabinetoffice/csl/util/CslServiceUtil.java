@@ -37,13 +37,14 @@ public class CslServiceUtil {
         }
         errorResponse.setTimestamp(LocalDateTime.now().toString());
         errorResponse.setPath(path);
-        log.debug("errorResponse.getMessage(): {}", errorResponse.getMessage());
+        log.error("errorResponse: {}", errorResponse);
         return new ResponseEntity<>(errorResponse, ex.getStatusCode());
     }
 
     public static  ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String error, String message, String path) {
         ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now().toString(), String.valueOf(httpStatusCode.value()),
                 error, message, path, null);
+        log.error("errorResponse: {}", errorResponse);
         return new ResponseEntity<>(errorResponse, httpStatusCode);
     }
 
