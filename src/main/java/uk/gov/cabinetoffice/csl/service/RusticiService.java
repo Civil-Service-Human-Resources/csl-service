@@ -88,6 +88,7 @@ public class RusticiService {
         Registration registration = new Registration();
         registration.setRegistrationId(registrationInput.getRegistrationId());
         registration.setCourseId(registrationInput.getCourseId() + "." + registrationInput.getModuleId());
+        //registration.setCourseId(registrationInput.getCourseId());
         registration.setLearner(learner);
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
@@ -102,11 +103,11 @@ public class RusticiService {
         ResponseEntity<?> response = null;
         try {
             response = restTemplate.exchange(postRequestWithBasicAuth, LaunchLink.class);
-//            if (response.getStatusCode().is2xxSuccessful()) {
-//                LaunchLink launchLink = (LaunchLink) response.getBody();
-//                assert launchLink != null;
-//                log.debug("launchLink: {}", launchLink.getLaunchLink());
-//            }
+            if (response.getStatusCode().is2xxSuccessful()) {
+                LaunchLink launchLink = (LaunchLink) response.getBody();
+                assert launchLink != null;
+                log.debug("launchLink: {}", launchLink.getLaunchLink());
+            }
         } catch (HttpStatusCodeException ex) {
             response = returnError(ex, postRequestWithBasicAuth.getUrl().getPath());
         }

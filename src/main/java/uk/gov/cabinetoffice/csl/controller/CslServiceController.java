@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.domain.CourseRecordInput;
+import uk.gov.cabinetoffice.csl.domain.ModuleLaunchLinkInput;
 import uk.gov.cabinetoffice.csl.domain.ModuleRecordInput;
 import uk.gov.cabinetoffice.csl.service.ModuleLaunchService;
 
@@ -29,7 +30,7 @@ public class CslServiceController {
     @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/launch", produces = "application/json")
     public ResponseEntity<?> createModuleLaunchLink(@PathVariable("courseId") String courseId,
                                                     @PathVariable("moduleId") String moduleId,
-                                                    @RequestBody(required = false) CourseRecordInput courseRecordInput,
+                                                    @RequestBody ModuleLaunchLinkInput moduleLaunchLinkInput,
                                                     Authentication authentication) {
         log.debug("courseId: {}, moduleId: {}", courseId, moduleId);
 
@@ -40,6 +41,8 @@ public class CslServiceController {
                     "/courses/" + courseId + "/modules/" +  moduleId + " /launch", null);
         }
 
+        CourseRecordInput courseRecordInput = moduleLaunchLinkInput.getCourseRecordInput();
+
         if(courseRecordInput != null && courseRecordInput.getModuleRecords() != null
                 && courseRecordInput.getModuleRecords().size() != 1) {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -48,8 +51,9 @@ public class CslServiceController {
         }
 
         courseRecordInput = setupCourseRecordInput(courseRecordInput, learnerId, courseId, moduleId);
+        moduleLaunchLinkInput.setCourseRecordInput(courseRecordInput);
 
-        return moduleLaunchService.createLaunchLink(courseRecordInput);
+        return moduleLaunchService.createLaunchLink(moduleLaunchLinkInput);
     }
 
     private CourseRecordInput setupCourseRecordInput(CourseRecordInput courseRecordInput,

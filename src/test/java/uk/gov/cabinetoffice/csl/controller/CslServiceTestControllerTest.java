@@ -36,7 +36,8 @@ public class CslServiceTestControllerTest {
     @Test
     public void testTest() throws Exception {
         String input = "abc";
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/csl-test/test/" + input).accept(MediaType.APPLICATION_JSON);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/csl-test/test/" + input)
+                .accept(MediaType.APPLICATION_JSON);
         MvcResult result = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
         Assertions.assertEquals(input, result.getResponse().getContentAsString());
     }
