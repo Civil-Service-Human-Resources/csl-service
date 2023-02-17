@@ -17,7 +17,9 @@ public class RusticiService {
 
     private final RequestEntityFactory requestEntityFactory;
 
-    private final String rusticiRegistrationUrl;
+    private final String registrationLaunchLinkUrl;
+
+    private final String registrationWithLaunchLinkUrl;
 
     private final String rusticiUsername;
 
@@ -32,7 +34,8 @@ public class RusticiService {
     private final RestTemplate restTemplate;
 
     public RusticiService(RequestEntityFactory requestEntityFactory, RestTemplate restTemplate,
-                          @Value("${rustici.registrationUrl}") String rusticiRegistrationUrl,
+                          @Value("${rustici.registrationLaunchLinkUrl}") String registrationLaunchLinkUrl,
+                          @Value("${rustici.registrationWithLaunchLinkUrl}") String registrationWithLaunchLinkUrl,
                           @Value("${rustici.username}") String rusticiUsername,
                           @Value("${rustici.password}") String rusticiPassword,
                           @Value("${rustici.engineTenantName}") String rusticiEngineTenantName,
@@ -40,7 +43,8 @@ public class RusticiService {
                           @Value("${rustici.launchLinkExpiry}") int rusticiLaunchLinkExpiry) {
         this.requestEntityFactory = requestEntityFactory;
         this.restTemplate = restTemplate;
-        this.rusticiRegistrationUrl = rusticiRegistrationUrl;
+        this.registrationLaunchLinkUrl = registrationLaunchLinkUrl;
+        this.registrationWithLaunchLinkUrl = registrationWithLaunchLinkUrl;
         this.rusticiUsername = rusticiUsername;
         this.rusticiPassword = rusticiPassword;
         this.rusticiEngineTenantName = rusticiEngineTenantName;
@@ -49,11 +53,10 @@ public class RusticiService {
     }
 
     public ResponseEntity<?> getRegistrationLaunchLink(RegistrationInput registrationInput) {
-
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
-                rusticiRegistrationUrl + "/" + registrationInput.getRegistrationId() + "/launchLink",
-                createLaunchLinkRequest(rusticiRedirectOnExitUrl + "/"
-                        + registrationInput.getCourseId() + "/" + registrationInput.getModuleId()),
+                String.format(registrationLaunchLinkUrl, registrationInput.getRegistrationId()),
+                createLaunchLinkRequest(String.format(rusticiRedirectOnExitUrl, registrationInput.getCourseId(),
+                        registrationInput.getModuleId())),
                 rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
 
         return getLaunchLink(postRequestWithBasicAuth);
@@ -61,8 +64,7 @@ public class RusticiService {
 
     public ResponseEntity<?> createRegistrationAndLaunchLink(RegistrationInput registrationInput) {
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
-                rusticiRegistrationUrl + "/withLaunchLink",
-                createRegistrationRequest(registrationInput),
+                registrationWithLaunchLinkUrl, createRegistrationRequest(registrationInput),
                 rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
 
         return getLaunchLink(postRequestWithBasicAuth);
@@ -90,9 +92,8 @@ public class RusticiService {
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
         registrationRequest.setRegistration(registration);
-        registrationRequest.setLaunchLinkRequest(createLaunchLinkRequest(
-                rusticiRedirectOnExitUrl + "/" + registrationInput.getCourseId()
-                        + "/" + registrationInput.getModuleId()));
+        registrationRequest.setLaunchLinkRequest(createLaunchLinkRequest(String.format(rusticiRedirectOnExitUrl,
+                registrationInput.getCourseId(), registrationInput.getModuleId())));
 
         return registrationRequest;
     }
@@ -101,11 +102,11 @@ public class RusticiService {
         ResponseEntity<?> response = null;
         try {
             response = restTemplate.exchange(postRequestWithBasicAuth, LaunchLink.class);
-//            if (response.getStatusCode().is2xxSuccessful()) {
-//                LaunchLink launchLink = (LaunchLink) response.getBody();
-//                assert launchLink != null;
-//                log.debug("launchLink: {}", launchLink.getLaunchLink());
-//            }
+            if (response.getStatusCode().is2xxSuccessful()) {
+                LaunchLink launchLink = (LaunchLink) response.getBody();
+                assert launchLink != null;
+                log.debug("launchLink: {}", launchLink.getLaunchLink());
+            }
         } catch (HttpStatusCodeException ex) {
             response = returnError(ex, postRequestWithBasicAuth.getUrl().getPath());
         }
