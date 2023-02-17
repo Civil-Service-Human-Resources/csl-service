@@ -33,7 +33,7 @@ public class CslServiceController {
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    "Learner Id is missing from authentication token","/course-record");
+                    "Learner Id is missing from authentication token","/course-record", null);
         }
         courseRecordInput.setUserId(learnerId);
         courseRecordInput.setCourseId(courseId);

@@ -46,7 +46,7 @@ public class CslServiceTestController {
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    "Learner Id is missing from authentication token","/course-records");
+                    "Learner Id is missing from authentication token","/course-records", null);
         }
         return learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
     }
@@ -58,7 +58,7 @@ public class CslServiceTestController {
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    "Learner Id is missing from authentication token","/course-record");
+                    "Learner Id is missing from authentication token","/course-record", null);
         }
         courseRecordInput.setUserId(learnerId);
         courseRecordInput.getModuleRecords().forEach(m -> m.setUserId(learnerId));
@@ -71,7 +71,7 @@ public class CslServiceTestController {
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    "Learner Id is missing from authentication token","/course-record/update");
+                    "Learner Id is missing from authentication token","/course-record/update", null);
         }
 
         Map<String, String> updateFields = new HashMap<>();
@@ -89,7 +89,7 @@ public class CslServiceTestController {
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    "Learner Id is missing from authentication token","/module-record");
+                    "Learner Id is missing from authentication token","/module-record", null);
         }
         moduleRecordInput.setUserId(learnerId);
         return learnerRecordService.createModuleRecordForLearner(moduleRecordInput);
@@ -102,7 +102,7 @@ public class CslServiceTestController {
         String learnerId = getLearnerIdFromAuth(authentication);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    "Learner Id is missing from authentication token","/module-record/update");
+                    "Learner Id is missing from authentication token","/module-record/update", null);
         }
 
         Map<String, String> updateFields = new HashMap<>();
@@ -127,7 +127,7 @@ public class CslServiceTestController {
         registrationInput.setLearnerId(learnerId);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    "Learner Id is missing from authentication token","/launch-link");
+                    "Learner Id is missing from authentication token","/launch-link", null);
         }
         return rusticiService.getRegistrationLaunchLink(registrationInput);
     }
@@ -141,7 +141,7 @@ public class CslServiceTestController {
         registrationInput.setLearnerId(learnerId);
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    "Learner Id is missing from authentication token","/registration-launch-link");
+                    "Learner Id is missing from authentication token","/registration-launch-link", null);
         }
         return rusticiService.createRegistrationAndLaunchLink(registrationInput);
     }

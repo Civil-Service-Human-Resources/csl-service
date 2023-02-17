@@ -44,11 +44,11 @@ public class LearnerRecordService {
         ResponseEntity<?> response;
         try {
             response = restTemplate.exchange(requestWithBearerAuth, CourseRecords.class);
-            if(response.getStatusCode().is2xxSuccessful()) {
-                CourseRecords courseRecords = (CourseRecords)response.getBody();
-                assert courseRecords != null;
-                courseRecords.getCourseRecords().forEach(c -> log.debug("Course Title: {}", c.getCourseTitle()));
-            }
+//            if(response.getStatusCode().is2xxSuccessful()) {
+//                CourseRecords courseRecords = (CourseRecords)response.getBody();
+//                assert courseRecords != null;
+//                courseRecords.getCourseRecords().forEach(c -> log.debug("Course Title: {}", c.getCourseTitle()));
+//            }
         } catch (HttpStatusCodeException ex) {
             response = returnError(ex, requestWithBearerAuth.getUrl().getPath());
         }

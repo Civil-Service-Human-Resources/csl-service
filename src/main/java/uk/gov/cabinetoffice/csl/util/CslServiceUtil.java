@@ -41,9 +41,9 @@ public class CslServiceUtil {
         return new ResponseEntity<>(errorResponse, ex.getStatusCode());
     }
 
-    public static  ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String error, String message, String path) {
+    public static  ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String error, String message, String path, String[] messages) {
         ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now().toString(), String.valueOf(httpStatusCode.value()),
-                error, message, path, null);
+                error, message, path, messages);
         log.error("errorResponse: {}", errorResponse);
         return new ResponseEntity<>(errorResponse, httpStatusCode);
     }
