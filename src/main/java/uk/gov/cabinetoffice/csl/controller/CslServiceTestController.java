@@ -118,7 +118,8 @@ public class CslServiceTestController {
         return learnerRecordService.updateModuleRecordForLearner(moduleRecordId, updateFields);
     }
 
-    //Only three inputs are required: registrationId, courseId and moduleId
+    //Only three inputs are required: registrationId, courseId and moduleId and
+    // the fourth input learnerId will be retrieved from the authentication
     @PostMapping(path = "/launch-link", produces = "application/json")
     public ResponseEntity<?> getRegistrationLaunchLink(@Valid @RequestBody RegistrationInput registrationInput,
                                                        Authentication authentication) {
@@ -132,7 +133,8 @@ public class CslServiceTestController {
         return rusticiService.getRegistrationLaunchLink(registrationInput);
     }
 
-    //Only four inputs are required: registrationId, courseId, moduleId and learnerFirstName
+    //Only four inputs are required: registrationId, courseId, moduleId and learnerFirstName and
+    // the fifth input learnerId will be retrieved from the authentication
     @PostMapping(path = "/registration-launch-link", produces = "application/json")
     public ResponseEntity<?> createRegistrationAndLaunchLink(@Valid @RequestBody RegistrationInput registrationInput,
                                                              Authentication authentication) {

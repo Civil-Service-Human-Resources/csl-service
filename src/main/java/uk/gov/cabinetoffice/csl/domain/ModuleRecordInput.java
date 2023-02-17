@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.UUID;
 
 import uk.gov.cabinetoffice.csl.annotations.ValidEnum;
 
@@ -16,7 +15,7 @@ import static uk.gov.cabinetoffice.csl.domain.State.IN_PROGRESS;
 @Data
 public class ModuleRecordInput {
 
-    private String uid = UUID.randomUUID().toString();
+    private String uid;
 
     @NotBlank(message = "userId is required")
     private String userId;
