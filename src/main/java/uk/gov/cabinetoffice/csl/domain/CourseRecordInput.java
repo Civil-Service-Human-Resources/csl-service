@@ -1,10 +1,13 @@
 package uk.gov.cabinetoffice.csl.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import uk.gov.cabinetoffice.csl.annotations.ValidEnum;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -25,6 +28,12 @@ public class CourseRecordInput {
 
     @ValidEnum(enumClass = Preference.class)
     private String preference;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private LocalDate previousDueDate;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private LocalDate nextDueDate;
 
     @Valid
     private List<ModuleRecordInput> moduleRecords;

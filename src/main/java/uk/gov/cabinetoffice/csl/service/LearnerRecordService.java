@@ -8,7 +8,6 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.cabinetoffice.csl.domain.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +56,6 @@ public class LearnerRecordService {
     public ResponseEntity<?> updateCourseRecordForLearner(String learnerId, String courseId,
                                                           Map<String, String> updateFields) {
         List<PatchOp> jsonPatch = new ArrayList<>();
-        jsonPatch.add(new PatchOp("replace", "/lastUpdated", LocalDateTime.now().toString()));
         updateFields.forEach((key, value) ->
                 jsonPatch.add(new PatchOp("replace", "/" + key, value)));
 
@@ -86,7 +84,6 @@ public class LearnerRecordService {
     public ResponseEntity<?> updateModuleRecordForLearner(Long moduleRecordId,
                                                           Map<String, String> updateFields) {
         List<PatchOp> jsonPatch = new ArrayList<>();
-        jsonPatch.add(new PatchOp("replace", "/updatedAt", LocalDateTime.now().toString()));
         updateFields.forEach((key, value) ->
                 jsonPatch.add(new PatchOp("replace", "/" + key, value)));
 

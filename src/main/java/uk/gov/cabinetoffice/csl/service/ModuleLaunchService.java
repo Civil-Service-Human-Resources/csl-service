@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -72,24 +73,38 @@ public class ModuleLaunchService {
                         if(moduleRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
                             moduleRecord = (ModuleRecord)moduleRecordForLearnerResponse.getBody();
                             log.debug("moduleRecord: {}", moduleRecord);
+                            //4A. Update course record for the same date and time as module update date and time
+                            assert moduleRecord != null;
+                            LocalDateTime moduleUpdatedAt = moduleRecord.getUpdatedAt();
+                            Map<String, String> updateFields = new HashMap<>();
+                            updateFields.put("lastUpdated", moduleUpdatedAt.toString());
+                            learnerRecordService.updateCourseRecordForLearner(learnerId, courseId, updateFields);
                         }
                     }
 
                     if(moduleRecord != null) {
                         if(StringUtils.isBlank(moduleRecord.getUid())) {
                             //5. If the uid is not present in the module record then update the module record to assign the uid
+                            String currentDateAndTime = LocalDateTime.now().toString();
                             Map<String, String> updateFields = new HashMap<>();
+                            updateFields.put("updatedAt", currentDateAndTime);
                             updateFields.put("uid", UUID.randomUUID().toString());
-                            ResponseEntity<?> moduleRecordForLearnerResponse =
+                            ResponseEntity<?> updateFieldsResponse =
                                  learnerRecordService.updateModuleRecordForLearner(moduleRecord.getId(), updateFields);
 
-                            if(moduleRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
-                                moduleRecord = (ModuleRecord)moduleRecordForLearnerResponse.getBody();
+                            if(updateFieldsResponse.getStatusCode().is2xxSuccessful()) {
+                                moduleRecord = (ModuleRecord)updateFieldsResponse.getBody();
                                 log.debug("moduleRecord: {}", moduleRecord);
+                                //5A. Update course record for the same date and time as module update date and time
+                                assert moduleRecord != null;
+                                LocalDateTime moduleUpdatedAt = moduleRecord.getUpdatedAt();
+                                updateFields = new HashMap<>();
+                                updateFields.put("lastUpdated", moduleUpdatedAt.toString());
+                                learnerRecordService.updateCourseRecordForLearner(learnerId, courseId, updateFields);
                             }
                         }
 
-                        if(moduleRecord != null && StringUtils.isNotBlank(moduleRecord.getUid())) {
+                        if(StringUtils.isNotBlank(moduleRecord.getUid())) {
                             //6. Get the launchLink using module uid as registration id
                             RegistrationInput registrationInput = new RegistrationInput();
                             registrationInput.setRegistrationId(moduleRecord.getUid());
@@ -103,16 +118,26 @@ public class ModuleLaunchService {
                                 registrationInput.setLearnerLastName(
                                         learnerLastName == null ? "" : learnerLastName);
                                 //7. If no launch link present then create the registration and launch link using withLaunchLink
-                                registrationLaunchLinkResponse = rusticiService.createRegistrationAndLaunchLink(registrationInput);
+                                registrationLaunchLinkResponse =
+                                        rusticiService.createRegistrationAndLaunchLink(registrationInput);
                             }
                             if(registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
                                 //8. Update launchLink with disabledBookmarking param
                                 //TODO: Implement rustici.disabledBookmarkingModuleIDs
-                                //9. Update the course and module records for the last updated timestamp
-                                //TODO: Update the course and module records for the last updated timestamp here
 
-                                //TODO: Write test for the new controller
-                                //TODO: Cleanup code - Delete controller and its test
+                                //9. Update the course and module records for the last updated timestamp
+                                String currentDateAndTime = LocalDateTime.now().toString();
+                                Map<String, String> updateDateTimeMap = new HashMap<>();
+                                updateDateTimeMap.put("updatedAt", currentDateAndTime);
+                                ResponseEntity<?> updateDateTimeResponse =
+                                        learnerRecordService.updateModuleRecordForLearner(moduleRecord.getId(), updateDateTimeMap);
+                                if(updateDateTimeResponse.getStatusCode().is2xxSuccessful()) {
+                                    moduleRecord = (ModuleRecord)updateDateTimeResponse.getBody();
+                                    log.debug("moduleRecord: {}", moduleRecord);
+                                    updateDateTimeMap = new HashMap<>();
+                                    updateDateTimeMap.put("lastUpdated", moduleRecord.getUpdatedAt().toString());
+                                    learnerRecordService.updateCourseRecordForLearner(learnerId, courseId, updateDateTimeMap);
+                                }
                             }
                             return registrationLaunchLinkResponse;
                         }
