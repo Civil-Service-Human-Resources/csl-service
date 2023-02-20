@@ -156,7 +156,7 @@ public class ModuleLaunchService {
         return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 "Unable to retrieve module launch link for the learnerId: " + learnerId + ", courseId: "
                         + courseId + ", modules/" +  moduleId,
-                "/courses/" + courseId + "/modules/" +  moduleId + " /launch", null);
+                "/csl/courses/" + courseId + "/modules/" +  moduleId + "/launch", null);
     }
 
     private boolean isDisabledBookmarkingModuleID(String moduleId) {
