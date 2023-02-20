@@ -36,14 +36,14 @@ public class CslServiceUtil {
         }
         errorResponse.setTimestamp(LocalDateTime.now().toString());
         errorResponse.setPath(path);
-        log.error("errorResponse: {}", errorResponse);
+        log.error(String.valueOf(errorResponse));
         return new ResponseEntity<>(errorResponse, ex.getStatusCode());
     }
 
     public static  ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String error, String message, String path, String[] messages) {
         ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now().toString(), String.valueOf(httpStatusCode.value()),
                 error, message, path, messages);
-        log.error("errorResponse: {}", errorResponse);
+        log.error(String.valueOf(errorResponse));
         return new ResponseEntity<>(errorResponse, httpStatusCode);
     }
 
@@ -59,15 +59,6 @@ public class CslServiceUtil {
         if(authentication != null) {
             Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
             learnerId = (String)jwtPrincipal.getClaims().get("user_name");
-
-            log.debug("Authenticated?: {}", authentication.isAuthenticated());
-            log.debug("Authentication jwtPrincipal: {}", jwtPrincipal);
-            log.debug("Authentication jwtPrincipal Claims: {}", jwtPrincipal.getClaims());
-            log.debug("Authentication jwtPrincipal Headers: {}",  jwtPrincipal.getHeaders());
-            log.debug("Authentication jwtPrincipal ExpiresAt: {}", jwtPrincipal.getExpiresAt());
-            log.debug("Authentication jwtPrincipal Id: {}", jwtPrincipal.getId());
-            log.debug("Authentication jwtPrincipal IssuedAt: {}", jwtPrincipal.getIssuedAt());
-            log.debug("Authentication jwtPrincipal TokenValue: {}", jwtPrincipal.getTokenValue());
         }
         log.debug("Learner Id from authentication token: {}", learnerId);
         return learnerId;
