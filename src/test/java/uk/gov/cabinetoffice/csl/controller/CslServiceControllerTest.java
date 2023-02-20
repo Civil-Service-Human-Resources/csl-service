@@ -51,11 +51,7 @@ public class CslServiceControllerTest {
         assertEquals("Learner Id is missing from authentication token", errorResponse.getMessage());
     }
 
-    private static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    private static String asJsonString(final Object obj) throws Exception {
+        return new ObjectMapper().writeValueAsString(obj);
     }
 }
