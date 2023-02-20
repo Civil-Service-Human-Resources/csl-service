@@ -133,8 +133,6 @@ public class ModuleLaunchService {
                                     LaunchLink launchLink = (LaunchLink) registrationLaunchLinkResponse.getBody();
                                     assert launchLink != null;
                                     String launchLinkWithDisabledBookmarking = launchLink.getLaunchLink() + "&clearbookmark=true";
-                                    //launchLink.setLaunchLink(launchLinkWithDisabledBookmarking);
-                                    //TODO: Debug/Test below to see if it return the updated launchLink
                                     ((LaunchLink) registrationLaunchLinkResponse.getBody()).setLaunchLink(launchLinkWithDisabledBookmarking);
                                 }
                                 //9. Update the module record for the last updated timestamp
