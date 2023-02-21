@@ -372,6 +372,24 @@
 					"response": []
 				},
 				{
+					"name": "actuator/metrics/jvm.info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/metrics/jvm.info",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"metrics",
+								"jvm.info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "actuator/scheduledtasks",
 					"request": {
 						"method": "GET",
@@ -453,7 +471,6 @@
 								"{{csl-base-url}}"
 							],
 							"path": [
-								"csl",
 								"courses",
 								"6iBnQ9nIQIuuzRave9bKGw",
 								"modules",
@@ -500,7 +517,7 @@
 	"variable": [
 		{
 			"key": "csl-base-url",
-			"value": "{{local-csl-base-url}}/csl-service",
+			"value": "{{local-csl-base-url}}/api",
 			"type": "default"
 		},
 		{
@@ -525,27 +542,32 @@
 		},
 		{
 			"key": "remote-identity-base-url",
-			"value": "https://identity.integration.learn.civilservice.gov.uk",
+			"value": "integration-identity-service-url",
 			"type": "default"
 		},
 		{
 			"key": "bearer_client_id",
-			"value": "9fbd4ae2-2db3-44c8-9544-88e80255b56e",
+			"value": "client-id",
 			"type": "default"
 		},
 		{
 			"key": "bearer_client_pw",
-			"value": "test",
+			"value": "client-secret",
 			"type": "default"
 		},
 		{
 			"key": "usertoken_username",
-			"value": "your_lpg_username",
+			"value": "your-lpg-username",
 			"type": "default"
 		},
 		{
 			"key": "usertoken_pw",
-			"value": "your_lpg_user_pw",
+			"value": "your-lpg-username-pw",
+			"type": "default"
+		},
+		{
+			"key": "remote-csl-base-url",
+			"value": "integration-csl-service-url",
 			"type": "default"
 		}
 	]
