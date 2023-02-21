@@ -51,12 +51,12 @@
 								},
 								{
 									"key": "username",
-									"value": "test@cabinetoffice.gov.uk",
+									"value": "{{usertoken_username}}",
 									"type": "text"
 								},
 								{
 									"key": "password",
-									"value": "Password123",
+									"value": "{{usertoken_pw}}",
 									"type": "text"
 								}
 							]
@@ -84,7 +84,7 @@
 							"formdata": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzEyODI2NDgsInVzZXJfbmFtZSI6Ijg0NTE5MDdiLTUwMWQtNDk0Ni1hNWFiLWQ3Mzc2YTJhNGZmOSIsImF1dGhvcml0aWVzIjpbIkxFQVJORVIiXSwianRpIjoiZmE5MzI5MjUtMzY2Mi00ZWNkLTg5ZmItMzQzMTY2MmIwZWZjIiwiY2xpZW50X2lkIjoiOWZiZDRhZTItMmRiMy00NGM4LTk1NDQtODhlODAyNTViNTZlIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl19.ygEheQLMSKstJCue9b-Eh5Gy9A8W8W74y6rMCz1L5rM",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNjc3MDY0NjUxLCJhdXRob3JpdGllcyI6WyJDTElFTlQiXSwianRpIjoiOGNiMWJiZmMtZDQwYy00YTJkLTk1MDItZmE3YTlmMzU5YTNkIiwiY2xpZW50X2lkIjoiOWZiZDRhZTItMmRiMy00NGM4LTk1NDQtODhlODAyNTViNTZlIn0.uwMEqYGVIsbBDwH07UDRy7-wq_Ey68BP9fsAfLY_J9M",
 									"type": "text"
 								}
 							]
@@ -110,7 +110,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNjI2NDM1Njg4LCJhdXRob3JpdGllcyI6WyJDTElFTlQiXSwianRpIjoiNGU4NTAzOTItOGY5My00ZTYxLTk5NmMtOWU4MTQ2ODViODdmIiwiY2xpZW50X2lkIjoiOWZiZDRhZTItMmRiMy00NGM4LTk1NDQtODhlODAyNTViNTZlIn0.AZRABZtL1QL-y-GfnxSG90waHzlmZLDErpfHW3jJSGA",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNjc3MDY0NjUxLCJhdXRob3JpdGllcyI6WyJDTElFTlQiXSwianRpIjoiOGNiMWJiZmMtZDQwYy00YTJkLTk1MDItZmE3YTlmMzU5YTNkIiwiY2xpZW50X2lkIjoiOWZiZDRhZTItMmRiMy00NGM4LTk1NDQtODhlODAyNTViNTZlIn0.uwMEqYGVIsbBDwH07UDRy7-wq_Ey68BP9fsAfLY_J9M",
 									"type": "string"
 								}
 							]
@@ -136,12 +136,12 @@
 				"basic": [
 					{
 						"key": "password",
-						"value": "test",
+						"value": "{{bearer_client_pw}}",
 						"type": "string"
 					},
 					{
 						"key": "username",
-						"value": "9fbd4ae2-2db3-44c8-9544-88e80255b56e",
+						"value": "{{bearer_client_id}}",
 						"type": "string"
 					}
 				]
@@ -428,22 +428,37 @@
 			]
 		},
 		{
-			"name": "3. api",
+			"name": "3. launch-link",
 			"item": [
 				{
-					"name": "test",
+					"name": "1. create-module-launch-link",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"learnerFirstName\": \"Neeraj Jain\",\n    \"learnerLastName\": \"\",\n    \"courseRecordInput\":\n        {\n            \"courseTitle\" : \"20Feb23_NJ2_Cou2_Test_CSL_Service\",\n            \"isRequired\" : \"true\",\n            \"moduleRecords\" : [\n                {\n                    \"moduleTitle\" : \"20Feb23_NJ2_Cou1_Mod2_Test_CSL_Service\",\n                    \"optional\" : \"false\",\n                    \"moduleType\" : \"elearning\"\n                }\n            ]\n        }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{csl-base-url}}/csl/test/abc",
+							"raw": "{{csl-base-url}}/csl/courses/6iBnQ9nIQIuuzRave9bKGw/modules/sUmxgUeHSCS6Z7G3cwI1Iw/launch",
 							"host": [
 								"{{csl-base-url}}"
 							],
 							"path": [
 								"csl",
-								"test",
-								"abc"
+								"courses",
+								"6iBnQ9nIQIuuzRave9bKGw",
+								"modules",
+								"sUmxgUeHSCS6Z7G3cwI1Iw",
+								"launch"
 							]
 						}
 					},
@@ -510,7 +525,27 @@
 		},
 		{
 			"key": "remote-identity-base-url",
-			"value": "https://identity.performance.learn.civilservice.gov.uk",
+			"value": "https://identity.integration.learn.civilservice.gov.uk",
+			"type": "default"
+		},
+		{
+			"key": "bearer_client_id",
+			"value": "9fbd4ae2-2db3-44c8-9544-88e80255b56e",
+			"type": "default"
+		},
+		{
+			"key": "bearer_client_pw",
+			"value": "test",
+			"type": "default"
+		},
+		{
+			"key": "usertoken_username",
+			"value": "your_lpg_username",
+			"type": "default"
+		},
+		{
+			"key": "usertoken_pw",
+			"value": "your_lpg_user_pw",
 			"type": "default"
 		}
 	]
