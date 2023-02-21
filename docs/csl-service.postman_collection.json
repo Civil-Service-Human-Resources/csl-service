@@ -448,7 +448,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{csl-base-url}}/csl/courses/6iBnQ9nIQIuuzRave9bKGw/modules/sUmxgUeHSCS6Z7G3cwI1Iw/launch",
+							"raw": "{{csl-base-url}}/courses/6iBnQ9nIQIuuzRave9bKGw/modules/sUmxgUeHSCS6Z7G3cwI1Iw/launch",
 							"host": [
 								"{{csl-base-url}}"
 							],

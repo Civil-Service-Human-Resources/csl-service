@@ -18,7 +18,6 @@ import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/csl")
 public class CslServiceController {
 
     private final ModuleLaunchService moduleLaunchService;
@@ -38,7 +37,7 @@ public class CslServiceController {
         if(StringUtils.isBlank(learnerId)) {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     "Learner Id is missing from authentication token",
-                    "/csl/courses/" + courseId + "/modules/" +  moduleId + "/launch", null);
+                    "/courses/" + courseId + "/modules/" +  moduleId + "/launch", null);
         }
 
         CourseRecordInput courseRecordInput = moduleLaunchLinkInput.getCourseRecordInput();
@@ -47,7 +46,7 @@ public class CslServiceController {
                 && courseRecordInput.getModuleRecords().size() != 1) {
             return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     "Either 0 or more than 1 modules are present in the request body.",
-                    "/csl/courses/" + courseId + "/modules/" +  moduleId + "/launch", null);
+                    "/courses/" + courseId + "/modules/" +  moduleId + "/launch", null);
         }
 
         courseRecordInput = setupCourseRecordInput(courseRecordInput, learnerId, courseId, moduleId);

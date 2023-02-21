@@ -36,7 +36,7 @@ public class CslServiceControllerTest {
         String courseId = "course-id";
         String moduleId = "module-id";
         ModuleLaunchLinkInput moduleLaunchLinkInput = new ModuleLaunchLinkInput();
-        String uri = String.format("/csl/courses/%s/modules/%s/launch", courseId, moduleId);
+        String uri = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post(uri)
                 .content(asJsonString(moduleLaunchLinkInput))
