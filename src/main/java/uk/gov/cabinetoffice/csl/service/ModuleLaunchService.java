@@ -128,12 +128,16 @@ public class ModuleLaunchService {
                             if(registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
                                 log.info("Module launch link is successfully retrieved for learner id: {}, course id: {} " +
                                                 "and module id: {}", learnerId, courseId, moduleId);
-                                //8. Update launchLink with disabledBookmarking param
                                 if(isDisabledBookmarkingModuleID(moduleId)) {
+                                    //8. Update launchLink with disabledBookmarking param
                                     LaunchLink launchLink = (LaunchLink) registrationLaunchLinkResponse.getBody();
-                                    assert launchLink != null;
-                                    String launchLinkWithDisabledBookmarking = launchLink.getLaunchLink() + "&clearbookmark=true";
-                                    ((LaunchLink) registrationLaunchLinkResponse.getBody()).setLaunchLink(launchLinkWithDisabledBookmarking);
+                                    if(launchLink != null) {
+                                        String launchLinkWithDisabledBookmarking = launchLink.getLaunchLink() + "&clearbookmark=true";
+                                        launchLink.setLaunchLink(launchLinkWithDisabledBookmarking);
+                                        registrationLaunchLinkResponse = new ResponseEntity<>(launchLink, HttpStatus.OK);
+                                        log.info("Module launch link is updated for clearbookmark=true for learner id: {}, course id: {} " +
+                                                "and module id: {}", learnerId, courseId, moduleId);
+                                    }
                                 }
                                 //9. Update the module record for the last updated timestamp
                                 String currentDateAndTime = LocalDateTime.now().toString();

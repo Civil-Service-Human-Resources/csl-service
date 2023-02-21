@@ -56,7 +56,6 @@ public class RusticiService {
                 createLaunchLinkRequest(String.format(rusticiRedirectOnExitUrl, registrationInput.getCourseId(),
                         registrationInput.getModuleId())),
                 rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
-
         return getLaunchLink(postRequestWithBasicAuth);
     }
 
@@ -64,16 +63,13 @@ public class RusticiService {
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
                 registrationWithLaunchLinkUrl, createRegistrationRequest(registrationInput),
                 rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
-
         return getLaunchLink(postRequestWithBasicAuth);
     }
 
     private LaunchLinkRequest createLaunchLinkRequest(String redirectOnExitUrl) {
-
         LaunchLinkRequest launchLinkRequest = new LaunchLinkRequest();
         launchLinkRequest.setExpiry(rusticiLaunchLinkExpiry);
         launchLinkRequest.setRedirectOnExitUrl(redirectOnExitUrl);
-
         return launchLinkRequest;
     }
 
@@ -92,7 +88,6 @@ public class RusticiService {
         registrationRequest.setRegistration(registration);
         registrationRequest.setLaunchLinkRequest(createLaunchLinkRequest(String.format(rusticiRedirectOnExitUrl,
                 registrationInput.getCourseId(), registrationInput.getModuleId())));
-
         return registrationRequest;
     }
 
