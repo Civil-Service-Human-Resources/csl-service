@@ -63,7 +63,7 @@ public class ModuleLaunchService {
                         if(StringUtils.isBlank(moduleRecord.getUid())) {
                             //5. If the uid is not present in the module record then update the module record to assign
                             // the uid
-                            moduleRecord = updateModuleRecordToAssignUid(moduleRecord);
+                            moduleRecord = updateModuleRecordToAssignUid(moduleRecord, learnerId, courseId);
                         }
                         assert moduleRecord != null;
                         if(StringUtils.isNotBlank(moduleRecord.getUid())) {
@@ -120,7 +120,7 @@ public class ModuleLaunchService {
         return null;
     }
 
-    private ModuleRecord updateModuleRecordToAssignUid(ModuleRecord moduleRecord) {
+    private ModuleRecord updateModuleRecordToAssignUid(ModuleRecord moduleRecord, String learnerId, String courseId) {
         String currentDateAndTime = LocalDateTime.now().toString();
         Map<String, String> updateFields = new HashMap<>();
         updateFields.put("updatedAt", currentDateAndTime);
@@ -129,11 +129,9 @@ public class ModuleLaunchService {
                 learnerRecordService.updateModuleRecordForLearner(moduleRecord.getId(), updateFields);
 
         if(updateFieldsResponse.getStatusCode().is2xxSuccessful()) {
-            //TODO: Check if moduleRecord has courseRecord, in turn which has userId and courseId
             log.debug("moduleRecord: {}", moduleRecord);
             log.info("uid and updatedAt fields are updated for the module record for learner id: "
-                            + "{}, course id: {} and module id: {}", moduleRecord.getCourseRecord().getUserId(),
-                    moduleRecord.getCourseRecord().getCourseId(), moduleRecord.getModuleId());
+                            + "{}, course id: {} and module id: {}", learnerId, courseId, moduleRecord.getModuleId());
             moduleRecord = (ModuleRecord)updateFieldsResponse.getBody();
         }
 
