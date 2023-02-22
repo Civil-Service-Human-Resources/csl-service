@@ -13,7 +13,7 @@ import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 @Service
 public class RusticiService {
 
-    private final RequestEntityFactory requestEntityFactory;
+    private final RequestEntityWithBasicAuthFactory requestEntityFactory;
 
     private final String registrationLaunchLinkUrl;
 
@@ -31,7 +31,7 @@ public class RusticiService {
 
     private final RestTemplate restTemplate;
 
-    public RusticiService(RequestEntityFactory requestEntityFactory, RestTemplate restTemplate,
+    public RusticiService(RequestEntityWithBasicAuthFactory requestEntityFactory, RestTemplate restTemplate,
                           @Value("${rustici.registrationLaunchLinkUrl}") String registrationLaunchLinkUrl,
                           @Value("${rustici.registrationWithLaunchLinkUrl}") String registrationWithLaunchLinkUrl,
                           @Value("${rustici.username}") String rusticiUsername,

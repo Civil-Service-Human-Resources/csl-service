@@ -17,7 +17,7 @@ import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 @Service
 public class LearnerRecordService {
 
-    private final RequestEntityFactory requestEntityFactory;
+    private final RequestEntityWithBearerAuthFactory requestEntityFactory;
 
     private final String courseRecordsForLearnerUrl;
 
@@ -25,9 +25,9 @@ public class LearnerRecordService {
 
     private final RestTemplate restTemplate;
 
-    public LearnerRecordService(RequestEntityFactory requestEntityFactory, RestTemplate restTemplate,
-        @Value("${learnerRecord.courseRecordsForLearnerUrl}") String courseRecordsForLearnerUrl,
-        @Value("${learnerRecord.moduleRecordsForLearnerUrl}") String moduleRecordsForLearnerUrl) {
+    public LearnerRecordService(RequestEntityWithBearerAuthFactory requestEntityFactory, RestTemplate restTemplate,
+                                @Value("${learnerRecord.courseRecordsForLearnerUrl}") String courseRecordsForLearnerUrl,
+                                @Value("${learnerRecord.moduleRecordsForLearnerUrl}") String moduleRecordsForLearnerUrl) {
         this.requestEntityFactory = requestEntityFactory;
         this.restTemplate = restTemplate;
         this.courseRecordsForLearnerUrl = courseRecordsForLearnerUrl;

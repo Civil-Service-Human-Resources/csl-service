@@ -458,7 +458,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"learnerFirstName\": \"Neeraj Jain\",\n    \"learnerLastName\": \"\",\n    \"courseRecordInput\":\n        {\n            \"courseTitle\" : \"20Feb23_NJ2_Cou2_Test_CSL_Service\",\n            \"isRequired\" : \"true\",\n            \"moduleRecords\" : [\n                {\n                    \"moduleTitle\" : \"20Feb23_NJ2_Cou1_Mod2_Test_CSL_Service\",\n                    \"optional\" : \"false\",\n                    \"moduleType\" : \"elearning\"\n                }\n            ]\n        }\n}",
+							"raw": "{\n    \"learnerFirstName\": \"Learner Firstname\",\n    \"learnerLastName\": \"\",\n    \"courseRecordInput\":\n        {\n            \"courseTitle\" : \"Test Course Title\",\n            \"isRequired\" : \"true\",\n            \"moduleRecords\" : [\n                {\n                    \"moduleTitle\" : \"Test Module Title\",\n                    \"optional\" : \"false\",\n                    \"moduleType\" : \"elearning\"\n                }\n            ]\n        }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
