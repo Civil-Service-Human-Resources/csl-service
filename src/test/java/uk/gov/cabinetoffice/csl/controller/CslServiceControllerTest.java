@@ -32,7 +32,7 @@ public class CslServiceControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    public void testCreateModuleLaunchLink() throws Exception {
+    public void testCreateModuleLaunchLinkForHttpStatus400() throws Exception {
         String courseId = "course-id";
         String moduleId = "module-id";
         ModuleLaunchLinkInput moduleLaunchLinkInput = new ModuleLaunchLinkInput();
