@@ -90,10 +90,10 @@ public class ModuleLaunchService {
         ResponseEntity<?> courseRecordForLearnerResponse =
                 learnerRecordService.createCourseRecordForLearner(courseRecordInput);
         if(courseRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
-            log.info("A new course record is created for learner id: {} and course id: {}",
-                    learnerId, courseId);
             CourseRecord courseRecord = (CourseRecord)courseRecordForLearnerResponse.getBody();
             log.debug("courseRecord: {}", courseRecord);
+            log.info("A new course record is created for learner id: {} and course id: {}",
+                    learnerId, courseId);
             return courseRecord;
         }
         return null;
@@ -129,12 +129,12 @@ public class ModuleLaunchService {
                 learnerRecordService.updateModuleRecordForLearner(moduleRecord.getId(), updateFields);
 
         if(updateFieldsResponse.getStatusCode().is2xxSuccessful()) {
-            log.debug("moduleRecord: {}", moduleRecord);
-            log.info("uid and updatedAt fields are updated for the module record for learner id: "
-                            + "{}, course id: {} and module id: {}", learnerId, courseId, moduleRecord.getModuleId());
             moduleRecord = (ModuleRecord)updateFieldsResponse.getBody();
+            assert moduleRecord != null;
+            log.info("uid and updatedAt fields are updated for the module record for learner id: "
+                    + "{}, course id: {} and module id: {}", learnerId, courseId, moduleRecord.getModuleId());
         }
-
+        log.debug("moduleRecord: {}", moduleRecord);
         return moduleRecord;
     }
 
