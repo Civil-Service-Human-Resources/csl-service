@@ -55,9 +55,11 @@ public class ModuleLaunchService {
                     courseRecordInput.setState(State.IN_PROGRESS.name());
                     moduleRecordInput.setUid(UUID.randomUUID().toString());
                     moduleRecordInput.setState(State.IN_PROGRESS.name());
-                    courseRecordForLearnerResponse = learnerRecordService.createCourseRecordForLearner(courseRecordInput);
+                    courseRecordForLearnerResponse =
+                            learnerRecordService.createCourseRecordForLearner(courseRecordInput);
                     if(courseRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
-                        log.info("A new course record is created for learner id: {} and course id: {}", learnerId, courseId);
+                        log.info("A new course record is created for learner id: {} and course id: {}",
+                                learnerId,courseId);
                         courseRecord = (CourseRecord)courseRecordForLearnerResponse.getBody();
                         log.debug("courseRecord: {}", courseRecord);
                     }
@@ -78,8 +80,8 @@ public class ModuleLaunchService {
                                         moduleRecordInput);
 
                         if(moduleRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
-                            log.info("A new module record is created for learner id: {}, course id: {} and module id: {}",
-                                    learnerId, courseId, moduleId);
+                            log.info("A new module record is created for learner id: {}, course id: {} and module id: "
+                                    + "{}", learnerId, courseId, moduleId);
                             moduleRecord = (ModuleRecord)moduleRecordForLearnerResponse.getBody();
                             log.debug("moduleRecord: {}", moduleRecord);
                         }
@@ -87,7 +89,8 @@ public class ModuleLaunchService {
 
                     if(moduleRecord != null) {
                         if(StringUtils.isBlank(moduleRecord.getUid())) {
-                            //5. If the uid is not present in the module record then update the module record to assign the uid
+                            //5. If the uid is not present in the module record then update the module record to assign
+                            // the uid
                             String currentDateAndTime = LocalDateTime.now().toString();
                             Map<String, String> updateFields = new HashMap<>();
                             updateFields.put("updatedAt", currentDateAndTime);
@@ -96,8 +99,8 @@ public class ModuleLaunchService {
                                  learnerRecordService.updateModuleRecordForLearner(moduleRecord.getId(), updateFields);
 
                             if(updateFieldsResponse.getStatusCode().is2xxSuccessful()) {
-                                log.info("uid and updatedAt fields are updated for the module record for learner id: {}, " +
-                                        "course id: {} and module id: {}", learnerId, courseId, moduleId);
+                                log.info("uid and updatedAt fields are updated for the module record for learner id: "
+                                        + "{}, course id: {} and module id: {}", learnerId, courseId, moduleId);
                                 moduleRecord = (ModuleRecord)updateFieldsResponse.getBody();
                                 log.debug("moduleRecord: {}", moduleRecord);
                             }
@@ -115,28 +118,31 @@ public class ModuleLaunchService {
                                     rusticiService.getRegistrationLaunchLink(registrationInput);
                             if(!registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
                                 log.info("Module launch link could not be retrieved using launchLink endpoint for " +
-                                                "learner id: {}, course id: {} and module id: {}", learnerId, courseId, moduleId);
+                                    "learner id: {}, course id: {} and module id: {}", learnerId, courseId, moduleId);
                                 registrationInput.setLearnerFirstName(learnerFirstName);
                                 registrationInput.setLearnerLastName(
                                         learnerLastName == null ? "" : learnerLastName);
-                                //7. If no launch link present then create the registration and launch link using withLaunchLink
-                                log.info("Invoking withLaunchLink endpoint for learner id: {}, course id: {} and module id: {}",
-                                        learnerId, courseId, moduleId);
+                                //7. If no launch link present then create the registration and launch link using
+                                // withLaunchLink
+                                log.info("Invoking withLaunchLink endpoint for learner id: {}, course id: {} and " +
+                                                "module id: {}", learnerId, courseId, moduleId);
                                 registrationLaunchLinkResponse =
                                         rusticiService.createRegistrationAndLaunchLink(registrationInput);
                             }
                             if(registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
-                                log.info("Module launch link is successfully retrieved for learner id: {}, course id: {} " +
-                                                "and module id: {}", learnerId, courseId, moduleId);
+                                log.info("Module launch link is successfully retrieved for learner id: {}, course id: "
+                                        + "{} and module id: {}", learnerId, courseId, moduleId);
                                 if(isDisabledBookmarkingModuleID(moduleId)) {
                                     //8. Update launchLink with disabledBookmarking param
                                     LaunchLink launchLink = (LaunchLink) registrationLaunchLinkResponse.getBody();
                                     if(launchLink != null) {
-                                        String launchLinkWithDisabledBookmarking = launchLink.getLaunchLink() + "&clearbookmark=true";
+                                        String launchLinkWithDisabledBookmarking = launchLink.getLaunchLink()
+                                                + "&clearbookmark=true";
                                         launchLink.setLaunchLink(launchLinkWithDisabledBookmarking);
-                                        registrationLaunchLinkResponse = new ResponseEntity<>(launchLink, HttpStatus.OK);
-                                        log.info("Module launch link is updated for clearbookmark=true for learner id: {}, course id: {} " +
-                                                "and module id: {}", learnerId, courseId, moduleId);
+                                        registrationLaunchLinkResponse = new ResponseEntity<>(launchLink,
+                                                HttpStatus.OK);
+                                        log.info("Module launch link is updated for clearbookmark=true for learner id: "
+                                                + "{}, course id: {} and module id: {}", learnerId, courseId, moduleId);
                                     }
                                 }
                                 //9. Update the module record for the last updated timestamp
@@ -144,7 +150,8 @@ public class ModuleLaunchService {
                                 Map<String, String> updateDateTimeMap = new HashMap<>();
                                 updateDateTimeMap.put("updatedAt", currentDateAndTime);
                                 ResponseEntity<?> updateDateTimeResponse =
-                                        learnerRecordService.updateModuleRecordForLearner(moduleRecord.getId(), updateDateTimeMap);
+                                        learnerRecordService.updateModuleRecordForLearner(moduleRecord.getId(),
+                                                updateDateTimeMap);
                                 if(updateDateTimeResponse.getStatusCode().is2xxSuccessful()) {
                                     log.info("updatedAt field is updated for the module record after retrieving the " +
                                             "module launch link for learner id: {}, course id: {} and module id: {}",
