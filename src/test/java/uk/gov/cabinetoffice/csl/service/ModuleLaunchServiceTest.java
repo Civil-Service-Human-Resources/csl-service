@@ -31,8 +31,8 @@ public class ModuleLaunchServiceTest {
     private final String learnerId = "learnerId";
     private final String courseId = "courseId";
     private final String moduleId = "moduleId";
-    String courseTitle = "courseTitle";
-    Boolean isRequired = true;
+    private final String courseTitle = "courseTitle";
+    private final Boolean isRequired = true;
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordForLearnerReturnsError() {
