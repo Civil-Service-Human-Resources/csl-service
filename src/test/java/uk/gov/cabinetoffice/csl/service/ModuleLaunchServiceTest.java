@@ -80,15 +80,6 @@ public class ModuleLaunchServiceTest {
         return moduleRecordInput;
     }
 
-    private ResponseEntity<?> createResponseForError(String message, String path) {
-        return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                message, path, null);
-    }
-
-    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyModules() {
-        return new ResponseEntity<>(createCourseRecordsWithEmptyModules(), HttpStatus.OK);
-    }
-
     private CourseRecords createCourseRecordsWithEmptyModules() {
         CourseRecords courseRecords = new CourseRecords(new ArrayList<>());
         courseRecords.getCourseRecords().add(createCourseRecordWithEmptyModules());
@@ -104,5 +95,14 @@ public class ModuleLaunchServiceTest {
         CourseRecords courseRecords = new CourseRecords(new ArrayList<>());
         courseRecords.getCourseRecords().add(new CourseRecord());
         return courseRecords;
+    }
+    
+    private ResponseEntity<?> createResponseForError(String message, String path) {
+        return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                message, path, null);
+    }
+
+    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyModules() {
+        return new ResponseEntity<>(createCourseRecordsWithEmptyModules(), HttpStatus.OK);
     }
 }
