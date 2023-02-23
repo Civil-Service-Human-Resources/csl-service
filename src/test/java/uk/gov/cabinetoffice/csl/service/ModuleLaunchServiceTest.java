@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
@@ -80,29 +81,41 @@ public class ModuleLaunchServiceTest {
         return moduleRecordInput;
     }
 
-    private CourseRecords createCourseRecordsWithEmptyModules() {
+    private CourseRecords createCourseRecords() {
         CourseRecords courseRecords = new CourseRecords(new ArrayList<>());
-        courseRecords.getCourseRecords().add(createCourseRecordWithEmptyModules());
+        courseRecords.getCourseRecords().add(createCourseRecord());
         return courseRecords;
     }
 
-    private CourseRecord createCourseRecordWithEmptyModules() {
+    private CourseRecord createCourseRecord() {
         return new CourseRecord(courseId, learnerId, courseTitle, State.IN_PROGRESS, null, null,
-                null, isRequired, new ArrayList<>(), LocalDateTime.now());
+                null, isRequired, createModuleRecords(), LocalDateTime.now());
     }
 
-    private CourseRecords createCourseRecordsWithEmptyCourseRecord() {
-        CourseRecords courseRecords = new CourseRecords(new ArrayList<>());
-        courseRecords.getCourseRecords().add(new CourseRecord());
-        return courseRecords;
+    private List<ModuleRecord> createModuleRecords() {
+        List<ModuleRecord> moduleRecords =  new ArrayList<>();
+        moduleRecords.add(createModuleRecord());
+        return moduleRecords;
     }
-    
+
+    private ModuleRecord createModuleRecord() {
+        ModuleRecord moduleRecord = new ModuleRecord();
+        //TODO: Populate moduleRecord
+        return moduleRecord;
+    }
+
     private ResponseEntity<?> createResponseForError(String message, String path) {
         return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 message, path, null);
     }
 
-    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyModules() {
-        return new ResponseEntity<>(createCourseRecordsWithEmptyModules(), HttpStatus.OK);
+    private ResponseEntity<?> createResponseForCourseRecords() {
+        return new ResponseEntity<>(createCourseRecords(), HttpStatus.OK);
+    }
+
+    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyCourseRecord() {
+        CourseRecords courseRecords = createCourseRecords();
+        courseRecords.setCourseRecords(new ArrayList<>());
+        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
     }
 }
