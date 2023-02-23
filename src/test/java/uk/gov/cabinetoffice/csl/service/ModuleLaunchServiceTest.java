@@ -12,7 +12,9 @@ import uk.gov.cabinetoffice.csl.domain.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
@@ -31,9 +33,15 @@ public class ModuleLaunchServiceTest {
 
     private final String learnerId = "learnerId";
     private final String courseId = "courseId";
-    private final String moduleId = "moduleId";
     private final String courseTitle = "courseTitle";
     private final Boolean isRequired = true;
+    private final String moduleId = "moduleId";
+    private final String moduleTitle = "moduleTitle";
+    private final Boolean optional = false;
+    private final String moduleType = "elearning";
+    private final String uid = UUID.randomUUID().toString();
+    private final String learnerFirstName = "learnerFirstName";
+    private final String learnerLastName = "";
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordForLearnerReturnsError() {
@@ -44,11 +52,15 @@ public class ModuleLaunchServiceTest {
         ResponseEntity<?> launchLinkResponse = moduleLaunchService
                 .createLaunchLink(createModuleLaunchLinkInput(learnerId, courseId, moduleId));
         assertTrue(launchLinkResponse.getStatusCode().is5xxServerError());
+        ErrorResponse responseBody = (ErrorResponse) launchLinkResponse.getBody();
+        assert responseBody != null;
+        assertEquals("Unable to retrieve module launch link for the learnerId: " + learnerId
+                + ", courseId: " + courseId + ", modules/" +  moduleId, responseBody.getMessage());
+        assertEquals("/courses/" + courseId + "/modules/" +  moduleId + "/launch", responseBody.getPath());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), responseBody.getError());
     }
 
     private ModuleLaunchLinkInput createModuleLaunchLinkInput(String learnerId, String courseId, String moduleId) {
-        String learnerFirstName = "learnerFirstName";
-        String learnerLastName = "learnerLastName";
         ModuleLaunchLinkInput moduleLaunchLinkInput = new ModuleLaunchLinkInput();
         moduleLaunchLinkInput.setLearnerFirstName(learnerFirstName);
         moduleLaunchLinkInput.setLearnerLastName(learnerLastName);
@@ -68,9 +80,6 @@ public class ModuleLaunchServiceTest {
     }
 
     private ModuleRecordInput createModuleRecordInput(String learnerId, String courseId, String moduleId) {
-        String moduleTitle = "moduleTitle";
-        Boolean optional = false;
-        String moduleType = "moduleType";
         ModuleRecordInput moduleRecordInput = new ModuleRecordInput();
         moduleRecordInput.setUserId(learnerId);
         moduleRecordInput.setCourseId(courseId);
@@ -100,7 +109,16 @@ public class ModuleLaunchServiceTest {
 
     private ModuleRecord createModuleRecord() {
         ModuleRecord moduleRecord = new ModuleRecord();
-        //TODO: Populate moduleRecord
+        moduleRecord.setId(1L);
+        moduleRecord.setUid(uid);
+        moduleRecord.setModuleId(moduleId);
+        moduleRecord.setModuleTitle(moduleTitle);
+        moduleRecord.setModuleType(moduleType);
+        moduleRecord.setOptional(false);
+        moduleRecord.setState(State.IN_PROGRESS);
+        moduleRecord.setCreatedAt(LocalDateTime.now());
+        moduleRecord.setUpdatedAt(LocalDateTime.now());
+        moduleRecord.setCompletionDate(LocalDateTime.now());
         return moduleRecord;
     }
 
@@ -117,5 +135,29 @@ public class ModuleLaunchServiceTest {
         CourseRecords courseRecords = createCourseRecords();
         courseRecords.setCourseRecords(new ArrayList<>());
         return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+    }
+
+    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyModuleRecord() {
+        CourseRecords courseRecords = createCourseRecords();
+        courseRecords.getCourseRecord(courseId).setModuleRecords(new ArrayList<>());
+        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+    }
+
+    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyModuleUid() {
+        CourseRecords courseRecords = createCourseRecords();
+        courseRecords.getCourseRecord(courseId).getModuleRecord(moduleId).setUid(null);
+        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+    }
+
+    private RegistrationInput createRegistrationInput() {
+        return new RegistrationInput(uid, courseId, moduleId, learnerId, learnerFirstName, learnerLastName);
+    }
+
+    private LaunchLink createLaunchLink() {
+        return new LaunchLink("https://rustici-engine/RusticiEngine/defaultui/launch.jsp?jwt=eyJ0eXAiOiJKV1");
+    }
+
+    private ResponseEntity<?> createResponseForLaunchLink() {
+        return new ResponseEntity<>(createLaunchLink(), HttpStatus.OK);
     }
 }
