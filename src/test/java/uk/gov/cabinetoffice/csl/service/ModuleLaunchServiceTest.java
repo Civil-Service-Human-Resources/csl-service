@@ -7,10 +7,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.cabinetoffice.csl.domain.CourseRecordInput;
-import uk.gov.cabinetoffice.csl.domain.ModuleLaunchLinkInput;
-import uk.gov.cabinetoffice.csl.domain.ModuleRecordInput;
+import uk.gov.cabinetoffice.csl.domain.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertTrue;
@@ -32,20 +31,18 @@ public class ModuleLaunchServiceTest {
     private final String learnerId = "learnerId";
     private final String courseId = "courseId";
     private final String moduleId = "moduleId";
+    String courseTitle = "courseTitle";
+    Boolean isRequired = true;
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordForLearnerReturnsError() {
-        ResponseEntity errorResponse = createErrorResponse(
-                "Unable to retrieve course record for the learnerId: " + learnerId + ", courseId: " + courseId
-                + ", modules/" +  moduleId, "/course_records?userId=" + learnerId + "&courseId=" + courseId);
+        ResponseEntity errorResponse = createResponseForError("Unable to retrieve course record for the" +
+                " learnerId: " + learnerId + ", courseId: " + courseId + ", modules/" +  moduleId,
+                "/course_records?userId=" + learnerId + "&courseId=" + courseId);
         when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(errorResponse);
-        ResponseEntity<?> launchLinkResponse = moduleLaunchService.createLaunchLink(createModuleLaunchLinkInput(learnerId, courseId, moduleId));
+        ResponseEntity<?> launchLinkResponse = moduleLaunchService
+                .createLaunchLink(createModuleLaunchLinkInput(learnerId, courseId, moduleId));
         assertTrue(launchLinkResponse.getStatusCode().is5xxServerError());
-    }
-
-    private ResponseEntity<?> createErrorResponse(String message, String path) {
-        return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                message, path, null);
     }
 
     private ModuleLaunchLinkInput createModuleLaunchLinkInput(String learnerId, String courseId, String moduleId) {
@@ -59,8 +56,6 @@ public class ModuleLaunchServiceTest {
     }
 
     private CourseRecordInput createCourseRecordInput(String learnerId, String courseId, String moduleId) {
-        String courseTitle = "courseTitle";
-        Boolean isRequired = true;
         CourseRecordInput courseRecordInput = new CourseRecordInput();
         courseRecordInput.setUserId(learnerId);
         courseRecordInput.setCourseId(courseId);
@@ -83,5 +78,31 @@ public class ModuleLaunchServiceTest {
         moduleRecordInput.setOptional(optional);
         moduleRecordInput.setModuleType(moduleType);
         return moduleRecordInput;
+    }
+
+    private ResponseEntity<?> createResponseForError(String message, String path) {
+        return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                message, path, null);
+    }
+
+    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyModules() {
+        return new ResponseEntity<>(createCourseRecordsWithEmptyModules(), HttpStatus.OK);
+    }
+
+    private CourseRecords createCourseRecordsWithEmptyModules() {
+        CourseRecords courseRecords = new CourseRecords(new ArrayList<>());
+        courseRecords.getCourseRecords().add(createCourseRecordWithEmptyModules());
+        return courseRecords;
+    }
+
+    private CourseRecord createCourseRecordWithEmptyModules() {
+        return new CourseRecord(courseId, learnerId, courseTitle, State.IN_PROGRESS, null, null,
+                null, isRequired, new ArrayList<>(), LocalDateTime.now());
+    }
+
+    private CourseRecords createCourseRecordsWithEmptyCourseRecord() {
+        CourseRecords courseRecords = new CourseRecords(new ArrayList<>());
+        courseRecords.getCourseRecords().add(new CourseRecord());
+        return courseRecords;
     }
 }
