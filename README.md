@@ -1,7 +1,7 @@
 # csl-service
 
-CSL service is a a business logic API service. It is intended to be a singular point for managing all of the data coming into and
-going out of the learner record API; as well as business logic related to Rustici.
+CSL service is a business logic API service. It is intended to be a singular point for managing all the data coming into
+and going out of the learner record API and Rustici engine; as well as business logic related to Rustici.
 
 This service includes the following technical implementation:
 
@@ -41,8 +41,8 @@ Run the application either using IDE e.g. Intellij or Maven or Docker as follows
 * A postman collection is available in [docs/csl-service.postman_collection.json](docs/csl-service.postman_collection.json) file for the following:
 
   * Generating oAuth2.0 token using identity-service.
-  * Actuator Endpoints.
-  * Test Endpoint.
+  * Actuator endpoints.
+  * Create module launch link endpoint.
 
 ### Azure Build Pipeline:
 

@@ -1,34 +1,57 @@
 package uk.gov.cabinetoffice.csl.controller;
 
-import org.junit.jupiter.api.Assertions;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import uk.gov.cabinetoffice.csl.domain.ErrorResponse;
+import uk.gov.cabinetoffice.csl.domain.ModuleLaunchLinkInput;
+import uk.gov.cabinetoffice.csl.service.ModuleLaunchService;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Slf4j
 @WebMvcTest(controllers = CslServiceController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 @AutoConfigureMockMvc(addFilters = false)
-@RunWith(SpringRunner.class)
 public class CslServiceControllerTest {
+
+    @MockBean
+    private ModuleLaunchService moduleLaunchService;
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    public void testTest() throws Exception {
-        String input = "abc";
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/csl/test/" + input).accept(MediaType.APPLICATION_JSON);
-        MvcResult result = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
-        Assertions.assertEquals(input, result.getResponse().getContentAsString());
+    public void testCreateModuleLaunchLinkForHttpStatus400() throws Exception {
+        String courseId = "course-id";
+        String moduleId = "module-id";
+        ModuleLaunchLinkInput moduleLaunchLinkInput = new ModuleLaunchLinkInput();
+        String uri = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post(uri)
+                .content(asJsonString(moduleLaunchLinkInput))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+        MvcResult result = mockMvc.perform(requestBuilder).andExpect(status().isBadRequest()).andReturn();
+        String responseAsString = result.getResponse().getContentAsString();
+        log.debug("responseAsString: {}", responseAsString);
+        ErrorResponse errorResponse = new ObjectMapper().readValue(responseAsString, ErrorResponse.class);
+        log.debug("errorResponse: {}", errorResponse);
+        assertEquals(uri, errorResponse.getPath());
+        assertEquals("Learner Id is missing from authentication token", errorResponse.getMessage());
+    }
+
+    private static String asJsonString(final Object obj) throws Exception {
+        return new ObjectMapper().writeValueAsString(obj);
     }
 }

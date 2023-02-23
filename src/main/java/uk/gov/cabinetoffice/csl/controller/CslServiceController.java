@@ -1,35 +1,78 @@
 package uk.gov.cabinetoffice.csl.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.domain.CourseRecordInput;
+import uk.gov.cabinetoffice.csl.domain.ModuleLaunchLinkInput;
+import uk.gov.cabinetoffice.csl.domain.ModuleRecordInput;
+import uk.gov.cabinetoffice.csl.service.ModuleLaunchService;
+
+import java.util.ArrayList;
+
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.getLearnerIdFromAuth;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/csl")
 public class CslServiceController {
 
-    @GetMapping(path = "/test/{input}", produces = "application/json")
-    public ResponseEntity<String> test(@PathVariable("input") String input, Authentication authentication) {
-        log.debug("Input: {}", input);
-        log.debug("Authentication: {}", authentication);
-        if(authentication != null) {
-            Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-            log.debug("Authenticated?: {}", authentication.isAuthenticated());
-            log.debug("Authentication jwtPrincipal: {}", jwtPrincipal);
-            log.debug("Authentication jwtPrincipal Claims: {}", jwtPrincipal.getClaims());
-            log.debug("Authentication jwtPrincipal Headers: {}",  jwtPrincipal.getHeaders());
-            log.debug("Authentication jwtPrincipal ExpiresAt: {}", jwtPrincipal.getExpiresAt());
-            log.debug("Authentication jwtPrincipal Id: {}", jwtPrincipal.getId());
-            log.debug("Authentication jwtPrincipal IssuedAt: {}", jwtPrincipal.getIssuedAt());
-            log.debug("Authentication jwtPrincipal TokenValue: {}", jwtPrincipal.getTokenValue());
+    private final ModuleLaunchService moduleLaunchService;
+
+    public CslServiceController(ModuleLaunchService moduleLaunchService) {
+        this.moduleLaunchService = moduleLaunchService;
+    }
+
+    @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/launch", produces = "application/json")
+    public ResponseEntity<?> createModuleLaunchLink(@PathVariable("courseId") String courseId,
+                                                    @PathVariable("moduleId") String moduleId,
+                                                    @RequestBody ModuleLaunchLinkInput moduleLaunchLinkInput,
+                                                    Authentication authentication) {
+        log.debug("courseId: {}, moduleId: {}", courseId, moduleId);
+
+        String learnerId = getLearnerIdFromAuth(authentication);
+        if(StringUtils.isBlank(learnerId)) {
+            return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    "Learner Id is missing from authentication token",
+                    "/courses/" + courseId + "/modules/" +  moduleId + "/launch", null);
         }
-        return new ResponseEntity<>(input, HttpStatus.OK);
+
+        CourseRecordInput courseRecordInput = moduleLaunchLinkInput.getCourseRecordInput();
+
+        if(courseRecordInput != null && courseRecordInput.getModuleRecords() != null
+                && courseRecordInput.getModuleRecords().size() != 1) {
+            return returnError(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    "Either 0 or more than 1 modules are present in the request body.",
+                    "/courses/" + courseId + "/modules/" +  moduleId + "/launch", null);
+        }
+
+        courseRecordInput = setupCourseRecordInput(courseRecordInput, learnerId, courseId, moduleId);
+        moduleLaunchLinkInput.setCourseRecordInput(courseRecordInput);
+
+        return moduleLaunchService.createLaunchLink(moduleLaunchLinkInput);
+    }
+
+    private CourseRecordInput setupCourseRecordInput(CourseRecordInput courseRecordInput,
+                                                     String learnerId, String courseId, String moduleId) {
+        if(courseRecordInput == null) {
+            courseRecordInput = new CourseRecordInput();
+        }
+
+        courseRecordInput.setUserId(learnerId);
+        courseRecordInput.setCourseId(courseId);
+
+        if(courseRecordInput.getModuleRecords() == null || courseRecordInput.getModuleRecords().isEmpty()) {
+            courseRecordInput.setModuleRecords(new ArrayList<>());
+            courseRecordInput.getModuleRecords().add(new ModuleRecordInput());
+        }
+
+        courseRecordInput.getModuleRecords().get(0).setUserId(learnerId);
+        courseRecordInput.getModuleRecords().get(0).setCourseId(courseId);
+        courseRecordInput.getModuleRecords().get(0).setModuleId(moduleId);
+
+        return courseRecordInput;
     }
 }
