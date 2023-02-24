@@ -1,10 +1,10 @@
 package uk.gov.cabinetoffice.csl.service;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.cabinetoffice.csl.domain.*;
@@ -14,12 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 
-@RunWith(MockitoJUnitRunner.class)
+@SpringBootTest
 public class ModuleLaunchServiceTest {
 
     @Mock
@@ -42,6 +42,13 @@ public class ModuleLaunchServiceTest {
     private final String uid = UUID.randomUUID().toString();
     private final String learnerFirstName = "learnerFirstName";
     private final String learnerLastName = "";
+
+    private String[] disabledBookmarkingModuleIDs = {moduleId, "moduleId1"};
+
+    @BeforeEach
+    public void setup() {
+        moduleLaunchService = new ModuleLaunchService(learnerRecordService, rusticiService, disabledBookmarkingModuleIDs);
+    }
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordForLearnerReturnsError() {
