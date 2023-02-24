@@ -56,8 +56,14 @@ public class ModuleLaunchServiceTest {
                 " learnerId: " + learnerId + ", courseId: " + courseId + ", modules/" +  moduleId,
                 "/course_records?userId=" + learnerId + "&courseId=" + courseId);
         when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(errorResponse);
-        ResponseEntity<?> launchLinkResponse = moduleLaunchService
-                .createLaunchLink(createModuleLaunchLinkInput(learnerId, courseId, moduleId));
+        verifyError(invokeService());
+    }
+
+    private ResponseEntity<?> invokeService() {
+        return moduleLaunchService.createLaunchLink(createModuleLaunchLinkInput(learnerId, courseId, moduleId));
+    }
+
+    private void verifyError(ResponseEntity<?> launchLinkResponse) {
         assertTrue(launchLinkResponse.getStatusCode().is5xxServerError());
         ErrorResponse responseBody = (ErrorResponse) launchLinkResponse.getBody();
         assert responseBody != null;
