@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 
@@ -40,10 +41,11 @@ public class ModuleLaunchServiceTest {
     private final Boolean optional = false;
     private final String moduleType = "elearning";
     private final String uid = UUID.randomUUID().toString();
+    private final Long id = 1L;
     private final String learnerFirstName = "learnerFirstName";
     private final String learnerLastName = "";
 
-    private String[] disabledBookmarkingModuleIDs = {moduleId, "moduleId1"};
+    private final String[] disabledBookmarkingModuleIDs = {moduleId, "moduleId1"};
 
     @BeforeEach
     public void setup() {
@@ -57,6 +59,24 @@ public class ModuleLaunchServiceTest {
                 "/course_records?userId=" + learnerId + "&courseId=" + courseId);
         when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(errorResponse);
         verifyError(invokeService());
+    }
+
+    @Test
+    public void createLaunchLinkShouldReturnLaunchLinkWithDisabledBookmark() {
+        ResponseEntity responseForCourseRecordsWithEmptyCourseRecord = createResponseForCourseRecordsWithEmptyCourseRecord();
+        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(responseForCourseRecordsWithEmptyCourseRecord);
+
+        CourseRecordInput courseRecordInput = createCourseRecordInput(learnerId, courseId, moduleId);
+        ResponseEntity responseForCourseRecord = createResponseForCourseRecord();
+        when(learnerRecordService.createCourseRecordForLearner(courseRecordInput)).thenReturn(responseForCourseRecord);
+
+        RegistrationInput registrationInput = createRegistrationInput();
+        ResponseEntity responseForLaunchLink = createResponseForLaunchLink();
+        when(rusticiService.getRegistrationLaunchLink(registrationInput)).thenReturn(responseForLaunchLink);
+
+        ResponseEntity responseForModuleRecord = createResponseForModuleRecord();
+        when(learnerRecordService.updateModuleRecordForLearner(any(), any())).thenReturn(responseForModuleRecord);
+        verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
     }
 
     private ResponseEntity<?> invokeService() {
@@ -73,6 +93,14 @@ public class ModuleLaunchServiceTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), responseBody.getError());
     }
 
+    private void verifySuccessAndLaunchLinkWithDisabledBookmark(ResponseEntity<?> launchLinkResponse) {
+        assertTrue(launchLinkResponse.getStatusCode().is2xxSuccessful());
+        LaunchLink actualLaunchLink = (LaunchLink) launchLinkResponse.getBody();
+        LaunchLink expectedLaunchLink = createLaunchLink();
+        expectedLaunchLink.setLaunchLink(expectedLaunchLink.getLaunchLink() + "&clearbookmark=true");
+        assertEquals(expectedLaunchLink, actualLaunchLink);
+    }
+
     private ModuleLaunchLinkInput createModuleLaunchLinkInput(String learnerId, String courseId, String moduleId) {
         ModuleLaunchLinkInput moduleLaunchLinkInput = new ModuleLaunchLinkInput();
         moduleLaunchLinkInput.setLearnerFirstName(learnerFirstName);
@@ -86,6 +114,7 @@ public class ModuleLaunchServiceTest {
         courseRecordInput.setUserId(learnerId);
         courseRecordInput.setCourseId(courseId);
         courseRecordInput.setCourseTitle(courseTitle);
+        courseRecordInput.setState(State.IN_PROGRESS.name());
         courseRecordInput.setIsRequired(isRequired);
         courseRecordInput.setModuleRecords(new ArrayList<>());
         courseRecordInput.getModuleRecords().add(createModuleRecordInput(learnerId, courseId, moduleId));
@@ -94,13 +123,20 @@ public class ModuleLaunchServiceTest {
 
     private ModuleRecordInput createModuleRecordInput(String learnerId, String courseId, String moduleId) {
         ModuleRecordInput moduleRecordInput = new ModuleRecordInput();
+        moduleRecordInput.setUid(uid);
         moduleRecordInput.setUserId(learnerId);
         moduleRecordInput.setCourseId(courseId);
         moduleRecordInput.setModuleId(moduleId);
         moduleRecordInput.setModuleTitle(moduleTitle);
         moduleRecordInput.setOptional(optional);
         moduleRecordInput.setModuleType(moduleType);
+        moduleRecordInput.setState(State.IN_PROGRESS.name());
         return moduleRecordInput;
+    }
+
+    private ResponseEntity<?> createResponseForError(String message, String path) {
+        return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                message, path, null);
     }
 
     private CourseRecords createCourseRecords() {
@@ -109,9 +145,19 @@ public class ModuleLaunchServiceTest {
         return courseRecords;
     }
 
+    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyCourseRecord() {
+        CourseRecords courseRecords = createCourseRecords();
+        courseRecords.setCourseRecords(null);
+        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+    }
+
     private CourseRecord createCourseRecord() {
         return new CourseRecord(courseId, learnerId, courseTitle, State.IN_PROGRESS, null, null,
                 null, isRequired, createModuleRecords(), LocalDateTime.now());
+    }
+
+    private ResponseEntity<?> createResponseForCourseRecord() {
+        return new ResponseEntity<>(createCourseRecord(), HttpStatus.OK);
     }
 
     private List<ModuleRecord> createModuleRecords() {
@@ -122,7 +168,7 @@ public class ModuleLaunchServiceTest {
 
     private ModuleRecord createModuleRecord() {
         ModuleRecord moduleRecord = new ModuleRecord();
-        moduleRecord.setId(1L);
+        moduleRecord.setId(id);
         moduleRecord.setUid(uid);
         moduleRecord.setModuleId(moduleId);
         moduleRecord.setModuleTitle(moduleTitle);
@@ -135,31 +181,8 @@ public class ModuleLaunchServiceTest {
         return moduleRecord;
     }
 
-    private ResponseEntity<?> createResponseForError(String message, String path) {
-        return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                message, path, null);
-    }
-
-    private ResponseEntity<?> createResponseForCourseRecords() {
-        return new ResponseEntity<>(createCourseRecords(), HttpStatus.OK);
-    }
-
-    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyCourseRecord() {
-        CourseRecords courseRecords = createCourseRecords();
-        courseRecords.setCourseRecords(new ArrayList<>());
-        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
-    }
-
-    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyModuleRecord() {
-        CourseRecords courseRecords = createCourseRecords();
-        courseRecords.getCourseRecord(courseId).setModuleRecords(new ArrayList<>());
-        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
-    }
-
-    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyModuleUid() {
-        CourseRecords courseRecords = createCourseRecords();
-        courseRecords.getCourseRecord(courseId).getModuleRecord(moduleId).setUid(null);
-        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+    private ResponseEntity<?> createResponseForModuleRecord() {
+        return new ResponseEntity<>(createModuleRecord(), HttpStatus.OK);
     }
 
     private RegistrationInput createRegistrationInput() {

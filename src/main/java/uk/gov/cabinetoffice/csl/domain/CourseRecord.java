@@ -46,9 +46,12 @@ public class CourseRecord {
     }
 
     public ModuleRecord getModuleRecord(String moduleId) {
-        return this.moduleRecords.stream()
-                .filter(moduleRecord -> moduleId.equals(moduleRecord.getModuleId()))
-                .findFirst()
-                .orElse(null);
+        if(moduleRecords != null) {
+            return this.moduleRecords.stream()
+                    .filter(moduleRecord -> moduleId.equals(moduleRecord.getModuleId()))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
     }
 }
