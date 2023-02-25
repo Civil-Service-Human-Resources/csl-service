@@ -166,7 +166,7 @@ public class ModuleLaunchService {
         ResponseEntity<?> registrationLaunchLinkResponse =
                 rusticiService.getRegistrationLaunchLink(registrationInput);
         if(!registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
-            log.warn("Module launch link could not be retrieved using launchLink endpoint, now invoking withLaunchLink"
+            log.error("Module launch link could not be retrieved using launchLink endpoint, now invoking withLaunchLink"
                     + "endpoint to retrieve module launch link for learner id: {}, course id: {} and module id: {}",
                     learnerId, courseId, moduleId);
             //7. If no launch link present then create the registration and launch link using withLaunchLink
