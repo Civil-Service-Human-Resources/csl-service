@@ -57,59 +57,46 @@ public class ModuleLaunchServiceTest {
                         + " learnerId: " + learnerId + ", courseId: " + courseId + ", moduleId: " +  moduleId,
                 "/course_records?userId=" + learnerId + "&courseId=" + courseId);
         when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(errorResponse);
-
         verifyError(invokeService());
     }
 
     @Test
     public void createLaunchLinkShouldCreateCourseModuleAndThenReturnLaunchLinkWithDisabledBookmark() {
-        ResponseEntity responseForCourseRecordsWithEmptyCourseRecord =
-                createResponseForCourseRecordsWithEmptyCourseRecord();
-
-        CourseRecordInput courseRecordInput = createCourseRecordInput(learnerId, courseId, moduleId);
-        ResponseEntity responseForCourseRecordWithEmptyModules = createResponseForCourseRecordWithEmptyModules();
-
-        ModuleRecordInput moduleRecordInput = createModuleRecordInput(learnerId, courseId, moduleId);
-        ResponseEntity responseForModuleRecord = createResponseForModuleRecord();
-
-        mockLearnerRecordServiceCalls(responseForCourseRecordsWithEmptyCourseRecord,
-                courseRecordInput, responseForCourseRecordWithEmptyModules,
-                moduleRecordInput, responseForModuleRecord);
-
+        mockLearnerRecordServiceGetAndUpdateCalls(createResponseForCourseRecordsWithEmptyCourseRecord(),
+                createResponseForModuleRecord());
+        mockLearnerRecordServiceCreateCalls(
+                createCourseRecordInput(learnerId, courseId, moduleId),
+                createResponseForCourseRecordWithEmptyModules(),
+                createModuleRecordInput(learnerId, courseId, moduleId),
+                createResponseForModuleRecord());
         mockRusticiServiceCalls();
-
         verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
     }
 
     @Test
     public void createLaunchLinkShouldUpdateModuleUidThenReturnLaunchLinkWithDisabledBookmark() {
-        ResponseEntity responseForCourseRecordsWithEmptyModuleUid =
-                createResponseForCourseRecordsWithEmptyModuleUid();
-        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId))
-                .thenReturn(responseForCourseRecordsWithEmptyModuleUid);
-
-        ResponseEntity responseForModuleRecord = createResponseForModuleRecord();
-        when(learnerRecordService.updateModuleRecordForLearner(any(), any())).thenReturn(responseForModuleRecord);
-
+        mockLearnerRecordServiceGetAndUpdateCalls(createResponseForCourseRecordsWithEmptyModuleUid(),
+                createResponseForModuleRecord());
         mockRusticiServiceCalls();
-
         verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
     }
 
-    private void mockLearnerRecordServiceCalls(ResponseEntity responseForCourseRecords,
-                                     CourseRecordInput courseRecordInput, ResponseEntity responseForCourseRecord,
-                                     ModuleRecordInput moduleRecordInput, ResponseEntity responseForModuleRecord) {
-        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId))
-                .thenReturn(responseForCourseRecords);
-        when(learnerRecordService.createCourseRecordForLearner(courseRecordInput)).thenReturn(responseForCourseRecord);
-        when(learnerRecordService.createModuleRecordForLearner(moduleRecordInput)).thenReturn(responseForModuleRecord);
+    private void mockLearnerRecordServiceGetAndUpdateCalls(ResponseEntity responseForCourseRecords,
+                                                           ResponseEntity responseForModuleRecord) {
+        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(responseForCourseRecords);
         when(learnerRecordService.updateModuleRecordForLearner(any(), any())).thenReturn(responseForModuleRecord);
     }
 
+    private void mockLearnerRecordServiceCreateCalls(
+            CourseRecordInput courseRecordInput, ResponseEntity responseForCourseRecord,
+            ModuleRecordInput moduleRecordInput, ResponseEntity responseForModuleRecord) {
+        when(learnerRecordService.createCourseRecordForLearner(courseRecordInput)).thenReturn(responseForCourseRecord);
+        when(learnerRecordService.createModuleRecordForLearner(moduleRecordInput)).thenReturn(responseForModuleRecord);
+    }
+
     private void mockRusticiServiceCalls() {
-        RegistrationInput registrationInput = createRegistrationInput();
         ResponseEntity responseForLaunchLink = createResponseForLaunchLink();
-        when(rusticiService.getRegistrationLaunchLink(registrationInput)).thenReturn(responseForLaunchLink);
+        when(rusticiService.getRegistrationLaunchLink(createRegistrationInput())).thenReturn(responseForLaunchLink);
     }
 
     private ResponseEntity<?> invokeService() {
