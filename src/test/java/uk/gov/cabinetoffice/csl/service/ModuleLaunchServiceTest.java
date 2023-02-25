@@ -69,14 +69,17 @@ public class ModuleLaunchServiceTest {
                 .thenReturn(responseForCourseRecordsWithEmptyCourseRecord);
 
         CourseRecordInput courseRecordInput = createCourseRecordInput(learnerId, courseId, moduleId);
-        ResponseEntity responseForCourseRecord = createResponseForCourseRecord();
-        when(learnerRecordService.createCourseRecordForLearner(courseRecordInput)).thenReturn(responseForCourseRecord);
+        ResponseEntity responseForCourseRecordWithEmptyModules = createResponseForCourseRecordWithEmptyModules();
+        when(learnerRecordService.createCourseRecordForLearner(courseRecordInput)).thenReturn(responseForCourseRecordWithEmptyModules);
+
+        ModuleRecordInput moduleRecordInput = createModuleRecordInput(learnerId, courseId, moduleId);
+        ResponseEntity responseForModuleRecord = createResponseForModuleRecord();
+        when(learnerRecordService.createModuleRecordForLearner(moduleRecordInput)).thenReturn(responseForModuleRecord);
 
         RegistrationInput registrationInput = createRegistrationInput();
         ResponseEntity responseForLaunchLink = createResponseForLaunchLink();
         when(rusticiService.getRegistrationLaunchLink(registrationInput)).thenReturn(responseForLaunchLink);
 
-        ResponseEntity responseForModuleRecord = createResponseForModuleRecord();
         when(learnerRecordService.updateModuleRecordForLearner(any(), any())).thenReturn(responseForModuleRecord);
 
         verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
@@ -159,7 +162,7 @@ public class ModuleLaunchServiceTest {
                 null, isRequired, createModuleRecords(), LocalDateTime.now());
     }
 
-    private ResponseEntity<?> createResponseForCourseRecord() {
+    private ResponseEntity<?> createResponseForCourseRecordWithEmptyModules() {
         CourseRecord courseRecord = createCourseRecord();
         courseRecord.setModuleRecords(null);
         return new ResponseEntity<>(courseRecord, HttpStatus.OK);
