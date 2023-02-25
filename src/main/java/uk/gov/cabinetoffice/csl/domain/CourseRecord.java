@@ -9,8 +9,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
-import static java.util.Collections.unmodifiableCollection;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -42,7 +40,7 @@ public class CourseRecord {
 
     @JsonProperty("modules")
     public Collection<ModuleRecord> getModuleRecords() {
-        return unmodifiableCollection(moduleRecords);
+        return moduleRecords;
     }
 
     public ModuleRecord getModuleRecord(String moduleId) {

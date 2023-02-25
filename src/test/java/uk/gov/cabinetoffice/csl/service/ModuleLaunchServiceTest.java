@@ -160,7 +160,9 @@ public class ModuleLaunchServiceTest {
     }
 
     private ResponseEntity<?> createResponseForCourseRecord() {
-        return new ResponseEntity<>(createCourseRecord(), HttpStatus.OK);
+        CourseRecord courseRecord = createCourseRecord();
+        courseRecord.setModuleRecords(null);
+        return new ResponseEntity<>(courseRecord, HttpStatus.OK);
     }
 
     private List<ModuleRecord> createModuleRecords() {
