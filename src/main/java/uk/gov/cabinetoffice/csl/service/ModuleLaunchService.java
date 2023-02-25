@@ -72,16 +72,13 @@ public class ModuleLaunchService {
                     }
                 }
             }
-        } else {
-            log.error("Unable to retrieve course records for the learnerId: " + learnerId + ", courseId: "
-                    + courseId + ", modules/" +  moduleId);
         }
-        log.error("Unable to retrieve module launch link for the learnerId: " + learnerId + ", courseId: "
-                + courseId + ", modules/" +  moduleId);
+        log.error("Unable to retrieve module launch link for the learnerId: " + learnerId + ", courseId: " + courseId
+                + ", moduleId: " +  moduleId);
         return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 "Unable to retrieve module launch link for the learnerId: " + learnerId + ", courseId: "
-                        + courseId + ", modules/" +  moduleId,
-                "/courses/" + courseId + "/modules/" +  moduleId + "/launch", null);
+                        + courseId + ", moduleId: " +  moduleId, "/courses/" + courseId + "/modules/" +  moduleId
+                        + "/launch", null);
     }
 
     private CourseRecord createCourseRecord(CourseRecordInput courseRecordInput) {

@@ -49,13 +49,14 @@ public class ModuleLaunchServiceTest {
 
     @BeforeEach
     public void setup() {
-        moduleLaunchService = new ModuleLaunchService(learnerRecordService, rusticiService, disabledBookmarkingModuleIDs);
+        moduleLaunchService = new ModuleLaunchService(learnerRecordService, rusticiService,
+                disabledBookmarkingModuleIDs);
     }
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordForLearnerReturnsError() {
-        ResponseEntity errorResponse = createResponseForError("Unable to retrieve course record for the" +
-                " learnerId: " + learnerId + ", courseId: " + courseId + ", modules/" +  moduleId,
+        ResponseEntity errorResponse = createResponseForError("Unable to retrieve course record for the"
+                        + " learnerId: " + learnerId + ", courseId: " + courseId + ", moduleId: " +  moduleId,
                 "/course_records?userId=" + learnerId + "&courseId=" + courseId);
         when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(errorResponse);
         verifyError(invokeService());
@@ -63,8 +64,10 @@ public class ModuleLaunchServiceTest {
 
     @Test
     public void createLaunchLinkShouldReturnLaunchLinkWithDisabledBookmark() {
-        ResponseEntity responseForCourseRecordsWithEmptyCourseRecord = createResponseForCourseRecordsWithEmptyCourseRecord();
-        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(responseForCourseRecordsWithEmptyCourseRecord);
+        ResponseEntity responseForCourseRecordsWithEmptyCourseRecord =
+                createResponseForCourseRecordsWithEmptyCourseRecord();
+        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId))
+                .thenReturn(responseForCourseRecordsWithEmptyCourseRecord);
 
         CourseRecordInput courseRecordInput = createCourseRecordInput(learnerId, courseId, moduleId);
         ResponseEntity responseForCourseRecord = createResponseForCourseRecord();
@@ -88,7 +91,7 @@ public class ModuleLaunchServiceTest {
         ErrorResponse responseBody = (ErrorResponse) launchLinkResponse.getBody();
         assert responseBody != null;
         assertEquals("Unable to retrieve module launch link for the learnerId: " + learnerId
-                + ", courseId: " + courseId + ", modules/" +  moduleId, responseBody.getMessage());
+                + ", courseId: " + courseId + ", moduleId: " +  moduleId, responseBody.getMessage());
         assertEquals("/courses/" + courseId + "/modules/" +  moduleId + "/launch", responseBody.getPath());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), responseBody.getError());
     }
