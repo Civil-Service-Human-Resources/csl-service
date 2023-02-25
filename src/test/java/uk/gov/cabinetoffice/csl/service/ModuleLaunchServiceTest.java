@@ -62,7 +62,7 @@ public class ModuleLaunchServiceTest {
     }
 
     @Test
-    public void createLaunchLinkShouldReturnLaunchLinkWithDisabledBookmark() {
+    public void createLaunchLinkShouldCreateCourseModuleAndThenReturnLaunchLinkWithDisabledBookmark() {
         ResponseEntity responseForCourseRecordsWithEmptyCourseRecord =
                 createResponseForCourseRecordsWithEmptyCourseRecord();
         when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId))
@@ -81,6 +81,23 @@ public class ModuleLaunchServiceTest {
         when(rusticiService.getRegistrationLaunchLink(registrationInput)).thenReturn(responseForLaunchLink);
 
         when(learnerRecordService.updateModuleRecordForLearner(any(), any())).thenReturn(responseForModuleRecord);
+
+        verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
+    }
+
+    @Test
+    public void createLaunchLinkShouldUpdateModuleUidThenReturnLaunchLinkWithDisabledBookmark() {
+        ResponseEntity responseForCourseRecordsWithEmptyModuleUid =
+                createResponseForCourseRecordsWithEmptyModuleUid();
+        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId))
+                .thenReturn(responseForCourseRecordsWithEmptyModuleUid);
+
+        ResponseEntity responseForModuleRecord = createResponseForModuleRecord();
+        when(learnerRecordService.updateModuleRecordForLearner(any(), any())).thenReturn(responseForModuleRecord);
+
+        RegistrationInput registrationInput = createRegistrationInput();
+        ResponseEntity responseForLaunchLink = createResponseForLaunchLink();
+        when(rusticiService.getRegistrationLaunchLink(registrationInput)).thenReturn(responseForLaunchLink);
 
         verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
     }
@@ -149,6 +166,12 @@ public class ModuleLaunchServiceTest {
         CourseRecords courseRecords = new CourseRecords(new ArrayList<>());
         courseRecords.getCourseRecords().add(createCourseRecord());
         return courseRecords;
+    }
+
+    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyModuleUid() {
+        CourseRecords courseRecords = createCourseRecords();
+        courseRecords.getCourseRecord(courseId).getModuleRecord(moduleId).setUid(null);
+        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
     }
 
     private ResponseEntity<?> createResponseForCourseRecordsWithEmptyCourseRecord() {
