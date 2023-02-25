@@ -38,10 +38,8 @@ public class ModuleLaunchServiceTest {
     private final Boolean isRequired = true;
     private final String moduleId = "moduleId";
     private final String moduleTitle = "moduleTitle";
-    private final Boolean optional = false;
     private final String moduleType = "elearning";
     private final String uid = UUID.randomUUID().toString();
-    private final Long id = 1L;
     private final String learnerFirstName = "learnerFirstName";
     private final String learnerLastName = "";
 
@@ -133,7 +131,7 @@ public class ModuleLaunchServiceTest {
         moduleRecordInput.setCourseId(courseId);
         moduleRecordInput.setModuleId(moduleId);
         moduleRecordInput.setModuleTitle(moduleTitle);
-        moduleRecordInput.setOptional(optional);
+        moduleRecordInput.setOptional(false);
         moduleRecordInput.setModuleType(moduleType);
         moduleRecordInput.setState(State.IN_PROGRESS.name());
         return moduleRecordInput;
@@ -173,7 +171,7 @@ public class ModuleLaunchServiceTest {
 
     private ModuleRecord createModuleRecord() {
         ModuleRecord moduleRecord = new ModuleRecord();
-        moduleRecord.setId(id);
+        moduleRecord.setId(1L);
         moduleRecord.setUid(uid);
         moduleRecord.setModuleId(moduleId);
         moduleRecord.setModuleTitle(moduleTitle);
