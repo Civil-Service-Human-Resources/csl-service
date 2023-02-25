@@ -59,6 +59,7 @@ public class ModuleLaunchServiceTest {
                         + " learnerId: " + learnerId + ", courseId: " + courseId + ", moduleId: " +  moduleId,
                 "/course_records?userId=" + learnerId + "&courseId=" + courseId);
         when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(errorResponse);
+
         verifyError(invokeService());
     }
 
@@ -79,6 +80,7 @@ public class ModuleLaunchServiceTest {
 
         ResponseEntity responseForModuleRecord = createResponseForModuleRecord();
         when(learnerRecordService.updateModuleRecordForLearner(any(), any())).thenReturn(responseForModuleRecord);
+
         verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
     }
 
