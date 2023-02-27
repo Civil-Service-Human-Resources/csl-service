@@ -52,70 +52,42 @@ public class ModuleLaunchServiceTest {
     }
 
     @Test
-    public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordForLearnerReturnsError() {
-        ResponseEntity errorResponse = createResponseForError("Unable to retrieve course record for the"
-                        + " learnerId: " + learnerId + ", courseId: " + courseId + ", moduleId: " +  moduleId,
-                "/course_records?userId=" + learnerId + "&courseId=" + courseId);
-        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(errorResponse);
-        verifyError(invokeService());
-    }
-
-    @Test
     public void createLaunchLinkShouldCreateCourseModuleAndThenReturnLaunchLinkWithDisabledBookmark() {
-        mockLearnerRecordServiceGetAndUpdateCalls(createResponseForCourseRecordsWithEmptyCourseRecord(),
-                createResponseForModuleRecord());
+        mockLearnerRecordServiceGetAndUpdateCalls(createSuccessResponseForCourseRecordsWithEmptyCourseRecord(),
+                createSuccessResponseForModuleRecord());
         mockLearnerRecordServiceCreateCalls(
                 createCourseRecordInput(learnerId, courseId, moduleId),
-                createResponseForCourseRecordWithEmptyModules(),
+                createSuccessResponseForCourseRecordWithEmptyModules(),
                 createModuleRecordInput(learnerId, courseId, moduleId),
-                createResponseForModuleRecord());
+                createSuccessResponseForModuleRecord());
         mockRusticiServiceCallGetRegistrationLaunchLink();
         verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
     }
 
     @Test
     public void createLaunchLinkShouldUpdateModuleUidThenReturnLaunchLinkWithDisabledBookmark() {
-        mockLearnerRecordServiceGetAndUpdateCalls(createResponseForCourseRecordsWithEmptyModuleUid(),
-                createResponseForModuleRecord());
+        mockLearnerRecordServiceGetAndUpdateCalls(createSuccessResponseForCourseRecordsWithEmptyModuleUid(),
+                createSuccessResponseForModuleRecord());
         mockRusticiServiceCallGetRegistrationLaunchLink();
         verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
     }
 
     @Test
     public void createLaunchLinkShouldCreateRegistrationWhenRegistrationIdNotFoundThenReturnLaunchLinkWithDisabledBookmark() {
-        mockLearnerRecordServiceGetAndUpdateCalls(createResponseForCourseRecordsWithEmptyModuleUid(),
-                createResponseForModuleRecord());
+        mockLearnerRecordServiceGetAndUpdateCalls(createSuccessResponseForCourseRecordsWithEmptyModuleUid(),
+                createSuccessResponseForModuleRecord());
         mockRusticiServiceCallForRegistrationIdNotFoundError();
         mockRusticiServiceCallCreateRegistrationAndLaunchLink();
         verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
     }
 
-    private void mockLearnerRecordServiceGetAndUpdateCalls(ResponseEntity responseForCourseRecords,
-                                                           ResponseEntity responseForModuleRecord) {
-        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(responseForCourseRecords);
-        when(learnerRecordService.updateModuleRecordForLearner(any(), any())).thenReturn(responseForModuleRecord);
-    }
-
-    private void mockLearnerRecordServiceCreateCalls(
-            CourseRecordInput courseRecordInput, ResponseEntity responseForCourseRecord,
-            ModuleRecordInput moduleRecordInput, ResponseEntity responseForModuleRecord) {
-        when(learnerRecordService.createCourseRecordForLearner(courseRecordInput)).thenReturn(responseForCourseRecord);
-        when(learnerRecordService.createModuleRecordForLearner(moduleRecordInput)).thenReturn(responseForModuleRecord);
-    }
-
-    private void mockRusticiServiceCallGetRegistrationLaunchLink() {
-        ResponseEntity responseForLaunchLink = createRusticiResponseForLaunchLink();
-        when(rusticiService.getRegistrationLaunchLink(createRegistrationInput())).thenReturn(responseForLaunchLink);
-    }
-
-    private void mockRusticiServiceCallCreateRegistrationAndLaunchLink() {
-        ResponseEntity responseForLaunchLink = createRusticiResponseForLaunchLink();
-        when(rusticiService.createRegistrationAndLaunchLink(createRegistrationInput())).thenReturn(responseForLaunchLink);
-    }
-
-    private void mockRusticiServiceCallForRegistrationIdNotFoundError() {
-        ResponseEntity rusticiResponseRegistrationIdNotFoundError = createRusticiResponseRegistrationIdNotFoundError();
-        when(rusticiService.getRegistrationLaunchLink(createRegistrationInput())).thenReturn(rusticiResponseRegistrationIdNotFoundError);
+    @Test
+    public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordForLearnerReturnsError() {
+        ResponseEntity errorResponse = createErrorResponse("Unable to retrieve course record for the"
+                        + " learnerId: " + learnerId + ", courseId: " + courseId + ", moduleId: " +  moduleId,
+                "/course_records?userId=" + learnerId + "&courseId=" + courseId);
+        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(errorResponse);
+        verifyError(invokeService());
     }
 
     private ResponseEntity<?> invokeService() {
@@ -138,6 +110,34 @@ public class ModuleLaunchServiceTest {
         LaunchLink expectedLaunchLink = createLaunchLink();
         expectedLaunchLink.setLaunchLink(expectedLaunchLink.getLaunchLink() + "&clearbookmark=true");
         assertEquals(expectedLaunchLink, actualLaunchLink);
+    }
+
+    private void mockLearnerRecordServiceGetAndUpdateCalls(ResponseEntity responseForCourseRecords,
+                                                           ResponseEntity responseForModuleRecord) {
+        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(responseForCourseRecords);
+        when(learnerRecordService.updateModuleRecordForLearner(any(), any())).thenReturn(responseForModuleRecord);
+    }
+
+    private void mockLearnerRecordServiceCreateCalls(
+            CourseRecordInput courseRecordInput, ResponseEntity responseForCourseRecord,
+            ModuleRecordInput moduleRecordInput, ResponseEntity responseForModuleRecord) {
+        when(learnerRecordService.createCourseRecordForLearner(courseRecordInput)).thenReturn(responseForCourseRecord);
+        when(learnerRecordService.createModuleRecordForLearner(moduleRecordInput)).thenReturn(responseForModuleRecord);
+    }
+
+    private void mockRusticiServiceCallGetRegistrationLaunchLink() {
+        ResponseEntity responseForLaunchLink = createSuccessRusticiResponseForLaunchLink();
+        when(rusticiService.getRegistrationLaunchLink(createRegistrationInput())).thenReturn(responseForLaunchLink);
+    }
+
+    private void mockRusticiServiceCallCreateRegistrationAndLaunchLink() {
+        ResponseEntity responseForLaunchLink = createSuccessRusticiResponseForLaunchLink();
+        when(rusticiService.createRegistrationAndLaunchLink(createRegistrationInput())).thenReturn(responseForLaunchLink);
+    }
+
+    private void mockRusticiServiceCallForRegistrationIdNotFoundError() {
+        ResponseEntity rusticiResponseRegistrationIdNotFoundError = createErrorRusticiResponseForRegistrationNotFound();
+        when(rusticiService.getRegistrationLaunchLink(createRegistrationInput())).thenReturn(rusticiResponseRegistrationIdNotFoundError);
     }
 
     private ModuleLaunchLinkInput createModuleLaunchLinkInput(String learnerId, String courseId, String moduleId) {
@@ -173,38 +173,15 @@ public class ModuleLaunchServiceTest {
         return moduleRecordInput;
     }
 
-    private ResponseEntity<?> createResponseForError(String message, String path) {
-        return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                message, path, null);
-    }
-
     private CourseRecords createCourseRecords() {
         CourseRecords courseRecords = new CourseRecords(new ArrayList<>());
         courseRecords.getCourseRecords().add(createCourseRecord());
         return courseRecords;
     }
 
-    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyModuleUid() {
-        CourseRecords courseRecords = createCourseRecords();
-        courseRecords.getCourseRecord(courseId).getModuleRecord(moduleId).setUid(null);
-        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
-    }
-
-    private ResponseEntity<?> createResponseForCourseRecordsWithEmptyCourseRecord() {
-        CourseRecords courseRecords = createCourseRecords();
-        courseRecords.setCourseRecords(null);
-        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
-    }
-
     private CourseRecord createCourseRecord() {
         return new CourseRecord(courseId, learnerId, courseTitle, State.IN_PROGRESS, null, null,
                 null, isRequired, createModuleRecords(), LocalDateTime.now());
-    }
-
-    private ResponseEntity<?> createResponseForCourseRecordWithEmptyModules() {
-        CourseRecord courseRecord = createCourseRecord();
-        courseRecord.setModuleRecords(null);
-        return new ResponseEntity<>(courseRecord, HttpStatus.OK);
     }
 
     private List<ModuleRecord> createModuleRecords() {
@@ -228,10 +205,6 @@ public class ModuleLaunchServiceTest {
         return moduleRecord;
     }
 
-    private ResponseEntity<?> createResponseForModuleRecord() {
-        return new ResponseEntity<>(createModuleRecord(), HttpStatus.OK);
-    }
-
     private RegistrationInput createRegistrationInput() {
         return new RegistrationInput(uid, courseId, moduleId, learnerId, learnerFirstName, learnerLastName);
     }
@@ -240,17 +213,44 @@ public class ModuleLaunchServiceTest {
         return new LaunchLink("https://rustici-engine/RusticiEngine/defaultui/launch.jsp?jwt=eyJ0eXAiOiJKV1");
     }
 
-    private ResponseEntity<?> createRusticiResponseForLaunchLink() {
+    private ResponseEntity<?> createSuccessResponseForCourseRecordsWithEmptyModuleUid() {
+        CourseRecords courseRecords = createCourseRecords();
+        courseRecords.getCourseRecord(courseId).getModuleRecord(moduleId).setUid(null);
+        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+    }
+
+    private ResponseEntity<?> createSuccessResponseForCourseRecordsWithEmptyCourseRecord() {
+        CourseRecords courseRecords = createCourseRecords();
+        courseRecords.setCourseRecords(null);
+        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+    }
+
+    private ResponseEntity<?> createErrorResponse(String message, String path) {
+        return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                message, path, null);
+    }
+
+    private ResponseEntity<?> createSuccessResponseForCourseRecordWithEmptyModules() {
+        CourseRecord courseRecord = createCourseRecord();
+        courseRecord.setModuleRecords(null);
+        return new ResponseEntity<>(courseRecord, HttpStatus.OK);
+    }
+
+    private ResponseEntity<?> createSuccessResponseForModuleRecord() {
+        return new ResponseEntity<>(createModuleRecord(), HttpStatus.OK);
+    }
+
+    private ResponseEntity<?> createSuccessRusticiResponseForLaunchLink() {
         return new ResponseEntity<>(createLaunchLink(), HttpStatus.OK);
     }
 
-    private ErrorResponse rusticiErrorForRegistrationNotFound() {
+    private ErrorResponse createErrorResponseForRegistrationNotFound() {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setMessage("Registration ID 'registration_id' does not exist");
         return errorResponse;
     }
 
-    private ResponseEntity<?> createRusticiResponseRegistrationIdNotFoundError() {
-        return new ResponseEntity<>(rusticiErrorForRegistrationNotFound(), HttpStatus.NOT_FOUND);
+    private ResponseEntity<?> createErrorRusticiResponseForRegistrationNotFound() {
+        return new ResponseEntity<>(createErrorResponseForRegistrationNotFound(), HttpStatus.NOT_FOUND);
     }
 }
