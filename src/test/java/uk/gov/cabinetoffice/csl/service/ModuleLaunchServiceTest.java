@@ -102,6 +102,13 @@ public class ModuleLaunchServiceTest {
         verifyError(invokeService());
     }
 
+    @Test
+    public void createLaunchLinkShouldReturnErrorWhenUpdateModuleRecordUidReturnsError() {
+        mockLearnerRecordServiceForGetCourseRecord(createSuccessResponseForCourseRecordsWithEmptyModuleUid());
+        mockLearnerRecordServiceForUpdateModuleRecord(createErrorResponse());
+        verifyError(invokeService());
+    }
+
     private ResponseEntity<?> invokeService() {
         return moduleLaunchService.createLaunchLink(createModuleLaunchLinkInput(learnerId, courseId, moduleId));
     }
@@ -149,6 +156,10 @@ public class ModuleLaunchServiceTest {
     private void mockLearnerRecordServiceForCreateModuleRecord(
             ModuleRecordInput moduleRecordInput, ResponseEntity responseForModuleRecord) {
         when(learnerRecordService.createModuleRecordForLearner(moduleRecordInput)).thenReturn(responseForModuleRecord);
+    }
+
+    private void mockLearnerRecordServiceForUpdateModuleRecord(ResponseEntity responseForModuleRecord) {
+        when(learnerRecordService.updateModuleRecordForLearner(any(), any())).thenReturn(responseForModuleRecord);
     }
 
     private void mockRusticiServiceCallGetRegistrationLaunchLink() {
