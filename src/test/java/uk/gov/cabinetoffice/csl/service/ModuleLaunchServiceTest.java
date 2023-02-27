@@ -86,8 +86,12 @@ public class ModuleLaunchServiceTest {
         ResponseEntity errorResponse = createErrorResponse("Unable to retrieve course record for the"
                         + " learnerId: " + learnerId + ", courseId: " + courseId + ", moduleId: " +  moduleId,
                 "/course_records?userId=" + learnerId + "&courseId=" + courseId);
-        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(errorResponse);
+        mockLearnerRecordServiceForGetCourseRecord(errorResponse);
         verifyError(invokeService());
+    }
+
+    private void mockLearnerRecordServiceForGetCourseRecord(ResponseEntity responseForCourseRecords) {
+        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(responseForCourseRecords);
     }
 
     private ResponseEntity<?> invokeService() {
