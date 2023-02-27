@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 
 @SpringBootTest
 public class ModuleLaunchServiceTest {
@@ -82,26 +81,25 @@ public class ModuleLaunchServiceTest {
     }
 
     @Test
-    public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordForLearnerReturnsError() {
+    public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordReturnsError() {
         mockLearnerRecordServiceForGetCourseRecord(createErrorResponseForCourseRecordsWithEmptyCourseRecord());
         verifyError(invokeService());
     }
 
     @Test
-    public void createLaunchLinkShouldReturnErrorWhenCreateCourseRecordForLearnerReturnsError() {
+    public void createLaunchLinkShouldReturnErrorWhenCreateCourseRecordReturnsError() {
         mockLearnerRecordServiceForGetCourseRecord(createSuccessResponseForCourseRecordsWithEmptyCourseRecord());
         mockLearnerRecordServiceForCreateCourseRecord(createCourseRecordInput(learnerId, courseId, moduleId),
                 createErrorResponseForCourseRecordsWithEmptyCourseRecord());
         verifyError(invokeService());
     }
 
-    private void mockLearnerRecordServiceForGetCourseRecord(ResponseEntity responseForCourseRecords) {
-        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(responseForCourseRecords);
-    }
-
-    private void mockLearnerRecordServiceForCreateCourseRecord(
-            CourseRecordInput courseRecordInput, ResponseEntity responseForCourseRecord) {
-        when(learnerRecordService.createCourseRecordForLearner(courseRecordInput)).thenReturn(responseForCourseRecord);
+    @Test
+    public void createLaunchLinkShouldReturnErrorWhenCreateModuleRecordReturnsError() {
+        mockLearnerRecordServiceForGetCourseRecord(createSuccessResponseForCourseRecordsWithEmptyModule());
+        mockLearnerRecordServiceForCreateModuleRecord(createModuleRecordInput(learnerId, courseId, moduleId),
+                createErrorResponse());
+        verifyError(invokeService());
     }
 
     private ResponseEntity<?> invokeService() {
@@ -136,6 +134,20 @@ public class ModuleLaunchServiceTest {
             CourseRecordInput courseRecordInput, ResponseEntity responseForCourseRecord,
             ModuleRecordInput moduleRecordInput, ResponseEntity responseForModuleRecord) {
         when(learnerRecordService.createCourseRecordForLearner(courseRecordInput)).thenReturn(responseForCourseRecord);
+        when(learnerRecordService.createModuleRecordForLearner(moduleRecordInput)).thenReturn(responseForModuleRecord);
+    }
+
+    private void mockLearnerRecordServiceForGetCourseRecord(ResponseEntity responseForCourseRecords) {
+        when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(responseForCourseRecords);
+    }
+
+    private void mockLearnerRecordServiceForCreateCourseRecord(
+            CourseRecordInput courseRecordInput, ResponseEntity responseForCourseRecord) {
+        when(learnerRecordService.createCourseRecordForLearner(courseRecordInput)).thenReturn(responseForCourseRecord);
+    }
+
+    private void mockLearnerRecordServiceForCreateModuleRecord(
+            ModuleRecordInput moduleRecordInput, ResponseEntity responseForModuleRecord) {
         when(learnerRecordService.createModuleRecordForLearner(moduleRecordInput)).thenReturn(responseForModuleRecord);
     }
 
@@ -233,6 +245,12 @@ public class ModuleLaunchServiceTest {
         return new ResponseEntity<>(courseRecords, HttpStatus.OK);
     }
 
+    private ResponseEntity<?> createSuccessResponseForCourseRecordsWithEmptyModule() {
+        CourseRecords courseRecords = createCourseRecords();
+        courseRecords.getCourseRecord(courseId).setModuleRecords(null);
+        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+    }
+
     private ResponseEntity<?> createSuccessResponseForCourseRecordsWithEmptyCourseRecord() {
         CourseRecords courseRecords = createCourseRecords();
         courseRecords.setCourseRecords(null);
@@ -243,11 +261,6 @@ public class ModuleLaunchServiceTest {
         CourseRecords courseRecords = createCourseRecords();
         courseRecords.setCourseRecords(null);
         return new ResponseEntity<>(courseRecords, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    private ResponseEntity<?> createErrorResponse(String message, String path) {
-        return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                message, path, null);
     }
 
     private ResponseEntity<?> createSuccessResponseForCourseRecordWithEmptyModules() {
@@ -272,5 +285,9 @@ public class ModuleLaunchServiceTest {
 
     private ResponseEntity<?> createErrorRusticiResponseForRegistrationNotFound() {
         return new ResponseEntity<>(createErrorResponseForRegistrationNotFound(), HttpStatus.NOT_FOUND);
+    }
+
+    private ResponseEntity<?> createErrorResponse() {
+        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
