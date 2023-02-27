@@ -69,7 +69,7 @@ public class ModuleLaunchServiceTest {
                 createResponseForCourseRecordWithEmptyModules(),
                 createModuleRecordInput(learnerId, courseId, moduleId),
                 createResponseForModuleRecord());
-        mockRusticiServiceCalls();
+        mockRusticiServiceCallGetRegistrationLaunchLink();
         verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
     }
 
@@ -77,7 +77,16 @@ public class ModuleLaunchServiceTest {
     public void createLaunchLinkShouldUpdateModuleUidThenReturnLaunchLinkWithDisabledBookmark() {
         mockLearnerRecordServiceGetAndUpdateCalls(createResponseForCourseRecordsWithEmptyModuleUid(),
                 createResponseForModuleRecord());
-        mockRusticiServiceCalls();
+        mockRusticiServiceCallGetRegistrationLaunchLink();
+        verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
+    }
+
+    @Test
+    public void createLaunchLinkShouldCreateRegistrationWhenRegistrationIdNotFoundThenReturnLaunchLinkWithDisabledBookmark() {
+        mockLearnerRecordServiceGetAndUpdateCalls(createResponseForCourseRecordsWithEmptyModuleUid(),
+                createResponseForModuleRecord());
+        mockRusticiServiceCallForRegistrationIdNotFoundError();
+        mockRusticiServiceCallCreateRegistrationAndLaunchLink();
         verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
     }
 
@@ -94,9 +103,19 @@ public class ModuleLaunchServiceTest {
         when(learnerRecordService.createModuleRecordForLearner(moduleRecordInput)).thenReturn(responseForModuleRecord);
     }
 
-    private void mockRusticiServiceCalls() {
-        ResponseEntity responseForLaunchLink = createResponseForLaunchLink();
+    private void mockRusticiServiceCallGetRegistrationLaunchLink() {
+        ResponseEntity responseForLaunchLink = createRusticiResponseForLaunchLink();
         when(rusticiService.getRegistrationLaunchLink(createRegistrationInput())).thenReturn(responseForLaunchLink);
+    }
+
+    private void mockRusticiServiceCallCreateRegistrationAndLaunchLink() {
+        ResponseEntity responseForLaunchLink = createRusticiResponseForLaunchLink();
+        when(rusticiService.createRegistrationAndLaunchLink(createRegistrationInput())).thenReturn(responseForLaunchLink);
+    }
+
+    private void mockRusticiServiceCallForRegistrationIdNotFoundError() {
+        ResponseEntity rusticiResponseRegistrationIdNotFoundError = createRusticiResponseRegistrationIdNotFoundError();
+        when(rusticiService.getRegistrationLaunchLink(createRegistrationInput())).thenReturn(rusticiResponseRegistrationIdNotFoundError);
     }
 
     private ResponseEntity<?> invokeService() {
@@ -221,7 +240,17 @@ public class ModuleLaunchServiceTest {
         return new LaunchLink("https://rustici-engine/RusticiEngine/defaultui/launch.jsp?jwt=eyJ0eXAiOiJKV1");
     }
 
-    private ResponseEntity<?> createResponseForLaunchLink() {
+    private ResponseEntity<?> createRusticiResponseForLaunchLink() {
         return new ResponseEntity<>(createLaunchLink(), HttpStatus.OK);
+    }
+
+    private ErrorResponse rusticiErrorForRegistrationNotFound() {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage("Registration ID 'registration_id' does not exist");
+        return errorResponse;
+    }
+
+    private ResponseEntity<?> createRusticiResponseRegistrationIdNotFoundError() {
+        return new ResponseEntity<>(rusticiErrorForRegistrationNotFound(), HttpStatus.NOT_FOUND);
     }
 }
