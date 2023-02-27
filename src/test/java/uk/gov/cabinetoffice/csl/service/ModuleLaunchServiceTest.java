@@ -51,7 +51,7 @@ public class ModuleLaunchServiceTest {
     }
 
     @Test
-    public void createLaunchLinkShouldCreateCourseModuleAndThenReturnLaunchLinkWithDisabledBookmark() {
+    public void createLaunchLinkShouldCreateCourseAndModuleAndThenReturnLaunchLinkWithDisabledBookmark() {
         mockLearnerRecordServiceGetAndUpdateCalls(createSuccessResponseForCourseRecordsWithEmptyCourseRecord(),
                 createSuccessResponseForModuleRecord());
         mockLearnerRecordServiceCreateCalls(
@@ -83,7 +83,7 @@ public class ModuleLaunchServiceTest {
     @Test
     public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordReturnsError() {
         mockLearnerRecordServiceForGetCourseRecord(createErrorResponseForCourseRecordsWithEmptyCourseRecord());
-        verifyError(invokeService());
+        verify5xxError(invokeService());
     }
 
     @Test
@@ -91,7 +91,7 @@ public class ModuleLaunchServiceTest {
         mockLearnerRecordServiceForGetCourseRecord(createSuccessResponseForCourseRecordsWithEmptyCourseRecord());
         mockLearnerRecordServiceForCreateCourseRecord(createCourseRecordInput(learnerId, courseId, moduleId),
                 createErrorResponseForCourseRecordsWithEmptyCourseRecord());
-        verifyError(invokeService());
+        verify5xxError(invokeService());
     }
 
     @Test
@@ -99,21 +99,31 @@ public class ModuleLaunchServiceTest {
         mockLearnerRecordServiceForGetCourseRecord(createSuccessResponseForCourseRecordsWithEmptyModule());
         mockLearnerRecordServiceForCreateModuleRecord(createModuleRecordInput(learnerId, courseId, moduleId),
                 createErrorResponse());
-        verifyError(invokeService());
+        verify5xxError(invokeService());
     }
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenUpdateModuleRecordUidReturnsError() {
         mockLearnerRecordServiceForGetCourseRecord(createSuccessResponseForCourseRecordsWithEmptyModuleUid());
         mockLearnerRecordServiceForUpdateModuleRecord(createErrorResponse());
-        verifyError(invokeService());
+        verify5xxError(invokeService());
+    }
+
+    @Test
+    public void createLaunchLinkShouldReturnErrorWhenRegistrationIdNotFoundAndThenNotAbleToCreateRegistrationInRustici() {
+        mockLearnerRecordServiceGetAndUpdateCalls(createSuccessResponseForCourseRecords(),
+                createSuccessResponseForModuleRecord());
+        mockRusticiServiceCallForRegistrationIdNotFoundError();
+        mockRusticiServiceCallForInvalidCourseIdBadRequestError();
+        String invalidCourseIdMessage = "Course ID '" + courseId + "." + moduleId + "' is invalid";
+        verify4xxError(invalidCourseIdMessage, invokeService());
     }
 
     private ResponseEntity<?> invokeService() {
         return moduleLaunchService.createLaunchLink(createModuleLaunchLinkInput(learnerId, courseId, moduleId));
     }
 
-    private void verifyError(ResponseEntity<?> launchLinkResponse) {
+    private void verify5xxError(ResponseEntity<?> launchLinkResponse) {
         assertTrue(launchLinkResponse.getStatusCode().is5xxServerError());
         ErrorResponse responseBody = (ErrorResponse) launchLinkResponse.getBody();
         assert responseBody != null;
@@ -121,6 +131,13 @@ public class ModuleLaunchServiceTest {
                 + ", courseId: " + courseId + ", moduleId: " +  moduleId, responseBody.getMessage());
         assertEquals("/courses/" + courseId + "/modules/" +  moduleId + "/launch", responseBody.getPath());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), responseBody.getError());
+    }
+
+    private void verify4xxError(String expectedMessage, ResponseEntity<?> launchLinkResponse) {
+        assertTrue(launchLinkResponse.getStatusCode().is4xxClientError());
+        ErrorResponse responseBody = (ErrorResponse) launchLinkResponse.getBody();
+        assert responseBody != null;
+        assertEquals(expectedMessage, responseBody.getMessage());
     }
 
     private void verifySuccessAndLaunchLinkWithDisabledBookmark(ResponseEntity<?> launchLinkResponse) {
@@ -175,6 +192,11 @@ public class ModuleLaunchServiceTest {
     private void mockRusticiServiceCallForRegistrationIdNotFoundError() {
         ResponseEntity rusticiResponseRegistrationIdNotFoundError = createErrorRusticiResponseForRegistrationNotFound();
         when(rusticiService.getRegistrationLaunchLink(createRegistrationInput())).thenReturn(rusticiResponseRegistrationIdNotFoundError);
+    }
+
+    private void mockRusticiServiceCallForInvalidCourseIdBadRequestError() {
+        ResponseEntity createErrorRusticiResponseForInvalidCourseIdBadRequest = createErrorRusticiResponseForInvalidCourseIdBadRequest();
+        when(rusticiService.createRegistrationAndLaunchLink(createRegistrationInput())).thenReturn(createErrorRusticiResponseForInvalidCourseIdBadRequest);
     }
 
     private ModuleLaunchLinkInput createModuleLaunchLinkInput(String learnerId, String courseId, String moduleId) {
@@ -250,6 +272,11 @@ public class ModuleLaunchServiceTest {
         return new LaunchLink("https://rustici-engine/RusticiEngine/defaultui/launch.jsp?jwt=eyJ0eXAiOiJKV1");
     }
 
+    private ResponseEntity<?> createSuccessResponseForCourseRecords() {
+        CourseRecords courseRecords = createCourseRecords();
+        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+    }
+
     private ResponseEntity<?> createSuccessResponseForCourseRecordsWithEmptyModuleUid() {
         CourseRecords courseRecords = createCourseRecords();
         courseRecords.getCourseRecord(courseId).getModuleRecord(moduleId).setUid(null);
@@ -288,14 +315,25 @@ public class ModuleLaunchServiceTest {
         return new ResponseEntity<>(createLaunchLink(), HttpStatus.OK);
     }
 
-    private ErrorResponse createErrorResponseForRegistrationNotFound() {
+    private ErrorResponse createErrorResponseForRegistrationDoesNotExist() {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setMessage("Registration ID 'registration_id' does not exist");
         return errorResponse;
     }
 
     private ResponseEntity<?> createErrorRusticiResponseForRegistrationNotFound() {
-        return new ResponseEntity<>(createErrorResponseForRegistrationNotFound(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(createErrorResponseForRegistrationDoesNotExist(), HttpStatus.NOT_FOUND);
+    }
+
+    private ErrorResponse createErrorResponseForInvalidCourseId() {
+        String invalidCourseIdMessage = "Course ID '" + courseId + "." + moduleId + "' is invalid";
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage(invalidCourseIdMessage);
+        return errorResponse;
+    }
+
+    private ResponseEntity<?> createErrorRusticiResponseForInvalidCourseIdBadRequest() {
+        return new ResponseEntity<>(createErrorResponseForInvalidCourseId(), HttpStatus.BAD_REQUEST);
     }
 
     private ResponseEntity<?> createErrorResponse() {
