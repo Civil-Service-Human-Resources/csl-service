@@ -83,15 +83,25 @@ public class ModuleLaunchServiceTest {
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordForLearnerReturnsError() {
-        ResponseEntity errorResponse = createErrorResponse("Unable to retrieve course record for the"
-                        + " learnerId: " + learnerId + ", courseId: " + courseId + ", moduleId: " +  moduleId,
-                "/course_records?userId=" + learnerId + "&courseId=" + courseId);
-        mockLearnerRecordServiceForGetCourseRecord(errorResponse);
+        mockLearnerRecordServiceForGetCourseRecord(createErrorResponseForCourseRecordsWithEmptyCourseRecord());
+        verifyError(invokeService());
+    }
+
+    @Test
+    public void createLaunchLinkShouldReturnErrorWhenCreateCourseRecordForLearnerReturnsError() {
+        mockLearnerRecordServiceForGetCourseRecord(createSuccessResponseForCourseRecordsWithEmptyCourseRecord());
+        mockLearnerRecordServiceForCreateCourseRecord(createCourseRecordInput(learnerId, courseId, moduleId),
+                createErrorResponseForCourseRecordsWithEmptyCourseRecord());
         verifyError(invokeService());
     }
 
     private void mockLearnerRecordServiceForGetCourseRecord(ResponseEntity responseForCourseRecords) {
         when(learnerRecordService.getCourseRecordForLearner(learnerId, courseId)).thenReturn(responseForCourseRecords);
+    }
+
+    private void mockLearnerRecordServiceForCreateCourseRecord(
+            CourseRecordInput courseRecordInput, ResponseEntity responseForCourseRecord) {
+        when(learnerRecordService.createCourseRecordForLearner(courseRecordInput)).thenReturn(responseForCourseRecord);
     }
 
     private ResponseEntity<?> invokeService() {
@@ -227,6 +237,12 @@ public class ModuleLaunchServiceTest {
         CourseRecords courseRecords = createCourseRecords();
         courseRecords.setCourseRecords(null);
         return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+    }
+
+    private ResponseEntity<?> createErrorResponseForCourseRecordsWithEmptyCourseRecord() {
+        CourseRecords courseRecords = createCourseRecords();
+        courseRecords.setCourseRecords(null);
+        return new ResponseEntity<>(courseRecords, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private ResponseEntity<?> createErrorResponse(String message, String path) {
