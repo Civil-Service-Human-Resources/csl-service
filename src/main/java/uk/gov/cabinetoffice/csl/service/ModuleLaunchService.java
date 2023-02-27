@@ -72,9 +72,12 @@ public class ModuleLaunchService {
                     }
                 }
             }
+        } else {
+            log.error("Unable to retrieve course record for learner id: {} and course id: {}. " +
+                    "Error response from learnerRecordService: {}", learnerId, courseId, courseRecordForLearnerResponse);
         }
-        log.error("Unable to retrieve module launch link for the learnerId: " + learnerId + ", courseId: " + courseId
-                + ", moduleId: " +  moduleId);
+        log.error("Unable to retrieve module launch link for the learnerId: {}, courseId: {}, moduleId: {}",
+                learnerId, courseId, moduleId);
         return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 "Unable to retrieve module launch link for the learnerId: " + learnerId + ", courseId: "
                         + courseId + ", moduleId: " +  moduleId, "/courses/" + courseId + "/modules/" +  moduleId
@@ -95,11 +98,13 @@ public class ModuleLaunchService {
         if(courseRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
             CourseRecord courseRecord = (CourseRecord)courseRecordForLearnerResponse.getBody();
             log.debug("courseRecord: {}", courseRecord);
-            log.info("A new course record is created for learner id: {} and course id: {}",
-                    learnerId, courseId);
+            log.info("A new course record is created for learner id: {}, course id: {} and module id: {}",
+                    learnerId, courseId, moduleRecordInput.getModuleId());
             return courseRecord;
         }
-        log.error("Unable to create a new course record learner id: {} and course id: {}", learnerId, courseId);
+        log.error("Unable to create a new course record for learner id: {}, course id: {} and module id: {}. " +
+                  "Error response from learnerRecordService: {}", learnerId, courseId, moduleRecordInput.getModuleId(),
+                  courseRecordForLearnerResponse);
         return null;
     }
 
@@ -116,13 +121,13 @@ public class ModuleLaunchService {
             ModuleRecord moduleRecord = (ModuleRecord)moduleRecordForLearnerResponse.getBody();
             log.debug("moduleRecord: {}", moduleRecord);
             assert moduleRecord != null;
-            log.info("A new module record is created for learner id: {}, course id: {} and module id: "
-                    + "{}", moduleRecordInput.getUserId(), moduleRecordInput.getCourseId(),
-                    moduleRecord.getModuleId());
+            log.info("A new module record is created for learner id: {}, course id: {} and module id: {}",
+                    moduleRecordInput.getUserId(), moduleRecordInput.getCourseId(), moduleRecord.getModuleId());
             return moduleRecord;
         }
-        log.error("Unable to create a new module record learner id: {} and course id: {}",
-                    moduleRecordInput.getUserId(), moduleRecordInput.getCourseId());
+        log.error("Unable to create a new course record for learner id: {}, course id: {} and module id: {}. " +
+                  "Error response from learnerRecordService: {}", moduleRecordInput.getUserId(),
+                  moduleRecordInput.getCourseId(), moduleRecordInput.getModuleId(), moduleRecordForLearnerResponse);
         return null;
     }
 
@@ -140,8 +145,9 @@ public class ModuleLaunchService {
             log.info("uid and updatedAt fields are updated for the module record for learner id: "
                     + "{}, course id: {} and module id: {}", learnerId, courseId, moduleRecord.getModuleId());
         } else {
-            log.error("Unable to update uid for the module record for learner id: {}, course id: {} and module id: {}",
-                    learnerId, courseId, moduleRecord.getModuleId());
+            log.error("Unable to update uid for the module record for learner id: {}, course id: {} and module id: {}. "
+                      + "Error response from learnerRecordService: {}", learnerId, courseId, moduleRecord.getModuleId(),
+                      updateFieldsResponse);
         }
         log.debug("moduleRecord: {}", moduleRecord);
         return moduleRecord;
@@ -166,9 +172,9 @@ public class ModuleLaunchService {
         ResponseEntity<?> registrationLaunchLinkResponse =
                 rusticiService.getRegistrationLaunchLink(registrationInput);
         if(!registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
-            log.error("Module launch link could not be retrieved using launchLink endpoint, now invoking withLaunchLink"
-                    + "endpoint to retrieve module launch link for learner id: {}, course id: {} and module id: {}",
-                    learnerId, courseId, moduleId);
+            log.error("Module launch link could not be retrieved using launchLink endpoint for learner id: {}, " +
+                      "course id: {} and module id: {} due to {}. Now invoking withLaunchLink endpoint to retrieve " +
+                      "module launch link.", learnerId, courseId, moduleId, registrationLaunchLinkResponse);
             //7. If no launch link present then create the registration and launch link using withLaunchLink
             registrationLaunchLinkResponse =
                     rusticiService.createRegistrationAndLaunchLink(registrationInput);
@@ -183,7 +189,8 @@ public class ModuleLaunchService {
             updateModuleUpdateDateTime(moduleRecord.getId(), learnerId, courseId);
         } else {
             log.error("Module launch link could not be retrieved using withLaunchLink endpoint for " +
-                    "learner id: {}, course id: {} and module id: {}", learnerId, courseId, moduleId);
+                      "learner id: {}, course id: {} and module id: {} due to {}",
+                      learnerId, courseId, moduleId, registrationLaunchLinkResponse);
         }
         return registrationLaunchLinkResponse;
     }
@@ -224,7 +231,7 @@ public class ModuleLaunchService {
                     learnerId, courseId, moduleRecord.getModuleId());
         } else {
             log.error("Unable to update updatedAt for the module record for learner id: {}, course id: {} and " +
-                    "module Long DB id: {}", learnerId, courseId, id);
+                    "module Long DB id: {} due to {}", learnerId, courseId, id, updateDateTimeResponse);
         }
     }
 }
