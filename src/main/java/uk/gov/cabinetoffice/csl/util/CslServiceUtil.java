@@ -25,25 +25,28 @@ import java.util.Map;
 public class CslServiceUtil {
 
     public static ResponseEntity<?> returnError(HttpStatusCodeException ex, String path) {
-        ErrorResponse errorResponse = ex.getResponseBodyAs(ErrorResponse.class);
-        if(errorResponse == null) {
+        ErrorResponse errorResponse;
+        try {
+            errorResponse = ex.getResponseBodyAs(ErrorResponse.class);
+        } catch(Exception e) {
             errorResponse = new ErrorResponse();
             errorResponse.setMessage(ex.getResponseBodyAsString());
         }
+        assert errorResponse != null;
         errorResponse.setStatus(String.valueOf(ex.getStatusCode().value()));
         if(StringUtils.isBlank(errorResponse.getError())) {
             errorResponse.setError(ex.getStatusText());
         }
         errorResponse.setTimestamp(LocalDateTime.now().toString());
         errorResponse.setPath(path);
-        log.error(String.valueOf(errorResponse));
+        log.error("Error received from the backend system: {}", errorResponse);
         return new ResponseEntity<>(errorResponse, ex.getStatusCode());
     }
 
     public static  ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String error, String message, String path, String[] messages) {
         ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now().toString(), String.valueOf(httpStatusCode.value()),
                 error, message, path, messages);
-        log.error(String.valueOf(errorResponse));
+        log.error("Returning error: {}", errorResponse);
         return new ResponseEntity<>(errorResponse, httpStatusCode);
     }
 

@@ -13,10 +13,13 @@ public class CourseRecords {
     public List<CourseRecord> courseRecords;
 
     public CourseRecord getCourseRecord(String courseId){
-        return this.courseRecords
-                .stream()
-                .filter(c -> c.getCourseId().equals(courseId))
-                .findFirst()
-                .orElse(null);
+        if (courseRecords != null ) {
+            return this.courseRecords
+                    .stream()
+                    .filter(c -> c.getCourseId().equals(courseId))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
     }
 }

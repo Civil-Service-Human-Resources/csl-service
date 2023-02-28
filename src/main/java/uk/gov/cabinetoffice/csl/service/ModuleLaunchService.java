@@ -65,19 +65,23 @@ public class ModuleLaunchService {
                             // the uid
                             moduleRecord = updateModuleRecordToAssignUid(moduleRecord, learnerId, courseId);
                         }
-                        assert moduleRecord != null;
-                        if(StringUtils.isNotBlank(moduleRecord.getUid())) {
+                        if(moduleRecord != null && StringUtils.isNotBlank(moduleRecord.getUid())) {
                             //6. Get the launchLink using module uid as registration id
                             return createLaunchLink(moduleRecord, moduleLaunchLinkInput);
                         }
                     }
                 }
             }
+        } else {
+            log.error("Unable to retrieve course record for learner id: {} and course id: {}. " +
+                    "Error response from learnerRecordService: {}", learnerId, courseId, courseRecordForLearnerResponse);
         }
+        log.error("Unable to retrieve module launch link for the learnerId: {}, courseId: {}, moduleId: {}",
+                learnerId, courseId, moduleId);
         return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 "Unable to retrieve module launch link for the learnerId: " + learnerId + ", courseId: "
-                        + courseId + ", modules/" +  moduleId,
-                "/courses/" + courseId + "/modules/" +  moduleId + "/launch", null);
+                        + courseId + ", moduleId: " +  moduleId, "/courses/" + courseId + "/modules/" +  moduleId
+                        + "/launch", null);
     }
 
     private CourseRecord createCourseRecord(CourseRecordInput courseRecordInput) {
@@ -85,17 +89,22 @@ public class ModuleLaunchService {
         String learnerId = courseRecordInput.getUserId();
         String courseId = courseRecordInput.getCourseId();
         ModuleRecordInput moduleRecordInput = courseRecordInput.getModuleRecords().get(0);
-        moduleRecordInput.setUid(UUID.randomUUID().toString());
+        if(StringUtils.isBlank(moduleRecordInput.getUid())) {
+            moduleRecordInput.setUid(UUID.randomUUID().toString());
+        }
         moduleRecordInput.setState(State.IN_PROGRESS.name());
         ResponseEntity<?> courseRecordForLearnerResponse =
                 learnerRecordService.createCourseRecordForLearner(courseRecordInput);
         if(courseRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
             CourseRecord courseRecord = (CourseRecord)courseRecordForLearnerResponse.getBody();
             log.debug("courseRecord: {}", courseRecord);
-            log.info("A new course record is created for learner id: {} and course id: {}",
-                    learnerId, courseId);
+            log.info("A new course record is created for learner id: {}, course id: {} and module id: {}",
+                    learnerId, courseId, moduleRecordInput.getModuleId());
             return courseRecord;
         }
+        log.error("Unable to create a new course record for learner id: {}, course id: {} and module id: {}. " +
+                  "Error response from learnerRecordService: {}", learnerId, courseId, moduleRecordInput.getModuleId(),
+                  courseRecordForLearnerResponse);
         return null;
     }
 
@@ -112,11 +121,13 @@ public class ModuleLaunchService {
             ModuleRecord moduleRecord = (ModuleRecord)moduleRecordForLearnerResponse.getBody();
             log.debug("moduleRecord: {}", moduleRecord);
             assert moduleRecord != null;
-            log.info("A new module record is created for learner id: {}, course id: {} and module id: "
-                    + "{}", moduleRecordInput.getUserId(), moduleRecordInput.getCourseId(),
-                    moduleRecord.getModuleId());
+            log.info("A new module record is created for learner id: {}, course id: {} and module id: {}",
+                    moduleRecordInput.getUserId(), moduleRecordInput.getCourseId(), moduleRecord.getModuleId());
             return moduleRecord;
         }
+        log.error("Unable to create a new course record for learner id: {}, course id: {} and module id: {}. " +
+                  "Error response from learnerRecordService: {}", moduleRecordInput.getUserId(),
+                  moduleRecordInput.getCourseId(), moduleRecordInput.getModuleId(), moduleRecordForLearnerResponse);
         return null;
     }
 
@@ -133,12 +144,16 @@ public class ModuleLaunchService {
             assert moduleRecord != null;
             log.info("uid and updatedAt fields are updated for the module record for learner id: "
                     + "{}, course id: {} and module id: {}", learnerId, courseId, moduleRecord.getModuleId());
+        } else {
+            log.error("Unable to update uid for the module record for learner id: {}, course id: {} and module id: {}. "
+                      + "Error response from learnerRecordService: {}", learnerId, courseId, moduleRecord.getModuleId(),
+                      updateFieldsResponse);
         }
         log.debug("moduleRecord: {}", moduleRecord);
         return moduleRecord;
     }
 
-private ResponseEntity<?> createLaunchLink(ModuleRecord moduleRecord, ModuleLaunchLinkInput moduleLaunchLinkInput) {
+    private ResponseEntity<?> createLaunchLink(ModuleRecord moduleRecord, ModuleLaunchLinkInput moduleLaunchLinkInput) {
         String learnerFirstName = moduleLaunchLinkInput.getLearnerFirstName();
         String learnerLastName = moduleLaunchLinkInput.getLearnerLastName();
         CourseRecordInput courseRecordInput = moduleLaunchLinkInput.getCourseRecordInput();
@@ -151,18 +166,16 @@ private ResponseEntity<?> createLaunchLink(ModuleRecord moduleRecord, ModuleLaun
         registrationInput.setLearnerId(learnerId);
         registrationInput.setCourseId(courseId);
         registrationInput.setModuleId(moduleId);
+        registrationInput.setLearnerFirstName(learnerFirstName);
+        registrationInput.setLearnerLastName(learnerLastName == null ? "" : learnerLastName);
 
         ResponseEntity<?> registrationLaunchLinkResponse =
                 rusticiService.getRegistrationLaunchLink(registrationInput);
         if(!registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
-            log.info("Module launch link could not be retrieved using launchLink endpoint for " +
-                    "learner id: {}, course id: {} and module id: {}", learnerId, courseId, moduleId);
-            registrationInput.setLearnerFirstName(learnerFirstName);
-            registrationInput.setLearnerLastName(
-                    learnerLastName == null ? "" : learnerLastName);
+            log.error("Module launch link could not be retrieved using launchLink endpoint for learner id: {}, " +
+                      "course id: {} and module id: {} due to {}. Now invoking withLaunchLink endpoint to retrieve " +
+                      "module launch link.", learnerId, courseId, moduleId, registrationLaunchLinkResponse);
             //7. If no launch link present then create the registration and launch link using withLaunchLink
-            log.info("Invoking withLaunchLink endpoint for learner id: {}, course id: {} and " +
-                    "module id: {}", learnerId, courseId, moduleId);
             registrationLaunchLinkResponse =
                     rusticiService.createRegistrationAndLaunchLink(registrationInput);
         }
@@ -174,6 +187,10 @@ private ResponseEntity<?> createLaunchLink(ModuleRecord moduleRecord, ModuleLaun
                     registrationLaunchLinkResponse);
             //9. Update the module record for the last updated timestamp
             updateModuleUpdateDateTime(moduleRecord.getId(), learnerId, courseId);
+        } else {
+            log.error("Module launch link could not be retrieved using withLaunchLink endpoint for " +
+                      "learner id: {}, course id: {} and module id: {} due to {}",
+                      learnerId, courseId, moduleId, registrationLaunchLinkResponse);
         }
         return registrationLaunchLinkResponse;
     }
@@ -188,8 +205,7 @@ private ResponseEntity<?> createLaunchLink(ModuleRecord moduleRecord, ModuleLaun
                 launchLink.setLaunchLink(launchLinkWithDisabledBookmarking);
                 log.info("Module launch link is updated for clearbookmark=true for learner id: "
                         + "{}, course id: {} and module id: {}", learnerId, courseId, moduleId);
-                return new ResponseEntity<>(launchLink,
-                        HttpStatus.OK);
+                return new ResponseEntity<>(launchLink, HttpStatus.OK);
             }
         }
         return registrationLaunchLinkResponse;
@@ -213,6 +229,9 @@ private ResponseEntity<?> createLaunchLink(ModuleRecord moduleRecord, ModuleLaun
             log.info("updatedAt field is updated for the module record after retrieving the module launch link for" +
                             " learner id: {}, course id: {} and module id: {}",
                     learnerId, courseId, moduleRecord.getModuleId());
+        } else {
+            log.error("Unable to update updatedAt for the module record for learner id: {}, course id: {} and " +
+                    "module Long DB id: {} due to {}", learnerId, courseId, id, updateDateTimeResponse);
         }
     }
 }
