@@ -3,6 +3,8 @@ package uk.gov.cabinetoffice.csl.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -19,17 +21,29 @@ public class SecurityConfig {
     @Value("${oauth.jwtKey}")
     private String jwtKey;
 
+    private CustomAuthenticationProvider authProvider;
+
+    public SecurityConfig(CustomAuthenticationProvider authProvider) {
+        this.authProvider = authProvider;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.cors().and().csrf().disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-                .oauth2ResourceServer()
-                .jwt(jwtSpec -> jwtSpec.decoder(jwtDecoder()))
-                .and()
-                .build();
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().authorizeHttpRequests().requestMatchers("/test/**").authenticated()
+                .and().httpBasic()
+                .and().authorizeHttpRequests().requestMatchers("/courses/**").authenticated()
+                .and().oauth2ResourceServer().jwt(jwtSpec -> jwtSpec.decoder(jwtDecoder()))
+                .and().build();
+    }
+
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(authProvider);
+        return authenticationManagerBuilder.build();
     }
 
     @Bean
