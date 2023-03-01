@@ -42,10 +42,14 @@ public class RequestEntityWithBasicAuthFactory {
                                                            Map<String, String> additionalHeaderParams) {
         HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword, additionalHeaderParams,
                 MediaType.APPLICATION_JSON);
-        return RequestEntity.post(uri).headers(headers).body(body);
+        if(body != null) {
+            return RequestEntity.post(uri).headers(headers).body(body);
+        } else {
+            return RequestEntity.post(uri).headers(headers).build();
+        }
     }
 
-    private HttpHeaders createHttpHeadersWithBasicAuth(String apiUsername, String apiPassword,
+    public HttpHeaders createHttpHeadersWithBasicAuth(String apiUsername, String apiPassword,
                                                        Map<String, String> additionalHeaderParams, MediaType mediaType) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(mediaType));
