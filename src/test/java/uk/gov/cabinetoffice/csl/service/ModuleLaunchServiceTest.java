@@ -128,7 +128,7 @@ public class ModuleLaunchServiceTest {
         ErrorResponse responseBody = (ErrorResponse) launchLinkResponse.getBody();
         assert responseBody != null;
         assertEquals("Unable to retrieve module launch link for the learnerId: " + learnerId
-                + ", courseId: " + courseId + ", moduleId: " +  moduleId, responseBody.getMessage());
+                + ", courseId: " + courseId + " and moduleId: " +  moduleId, responseBody.getMessage());
         assertEquals("/courses/" + courseId + "/modules/" +  moduleId + "/launch", responseBody.getPath());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), responseBody.getError());
     }

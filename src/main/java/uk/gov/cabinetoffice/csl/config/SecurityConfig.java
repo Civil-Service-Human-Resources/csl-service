@@ -21,10 +21,10 @@ public class SecurityConfig {
     @Value("${oauth.jwtKey}")
     private String jwtKey;
 
-    private CustomAuthenticationProvider authProvider;
+    private CustomBasicAuthenticationProvider basicAuthenticationProvider;
 
-    public SecurityConfig(CustomAuthenticationProvider authProvider) {
-        this.authProvider = authProvider;
+    public SecurityConfig(CustomBasicAuthenticationProvider basicAuthenticationProvider) {
+        this.basicAuthenticationProvider = basicAuthenticationProvider;
     }
 
     @Bean
@@ -42,7 +42,7 @@ public class SecurityConfig {
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.authenticationProvider(authProvider);
+        authenticationManagerBuilder.authenticationProvider(basicAuthenticationProvider);
         return authenticationManagerBuilder.build();
     }
 

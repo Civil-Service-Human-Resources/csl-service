@@ -76,11 +76,11 @@ public class ModuleLaunchService {
             log.error("Unable to retrieve course record for learner id: {} and course id: {}. " +
                     "Error response from learnerRecordService: {}", learnerId, courseId, courseRecordForLearnerResponse);
         }
-        log.error("Unable to retrieve module launch link for the learnerId: {}, courseId: {}, moduleId: {}",
+        log.error("Unable to retrieve module launch link for the learnerId: {}, courseId: {} and moduleId: {}",
                 learnerId, courseId, moduleId);
         return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 "Unable to retrieve module launch link for the learnerId: " + learnerId + ", courseId: "
-                        + courseId + ", moduleId: " +  moduleId, "/courses/" + courseId + "/modules/" +  moduleId
+                        + courseId + " and moduleId: " +  moduleId, "/courses/" + courseId + "/modules/" +  moduleId
                         + "/launch", null);
     }
 
@@ -231,7 +231,7 @@ public class ModuleLaunchService {
                     learnerId, courseId, moduleRecord.getModuleId());
         } else {
             log.error("Unable to update updatedAt for the module record for learner id: {}, course id: {} and " +
-                    "module Long DB id: {} due to {}", learnerId, courseId, id, updateDateTimeResponse);
+                    "module DB id: {} due to {}", learnerId, courseId, id, updateDateTimeResponse);
         }
     }
 }

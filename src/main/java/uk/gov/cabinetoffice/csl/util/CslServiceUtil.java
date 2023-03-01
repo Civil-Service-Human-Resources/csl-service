@@ -59,8 +59,7 @@ public class CslServiceUtil {
     public static String getLearnerIdFromAuth(Authentication authentication) {
         log.debug("Authentication: {}", authentication);
         String learnerId = null;
-        if(authentication != null) {
-            Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
+        if(authentication != null && authentication.getPrincipal() instanceof Jwt jwtPrincipal) {
             learnerId = (String)jwtPrincipal.getClaims().get("user_name");
         }
         log.debug("Learner Id from authentication token: {}", learnerId);
