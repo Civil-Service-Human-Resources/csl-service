@@ -56,8 +56,7 @@ public class LearnerRecordService {
     public ResponseEntity<?> updateCourseRecordForLearner(String learnerId, String courseId,
                                                           Map<String, String> updateFields) {
         List<PatchOp> jsonPatch = new ArrayList<>();
-        updateFields.forEach((key, value) ->
-                jsonPatch.add(new PatchOp("replace", "/" + key, value)));
+        updateFields.forEach((key, value) -> jsonPatch.add(new PatchOp("replace", "/" + key, value)));
 
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
                 courseRecordsForLearnerUrl + "?userId=" + learnerId + "&courseId=" + courseId,
@@ -84,8 +83,7 @@ public class LearnerRecordService {
     public ResponseEntity<?> updateModuleRecordForLearner(Long moduleRecordId,
                                                           Map<String, String> updateFields) {
         List<PatchOp> jsonPatch = new ArrayList<>();
-        updateFields.forEach((key, value) ->
-                jsonPatch.add(new PatchOp("replace", "/" + key, value)));
+        updateFields.forEach((key, value) -> jsonPatch.add(new PatchOp("replace", "/" + key, value)));
 
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
                 moduleRecordsForLearnerUrl + "/" + moduleRecordId, jsonPatch, null);

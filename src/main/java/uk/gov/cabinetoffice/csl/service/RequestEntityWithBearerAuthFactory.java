@@ -14,9 +14,7 @@ import java.util.Map;
 public class RequestEntityWithBearerAuthFactory {
 
     public RequestEntity<?> createGetRequestWithBearerAuth(String strUri, Map<String, String> additionalHeaderParams) {
-        URI uri = UriComponentsBuilder.fromUriString(strUri)
-                .build()
-                .toUri();
+        URI uri = UriComponentsBuilder.fromUriString(strUri).build().toUri();
         return createGetRequestWithBearerAuth(uri, additionalHeaderParams);
     }
 
@@ -27,9 +25,7 @@ public class RequestEntityWithBearerAuthFactory {
 
     public RequestEntity<?> createPostRequestWithBearerAuth(String strUri, Object body,
                                                             Map<String, String> additionalHeaderParams) {
-        URI uri = UriComponentsBuilder.fromUriString(strUri)
-                .build()
-                .toUri();
+        URI uri = UriComponentsBuilder.fromUriString(strUri).build().toUri();
         return createPostRequestWithBearerAuth(uri, body, additionalHeaderParams);
     }
 
@@ -41,9 +37,7 @@ public class RequestEntityWithBearerAuthFactory {
 
     public RequestEntity<?> createPatchRequestWithBearerAuth(String strUri, Object body,
                                                             Map<String, String> additionalHeaderParams) {
-        URI uri = UriComponentsBuilder.fromUriString(strUri)
-                .build()
-                .toUri();
+        URI uri = UriComponentsBuilder.fromUriString(strUri).build().toUri();
         return createPatchRequestWithBearerAuth(uri, body, additionalHeaderParams);
     }
 
