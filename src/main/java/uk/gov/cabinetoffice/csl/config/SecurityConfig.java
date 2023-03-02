@@ -21,6 +21,9 @@ public class SecurityConfig {
     @Value("${oauth.jwtKey}")
     private String jwtKey;
 
+    @Value("${management.endpoints.web.base-path}")
+    private String actuatorBasePath;
+
     private CustomBasicAuthenticationProvider basicAuthenticationProvider;
 
     public SecurityConfig(CustomBasicAuthenticationProvider basicAuthenticationProvider) {
@@ -33,7 +36,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeHttpRequests().requestMatchers("/test/**", "/rustici/**").authenticated()
                 .and().httpBasic()
-                .and().authorizeHttpRequests().requestMatchers("/courses/**").authenticated()
+                .and().authorizeHttpRequests().requestMatchers(actuatorBasePath + "/**", "/courses/**").authenticated()
                 .and().oauth2ResourceServer().jwt(jwtSpec -> jwtSpec.decoder(jwtDecoder()))
                 .and().build();
     }
