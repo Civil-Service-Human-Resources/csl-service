@@ -18,11 +18,11 @@ import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 
 @Slf4j
 @RestController
-public class CslServiceController {
+public class ModuleLaunchController {
 
     private final ModuleLaunchService moduleLaunchService;
 
-    public CslServiceController(ModuleLaunchService moduleLaunchService) {
+    public ModuleLaunchController(ModuleLaunchService moduleLaunchService) {
         this.moduleLaunchService = moduleLaunchService;
     }
 

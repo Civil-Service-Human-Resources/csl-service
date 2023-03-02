@@ -107,7 +107,7 @@ public class CslServiceUtil {
             jsonGenerator.close();
             return writer.toString();
         } catch (IOException e) {
-            log.error("Could not convert the Object into Json String: {}", e.toString());
+            log.error("Could not convert the Object: {}, into json String, due to: {}", obj.toString(), e.toString());
         }
         return null;
     }
@@ -116,7 +116,8 @@ public class CslServiceUtil {
         try {
             return objectMapper().readValue(jsonString, objectType);
         } catch (JsonProcessingException e) {
-            log.error("Could not convert the response body json string into object: {}", e.toString());
+            log.error("Could not convert the json String: {}, into Object type: {}, due to: {}",
+                    jsonString, objectType.getName(), e.toString());
         }
         return null;
     }

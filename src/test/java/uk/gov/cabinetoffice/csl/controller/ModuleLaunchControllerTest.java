@@ -22,9 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.convertObjectToJsonString;
 
 @Slf4j
-@WebMvcTest(controllers = CslServiceController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
+@WebMvcTest(controllers = ModuleLaunchController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 @AutoConfigureMockMvc(addFilters = false)
-public class CslServiceControllerTest {
+public class ModuleLaunchControllerTest {
 
     @MockBean
     private ModuleLaunchService moduleLaunchService;
