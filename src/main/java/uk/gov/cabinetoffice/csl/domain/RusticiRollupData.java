@@ -17,17 +17,21 @@ public class RusticiRollupData {
 
     private String id;
 
-    private String  registrationCompletion;
+    //This will be mapped to the <ModuleRecord.state>
+    private String registrationCompletion;
 
+    //This will be mapped to the <ModuleRecord.result>
     private String registrationSuccess;
 
     private Course course;
 
     private Learner learner;
 
+    //This will be mapped to the <ModuleRecord.updatedAt>
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime updated;
 
+    //This will be mapped to the <ModuleRecord.completionDate>
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime completedDate;
 }
