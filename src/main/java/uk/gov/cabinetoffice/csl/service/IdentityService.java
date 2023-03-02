@@ -1,16 +1,15 @@
 package uk.gov.cabinetoffice.csl.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestTemplate;
 import uk.gov.cabinetoffice.csl.domain.BearerToken;
 
-import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.invokeService;
 
 @Slf4j
 @Service
@@ -18,46 +17,39 @@ public class IdentityService {
 
     private final RequestEntityWithBasicAuthFactory requestEntityFactory;
 
-    private final String oauthTokenUrl;
+    @Value("${oauth.tokenUrl}")
+    private String oauthTokenUrl;
 
-    private final String clientId;
+    @Value("${oauth.clientId}")
+    private String clientId;
 
-    private final String clientSecret;
+    @Value("${oauth.clientSecret}")
+    private String clientSecret;
 
-    private final RestTemplate restTemplate;
-
-    public IdentityService(RequestEntityWithBasicAuthFactory requestEntityFactory,
-                           RestTemplate restTemplate,
-                           @Value("${oauth.tokenUrl}") String oauthTokenUrl,
-                           @Value("${oauth.clientId}") String clientId,
-                           @Value("${oauth.clientSecret}") String clientSecret) {
+    public IdentityService(RequestEntityWithBasicAuthFactory requestEntityFactory) {
         this.requestEntityFactory = requestEntityFactory;
-        this.restTemplate = restTemplate;
-        this.oauthTokenUrl = oauthTokenUrl;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
     }
 
-    public BearerToken getOAuthServiceToken() throws Exception {
+    public String getOAuthServiceToken() {
         String accessTokenUrl = oauthTokenUrl + "?grant_type=client_credentials";
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
                 accessTokenUrl, null, clientId, clientSecret, null);
-        ResponseEntity<?> tokenResponse = getToken(postRequestWithBasicAuth);
+        ResponseEntity<?> tokenResponse = invokeService(postRequestWithBasicAuth);
         if(tokenResponse.getStatusCode().is2xxSuccessful()) {
-            BearerToken bearerToken = new ObjectMapper().readValue((String)tokenResponse.getBody(), BearerToken.class);
+            BearerToken bearerToken = mapJsonStringToBearerToken((String)tokenResponse.getBody());
             log.debug("bearerToken: {}", bearerToken);
-            return bearerToken;
+            assert bearerToken != null;
+            return bearerToken.getAccessToken();
         }
         return null;
     }
 
-    private ResponseEntity<?> getToken(RequestEntity<?> postRequestWithBasicAuth) {
-        ResponseEntity<?> response;
+    private BearerToken mapJsonStringToBearerToken(String jsonString) {
         try {
-            response = restTemplate.exchange(postRequestWithBasicAuth, String.class);
-        } catch (HttpStatusCodeException ex) {
-            response = returnError(ex, postRequestWithBasicAuth.getUrl().getPath());
+            return new ObjectMapper().readValue(jsonString, BearerToken.class);
+        } catch (JsonProcessingException e) {
+            log.error("Could not convert the response body into BearerToken object: {}", e.toString());
         }
-        return response;
+        return null;
     }
 }

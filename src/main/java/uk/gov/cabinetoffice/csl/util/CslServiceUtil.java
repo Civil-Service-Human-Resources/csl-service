@@ -1,10 +1,17 @@
 package uk.gov.cabinetoffice.csl.util;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
@@ -16,6 +23,8 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.cabinetoffice.csl.domain.ErrorResponse;
 import org.apache.hc.client5.http.classic.HttpClient;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +59,10 @@ public class CslServiceUtil {
         return new ResponseEntity<>(errorResponse, httpStatusCode);
     }
 
+    public static ResponseEntity<?> createInternalServerErrorResponse() {
+        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     public static Map<String, String> addAdditionalHeaderParams(String key, String value) {
         Map<String, String> additionalHeaderParams = new HashMap<>();
         additionalHeaderParams.put(key, value);
@@ -66,12 +79,50 @@ public class CslServiceUtil {
         return learnerId;
     }
 
-    @Bean
-    public RestTemplate restTemplate() {
+    public static RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate();
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
         restTemplate.setRequestFactory(requestFactory);
         return restTemplate;
+    }
+
+    public static ResponseEntity<?> invokeService(RequestEntity<?> requestEntity) {
+        ResponseEntity<?> response;
+        try {
+            response = restTemplate().exchange(requestEntity, String.class);
+        } catch (HttpStatusCodeException ex) {
+            response = returnError(ex, requestEntity.getUrl().getPath());
+        }
+        return response;
+    }
+
+    public static String convertObjectToJsonString(final Object obj) {
+        try {
+            StringWriter writer = new StringWriter();
+            JsonGenerator jsonGenerator = new JsonFactory().createGenerator(writer);
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            jsonGenerator.setCodec(objectMapper);
+            jsonGenerator.writeObject(obj);
+            jsonGenerator.close();
+            return writer.toString();
+        } catch (IOException e) {
+            log.error("Could not convert the Object into Json String: {}", e.toString());
+        }
+        return null;
+    }
+
+    public static <T> T mapJsonStringToObject(String jsonString, Class<T> objectType) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            return objectMapper.readValue(jsonString, objectType);
+        } catch (JsonProcessingException e) {
+            log.error("Could not convert the response body json string into object: {}", e.toString());
+        }
+        return null;
     }
 }

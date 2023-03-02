@@ -19,6 +19,7 @@ import uk.gov.cabinetoffice.csl.service.ModuleLaunchService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.convertObjectToJsonString;
 
 @Slf4j
 @WebMvcTest(controllers = CslServiceController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
@@ -39,7 +40,7 @@ public class CslServiceControllerTest {
         String uri = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post(uri)
-                .content(asJsonString(moduleLaunchLinkInput))
+                .content(convertObjectToJsonString(moduleLaunchLinkInput))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
         MvcResult result = mockMvc.perform(requestBuilder).andExpect(status().isBadRequest()).andReturn();
@@ -49,9 +50,5 @@ public class CslServiceControllerTest {
         log.debug("errorResponse: {}", errorResponse);
         assertEquals(uri, errorResponse.getPath());
         assertEquals("Learner Id is missing from authentication token", errorResponse.getMessage());
-    }
-
-    private static String asJsonString(final Object obj) throws Exception {
-        return new ObjectMapper().writeValueAsString(obj);
     }
 }

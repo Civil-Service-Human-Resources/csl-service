@@ -20,10 +20,8 @@ public class CslServiceTestController {
     }
 
     @GetMapping(path = "/test/{input}", produces = "application/json")
-    public ResponseEntity<?> test(@PathVariable("input") String input) throws Exception {
+    public ResponseEntity<?> test(@PathVariable("input") String input) {
         log.info("Input: {}", input);
         return new ResponseEntity<>(identityService.getOAuthServiceToken(), OK);
-        //return identityService.getClientAccessTokenFromIdentityService();
-        //return identityService.getOAuthServiceToken();
     }
 }

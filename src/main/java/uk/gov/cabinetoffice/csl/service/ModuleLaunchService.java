@@ -12,8 +12,9 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
+import static java.util.UUID.randomUUID;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.mapJsonStringToObject;
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
 
 @Slf4j
@@ -44,7 +45,8 @@ public class ModuleLaunchService {
         ResponseEntity<?> courseRecordForLearnerResponse =
                 learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
         if(courseRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
-            CourseRecords courseRecords = (CourseRecords)courseRecordForLearnerResponse.getBody();
+            CourseRecords courseRecords =
+                    mapJsonStringToObject((String)courseRecordForLearnerResponse.getBody(), CourseRecords.class);
             log.debug("courseRecords: {}", courseRecords);
             if(courseRecords != null) {
                 CourseRecord courseRecord = courseRecords.getCourseRecord(courseId);
@@ -90,13 +92,14 @@ public class ModuleLaunchService {
         String courseId = courseRecordInput.getCourseId();
         ModuleRecordInput moduleRecordInput = courseRecordInput.getModuleRecords().get(0);
         if(StringUtils.isBlank(moduleRecordInput.getUid())) {
-            moduleRecordInput.setUid(UUID.randomUUID().toString());
+            moduleRecordInput.setUid(randomUUID().toString());
         }
         moduleRecordInput.setState(State.IN_PROGRESS.name());
         ResponseEntity<?> courseRecordForLearnerResponse =
                 learnerRecordService.createCourseRecordForLearner(courseRecordInput);
         if(courseRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
-            CourseRecord courseRecord = (CourseRecord)courseRecordForLearnerResponse.getBody();
+            CourseRecord courseRecord =
+                    mapJsonStringToObject((String)courseRecordForLearnerResponse.getBody(), CourseRecord.class);
             log.debug("courseRecord: {}", courseRecord);
             log.info("A new course record is created for learner id: {}, course id: {} and module id: {}",
                     learnerId, courseId, moduleRecordInput.getModuleId());
@@ -110,7 +113,7 @@ public class ModuleLaunchService {
 
     private ModuleRecord createModuleRecord(ModuleRecordInput moduleRecordInput) {
         if(StringUtils.isBlank(moduleRecordInput.getUid())){
-            moduleRecordInput.setUid(UUID.randomUUID().toString());
+            moduleRecordInput.setUid(randomUUID().toString());
         }
         moduleRecordInput.setState(State.IN_PROGRESS.name());
         ResponseEntity<?> moduleRecordForLearnerResponse =
@@ -118,7 +121,8 @@ public class ModuleLaunchService {
                         moduleRecordInput);
 
         if(moduleRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
-            ModuleRecord moduleRecord = (ModuleRecord)moduleRecordForLearnerResponse.getBody();
+            ModuleRecord moduleRecord =
+                    mapJsonStringToObject((String)moduleRecordForLearnerResponse.getBody(), ModuleRecord.class);
             log.debug("moduleRecord: {}", moduleRecord);
             assert moduleRecord != null;
             log.info("A new module record is created for learner id: {}, course id: {} and module id: {}",
@@ -135,12 +139,11 @@ public class ModuleLaunchService {
         String currentDateAndTime = LocalDateTime.now().toString();
         Map<String, String> updateFields = new HashMap<>();
         updateFields.put("updatedAt", currentDateAndTime);
-        updateFields.put("uid", UUID.randomUUID().toString());
+        updateFields.put("uid", randomUUID().toString());
         ResponseEntity<?> updateFieldsResponse =
                 learnerRecordService.updateModuleRecordForLearner(moduleRecord.getId(), updateFields);
-
         if(updateFieldsResponse.getStatusCode().is2xxSuccessful()) {
-            moduleRecord = (ModuleRecord)updateFieldsResponse.getBody();
+            moduleRecord = mapJsonStringToObject((String)updateFieldsResponse.getBody(), ModuleRecord.class);
             assert moduleRecord != null;
             log.info("uid and updatedAt fields are updated for the module record for learner id: "
                     + "{}, course id: {} and module id: {}", learnerId, courseId, moduleRecord.getModuleId());
@@ -198,7 +201,8 @@ public class ModuleLaunchService {
     private ResponseEntity<?> checkAndSetDisabledBookMarking(String moduleId, String learnerId, String courseId,
                                                              ResponseEntity<?> registrationLaunchLinkResponse) {
         if(isDisabledBookmarkingModuleID(moduleId)) {
-            LaunchLink launchLink = (LaunchLink) registrationLaunchLinkResponse.getBody();
+            LaunchLink launchLink =
+                    mapJsonStringToObject((String)registrationLaunchLinkResponse.getBody(), LaunchLink.class);
             if(launchLink != null) {
                 String launchLinkWithDisabledBookmarking = launchLink.getLaunchLink()
                         + "&clearbookmark=true";
@@ -223,7 +227,8 @@ public class ModuleLaunchService {
                 learnerRecordService.updateModuleRecordForLearner(id,
                         updateDateTimeMap);
         if(updateDateTimeResponse.getStatusCode().is2xxSuccessful()) {
-            ModuleRecord moduleRecord = (ModuleRecord)updateDateTimeResponse.getBody();
+            ModuleRecord moduleRecord =
+                    mapJsonStringToObject((String)updateDateTimeResponse.getBody(), ModuleRecord.class);
             log.debug("moduleRecord: {}", moduleRecord);
             assert moduleRecord != null;
             log.info("updatedAt field is updated for the module record after retrieving the module launch link for" +

@@ -9,7 +9,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class CslServiceApplicationTests {

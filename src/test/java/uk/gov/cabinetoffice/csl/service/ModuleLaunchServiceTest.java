@@ -12,12 +12,14 @@ import uk.gov.cabinetoffice.csl.domain.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
+import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.convertObjectToJsonString;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.createInternalServerErrorResponse;
 
 @SpringBootTest
 public class ModuleLaunchServiceTest {
@@ -38,7 +40,7 @@ public class ModuleLaunchServiceTest {
     private final String moduleId = "moduleId";
     private final String moduleTitle = "moduleTitle";
     private final String moduleType = "elearning";
-    private final String uid = UUID.randomUUID().toString();
+    private final String uid = randomUUID().toString();
     private final String learnerFirstName = "learnerFirstName";
     private final String learnerLastName = "";
 
@@ -46,8 +48,7 @@ public class ModuleLaunchServiceTest {
 
     @BeforeEach
     public void setup() {
-        moduleLaunchService = new ModuleLaunchService(learnerRecordService, rusticiService,
-                disabledBookmarkingModuleIDs);
+        moduleLaunchService = new ModuleLaunchService(learnerRecordService, rusticiService, disabledBookmarkingModuleIDs);
     }
 
     @Test
@@ -98,14 +99,14 @@ public class ModuleLaunchServiceTest {
     public void createLaunchLinkShouldReturnErrorWhenCreateModuleRecordReturnsError() {
         mockLearnerRecordServiceForGetCourseRecord(createSuccessResponseForCourseRecordsWithEmptyModule());
         mockLearnerRecordServiceForCreateModuleRecord(createModuleRecordInput(learnerId, courseId, moduleId),
-                createErrorResponse());
+                createInternalServerErrorResponse());
         verify5xxError(invokeService());
     }
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenUpdateModuleRecordUidReturnsError() {
         mockLearnerRecordServiceForGetCourseRecord(createSuccessResponseForCourseRecordsWithEmptyModuleUid());
-        mockLearnerRecordServiceForUpdateModuleRecord(createErrorResponse());
+        mockLearnerRecordServiceForUpdateModuleRecord(createInternalServerErrorResponse());
         verify5xxError(invokeService());
     }
 
@@ -273,46 +274,53 @@ public class ModuleLaunchServiceTest {
     }
 
     private ResponseEntity<?> createSuccessResponseForCourseRecords() {
-        CourseRecords courseRecords = createCourseRecords();
-        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+        return new ResponseEntity<>(convertObjectToJsonString(createCourseRecords()), HttpStatus.OK);
     }
 
     private ResponseEntity<?> createSuccessResponseForCourseRecordsWithEmptyModuleUid() {
         CourseRecords courseRecords = createCourseRecords();
         courseRecords.getCourseRecord(courseId).getModuleRecord(moduleId).setUid(null);
-        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+        return new ResponseEntity<>(convertObjectToJsonString(courseRecords), HttpStatus.OK);
     }
 
     private ResponseEntity<?> createSuccessResponseForCourseRecordsWithEmptyModule() {
         CourseRecords courseRecords = createCourseRecords();
         courseRecords.getCourseRecord(courseId).setModuleRecords(null);
-        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+        return new ResponseEntity<>(convertObjectToJsonString(courseRecords), HttpStatus.OK);
     }
 
     private ResponseEntity<?> createSuccessResponseForCourseRecordsWithEmptyCourseRecord() {
         CourseRecords courseRecords = createCourseRecords();
         courseRecords.setCourseRecords(null);
-        return new ResponseEntity<>(courseRecords, HttpStatus.OK);
+        return new ResponseEntity<>(convertObjectToJsonString(courseRecords), HttpStatus.OK);
     }
 
     private ResponseEntity<?> createErrorResponseForCourseRecordsWithEmptyCourseRecord() {
         CourseRecords courseRecords = createCourseRecords();
         courseRecords.setCourseRecords(null);
-        return new ResponseEntity<>(courseRecords, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(convertObjectToJsonString(courseRecords), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private ResponseEntity<?> createSuccessResponseForCourseRecordWithEmptyModules() {
         CourseRecord courseRecord = createCourseRecord();
         courseRecord.setModuleRecords(null);
-        return new ResponseEntity<>(courseRecord, HttpStatus.OK);
+        return new ResponseEntity<>(convertObjectToJsonString(courseRecord), HttpStatus.OK);
     }
 
     private ResponseEntity<?> createSuccessResponseForModuleRecord() {
-        return new ResponseEntity<>(createModuleRecord(), HttpStatus.OK);
+        return new ResponseEntity<>(convertObjectToJsonString(createModuleRecord()), HttpStatus.OK);
     }
 
     private ResponseEntity<?> createSuccessRusticiResponseForLaunchLink() {
-        return new ResponseEntity<>(createLaunchLink(), HttpStatus.OK);
+        return new ResponseEntity<>(convertObjectToJsonString(createLaunchLink()), HttpStatus.OK);
+    }
+
+    private ResponseEntity<?> createErrorRusticiResponseForRegistrationNotFound() {
+        return new ResponseEntity<>(createErrorResponseForRegistrationDoesNotExist(), HttpStatus.NOT_FOUND);
+    }
+
+    private ResponseEntity<?> createErrorRusticiResponseForInvalidCourseIdBadRequest() {
+        return new ResponseEntity<>(createErrorResponseForInvalidCourseId(), HttpStatus.BAD_REQUEST);
     }
 
     private ErrorResponse createErrorResponseForRegistrationDoesNotExist() {
@@ -321,22 +329,10 @@ public class ModuleLaunchServiceTest {
         return errorResponse;
     }
 
-    private ResponseEntity<?> createErrorRusticiResponseForRegistrationNotFound() {
-        return new ResponseEntity<>(createErrorResponseForRegistrationDoesNotExist(), HttpStatus.NOT_FOUND);
-    }
-
     private ErrorResponse createErrorResponseForInvalidCourseId() {
         String invalidCourseIdMessage = "Course ID '" + courseId + "." + moduleId + "' is invalid";
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setMessage(invalidCourseIdMessage);
         return errorResponse;
-    }
-
-    private ResponseEntity<?> createErrorRusticiResponseForInvalidCourseIdBadRequest() {
-        return new ResponseEntity<>(createErrorResponseForInvalidCourseId(), HttpStatus.BAD_REQUEST);
-    }
-
-    private ResponseEntity<?> createErrorResponse() {
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
