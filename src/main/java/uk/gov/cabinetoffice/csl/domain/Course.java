@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Learner {
+public class Course {
     private String id;
-    private String firstName;
-    private String lastName;
+    private String title;
+    private Integer version;
 }
