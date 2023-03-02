@@ -1,7 +1,5 @@
 package uk.gov.cabinetoffice.csl.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
@@ -10,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.BearerToken;
 
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.invokeService;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.mapJsonStringToObject;
 
 @Slf4j
 @Service
@@ -30,26 +29,16 @@ public class IdentityService {
         this.requestEntityFactory = requestEntityFactory;
     }
 
-    public String getOAuthServiceToken() {
+    public BearerToken getOAuthServiceToken() {
         String accessTokenUrl = oauthTokenUrl + "?grant_type=client_credentials";
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
                 accessTokenUrl, null, clientId, clientSecret, null);
         ResponseEntity<?> tokenResponse = invokeService(postRequestWithBasicAuth);
         if(tokenResponse.getStatusCode().is2xxSuccessful()) {
-            BearerToken bearerToken = mapJsonStringToBearerToken((String)tokenResponse.getBody());
-            log.debug("bearerToken: {}", bearerToken);
-            assert bearerToken != null;
-            return bearerToken.getAccessToken();
+            return mapJsonStringToObject((String)tokenResponse.getBody(), BearerToken.class);
         }
-        return null;
-    }
-
-    private BearerToken mapJsonStringToBearerToken(String jsonString) {
-        try {
-            return new ObjectMapper().readValue(jsonString, BearerToken.class);
-        } catch (JsonProcessingException e) {
-            log.error("Could not convert the response body into BearerToken object: {}", e.toString());
-        }
+        log.error("Unable to retrieve service token from identity-service. " +
+                "Following response is received from identity-service: {}", tokenResponse);
         return null;
     }
 }
