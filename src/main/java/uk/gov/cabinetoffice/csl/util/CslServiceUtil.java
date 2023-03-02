@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.util;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -101,10 +102,7 @@ public class CslServiceUtil {
         try {
             StringWriter writer = new StringWriter();
             JsonGenerator jsonGenerator = new JsonFactory().createGenerator(writer);
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new JavaTimeModule());
-            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            jsonGenerator.setCodec(objectMapper);
+            jsonGenerator.setCodec(objectMapper());
             jsonGenerator.writeObject(obj);
             jsonGenerator.close();
             return writer.toString();
@@ -116,13 +114,18 @@ public class CslServiceUtil {
 
     public static <T> T mapJsonStringToObject(String jsonString, Class<T> objectType) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new JavaTimeModule());
-            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            return objectMapper.readValue(jsonString, objectType);
+            return objectMapper().readValue(jsonString, objectType);
         } catch (JsonProcessingException e) {
             log.error("Could not convert the response body json string into object: {}", e.toString());
         }
         return null;
+    }
+
+    public static ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return objectMapper;
     }
 }
