@@ -25,6 +25,6 @@ public class RusticiRollupController {
                                                     Authentication authentication) {
         log.debug("rusticiRollupData: {}", rusticiRollupData);
         moduleRollupService.processRusticiRollupData(rusticiRollupData);
-        return new ResponseEntity<>("Rustici Rollup Data received: " + rusticiRollupData, HttpStatus.OK);
+        return new ResponseEntity<>(rusticiRollupData, HttpStatus.OK);
     }
 }
