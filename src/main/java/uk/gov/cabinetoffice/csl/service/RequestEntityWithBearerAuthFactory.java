@@ -1,14 +1,13 @@
 package uk.gov.cabinetoffice.csl.service;
 
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Map;
+
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.getBearerTokenFromSecurityContext;
 
 @Component
 public class RequestEntityWithBearerAuthFactory {
@@ -58,11 +57,5 @@ public class RequestEntityWithBearerAuthFactory {
             headers.setAll(additionalHeaderParams);
         }
         return headers;
-    }
-
-    private String getBearerTokenFromSecurityContext() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-        return jwtPrincipal.getTokenValue();
     }
 }

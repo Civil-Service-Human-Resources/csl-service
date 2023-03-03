@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.domain.BearerToken;
+import uk.gov.cabinetoffice.csl.domain.OAuthToken;
 
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.invokeService;
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.mapJsonStringToObject;
@@ -29,13 +29,13 @@ public class IdentityService {
         this.requestEntityFactory = requestEntityFactory;
     }
 
-    public BearerToken getOAuthServiceToken() {
+    public OAuthToken getOAuthServiceToken() {
         String accessTokenUrl = oauthTokenUrl + "?grant_type=client_credentials";
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
                 accessTokenUrl, null, clientId, clientSecret, null);
         ResponseEntity<?> tokenResponse = invokeService(postRequestWithBasicAuth);
         if(tokenResponse.getStatusCode().is2xxSuccessful()) {
-            return mapJsonStringToObject((String)tokenResponse.getBody(), BearerToken.class);
+            return mapJsonStringToObject((String)tokenResponse.getBody(), OAuthToken.class);
         }
         log.error("Unable to retrieve service token from identity-service. " +
                 "Following response is received from identity-service: {}", tokenResponse);

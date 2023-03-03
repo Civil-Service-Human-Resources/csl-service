@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -70,14 +71,32 @@ public class CslServiceUtil {
         return additionalHeaderParams;
     }
 
-    public static String getLearnerIdFromAuth(Authentication authentication) {
-        log.debug("Authentication: {}", authentication);
-        String learnerId = null;
-        if(authentication != null && authentication.getPrincipal() instanceof Jwt jwtPrincipal) {
-            learnerId = (String)jwtPrincipal.getClaims().get("user_name");
+    public static String getLearnerIdFromSecurityContext() {
+        Jwt jwtPrincipal = getJwtPrincipalFromSecurityContext();
+        if(jwtPrincipal != null) {
+            return (String)jwtPrincipal.getClaims().get("user_name");
         }
-        log.debug("Learner Id from authentication token: {}", learnerId);
-        return learnerId;
+        return null;
+    }
+
+    public static String getBearerTokenFromSecurityContext() {
+        Jwt jwtPrincipal = getJwtPrincipalFromSecurityContext();
+        if(jwtPrincipal != null) {
+            return jwtPrincipal.getTokenValue();
+        }
+        return null;
+    }
+
+    public static Jwt getJwtPrincipalFromSecurityContext() {
+        Authentication authentication = getAuthenticationFromSecurityContext();
+        if(authentication != null && authentication.getPrincipal() instanceof Jwt jwtPrincipal) {
+            return jwtPrincipal;
+        }
+        return null;
+    }
+
+    public static Authentication getAuthenticationFromSecurityContext() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 
     public static RestTemplate restTemplate() {

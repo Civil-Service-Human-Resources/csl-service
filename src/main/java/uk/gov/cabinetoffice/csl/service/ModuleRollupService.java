@@ -30,8 +30,6 @@ public class ModuleRollupService {
         String courseId = courseIdDotModuleIdParts[0];
         String moduleId = courseIdDotModuleIdParts[1];
         String learnerId = rusticiRollupData.getLearner().getId();
-        log.debug("Processing Rustici rollup data for the learnerId: {}, courseId: {} and module Id: {}",
-                learnerId, courseId, moduleId);
         //2. Fetch the course record from the learner-record-service
         ResponseEntity<?> courseRecordForLearnerResponse =
                 learnerRecordService.getCourseRecordForLearner(learnerId, courseId);

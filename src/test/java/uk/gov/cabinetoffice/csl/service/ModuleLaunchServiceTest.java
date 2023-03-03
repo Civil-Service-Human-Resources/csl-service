@@ -195,8 +195,6 @@ public class ModuleLaunchServiceTest {
     }
 
     private void mockLearnerRecordServiceForUpdateModuleRecordToAssignUid(ModuleRecord moduleRecord, String learnerId, String courseId) {
-//        ModuleRecord moduleRecord1 = moduleRecord;
-//        moduleRecord1.setUid(uid);
         ModuleRecord moduleRecord1 = createModuleRecord();
                 when(learnerRecordService.updateModuleRecordToAssignUid(moduleRecord, learnerId, courseId)).thenReturn(moduleRecord1);
     }
