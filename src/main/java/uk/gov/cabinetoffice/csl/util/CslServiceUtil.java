@@ -24,6 +24,8 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.cabinetoffice.csl.domain.ErrorResponse;
 import org.apache.hc.client5.http.classic.HttpClient;
+import uk.gov.cabinetoffice.csl.domain.OAuthToken;
+import uk.gov.cabinetoffice.csl.service.IdentityService;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -34,6 +36,12 @@ import java.util.Map;
 @Slf4j
 @Component
 public class CslServiceUtil {
+
+    private final IdentityService identityService;
+
+    public CslServiceUtil(IdentityService identityService) {
+        this.identityService = identityService;
+    }
 
     public static ResponseEntity<?> returnError(HttpStatusCodeException ex, String path) {
         ErrorResponse errorResponse;
@@ -77,6 +85,24 @@ public class CslServiceUtil {
             return (String)jwtPrincipal.getClaims().get("user_name");
         }
         return null;
+    }
+
+    public String getBearerToken() {
+        String bearerToken = getBearerTokenFromSecurityContext();
+        if(StringUtils.isBlank(bearerToken)) {
+            //TODO: Implement the cache as below:
+            //1. Get the service token from cache
+            //2. if not present in cache then get it from the identity-service and put it in cache
+            //3. If token present in cache then check its expiry and if it expiring in 1 minute then
+            //get it from the identity-service and update it in the cache
+            bearerToken = getServiceTokenFromIdentityService();
+        }
+        return bearerToken;
+    }
+
+    public String getServiceTokenFromIdentityService() {
+        OAuthToken oAuthServiceToken = identityService.getOAuthServiceToken();
+        return oAuthServiceToken != null ? oAuthServiceToken.getAccessToken() : null;
     }
 
     public static String getBearerTokenFromSecurityContext() {

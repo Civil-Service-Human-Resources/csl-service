@@ -31,11 +31,10 @@ public class ModuleRollupService {
         String moduleId = courseIdDotModuleIdParts[1];
         String learnerId = rusticiRollupData.getLearner().getId();
         //2. Fetch the course record from the learner-record-service
-        ResponseEntity<?> courseRecordForLearnerResponse =
-                learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
-        if(courseRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
+        ResponseEntity<?> courseRecordResponse = learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
+        if(courseRecordResponse.getStatusCode().is2xxSuccessful()) {
             CourseRecords courseRecords =
-                    mapJsonStringToObject((String) courseRecordForLearnerResponse.getBody(), CourseRecords.class);
+                    mapJsonStringToObject((String) courseRecordResponse.getBody(), CourseRecords.class);
             log.debug("courseRecords: {}", courseRecords);
             if (courseRecords != null) {
                 CourseRecord courseRecord = courseRecords.getCourseRecord(courseId);

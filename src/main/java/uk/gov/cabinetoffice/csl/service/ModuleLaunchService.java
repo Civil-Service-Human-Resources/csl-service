@@ -38,11 +38,10 @@ public class ModuleLaunchService {
         ModuleRecordInput moduleRecordInput = courseRecordInput.getModuleRecords().get(0);
         String moduleId = moduleRecordInput.getModuleId();
         //1. Fetch the course record from the learner-record-service
-        ResponseEntity<?> courseRecordForLearnerResponse =
-                learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
-        if(courseRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
+        ResponseEntity<?> courseRecordResponse = learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
+        if(courseRecordResponse.getStatusCode().is2xxSuccessful()) {
             CourseRecords courseRecords =
-                    mapJsonStringToObject((String)courseRecordForLearnerResponse.getBody(), CourseRecords.class);
+                    mapJsonStringToObject((String)courseRecordResponse.getBody(), CourseRecords.class);
             log.debug("courseRecords: {}", courseRecords);
             if(courseRecords != null) {
                 CourseRecord courseRecord = courseRecords.getCourseRecord(courseId);
@@ -76,7 +75,7 @@ public class ModuleLaunchService {
             }
         } else {
             log.error("Unable to retrieve course record for learner id: {} and course id: {}. " +
-                "Error response from learnerRecordService: {}", learnerId, courseId, courseRecordForLearnerResponse);
+                "Error response from learnerRecordService: {}", learnerId, courseId, courseRecordResponse);
         }
         log.error("Unable to retrieve module launch link for the learnerId: {}, courseId: {} and moduleId: {}",
                 learnerId, courseId, moduleId);
