@@ -51,25 +51,24 @@ public class ModuleLaunchService {
                     courseRecord = learnerRecordService.createInProgressCourseRecordWithModuleRecord(courseRecordInput);
                 }
                 if(courseRecord != null) {
-                    //3A. Update the course record status if it is
                     if(courseRecord.getState() == null || courseRecord.getState().equals(State.ARCHIVED)) {
+                        //3. Update the course record status if it is null or ARCHIVED
                         learnerRecordService.updateCourseRecordState(learnerId, courseId, State.IN_PROGRESS);
                     }
-                    //3B. Retrieve the relevant module record from the course record
+                    //4. Retrieve the relevant module record from the course record
                     ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
                     if(moduleRecord == null) {
-                        //4.A If the relevant module record is not present then create the module record
+                        //5. If the relevant module record is not present then create the module record
                         moduleRecord = learnerRecordService.createInProgressModuleRecord(moduleRecordInput);
                     }
                     if(moduleRecord != null) {
                         if(StringUtils.isBlank(moduleRecord.getUid())) {
-                            //5. If the uid is not present in the module record then update the module record to assign
-                            // the uid
+                            //6. If the uid is not present then update the module record to assign the uid
                             moduleRecord = learnerRecordService
                                     .updateModuleRecordToAssignUid(moduleRecord, learnerId, courseId);
                         }
                         if(moduleRecord != null && StringUtils.isNotBlank(moduleRecord.getUid())) {
-                            //6. Get the launchLink using module uid as registration id
+                            //7. Get the launchLink using module uid as registration id
                             return createLaunchLink(moduleRecord, moduleLaunchLinkInput);
                         }
                     }
@@ -109,17 +108,17 @@ public class ModuleLaunchService {
             log.error("Module launch link could not be retrieved using launchLink endpoint for learner id: {}, " +
                       "course id: {} and module id: {} due to {}. Now invoking withLaunchLink endpoint to retrieve " +
                       "module launch link.", learnerId, courseId, moduleId, registrationLaunchLinkResponse);
-            //7. If no launch link present then create the registration and launch link using withLaunchLink
+            //8. If no launch link present then create the registration and launch link using withLaunchLink
             registrationLaunchLinkResponse =
                     rusticiService.createRegistrationAndLaunchLink(registrationInput);
         }
         if(registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
             log.info("Module launch link is successfully retrieved for learner id: {}, course id: "
                     + "{} and module id: {}", learnerId, courseId, moduleId);
-            //8. Check and Update launchLink for disabledBookmarking
+            //9. Check and Update launchLink for disabledBookmarking
             registrationLaunchLinkResponse = checkAndSetDisabledBookMarking(moduleId, learnerId, courseId,
                     registrationLaunchLinkResponse);
-            //9. Update the module record for the last updated timestamp
+            //10. Update the module record for the last updated timestamp
             learnerRecordService.updateModuleUpdateDateTime(moduleRecord, learnerId, courseId);
         } else {
             log.error("Module launch link could not be retrieved using withLaunchLink endpoint for " +

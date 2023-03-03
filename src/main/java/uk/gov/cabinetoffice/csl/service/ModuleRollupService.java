@@ -1,8 +1,12 @@
 package uk.gov.cabinetoffice.csl.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.domain.RusticiRollupData;
+import uk.gov.cabinetoffice.csl.domain.*;
+
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.mapJsonStringToObject;
 
 @Slf4j
 @Service
@@ -10,15 +14,8 @@ public class ModuleRollupService {
 
     private final LearnerRecordService learnerRecordService;
 
-    private final RusticiService rusticiService;
-
-    private final IdentityService identityService;
-
-    public ModuleRollupService(LearnerRecordService learnerRecordService, RusticiService rusticiService,
-                               IdentityService identityService) {
+    public ModuleRollupService(LearnerRecordService learnerRecordService) {
         this.learnerRecordService = learnerRecordService;
-        this.rusticiService = rusticiService;
-        this.identityService = identityService;
     }
 
     public void processRusticiRollupData(RusticiRollupData rusticiRollupData) {
@@ -28,17 +25,40 @@ public class ModuleRollupService {
             log.error("Invalid rustici rollup data. \".\" is missing from course.id: {}", rusticiRollupData);
             return;
         }
-
-        //1. get the courseId, moduleId and learnerId from the rollup data
+        //1. Get the courseId, moduleId and learnerId from the rollup data
         String[] courseIdDotModuleIdParts = courseIdDotModuleId.split("\\.");
         String courseId = courseIdDotModuleIdParts[0];
         String moduleId = courseIdDotModuleIdParts[1];
         String learnerId = rusticiRollupData.getLearner().getId();
         log.debug("Processing Rustici rollup data for the learnerId: {}, courseId: {} and module Id: {}",
                 learnerId, courseId, moduleId);
-
-        //1. Get the course record
-        //2. Check if the course record state is NULL or archived then update it
-        //3. update module record update date and time
+        //2. Fetch the course record from the learner-record-service
+        ResponseEntity<?> courseRecordForLearnerResponse =
+                learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
+        if(courseRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
+            CourseRecords courseRecords =
+                    mapJsonStringToObject((String) courseRecordForLearnerResponse.getBody(), CourseRecords.class);
+            log.debug("courseRecords: {}", courseRecords);
+            if (courseRecords != null) {
+                CourseRecord courseRecord = courseRecords.getCourseRecord(courseId);
+                if (courseRecord != null) {
+                    //3. Retrieve the relevant module record from the course record
+                    ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
+                    if(moduleRecord != null) {
+                        if (StringUtils.isBlank(moduleRecord.getUid())) {
+                            //4. If the uid is not present then update the module record to assign the uid
+                            moduleRecord = learnerRecordService
+                                    .updateModuleRecordToAssignUid(moduleRecord, learnerId, courseId);
+                        }
+                        //5. Update the module record for the last updated timestamp
+                        learnerRecordService.updateModuleUpdateDateTime(moduleRecord, learnerId, courseId);
+                        if (courseRecord.getState() == null || courseRecord.getState().equals(State.ARCHIVED)) {
+                            //6. Update the course record status if it is null or ARCHIVED
+                            learnerRecordService.updateCourseRecordState(learnerId, courseId, State.IN_PROGRESS);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

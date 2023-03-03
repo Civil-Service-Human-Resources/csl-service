@@ -30,6 +30,6 @@ public class RusticiRollupController {
         } else {
             log.error("Invalid rustici rollup data: {}", rusticiRollupData);
         }
-        return new ResponseEntity<>(rusticiRollupData, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }
