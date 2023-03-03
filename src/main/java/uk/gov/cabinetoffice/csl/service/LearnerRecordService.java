@@ -59,9 +59,9 @@ public class LearnerRecordService {
     }
 
     public ResponseEntity<?> updateCourseRecordState(String learnerId, String courseId, State state) {
-        Map<String, String> updateState = new HashMap<>();
-        updateState.put("state", state.name());
-        return updateCourseRecordForLearner(learnerId, courseId, updateState);
+        Map<String, String> updateFields = new HashMap<>();
+        updateFields.put("state", state.name());
+        return updateCourseRecordForLearner(learnerId, courseId, updateFields);
     }
 
     public ResponseEntity<?> createModuleRecordForLearner(ModuleRecordInput moduleRecordInput) {
@@ -147,19 +147,19 @@ public class LearnerRecordService {
     }
 
     public ModuleRecord updateModuleUpdateDateTime(ModuleRecord moduleRecord, String learnerId, String courseId) {
-        Long id = moduleRecord.getId();
+        String moduleId = moduleRecord.getModuleId();
         String currentDateAndTime = LocalDateTime.now().toString();
-        Map<String, String> updateDateTimeMap = new HashMap<>();
-        updateDateTimeMap.put("updatedAt", currentDateAndTime);
-        ResponseEntity<?> updateDateTimeResponse = updateModuleRecordForLearner(id, updateDateTimeMap);
+        Map<String, String> updateFields = new HashMap<>();
+        updateFields.put("updatedAt", currentDateAndTime);
+        ResponseEntity<?> updateDateTimeResponse = updateModuleRecordForLearner(moduleRecord.getId(), updateFields);
         if(updateDateTimeResponse.getStatusCode().is2xxSuccessful()) {
             moduleRecord = mapJsonStringToObject((String)updateDateTimeResponse.getBody(), ModuleRecord.class);
             log.debug("moduleRecord: {}", moduleRecord);
             log.info("updatedAt field is updated for the module record after retrieving the module launch link for"
-                    + " learner id: {}, course id: {} and module id: {}", learnerId, courseId, id);
+                    + " learner id: {}, course id: {} and module id: {}", learnerId, courseId, moduleId);
         } else {
             log.error("Unable to update updatedAt for the module record for learner id: {}, course id: {} and "
-                    + "module DB id: {} due to {}", learnerId, courseId, id, updateDateTimeResponse);
+                    + "module id: {} due to {}", learnerId, courseId, moduleId, updateDateTimeResponse);
         }
         return moduleRecord;
     }
