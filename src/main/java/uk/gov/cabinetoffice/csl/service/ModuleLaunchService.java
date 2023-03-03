@@ -51,15 +51,15 @@ public class ModuleLaunchService {
                     courseRecord = learnerRecordService.createInProgressCourseRecordWithModuleRecord(courseRecordInput);
                 }
                 if(courseRecord != null) {
-                    //3. Retrieve the relevant module record from the course record
+                    //3A. Update the course record status if it is
+                    if(courseRecord.getState() == null || courseRecord.getState().equals(State.ARCHIVED)) {
+                        learnerRecordService.updateCourseRecordState(learnerId, courseId, State.IN_PROGRESS);
+                    }
+                    //3B. Retrieve the relevant module record from the course record
                     ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
                     if(moduleRecord == null) {
                         //4.A If the relevant module record is not present then create the module record
                         moduleRecord = learnerRecordService.createInProgressModuleRecord(moduleRecordInput);
-                        //4.B Update the course record status if it is
-                        if(courseRecord.getState() == null || courseRecord.getState().equals(State.ARCHIVED)) {
-                            learnerRecordService.updateCourseRecordState(learnerId, courseId, State.IN_PROGRESS);
-                        }
                     }
                     if(moduleRecord != null) {
                         if(StringUtils.isBlank(moduleRecord.getUid())) {
