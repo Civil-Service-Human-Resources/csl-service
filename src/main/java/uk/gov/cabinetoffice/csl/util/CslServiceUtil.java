@@ -92,9 +92,11 @@ public class CslServiceUtil {
         if(StringUtils.isBlank(bearerToken)) {
             //TODO: Implement the cache as below:
             //1. Get the service token from cache
-            //2. if not present in cache then get it from the identity-service and put it in cache
-            //3. If token present in cache then check its expiry and if it expiring in 1 minute then
-            //get it from the identity-service and update it in the cache
+            //2. if not present in cache then get it from the identity-service
+            //3. and put it in cache
+            //4. If token present in cache then check its expiry
+            //5. If it expired or expiring in less than 15seconds
+            //6. then get it from the identity-service and update it in the cache
             bearerToken = getServiceTokenFromIdentityService();
         }
         return bearerToken;
