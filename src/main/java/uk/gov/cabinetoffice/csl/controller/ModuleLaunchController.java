@@ -8,20 +8,22 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.domain.CourseRecordInput;
 import uk.gov.cabinetoffice.csl.domain.ModuleLaunchLinkInput;
 import uk.gov.cabinetoffice.csl.domain.ModuleRecordInput;
-import uk.gov.cabinetoffice.csl.service.RusticiModuleService;
+import uk.gov.cabinetoffice.csl.service.ModuleLaunchService;
 
 import java.util.ArrayList;
 
-import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.*;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.getLearnerIdFromSecurityContext;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
+
 
 @Slf4j
 @RestController
 public class ModuleLaunchController {
 
-    private final RusticiModuleService rusticiModuleService;
+    private final ModuleLaunchService moduleLaunchService;
 
-    public ModuleLaunchController(RusticiModuleService rusticiModuleService) {
-        this.rusticiModuleService = rusticiModuleService;
+    public ModuleLaunchController(ModuleLaunchService moduleLaunchService) {
+        this.moduleLaunchService = moduleLaunchService;
     }
 
     @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/launch", produces = "application/json")
@@ -49,7 +51,7 @@ public class ModuleLaunchController {
         courseRecordInput = setupCourseRecordInput(courseRecordInput, learnerId, courseId, moduleId);
         moduleLaunchLinkInput.setCourseRecordInput(courseRecordInput);
 
-        return rusticiModuleService.createLaunchLink(moduleLaunchLinkInput);
+        return moduleLaunchService.createLaunchLink(moduleLaunchLinkInput);
     }
 
     private CourseRecordInput setupCourseRecordInput(CourseRecordInput courseRecordInput,

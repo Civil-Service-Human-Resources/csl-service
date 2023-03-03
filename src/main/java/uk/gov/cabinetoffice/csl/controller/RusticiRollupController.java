@@ -7,16 +7,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cabinetoffice.csl.domain.RusticiRollupData;
-import uk.gov.cabinetoffice.csl.service.RusticiModuleService;
+import uk.gov.cabinetoffice.csl.service.ModuleRollupService;
 
 @Slf4j
 @RestController
 public class RusticiRollupController {
 
-    private final RusticiModuleService rusticiModuleService;
+    private final ModuleRollupService moduleRollupService;
 
-    public RusticiRollupController(RusticiModuleService rusticiModuleService) {
-        this.rusticiModuleService = rusticiModuleService;
+    public RusticiRollupController(ModuleRollupService moduleRollupService) {
+        this.moduleRollupService = moduleRollupService;
     }
 
     @PostMapping(path = "/rustici/rollup", produces = "application/json")
@@ -24,7 +24,7 @@ public class RusticiRollupController {
         if(rusticiRollupData != null
                 && rusticiRollupData.getLearner() != null && rusticiRollupData.getLearner().getId() != null
                 && rusticiRollupData.getCourse() != null && rusticiRollupData.getCourse().getId() != null) {
-            rusticiModuleService.processRusticiRollupData(rusticiRollupData);
+            moduleRollupService.processRusticiRollupData(rusticiRollupData);
         } else {
             log.error("Invalid rustici rollup data: {}", rusticiRollupData);
         }
