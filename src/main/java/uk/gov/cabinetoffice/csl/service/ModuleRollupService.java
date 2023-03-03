@@ -18,12 +18,12 @@ public class ModuleRollupService {
         this.learnerRecordService = learnerRecordService;
     }
 
-    public void processRusticiRollupData(RusticiRollupData rusticiRollupData) {
+    public ModuleRecord processRusticiRollupData(RusticiRollupData rusticiRollupData) {
         log.debug("rusticiRollupData: {}", rusticiRollupData);
         String courseIdDotModuleId = rusticiRollupData.getCourse().getId();
         if(!courseIdDotModuleId.contains(".")) {
             log.error("Invalid rustici rollup data. \".\" is missing from course.id: {}", rusticiRollupData);
-            return;
+            return null;
         }
 
         String[] courseIdDotModuleIdParts = courseIdDotModuleId.split("\\.");
@@ -47,6 +47,6 @@ public class ModuleRollupService {
         courseRecordInput.setModuleRecords(new ArrayList<>());
         courseRecordInput.getModuleRecords().add(moduleRecordInput);
 
-        processCourseAndModuleData(learnerRecordService, courseRecordInput);
+        return processCourseAndModuleData(learnerRecordService, courseRecordInput);
     }
 }
