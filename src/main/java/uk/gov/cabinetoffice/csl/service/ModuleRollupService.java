@@ -28,11 +28,17 @@ public class ModuleRollupService {
             log.error("Invalid rustici rollup data. \".\" is missing from course.id: {}", rusticiRollupData);
             return;
         }
+
+        //1. get the courseId, moduleId and learnerId from the rollup data
         String[] courseIdDotModuleIdParts = courseIdDotModuleId.split("\\.");
         String courseId = courseIdDotModuleIdParts[0];
         String moduleId = courseIdDotModuleIdParts[1];
         String learnerId = rusticiRollupData.getLearner().getId();
         log.debug("Processing Rustici rollup data for the learnerId: {}, courseId: {} and module Id: {}",
                 learnerId, courseId, moduleId);
+
+        //1. Get the course record
+        //2. Check if the course record state is NULL or archived then update it
+        //3. update module record update date and time
     }
 }
