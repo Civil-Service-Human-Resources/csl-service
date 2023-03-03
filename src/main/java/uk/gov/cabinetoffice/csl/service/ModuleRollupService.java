@@ -23,5 +23,16 @@ public class ModuleRollupService {
 
     public void processRusticiRollupData(RusticiRollupData rusticiRollupData) {
         log.debug("rusticiRollupData: {}", rusticiRollupData);
+        String courseIdDotModuleId = rusticiRollupData.getCourse().getId();
+        if(!courseIdDotModuleId.contains(".")) {
+            log.error("Invalid rustici rollup data. \".\" is missing from course.id: {}", rusticiRollupData);
+            return;
+        }
+        String[] courseIdDotModuleIdParts = courseIdDotModuleId.split("\\.");
+        String courseId = courseIdDotModuleIdParts[0];
+        String moduleId = courseIdDotModuleIdParts[1];
+        String learnerId = rusticiRollupData.getLearner().getId();
+        log.debug("Processing Rustici rollup data for the learnerId: {}, courseId: {} and module Id: {}",
+                learnerId, courseId, moduleId);
     }
 }

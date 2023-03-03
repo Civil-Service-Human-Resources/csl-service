@@ -23,8 +23,13 @@ public class RusticiRollupController {
     @PostMapping(path = "/rustici/rollup", produces = "application/json")
     public ResponseEntity<?> createModuleLaunchLink(@RequestBody RusticiRollupData rusticiRollupData,
                                                     Authentication authentication) {
-        log.debug("rusticiRollupData: {}", rusticiRollupData);
-        moduleRollupService.processRusticiRollupData(rusticiRollupData);
-        return new ResponseEntity<>(rusticiRollupData, HttpStatus.OK);
+        if(rusticiRollupData != null
+                && rusticiRollupData.getLearner() != null && rusticiRollupData.getLearner().getId() != null
+                && rusticiRollupData.getCourse() != null && rusticiRollupData.getCourse().getId() != null) {
+            moduleRollupService.processRusticiRollupData(rusticiRollupData);
+        } else {
+            log.error("Invalid rustici rollup data: {}", rusticiRollupData);
+        }
+        return new ResponseEntity<>(rusticiRollupData, HttpStatus.ACCEPTED);
     }
 }
