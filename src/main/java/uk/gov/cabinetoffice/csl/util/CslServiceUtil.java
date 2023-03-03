@@ -97,6 +97,7 @@ public class CslServiceUtil {
             //4. If token present in cache then check its expiry
             //5. If it expired or expiring in less than 15seconds
             //6. then get it from the identity-service and update it in the cache
+            //7. Also clear the cache on hourly basis to refresh the token
             bearerToken = getServiceTokenFromIdentityService();
         }
         return bearerToken;
