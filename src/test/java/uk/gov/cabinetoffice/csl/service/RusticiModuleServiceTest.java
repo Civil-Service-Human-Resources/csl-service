@@ -22,7 +22,7 @@ import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.convertObjectToJsonSt
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.createInternalServerErrorResponse;
 
 @SpringBootTest
-public class ModuleLaunchServiceTest {
+public class RusticiModuleServiceTest {
 
     @Mock
     private LearnerRecordService learnerRecordService;
@@ -31,7 +31,7 @@ public class ModuleLaunchServiceTest {
     private RusticiService rusticiService;
 
     @InjectMocks
-    private ModuleLaunchService moduleLaunchService;
+    private RusticiModuleService rusticiModuleService;
 
     private final String learnerId = "learnerId";
     private final String courseId = "courseId";
@@ -48,7 +48,7 @@ public class ModuleLaunchServiceTest {
 
     @BeforeEach
     public void setup() {
-        moduleLaunchService = new ModuleLaunchService(learnerRecordService, rusticiService, disabledBookmarkingModuleIDs);
+        rusticiModuleService = new RusticiModuleService(learnerRecordService, rusticiService, disabledBookmarkingModuleIDs);
     }
 
     @Test
@@ -130,7 +130,7 @@ public class ModuleLaunchServiceTest {
     }
 
     private ResponseEntity<?> invokeService() {
-        return moduleLaunchService.createLaunchLink(createModuleLaunchLinkInput(learnerId, courseId, moduleId));
+        return rusticiModuleService.createLaunchLink(createModuleLaunchLinkInput(learnerId, courseId, moduleId));
     }
 
     private void verify5xxError(ResponseEntity<?> launchLinkResponse) {

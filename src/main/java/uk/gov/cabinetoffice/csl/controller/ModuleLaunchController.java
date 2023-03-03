@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.domain.CourseRecordInput;
 import uk.gov.cabinetoffice.csl.domain.ModuleLaunchLinkInput;
 import uk.gov.cabinetoffice.csl.domain.ModuleRecordInput;
-import uk.gov.cabinetoffice.csl.service.ModuleLaunchService;
+import uk.gov.cabinetoffice.csl.service.RusticiModuleService;
 
 import java.util.ArrayList;
 
@@ -18,10 +18,10 @@ import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.*;
 @RestController
 public class ModuleLaunchController {
 
-    private final ModuleLaunchService moduleLaunchService;
+    private final RusticiModuleService rusticiModuleService;
 
-    public ModuleLaunchController(ModuleLaunchService moduleLaunchService) {
-        this.moduleLaunchService = moduleLaunchService;
+    public ModuleLaunchController(RusticiModuleService rusticiModuleService) {
+        this.rusticiModuleService = rusticiModuleService;
     }
 
     @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/launch", produces = "application/json")
@@ -49,7 +49,7 @@ public class ModuleLaunchController {
         courseRecordInput = setupCourseRecordInput(courseRecordInput, learnerId, courseId, moduleId);
         moduleLaunchLinkInput.setCourseRecordInput(courseRecordInput);
 
-        return moduleLaunchService.createLaunchLink(moduleLaunchLinkInput);
+        return rusticiModuleService.createLaunchLink(moduleLaunchLinkInput);
     }
 
     private CourseRecordInput setupCourseRecordInput(CourseRecordInput courseRecordInput,

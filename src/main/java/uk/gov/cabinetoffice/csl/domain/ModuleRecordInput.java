@@ -2,10 +2,12 @@ package uk.gov.cabinetoffice.csl.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import uk.gov.cabinetoffice.csl.annotations.ValidEnum;
 
@@ -32,6 +34,9 @@ public class ModuleRecordInput {
     @ValidEnum(enumClass = State.class)
     private String state;
 
+    @ValidEnum(enumClass = Result.class)
+    private String result;
+
     private BigDecimal cost;
 
     private Long duration;
@@ -40,4 +45,10 @@ public class ModuleRecordInput {
     private LocalDate eventDate;
 
     private String eventId;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime updated;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime completedDate;
 }
