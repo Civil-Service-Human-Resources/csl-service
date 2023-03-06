@@ -198,11 +198,12 @@ public class CslServiceUtil {
                 if(courseRecord != null) {
                     if(courseRecord.getState() == null || courseRecord.getState().equals(State.ARCHIVED)) {
                         //Update the course record status if it is null or ARCHIVED
-                        learnerRecordService.updateCourseRecordState(learnerId, courseId, State.IN_PROGRESS);
+                        courseRecord = learnerRecordService.updateCourseRecordState(learnerId, courseId,
+                                State.IN_PROGRESS);
                     }
                     //Retrieve the relevant module record from the course record
-                    moduleRecord = courseRecord.getModuleRecord(moduleId);
-                    if(moduleRecord == null) {
+                    moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
+                    if(courseRecord != null && moduleRecord == null) {
                         //If the relevant module record is not present then create the module record
                         moduleRecord = learnerRecordService.createInProgressModuleRecord(moduleRecordInput);
                     }

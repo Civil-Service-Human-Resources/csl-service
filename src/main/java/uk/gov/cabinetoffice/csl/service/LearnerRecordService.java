@@ -58,11 +58,22 @@ public class LearnerRecordService {
         return invokeService(requestWithBearerAuth);
     }
 
-    public ResponseEntity<?> updateCourseRecordState(String learnerId, String courseId, State state) {
+    public CourseRecord updateCourseRecordState(String learnerId, String courseId, State state) {
         Map<String, String> updateFields = new HashMap<>();
         updateFields.put("state", state.name());
         updateFields.put("lastUpdated", LocalDateTime.now().toString());
-        return updateCourseRecordForLearner(learnerId, courseId, updateFields);
+        ResponseEntity<?> updateResponse = updateCourseRecordForLearner(learnerId, courseId, updateFields);
+        if(updateResponse.getStatusCode().is2xxSuccessful()) {
+            CourseRecord courseRecord =
+                    mapJsonStringToObject((String)updateResponse.getBody(), CourseRecord.class);
+            log.debug("courseRecord: {}", courseRecord);
+            log.info("Course record status and lastUpdated are update for learner id: {}, course id: {} and state: {}",
+                    learnerId, courseId, state);
+            return courseRecord;
+        }
+        log.error("Unable to update course record status and lastUpdated for learner id: {}, course id: {} and state: {}",
+                learnerId, courseId, state);
+        return null;
     }
 
     public ResponseEntity<?> createModuleRecordForLearner(ModuleRecordInput moduleRecordInput) {
