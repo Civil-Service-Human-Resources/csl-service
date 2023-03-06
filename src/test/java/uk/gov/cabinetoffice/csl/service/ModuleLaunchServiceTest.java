@@ -137,7 +137,7 @@ public class ModuleLaunchServiceTest {
     }
 
     private ResponseEntity<?> invokeService() {
-        return moduleLaunchService.createLaunchLink(createModuleLaunchLinkInput(learnerId, courseId, moduleId));
+        return moduleLaunchService.createLaunchLink(createModuleLaunchLinkInput());
     }
 
     private void verify5xxError(ResponseEntity<?> launchLinkResponse) {
@@ -187,7 +187,7 @@ public class ModuleLaunchServiceTest {
                 .thenReturn(createErrorRusticiResponseForInvalidCourseIdBadRequest);
     }
 
-    private ModuleLaunchLinkInput createModuleLaunchLinkInput(String learnerId, String courseId, String moduleId) {
+    private ModuleLaunchLinkInput createModuleLaunchLinkInput() {
         ModuleLaunchLinkInput moduleLaunchLinkInput = new ModuleLaunchLinkInput();
         moduleLaunchLinkInput.setLearnerFirstName(learnerFirstName);
         moduleLaunchLinkInput.setLearnerLastName(learnerLastName);
