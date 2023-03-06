@@ -2,7 +2,10 @@ package uk.gov.cabinetoffice.csl.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.domain.*;
+import uk.gov.cabinetoffice.csl.domain.CourseRecordInput;
+import uk.gov.cabinetoffice.csl.domain.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.ModuleRecordInput;
+import uk.gov.cabinetoffice.csl.domain.RusticiRollupData;
 
 import java.util.ArrayList;
 
@@ -47,6 +50,13 @@ public class ModuleRollupService {
         courseRecordInput.setModuleRecords(new ArrayList<>());
         courseRecordInput.getModuleRecords().add(moduleRecordInput);
 
-        return processCourseAndModuleData(learnerRecordService, courseRecordInput);
+        ModuleRecord moduleRecord = processCourseAndModuleData(learnerRecordService, courseRecordInput);
+        if(moduleRecord != null) {
+            moduleRecord = learnerRecordService.updateModuleUpdateDateTime(moduleRecord,
+                    moduleRecordInput.getUpdated(), learnerId, courseId);
+        } else {
+            log.error("Unable to process the rustici rollup data: {}", rusticiRollupData);
+        }
+        return moduleRecord;
     }
 }

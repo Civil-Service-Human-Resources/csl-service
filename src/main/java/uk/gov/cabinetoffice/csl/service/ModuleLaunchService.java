@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.*;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.*;
@@ -80,7 +81,7 @@ public class ModuleLaunchService {
             registrationLaunchLinkResponse = checkAndSetDisabledBookMarking(moduleId, learnerId, courseId,
                     registrationLaunchLinkResponse);
             //10. Update the module record for the last updated timestamp
-            learnerRecordService.updateModuleUpdateDateTime(moduleRecord, learnerId, courseId);
+            learnerRecordService.updateModuleUpdateDateTime(moduleRecord, LocalDateTime.now(), learnerId, courseId);
         } else {
             log.error("Module launch link could not be retrieved using withLaunchLink endpoint for " +
                       "learner id: {}, course id: {} and module id: {} due to {}",

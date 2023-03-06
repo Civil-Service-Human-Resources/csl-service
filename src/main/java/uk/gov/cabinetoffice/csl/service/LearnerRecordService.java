@@ -61,6 +61,7 @@ public class LearnerRecordService {
     public ResponseEntity<?> updateCourseRecordState(String learnerId, String courseId, State state) {
         Map<String, String> updateFields = new HashMap<>();
         updateFields.put("state", state.name());
+        updateFields.put("lastUpdated", LocalDateTime.now().toString());
         return updateCourseRecordForLearner(learnerId, courseId, updateFields);
     }
 
@@ -146,11 +147,11 @@ public class LearnerRecordService {
         return moduleRecord;
     }
 
-    public ModuleRecord updateModuleUpdateDateTime(ModuleRecord moduleRecord, String learnerId, String courseId) {
+    public ModuleRecord updateModuleUpdateDateTime(ModuleRecord moduleRecord, LocalDateTime updatedAt,
+                                                   String learnerId, String courseId) {
         String moduleId = moduleRecord.getModuleId();
-        String currentDateAndTime = LocalDateTime.now().toString();
         Map<String, String> updateFields = new HashMap<>();
-        updateFields.put("updatedAt", currentDateAndTime);
+        updateFields.put("updatedAt", updatedAt.toString());
         ResponseEntity<?> updateDateTimeResponse = updateModuleRecordForLearner(moduleRecord.getId(), updateFields);
         if(updateDateTimeResponse.getStatusCode().is2xxSuccessful()) {
             moduleRecord = mapJsonStringToObject((String)updateDateTimeResponse.getBody(), ModuleRecord.class);

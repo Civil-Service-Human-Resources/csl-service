@@ -90,20 +90,19 @@ public class CslServiceUtil {
     public String getBearerToken() {
         String bearerToken = getBearerTokenFromSecurityContext();
         if(StringUtils.isBlank(bearerToken)) {
-            //TODO: Implement the cache as below:
-            //1. Get the service token from cache
-            //2. if not present in cache then get it from the identity-service
-            //3. and put it in cache
-            //4. If token present in cache then check its expiry
-            //5. If it expired or expiring in less than 15seconds
-            //6. then get it from the identity-service and update it in the cache
-            //7. Also clear the cache on hourly basis to refresh the token
             bearerToken = getServiceTokenFromIdentityService();
         }
         return bearerToken;
     }
 
     public String getServiceTokenFromIdentityService() {
+        //TODO: Implement the cache as below:
+        //1. Get the service token from cache
+        //2. if not present in cache then get it from the identity-service
+        //3. and put it in cache
+        //4. If token present in cache then check its expiry
+        //5. If it expired or expiring in less than 5 seconds (configurable)
+        //6. then get it from the identity-service and update it in the cache
         OAuthToken oAuthServiceToken = identityService.getOAuthServiceToken();
         return oAuthServiceToken != null ? oAuthServiceToken.getAccessToken() : null;
     }

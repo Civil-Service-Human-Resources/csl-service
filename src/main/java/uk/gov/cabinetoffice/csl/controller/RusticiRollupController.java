@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.cabinetoffice.csl.domain.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.RusticiRollupData;
 import uk.gov.cabinetoffice.csl.service.ModuleRollupService;
 
@@ -25,10 +24,7 @@ public class RusticiRollupController {
         if(rusticiRollupData != null
                 && rusticiRollupData.getLearner() != null && rusticiRollupData.getLearner().getId() != null
                 && rusticiRollupData.getCourse() != null && rusticiRollupData.getCourse().getId() != null) {
-            ModuleRecord moduleRecord = moduleRollupService.processRusticiRollupData(rusticiRollupData);
-            if(moduleRecord == null) {
-                log.error("Unable to process the rustici rollup data: {}", rusticiRollupData);
-            }
+            moduleRollupService.processRusticiRollupData(rusticiRollupData);
         } else {
             log.error("Invalid rustici rollup data: {}", rusticiRollupData);
         }
