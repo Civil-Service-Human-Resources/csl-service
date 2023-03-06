@@ -70,17 +70,17 @@ public class ModuleLaunchService {
             log.error("Module launch link could not be retrieved using launchLink endpoint for learner id: {}, " +
                       "course id: {} and module id: {} due to {}. Now invoking withLaunchLink endpoint to retrieve " +
                       "module launch link.", learnerId, courseId, moduleId, registrationLaunchLinkResponse);
-            //8. If no launch link present then create the registration and launch link using withLaunchLink
+            //If no launch link present then create the registration and launch link using withLaunchLink
             registrationLaunchLinkResponse =
                     rusticiService.createRegistrationAndLaunchLink(registrationInput);
         }
         if(registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
             log.info("Module launch link is successfully retrieved for learner id: {}, course id: "
                     + "{} and module id: {}", learnerId, courseId, moduleId);
-            //9. Check and Update launchLink for disabledBookmarking
+            //Check and Update launchLink for disabledBookmarking
             registrationLaunchLinkResponse = checkAndSetDisabledBookMarking(moduleId, learnerId, courseId,
                     registrationLaunchLinkResponse);
-            //10. Update the module record for the last updated timestamp
+            //Update the module record for the last updated timestamp
             learnerRecordService.updateModuleUpdateDateTime(moduleRecord, LocalDateTime.now(), learnerId, courseId);
         } else {
             log.error("Module launch link could not be retrieved using withLaunchLink endpoint for " +
