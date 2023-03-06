@@ -20,7 +20,7 @@ public class RusticiRollupController {
     }
 
     @PostMapping(path = "/rustici/rollup", produces = "application/json")
-    public ResponseEntity<?> createModuleLaunchLink(@RequestBody RusticiRollupData rusticiRollupData) {
+    public ResponseEntity<?> processRusticiRollupData(@RequestBody RusticiRollupData rusticiRollupData) {
         if(rusticiRollupData != null
                 && rusticiRollupData.getLearner() != null && rusticiRollupData.getLearner().getId() != null
                 && rusticiRollupData.getCourse() != null && rusticiRollupData.getCourse().getId() != null) {
