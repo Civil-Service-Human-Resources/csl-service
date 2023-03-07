@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.RequestEntity;
@@ -40,8 +41,13 @@ public class CslServiceUtil {
 
     private final IdentityService identityService;
 
-    public CslServiceUtil(IdentityService identityService) {
+    private final long refreshServiceTokenCacheBeforeSecondsToExpire;
+
+    public CslServiceUtil(IdentityService identityService,
+                          @Value("${oauth.refresh.serviceTokenCache.beforeSecondsToExpire}")
+                          long refreshServiceTokenCacheBeforeSecondsToExpire) {
         this.identityService = identityService;
+        this.refreshServiceTokenCacheBeforeSecondsToExpire = refreshServiceTokenCacheBeforeSecondsToExpire;
     }
 
     public static ResponseEntity<?> returnError(HttpStatusCodeException ex, String path) {
@@ -95,7 +101,7 @@ public class CslServiceUtil {
             log.debug("serviceToken: expiryDate: {}", serviceToken.getExpiryDate());
             long secondsRemainingToExpire = ChronoUnit.SECONDS.between(LocalDateTime.now(), serviceToken.getExpiryDate());
             log.debug("serviceToken: secondsRemainingToExpire: {}", secondsRemainingToExpire);
-            if(secondsRemainingToExpire <= 0) {
+            if(secondsRemainingToExpire <= refreshServiceTokenCacheBeforeSecondsToExpire) {
                 identityService.removeServiceTokenFromCache();
                 serviceToken = identityService.getOAuthServiceToken();
             }
