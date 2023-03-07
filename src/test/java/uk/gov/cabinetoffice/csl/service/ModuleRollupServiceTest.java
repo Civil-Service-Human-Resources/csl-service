@@ -63,7 +63,7 @@ public class ModuleRollupServiceTest {
     }
 
     @Test
-    public void  testProcessRusticiRollupDataForInvalidRusticiRollupData() {
+    public void  testProcessRusticiRollupDataForInvalidRollupData() {
         rusticiRollupData.getCourse().setId(courseId);
         ModuleRecord updatedModuleRecord = invokeService();
         assertNull(updatedModuleRecord);
