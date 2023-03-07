@@ -58,6 +58,7 @@ public class ModuleRollupService {
         if(moduleRecord == null) {
             log.error("Unable to process the rustici rollup data: {}", rusticiRollupData);
         }
+        log.debug("moduleRecord after processing rollup data: {}", moduleRecord);
         return moduleRecord;
     }
 }
