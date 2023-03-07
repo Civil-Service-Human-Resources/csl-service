@@ -99,7 +99,8 @@ public class CslServiceUtil {
         if(StringUtils.isBlank(bearerToken)) {
             OAuthToken serviceToken = identityService.getOAuthServiceToken();
             log.debug("serviceToken: expiryDate: {}", serviceToken.getExpiryDate());
-            long secondsRemainingToExpire = ChronoUnit.SECONDS.between(LocalDateTime.now(), serviceToken.getExpiryDate());
+            long secondsRemainingToExpire = serviceToken.getExpiryDate() != null ?
+                    ChronoUnit.SECONDS.between(LocalDateTime.now(), serviceToken.getExpiryDate()) : 0;
             log.debug("serviceToken: secondsRemainingToExpire: {}", secondsRemainingToExpire);
             if(secondsRemainingToExpire <= refreshServiceTokenCacheBeforeSecondsToExpire) {
                 identityService.removeServiceTokenFromCache();
