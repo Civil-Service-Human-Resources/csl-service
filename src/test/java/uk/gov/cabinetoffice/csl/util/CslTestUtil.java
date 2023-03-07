@@ -20,6 +20,9 @@ public class CslTestUtil {
     private final String courseId;
     private final String moduleId;
     private final String uid;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
+    private final LocalDateTime completedAt;
 
     private final String courseTitle = "courseTitle";
     private final Boolean isRequired = true;
@@ -27,12 +30,16 @@ public class CslTestUtil {
     private final String moduleType = "elearning";
 
     public CslTestUtil(LearnerRecordService learnerRecordService,
-                       String learnerId, String courseId, String moduleId, String uid) {
+                       String learnerId, String courseId, String moduleId, String uid,
+                       LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime completedAt) {
         this.learnerRecordService = learnerRecordService;
         this.learnerId = learnerId;
         this.courseId = courseId;
         this.moduleId = moduleId;
         this.uid = uid;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.completedAt = completedAt;
     }
 
     public void mockLearnerRecordServiceGetAndUpdateCalls(ResponseEntity responseForCourseRecords,
@@ -69,6 +76,10 @@ public class CslTestUtil {
 
     public void mockLearnerRecordServiceForUpdateModuleRecord(ResponseEntity responseForModuleRecord) {
         when(learnerRecordService.updateModuleRecordForLearner(any(), any())).thenReturn(responseForModuleRecord);
+    }
+
+    public void mockLearnerRecordServiceForUpdateModuleUpdateDateTime(ModuleRecord moduleRecord) {
+        when(learnerRecordService.updateModuleUpdateDateTime(any(), any(), any(), any())).thenReturn(moduleRecord);
     }
 
     public void mockLearnerRecordServiceForUpdateModuleRecordToAssignUid(ModuleRecord moduleRecord, String learnerId, String courseId) {
@@ -109,7 +120,7 @@ public class CslTestUtil {
 
     public CourseRecord createCourseRecord() {
         return new CourseRecord(courseId, learnerId, courseTitle, State.IN_PROGRESS, null, null,
-                null, isRequired, createModuleRecords(), LocalDateTime.now());
+                null, isRequired, createModuleRecords(), updatedAt);
     }
 
     public List<ModuleRecord> createModuleRecords() {
@@ -127,9 +138,9 @@ public class CslTestUtil {
         moduleRecord.setModuleType(moduleType);
         moduleRecord.setOptional(false);
         moduleRecord.setState(State.IN_PROGRESS);
-        moduleRecord.setCreatedAt(LocalDateTime.now());
-        moduleRecord.setUpdatedAt(LocalDateTime.now());
-        moduleRecord.setCompletionDate(LocalDateTime.now());
+        moduleRecord.setCreatedAt(createdAt);
+        moduleRecord.setUpdatedAt(updatedAt);
+        moduleRecord.setCompletionDate(completedAt);
         return moduleRecord;
     }
 

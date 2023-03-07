@@ -5,11 +5,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import uk.gov.cabinetoffice.csl.domain.Course;
+import uk.gov.cabinetoffice.csl.domain.Learner;
 import uk.gov.cabinetoffice.csl.domain.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.RusticiRollupData;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
+import java.time.LocalDateTime;
+
 import static java.util.UUID.randomUUID;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class ModuleRollupServiceTest {
@@ -22,28 +27,63 @@ public class ModuleRollupServiceTest {
 
     private CslTestUtil cslTestUtil;
 
+    private RusticiRollupData rusticiRollupData;
+
     private final String learnerId = "learnerId";
     private final String courseId = "courseId";
-
     private final String moduleId = "moduleId";
-
     private final String uid = randomUUID().toString();
-
-    private final String learnerFirstName = "learnerFirstName";
-    private final String learnerLastName = "";
+    private final LocalDateTime currentDateTime = LocalDateTime.now();
 
     @BeforeEach
     public void setup() {
         moduleRollupService = new ModuleRollupService(learnerRecordService);
-        cslTestUtil = new CslTestUtil(learnerRecordService, learnerId, courseId, moduleId, uid);
+        cslTestUtil = new CslTestUtil(learnerRecordService, learnerId, courseId, moduleId, uid,
+                currentDateTime, currentDateTime, currentDateTime);
+        rusticiRollupData = createRusticiRollupData();
+    }
+
+    @Test
+    public void  testProcessRusticiRollupDataForSuccess() {
+        ModuleRecord moduleRecord = cslTestUtil.createModuleRecord();
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(cslTestUtil.createSuccessResponseForCourseRecords());
+        cslTestUtil.mockLearnerRecordServiceForUpdateModuleUpdateDateTime(moduleRecord);
+        ModuleRecord updatedModuleRecord = invokeService();
+        assertNotNull(updatedModuleRecord);
+        assertEquals(moduleId, updatedModuleRecord.getModuleId());
+        assertEquals(rusticiRollupData.getUpdated(), updatedModuleRecord.getUpdatedAt());
+    }
+
+    @Test
+    public void  testProcessRusticiRollupDataForFailure() {
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(cslTestUtil.createSuccessResponseForCourseRecords());
+        cslTestUtil.mockLearnerRecordServiceForUpdateModuleUpdateDateTime(null);
+        ModuleRecord updatedModuleRecord = invokeService();
+        assertNull(updatedModuleRecord);
+    }
+
+    @Test
+    public void  testProcessRusticiRollupDataForInvalidRusticiRollupData() {
+        rusticiRollupData.getCourse().setId(courseId);
+        ModuleRecord updatedModuleRecord = invokeService();
+        assertNull(updatedModuleRecord);
     }
 
     private ModuleRecord invokeService() {
-        return moduleRollupService.processRusticiRollupData(createRusticiRollupData());
+        return moduleRollupService.processRusticiRollupData(rusticiRollupData);
     }
 
     private RusticiRollupData createRusticiRollupData() {
         RusticiRollupData rusticiRollupData = new RusticiRollupData();
+        rusticiRollupData.setId("rustici_test_course1662455183725");
+        rusticiRollupData.setRegistrationCompletion("IN_PROGRESS");
+        rusticiRollupData.setRegistrationSuccess("PASSED");
+        rusticiRollupData.setUpdated(currentDateTime);
+        rusticiRollupData.setCompletedDate(currentDateTime);
+        Course course = new Course(courseId + "." + moduleId, "courseTitle", 1);
+        rusticiRollupData.setCourse(course);
+        Learner learner = new Learner(learnerId, "learnerFirstName", "");
+        rusticiRollupData.setLearner(learner);
         return rusticiRollupData;
     }
 }

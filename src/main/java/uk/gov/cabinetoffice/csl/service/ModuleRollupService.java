@@ -54,7 +54,8 @@ public class ModuleRollupService {
         if(moduleRecord != null) {
             moduleRecord = learnerRecordService.updateModuleUpdateDateTime(moduleRecord,
                     moduleRecordInput.getUpdated(), learnerId, courseId);
-        } else {
+        }
+        if(moduleRecord == null) {
             log.error("Unable to process the rustici rollup data: {}", rusticiRollupData);
         }
         return moduleRecord;

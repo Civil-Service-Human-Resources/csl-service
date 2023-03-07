@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.cabinetoffice.csl.domain.*;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
+import java.time.LocalDateTime;
+
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,21 +32,20 @@ public class ModuleLaunchServiceTest {
     private ModuleLaunchService moduleLaunchService;
 
     private CslTestUtil cslTestUtil;
-
     private final String learnerId = "learnerId";
     private final String courseId = "courseId";
-
     private final String moduleId = "moduleId";
     private final String uid = randomUUID().toString();
+    private final LocalDateTime currentDateTime = LocalDateTime.now();
     private final String learnerFirstName = "learnerFirstName";
     private final String learnerLastName = "";
-
     private final String[] disabledBookmarkingModuleIDs = {moduleId, "moduleId1"};
 
     @BeforeEach
     public void setup() {
         moduleLaunchService = new ModuleLaunchService(learnerRecordService, rusticiService, disabledBookmarkingModuleIDs);
-        cslTestUtil = new CslTestUtil(learnerRecordService, learnerId, courseId, moduleId, uid);
+        cslTestUtil = new CslTestUtil(learnerRecordService, learnerId, courseId, moduleId, uid,
+                currentDateTime, currentDateTime, currentDateTime);
     }
 
     @Test
