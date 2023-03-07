@@ -30,6 +30,7 @@ import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,14 +91,17 @@ public class CslServiceUtil {
     public String getBearerToken() {
         String bearerToken = getBearerTokenFromSecurityContext();
         if(StringUtils.isBlank(bearerToken)) {
-            bearerToken = getServiceTokenFromIdentityService();
+            OAuthToken serviceToken = identityService.getOAuthServiceToken();
+            log.debug("serviceToken: expiryDate: {}", serviceToken.getExpiryDate());
+            long secondsRemainingToExpire = ChronoUnit.SECONDS.between(LocalDateTime.now(), serviceToken.getExpiryDate());
+            log.debug("serviceToken: secondsRemainingToExpire: {}", secondsRemainingToExpire);
+            if(secondsRemainingToExpire <= 0) {
+                identityService.removeServiceTokenFromCache();
+                serviceToken = identityService.getOAuthServiceToken();
+            }
+            bearerToken = serviceToken.getAccessToken();
         }
         return bearerToken;
-    }
-
-    public String getServiceTokenFromIdentityService() {
-        OAuthToken oAuthServiceToken = identityService.getOAuthServiceToken();
-        return oAuthServiceToken != null ? oAuthServiceToken.getAccessToken() : null;
     }
 
     public static String getBearerTokenFromSecurityContext() {

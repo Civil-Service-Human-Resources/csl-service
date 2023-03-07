@@ -1,14 +1,17 @@
 package uk.gov.cabinetoffice.csl.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class OAuthToken {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OAuthToken implements Serializable {
 
     @JsonProperty("access_token")
     private String accessToken;
@@ -24,4 +27,6 @@ public class OAuthToken {
 
     @JsonProperty("jti")
     private String jti;
+
+    private LocalDateTime expiryDate;
 }
