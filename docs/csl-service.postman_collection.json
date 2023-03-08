@@ -80,7 +80,7 @@
 							"formdata": [
 								{
 									"key": "token",
-									"value": "token_value",
+									"value": "bearer-token-value",
 									"type": "text"
 								}
 							]
@@ -106,7 +106,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "token_value",
+									"value": "bearer-token-value",
 									"type": "string"
 								}
 							]
@@ -454,7 +454,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"learnerFirstName\": \"learner FirstName\",\n    \"learnerLastName\": \"\",\n    \"courseRecordInput\":\n        {\n            \"courseTitle\" : \"6Mar23_4FN_Cou1_Test_CSL_Service\",\n            \"isRequired\" : \"true\",\n            \"moduleRecords\" : [\n                {\n                    \"moduleTitle\" : \"6Mar23_4FN_Cou1_Mod1_Test_CSL_Service\",\n                    \"optional\" : \"false\",\n                    \"moduleType\" : \"elearning\"\n                }\n            ]\n        }\n}",
+							"raw": "{\n    \"learnerFirstName\": \"Learner Firstname\",\n    \"learnerLastName\": \"\",\n    \"courseRecordInput\":\n        {\n            \"courseTitle\" : \"Test Course Title\",\n            \"isRequired\" : \"true\",\n            \"moduleRecords\" : [\n                {\n                    \"moduleTitle\" : \"Test Module Title\",\n                    \"optional\" : \"false\",\n                    \"moduleType\" : \"elearning\"\n                }\n            ]\n        }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -583,32 +583,32 @@
 		},
 		{
 			"key": "remote-identity-base-url",
-			"value": "https://identity.remote-identity-base-url",
+			"value": "integration-identity-service-url",
 			"type": "default"
 		},
 		{
 			"key": "bearer_client_id",
-			"value": "bearer_client_id",
+			"value": "client-id",
 			"type": "default"
 		},
 		{
 			"key": "bearer_client_pw",
-			"value": "bearer_client_pw",
+			"value": "client-secret",
 			"type": "default"
 		},
 		{
 			"key": "usertoken_username",
-			"value": "usertoken_username@domain.co",
+			"value": "your-lpg-username",
 			"type": "default"
 		},
 		{
 			"key": "usertoken_pw",
-			"value": "usertoken_pw",
+			"value": "your-lpg-username-pw",
 			"type": "default"
 		},
 		{
 			"key": "remote-csl-base-url",
-			"value": "https://csl-service.remote-csl-base-url",
+			"value": "integration-csl-service-url",
 			"type": "default"
 		}
 	]
