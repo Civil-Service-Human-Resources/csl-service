@@ -101,7 +101,9 @@ public class CslServiceUtil {
             log.debug("serviceToken: expiryDate: {}", serviceToken.getExpiryDate());
             long secondsRemainingToExpire = serviceToken.getExpiryDate() != null ?
                     ChronoUnit.SECONDS.between(LocalDateTime.now(), serviceToken.getExpiryDate()) : 0;
-            log.debug("serviceToken: secondsRemainingToExpire: {}", secondsRemainingToExpire);
+            log.debug("serviceToken: seconds remaining to service token expiry: {}", secondsRemainingToExpire);
+            log.debug("serviceToken: seconds remaining to refresh the service token cache: {}",
+                    (secondsRemainingToExpire - refreshServiceTokenCacheBeforeSecondsToExpire));
             if(secondsRemainingToExpire <= refreshServiceTokenCacheBeforeSecondsToExpire) {
                 identityService.removeServiceTokenFromCache();
                 serviceToken = identityService.getOAuthServiceToken();

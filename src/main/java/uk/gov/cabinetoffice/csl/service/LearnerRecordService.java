@@ -167,8 +167,8 @@ public class LearnerRecordService {
         if(updateDateTimeResponse.getStatusCode().is2xxSuccessful()) {
             moduleRecord = mapJsonStringToObject((String)updateDateTimeResponse.getBody(), ModuleRecord.class);
             log.debug("moduleRecord: {}", moduleRecord);
-            log.info("updatedAt field is updated for the module record after retrieving the module launch link for"
-                    + " learner id: {}, course id: {} and module id: {}", learnerId, courseId, moduleId);
+            log.info("updatedAt field is updated for the module record for learner id: {}, course id: {} and"
+                    + "module id: {}", learnerId, courseId, moduleId);
         } else {
             log.error("Unable to update updatedAt for the module record for learner id: {}, course id: {} and "
                     + "module id: {} due to {}", learnerId, courseId, moduleId, updateDateTimeResponse);
