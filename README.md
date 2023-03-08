@@ -38,12 +38,12 @@ Run the application either using IDE e.g. Intellij or Maven or Docker as follows
 
 ### REST Endpoints:
 
-* A postman collection is available in [docs/csl-service.postman_collection.json](docs/csl-service.postman_collection.json) file for the following:
-
   * Endpoints to generate the oAuth 2.0 token using identity-service.
   * Actuator endpoints secured with oAuth 2.0 token as well as basic authentication.
   * Endpoint for creating the module launch link secured with oAuth 2.0 token.
   * Endpoint for processing the rustici rollup data secured with basic authentication.
+
+A postman collection is available in [docs/csl-service.postman_collection.json](docs/csl-service.postman_collection.json) to execute above endpoints.
 
 ### Azure Build Pipeline:
 
