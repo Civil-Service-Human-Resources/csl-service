@@ -24,7 +24,7 @@ public class ModuleLaunchService {
     private final String[] disabledBookmarkingModuleIDs;
 
     public ModuleLaunchService(LearnerRecordService learnerRecordService, RusticiService rusticiService,
-                               @Value("${rustici.disabledBookmarkingModuleIDs}") String[] disabledBookmarkingModuleIDs) {
+        @Value("${rustici.disabledBookmarkingModuleIDs}") String[] disabledBookmarkingModuleIDs) {
         this.learnerRecordService = learnerRecordService;
         this.rusticiService = rusticiService;
         this.disabledBookmarkingModuleIDs = disabledBookmarkingModuleIDs;
