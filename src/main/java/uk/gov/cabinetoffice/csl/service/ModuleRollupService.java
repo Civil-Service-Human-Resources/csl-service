@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,18 +50,19 @@ public class ModuleRollupService {
                 moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
                 if(moduleRecord != null) {
                     Map<String, String> updateFields = new HashMap<>();
-                    updateFields.put("updatedAt", updated.toString());
-                    if(completedDate != null) {
-                        updateFields.put("completionDate", completedDate.toString());
+                    updateFields.put("updatedAt", updated.toString()); //rusticiRollupData.getUpdated()
+                    if(completedDate != null) { //rusticiRollupData.getCompletedDate()
                         updateFields.put("state", State.COMPLETED.name()); //rusticiRollupData.getRegistrationCompletion()
+                        updateFields.put("completionDate", completedDate.toString());
                     }
-                    if(isNotBlank(result)) {
-                        updateFields.put("result", Result.valueOf(result).name());
+                    if(isNotBlank(result) && Arrays.stream(Result.values()).anyMatch(v -> v.name().equals(result))) {
+                        //TODO: Write unit test for right and wrong value (case-sensitive) of result
+                        updateFields.put("result", result);
                     }
                     moduleRecord = learnerRecordService.updateModuleRecord(moduleRecord.getId(), updateFields);
                     //TODO: check if the above moduleRecord holds the course record in it or not
                     if(moduleRecord != null) {
-                        //TODO: Calculate and Update course completion status by calling learning-catalogue service
+                        //TODO: Calculate and update course completion status by calling learning-catalogue service
                         //updateCourseRecordState(learnerId, courseId, State state, updated)
                     }
                 }

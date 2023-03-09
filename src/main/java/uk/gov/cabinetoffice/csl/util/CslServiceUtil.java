@@ -23,10 +23,10 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.cabinetoffice.csl.domain.*;
 import org.apache.hc.client5.http.classic.HttpClient;
+import uk.gov.cabinetoffice.csl.domain.ErrorResponse;
+import uk.gov.cabinetoffice.csl.domain.OAuthToken;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
-import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -181,51 +181,5 @@ public class CslServiceUtil {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return objectMapper;
-    }
-
-    public static ModuleRecord processCourseAndModuleData(LearnerRecordService learnerRecordService,
-                                                          CourseRecordInput courseRecordInput) {
-        ModuleRecord moduleRecord = null;
-        String learnerId = courseRecordInput.getUserId();
-        String courseId = courseRecordInput.getCourseId();
-        ModuleRecordInput moduleRecordInput = courseRecordInput.getModuleRecords().get(0);
-        String moduleId = moduleRecordInput.getModuleId();
-        ResponseEntity<?> courseRecordResponse = learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
-        if(courseRecordResponse.getStatusCode().is2xxSuccessful()) {
-            CourseRecords courseRecords =
-                    mapJsonStringToObject((String)courseRecordResponse.getBody(), CourseRecords.class);
-            log.debug("courseRecords: {}", courseRecords);
-            if(courseRecords != null) {
-                CourseRecord courseRecord = courseRecords.getCourseRecord(courseId);
-                if(courseRecord == null) {
-                    //If the course record is not present then create the course record along with module record
-                    courseRecord = learnerRecordService.createInProgressCourseRecordWithModuleRecord(courseRecordInput);
-                }
-                if(courseRecord != null) {
-                    if(courseRecord.getState() == null || courseRecord.getState().equals(State.ARCHIVED)) {
-                        //Update the course record status if it is null or ARCHIVED
-                        courseRecord = learnerRecordService.updateCourseRecordState(learnerId, courseId,
-                                State.IN_PROGRESS, LocalDateTime.now());
-                    }
-                    //Retrieve the relevant module record from the course record
-                    moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
-                    if(courseRecord != null && moduleRecord == null) {
-                        //If the relevant module record is not present then create the module record
-                        moduleRecord = learnerRecordService.createInProgressModuleRecord(moduleRecordInput);
-                    }
-                    if(moduleRecord != null) {
-                        if(StringUtils.isBlank(moduleRecord.getUid())) {
-                            //If the uid is not present then update the module record to assign the uid
-                            moduleRecord = learnerRecordService
-                                    .updateModuleRecordToAssignUid(moduleRecord, learnerId, courseId);
-                        }
-                    }
-                }
-            }
-        } else {
-            log.error("Unable to retrieve course record for learner id: {} and course id: {}. " +
-                    "Error response from learnerRecordService: {}", learnerId, courseId, courseRecordResponse);
-        }
-        return moduleRecord;
     }
 }
