@@ -3,19 +3,14 @@ package uk.gov.cabinetoffice.csl.service;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.gov.cabinetoffice.csl.util.CslServiceUtil;
 
 import java.net.URI;
 import java.util.Map;
 
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.getBearerToken;
+
 @Component
 public class RequestEntityWithBearerAuthFactory {
-
-    private final CslServiceUtil cslServiceUtil;
-
-    public RequestEntityWithBearerAuthFactory(CslServiceUtil cslServiceUtil) {
-        this.cslServiceUtil = cslServiceUtil;
-    }
 
     public RequestEntity<?> createGetRequestWithBearerAuth(String strUri, Map<String, String> additionalHeaderParams) {
         URI uri = UriComponentsBuilder.fromUriString(strUri).build().toUri();
@@ -54,7 +49,7 @@ public class RequestEntityWithBearerAuthFactory {
 
     private HttpHeaders createHttpHeadersWithBearerAuth(Map<String, String> additionalHeaderParams,
                                                         MediaType mediaType) {
-        String bearerToken = cslServiceUtil.getBearerToken();
+        String bearerToken = getBearerToken();
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(bearerToken);
         headers.setContentType(mediaType);

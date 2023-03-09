@@ -39,9 +39,9 @@ import java.util.Map;
 @Component
 public class CslServiceUtil {
 
-    private final IdentityService identityService;
+    private static IdentityService identityService;
 
-    private final long refreshServiceTokenCacheBeforeSecondsToExpire;
+    private static long refreshServiceTokenCacheBeforeSecondsToExpire;
 
     public CslServiceUtil(IdentityService identityService,
                           @Value("${oauth.refresh.serviceTokenCache.beforeSecondsToExpire}")
@@ -94,7 +94,7 @@ public class CslServiceUtil {
         return null;
     }
 
-    public String getBearerToken() {
+    public static String getBearerToken() {
         String bearerToken = getBearerTokenFromSecurityContext();
         if(StringUtils.isBlank(bearerToken)) {
             OAuthToken serviceToken = identityService.getOAuthServiceToken();

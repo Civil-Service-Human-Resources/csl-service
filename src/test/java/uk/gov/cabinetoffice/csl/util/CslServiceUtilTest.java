@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.getBearerToken;
 
 @SpringBootTest
 public class CslServiceUtilTest {
@@ -36,7 +37,7 @@ public class CslServiceUtilTest {
     public void getBearerTokenShouldReturnValidTokenAndShouldNotRefreshTheCacheWhenIdentityServiceReturnValidOAuthToken() {
         OAuthToken validOAuthToken = createValidOAuthToken();
         mockIdentityServiceGetOAuthServiceToken(validOAuthToken);
-        String bearerToken = cslServiceUtil.getBearerToken();
+        String bearerToken = getBearerToken();
         assertEquals(validOAuthToken.getAccessToken(), bearerToken);
         verify(identityService, times(1)).getOAuthServiceToken();
         verify(identityService, times(0)).removeServiceTokenFromCache();
@@ -48,7 +49,7 @@ public class CslServiceUtilTest {
         validOAuthToken.setExpiryDateTime(LocalDateTime.now().minusSeconds(5));
         mockIdentityServiceGetOAuthServiceToken(validOAuthToken);
         mockIdentityServiceRemoveServiceTokenFromCache();
-        String bearerToken = cslServiceUtil.getBearerToken();
+        String bearerToken = getBearerToken();
         assertEquals(validOAuthToken.getAccessToken(), bearerToken);
         verify(identityService, times(2)).getOAuthServiceToken();
         verify(identityService, times(1)).removeServiceTokenFromCache();
@@ -58,7 +59,7 @@ public class CslServiceUtilTest {
     public void getBearerTokenShouldReturnEmptyTokenWhenIdentityServiceReturnInValidOAuthToken() {
         mockIdentityServiceGetOAuthServiceToken(new OAuthToken());
         mockIdentityServiceRemoveServiceTokenFromCache();
-        String bearerToken = cslServiceUtil.getBearerToken();
+        String bearerToken = getBearerToken();
         assertNull(bearerToken);
         verify(identityService, times(2)).getOAuthServiceToken();
         verify(identityService, times(1)).removeServiceTokenFromCache();
