@@ -65,8 +65,7 @@ public class LearnerRecordService {
         updateFields.put("lastUpdated", updatedAt.toString());
         ResponseEntity<?> updateResponse = updateCourseRecordForLearner(learnerId, courseId, updateFields);
         if(updateResponse.getStatusCode().is2xxSuccessful()) {
-            CourseRecord courseRecord =
-                    mapJsonStringToObject((String)updateResponse.getBody(), CourseRecord.class);
+            CourseRecord courseRecord = mapJsonStringToObject((String)updateResponse.getBody(), CourseRecord.class);
             log.debug("courseRecord: {}", courseRecord);
             log.info("Course record status and lastUpdated are update for learner id: {}, course id: {} and state: {}",
                     learnerId, courseId, state);
@@ -87,7 +86,6 @@ public class LearnerRecordService {
                                                           Map<String, String> updateFields) {
         List<PatchOp> jsonPatch = new ArrayList<>();
         updateFields.forEach((key, value) -> jsonPatch.add(new PatchOp("replace", "/" + key, value)));
-
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
                 moduleRecordsForLearnerUrl + "/" + moduleRecordId, jsonPatch, null);
         return invokeService(requestWithBearerAuth);
@@ -123,7 +121,6 @@ public class LearnerRecordService {
         }
         moduleRecordInput.setState(State.IN_PROGRESS.name());
         ResponseEntity<?> moduleRecordForLearnerResponse = createModuleRecordForLearner(moduleRecordInput);
-
         if(moduleRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
             ModuleRecord moduleRecord =
                     mapJsonStringToObject((String)moduleRecordForLearnerResponse.getBody(), ModuleRecord.class);
