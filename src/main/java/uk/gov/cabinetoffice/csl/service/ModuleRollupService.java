@@ -45,8 +45,7 @@ public class ModuleRollupService {
                     mapJsonStringToObject((String) courseRecordResponse.getBody(), CourseRecords.class);
             log.debug("courseRecords: {}", courseRecords);
             if (courseRecords != null) {
-                courseRecord = courseRecords.getCourseRecord(courseId);
-                //TODO check if above courseRecord contains all the modules in it or not
+                courseRecord = courseRecords.getCourseRecord(courseId); //courseRecord contains all the modules in it
                 moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
                 if(moduleRecord != null) {
                     Map<String, String> updateFields = new HashMap<>();
@@ -60,7 +59,7 @@ public class ModuleRollupService {
                         updateFields.put("result", result);
                     }
                     moduleRecord = learnerRecordService.updateModuleRecord(moduleRecord.getId(), updateFields);
-                    //TODO: check if the above moduleRecord holds the course record in it or not
+                    //above moduleRecord does not contain the course record in it
                     if(moduleRecord != null) {
                         //TODO: Calculate and update course completion status by calling learning-catalogue service
                         //updateCourseRecordState(learnerId, courseId, State state, updated)
