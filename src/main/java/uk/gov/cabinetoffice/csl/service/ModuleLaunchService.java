@@ -111,46 +111,44 @@ public class ModuleLaunchService {
         registrationInput.setLearnerFirstName(learnerFirstName);
         registrationInput.setLearnerLastName(learnerLastName == null ? "" : learnerLastName);
 
-        ResponseEntity<?> registrationLaunchLinkResponse =
+        ResponseEntity<?> registrationResponse =
                 rusticiService.getRegistrationLaunchLink(registrationInput);
-        if(!registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
+        if(!registrationResponse.getStatusCode().is2xxSuccessful()) {
             log.error("Module launch link could not be retrieved using launchLink endpoint for learner id: {}, " +
                       "course id: {} and module id: {} due to {}. Now invoking withLaunchLink endpoint to retrieve " +
-                      "module launch link.", learnerId, courseId, moduleId, registrationLaunchLinkResponse);
+                      "module launch link.", learnerId, courseId, moduleId, registrationResponse);
             //If no launch link present then create the registration and launch link using withLaunchLink
-            registrationLaunchLinkResponse = rusticiService.createRegistrationAndLaunchLink(registrationInput);
+            registrationResponse = rusticiService.createRegistrationAndLaunchLink(registrationInput);
         }
-        if(registrationLaunchLinkResponse.getStatusCode().is2xxSuccessful()) {
+        if(registrationResponse.getStatusCode().is2xxSuccessful()) {
             log.info("Module launch link is successfully retrieved for learner id: {}, course id: "
                     + "{} and module id: {}", learnerId, courseId, moduleId);
             //Check and Update launchLink for disabledBookmarking
-            registrationLaunchLinkResponse = checkAndSetDisabledBookMarking(moduleId, learnerId, courseId,
-                    registrationLaunchLinkResponse);
+            registrationResponse = checkAndSetDisabledBookMarking(moduleId, learnerId, courseId,
+                    registrationResponse);
             //Update the module record for the last updated timestamp
             learnerRecordService.updateModuleUpdateDateTime(moduleRecord, LocalDateTime.now(), learnerId, courseId);
         } else {
-            log.error("Module launch link could not be retrieved using withLaunchLink endpoint for " +
-                      "learner id: {}, course id: {} and module id: {} due to {}",
-                      learnerId, courseId, moduleId, registrationLaunchLinkResponse);
+            log.error("Module launch link could not be retrieved using withLaunchLink endpoint for learner id: {}, " +
+                      "course id: {} and module id: {} due to {}", learnerId, courseId, moduleId, registrationResponse);
         }
-        return registrationLaunchLinkResponse;
+        return registrationResponse;
     }
 
     private ResponseEntity<?> checkAndSetDisabledBookMarking(String moduleId, String learnerId, String courseId,
-                                                             ResponseEntity<?> registrationLaunchLinkResponse) {
+                                                             ResponseEntity<?> registrationResponse) {
         if(isDisabledBookmarkingModuleID(moduleId)) {
             LaunchLink launchLink =
-                    mapJsonStringToObject((String)registrationLaunchLinkResponse.getBody(), LaunchLink.class);
+                    mapJsonStringToObject((String)registrationResponse.getBody(), LaunchLink.class);
             if(launchLink != null) {
-                String launchLinkWithDisabledBookmarking = launchLink.getLaunchLink()
-                        + "&clearbookmark=true";
+                String launchLinkWithDisabledBookmarking = launchLink.getLaunchLink() + "&clearbookmark=true";
                 launchLink.setLaunchLink(launchLinkWithDisabledBookmarking);
                 log.info("Module launch link is updated for clearbookmark=true for learner id: "
                         + "{}, course id: {} and module id: {}", learnerId, courseId, moduleId);
                 return new ResponseEntity<>(launchLink, HttpStatus.OK);
             }
         }
-        return registrationLaunchLinkResponse;
+        return registrationResponse;
     }
 
     private boolean isDisabledBookmarkingModuleID(String moduleId) {
