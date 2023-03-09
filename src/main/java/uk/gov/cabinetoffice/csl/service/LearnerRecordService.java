@@ -138,6 +138,20 @@ public class LearnerRecordService {
         return null;
     }
 
+    public ModuleRecord updateModuleRecord(Long moduleId, Map<String, String> updateFields) {
+        ResponseEntity<?> updateResponse = updateModuleRecordForLearner(moduleId, updateFields);
+        if(updateResponse.getStatusCode().is2xxSuccessful()) {
+            ModuleRecord moduleRecord = mapJsonStringToObject((String)updateResponse.getBody(), ModuleRecord.class);
+            log.debug("moduleRecord: {}", moduleRecord);
+            assert moduleRecord != null;
+            log.info("Fields {} are updated for the module record for module id: {}", updateFields, moduleId);
+            return moduleRecord;
+        }
+        log.error("Unable to update fields {} for the module record for module id: {}."
+                + " Error response from learnerRecordService: {}", updateFields, moduleId, updateResponse);
+        return null;
+    }
+
     public ModuleRecord updateModuleRecordToAssignUid(ModuleRecord moduleRecord, String learnerId, String courseId) {
         String moduleId = moduleRecord.getModuleId();
         String currentDateAndTime = LocalDateTime.now().toString();

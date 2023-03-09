@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.mapJsonStringToObject;
 
 @Slf4j
@@ -34,10 +35,9 @@ public class ModuleRollupService {
         String learnerId = rusticiRollupData.getLearner().getId();
         LocalDateTime updated = rusticiRollupData.getUpdated();
         LocalDateTime completedDate = rusticiRollupData.getCompletedDate();
-        String completion = rusticiRollupData.getRegistrationCompletion();
         String result = rusticiRollupData.getRegistrationSuccess();
-
         CourseRecord courseRecord = null;
+        ModuleRecord moduleRecord = null;
         ResponseEntity<?> courseRecordResponse = learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
         if(courseRecordResponse.getStatusCode().is2xxSuccessful()) {
             CourseRecords courseRecords =
@@ -45,27 +45,32 @@ public class ModuleRollupService {
             log.debug("courseRecords: {}", courseRecords);
             if (courseRecords != null) {
                 courseRecord = courseRecords.getCourseRecord(courseId);
-                ModuleRecord moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
+                //TODO check if above courseRecord contains all the modules in it or not
+                moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
                 if(moduleRecord != null) {
                     Map<String, String> updateFields = new HashMap<>();
-
-                    //TODO: Update module data
-                    //learnerRecordService.updateModuleRecordForLearner(moduleRecordId, Map<String, String> updateFields)
-
-                    //TODO: Update course status
-                    //updateCourseRecordState(learnerId, courseId, State state, LocalDateTime updatedAt)
-
-//                    moduleRecord = learnerRecordService.updateModuleUpdateDateTime(moduleRecord, updated, learnerId, courseId);
-
+                    updateFields.put("updatedAt", updated.toString());
+                    if(completedDate != null) {
+                        updateFields.put("completionDate", completedDate.toString());
+                        updateFields.put("state", State.COMPLETED.name()); //rusticiRollupData.getRegistrationCompletion()
+                    }
+                    if(isNotBlank(result)) {
+                        updateFields.put("result", Result.valueOf(result).name());
+                    }
+                    moduleRecord = learnerRecordService.updateModuleRecord(moduleRecord.getId(), updateFields);
+                    //TODO: check if the above moduleRecord holds the course record in it or not
+                    if(moduleRecord != null) {
+                        //TODO: Calculate and Update course completion status by calling learning-catalogue service
+                        //updateCourseRecordState(learnerId, courseId, State state, updated)
+                    }
                 }
             }
         }
-
-        if(courseRecord == null) {
+        if(courseRecord == null || moduleRecord == null) {
             log.error("Unable to process the rustici rollup data: {}", rusticiRollupData);
         }
         log.debug("courseRecord after processing rollup data: {}", courseRecord);
-
+        log.debug("moduleRecord after processing rollup data: {}", moduleRecord);
         return courseRecord;
     }
 }
