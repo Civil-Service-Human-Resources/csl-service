@@ -58,10 +58,10 @@ public class LearnerRecordService {
         return invokeService(requestWithBearerAuth);
     }
 
-    public CourseRecord updateCourseRecordState(String learnerId, String courseId, State state) {
+    public CourseRecord updateCourseRecordState(String learnerId, String courseId, State state, LocalDateTime updatedAt) {
         Map<String, String> updateFields = new HashMap<>();
         updateFields.put("state", state.name());
-        updateFields.put("lastUpdated", LocalDateTime.now().toString());
+        updateFields.put("lastUpdated", updatedAt.toString());
         ResponseEntity<?> updateResponse = updateCourseRecordForLearner(learnerId, courseId, updateFields);
         if(updateResponse.getStatusCode().is2xxSuccessful()) {
             CourseRecord courseRecord =
