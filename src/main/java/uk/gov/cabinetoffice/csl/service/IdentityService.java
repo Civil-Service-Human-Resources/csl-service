@@ -7,7 +7,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.domain.OAuthToken;
+import uk.gov.cabinetoffice.csl.domain.identity.OAuthToken;
+import uk.gov.cabinetoffice.csl.factory.RequestEntityWithBasicAuthFactory;
 
 import java.time.LocalDateTime;
 

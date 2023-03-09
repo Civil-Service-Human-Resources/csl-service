@@ -25,7 +25,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.apache.hc.client5.http.classic.HttpClient;
 import uk.gov.cabinetoffice.csl.domain.ErrorResponse;
-import uk.gov.cabinetoffice.csl.domain.OAuthToken;
+import uk.gov.cabinetoffice.csl.domain.identity.OAuthToken;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
 
 import java.io.IOException;

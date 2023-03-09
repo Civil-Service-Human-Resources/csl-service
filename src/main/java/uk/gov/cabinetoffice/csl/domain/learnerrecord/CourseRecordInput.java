@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain;
+package uk.gov.cabinetoffice.csl.domain.learnerrecord;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

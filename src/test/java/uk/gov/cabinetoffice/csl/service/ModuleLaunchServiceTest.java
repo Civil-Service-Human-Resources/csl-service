@@ -8,6 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.cabinetoffice.csl.domain.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
+import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
+import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationInput;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
 import java.time.LocalDateTime;

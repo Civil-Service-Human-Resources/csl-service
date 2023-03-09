@@ -1,21 +1,20 @@
-package uk.gov.cabinetoffice.csl.domain;
+package uk.gov.cabinetoffice.csl.domain.learningcatalogue;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Course {
+public class Event {
 
-    //This will be mapped to the <CourseRecord.courseId>.<ModuleRecord.moduleId>
     private String id;
-
-    //This will be mapped to the <CourseRecord.courseTitle>
-    private String title;
-
-    private Integer version;
+    private List<DateRange> dateRanges = new ArrayList<>();
+    private Venue venue;
 }

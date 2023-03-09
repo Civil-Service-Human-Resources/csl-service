@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain;
+package uk.gov.cabinetoffice.csl.domain.learnerrecord;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

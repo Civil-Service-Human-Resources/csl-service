@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cabinetoffice.csl.domain.ErrorResponse;
-import uk.gov.cabinetoffice.csl.domain.ModuleLaunchLinkInput;
+import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
 import uk.gov.cabinetoffice.csl.service.ModuleLaunchService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

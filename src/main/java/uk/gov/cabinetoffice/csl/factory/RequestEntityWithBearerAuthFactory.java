@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.service;
+package uk.gov.cabinetoffice.csl.factory;
 
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;

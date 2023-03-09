@@ -3,7 +3,8 @@ package uk.gov.cabinetoffice.csl.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.domain.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

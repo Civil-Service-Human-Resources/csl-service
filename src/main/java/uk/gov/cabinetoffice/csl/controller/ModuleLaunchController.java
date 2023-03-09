@@ -5,9 +5,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.cabinetoffice.csl.domain.CourseRecordInput;
-import uk.gov.cabinetoffice.csl.domain.ModuleLaunchLinkInput;
-import uk.gov.cabinetoffice.csl.domain.ModuleRecordInput;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordInput;
+import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecordInput;
 import uk.gov.cabinetoffice.csl.service.ModuleLaunchService;
 
 import java.util.ArrayList;
