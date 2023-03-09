@@ -44,7 +44,7 @@ public class IdentityService {
         if(tokenResponse.getStatusCode().is2xxSuccessful()) {
             oAuthToken = mapJsonStringToObject((String) tokenResponse.getBody(), OAuthToken.class);
             assert oAuthToken != null;
-            oAuthToken.setExpiryDate(LocalDateTime.now().plusSeconds(oAuthToken.getExpiresIn()));
+            oAuthToken.setExpiryDateTime(LocalDateTime.now().plusSeconds(oAuthToken.getExpiresIn()));
         } else {
             log.error("Unable to retrieve service token from identity-service. " +
                     "Following response is received from identity-service: {}", tokenResponse);

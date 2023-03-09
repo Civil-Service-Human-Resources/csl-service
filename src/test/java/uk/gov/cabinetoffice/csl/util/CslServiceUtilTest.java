@@ -45,7 +45,7 @@ public class CslServiceUtilTest {
     @Test
     public void getBearerTokenShouldRefreshTheCacheAndReturnValidTokenWhenServiceTokenExpired() {
         OAuthToken validOAuthToken = createValidOAuthToken();
-        validOAuthToken.setExpiryDate(LocalDateTime.now().minusSeconds(5));
+        validOAuthToken.setExpiryDateTime(LocalDateTime.now().minusSeconds(5));
         mockIdentityServiceGetOAuthServiceToken(validOAuthToken);
         mockIdentityServiceRemoveServiceTokenFromCache();
         String bearerToken = cslServiceUtil.getBearerToken();
@@ -82,7 +82,7 @@ public class CslServiceUtilTest {
         authToken.setExpiresIn(serviceTokenExpiryInSeconds);
         authToken.setScope("read write");
         authToken.setJti("cbc1e522-2df9-4a94-bb51-3eb380f12364");
-        authToken.setExpiryDate(LocalDateTime.now().plusSeconds(serviceTokenExpiryInSeconds));
+        authToken.setExpiryDateTime(LocalDateTime.now().plusSeconds(serviceTokenExpiryInSeconds));
         return authToken;
     }
 }
