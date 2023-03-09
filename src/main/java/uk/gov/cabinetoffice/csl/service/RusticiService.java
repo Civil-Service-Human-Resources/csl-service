@@ -30,7 +30,7 @@ public class RusticiService {
     @Value("${rustici.redirectOnExitUrl}")
     private String rusticiRedirectOnExitUrl;
 
-    @Value("${rustici.launchLinkExpiry}")
+    @Value("${rustici.launchLinkExpirySeconds}")
     private int rusticiLaunchLinkExpiry;
 
     public RusticiService(RequestEntityWithBasicAuthFactory requestEntityFactory) {
