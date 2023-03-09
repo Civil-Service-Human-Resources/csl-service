@@ -45,7 +45,7 @@ public class ModuleRollupService {
                     mapJsonStringToObject((String) courseRecordResponse.getBody(), CourseRecords.class);
             log.debug("courseRecords: {}", courseRecords);
             if (courseRecords != null) {
-                courseRecord = courseRecords.getCourseRecord(courseId); //courseRecord contains all the modules in it
+                courseRecord = courseRecords.getCourseRecord(courseId);
                 moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
                 if(moduleRecord != null) {
                     Map<String, String> updateFields = new HashMap<>();
@@ -55,11 +55,11 @@ public class ModuleRollupService {
                         updateFields.put("completionDate", completedDate.toString());
                     }
                     if(isNotBlank(result) && Arrays.stream(Result.values()).anyMatch(v -> v.name().equals(result))) {
-                        //TODO: Write unit test for right and wrong value (case-sensitive) of result
                         updateFields.put("result", result);
                     }
                     moduleRecord = learnerRecordService.updateModuleRecord(moduleRecord.getId(), updateFields);
-                    //above moduleRecord does not contain the course record in it
+                    //Above moduleRecord does not contain the course record in it
+                    //At this point courseRecord does not contain the above updated module in it
                     if(moduleRecord != null) {
                         //TODO: Calculate and update course completion status by calling learning-catalogue service
                         //updateCourseRecordState(learnerId, courseId, State state, updated)
