@@ -46,8 +46,8 @@ public class CslServiceUtil {
     public CslServiceUtil(IdentityService identityService,
                           @Value("${oauth.refresh.serviceTokenCache.beforeSecondsToExpire}")
                           long refreshServiceTokenCacheBeforeSecondsToExpire) {
-        this.identityService = identityService;
-        this.refreshServiceTokenCacheBeforeSecondsToExpire = refreshServiceTokenCacheBeforeSecondsToExpire;
+        CslServiceUtil.identityService = identityService;
+        CslServiceUtil.refreshServiceTokenCacheBeforeSecondsToExpire = refreshServiceTokenCacheBeforeSecondsToExpire;
     }
 
     public static ResponseEntity<?> returnError(HttpStatusCodeException ex, String path) {
