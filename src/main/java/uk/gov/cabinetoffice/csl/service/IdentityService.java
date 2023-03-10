@@ -34,14 +34,18 @@ public class IdentityService {
         this.requestEntityFactory = requestEntityFactory;
     }
 
-    @Cacheable("service-token")
-    public OAuthToken getOAuthServiceToken() {
+    public ResponseEntity<?> getOAuthServiceToken() {
         log.info("IdentityService.getOAuthServiceToken: Invoking identity service to retrieve service token.");
-        OAuthToken oAuthToken = new OAuthToken();
         String accessTokenUrl = oauthTokenUrl + "?grant_type=client_credentials";
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
                 accessTokenUrl, null, clientId, clientSecret, null);
-        ResponseEntity<?> tokenResponse = invokeService(postRequestWithBasicAuth);
+        return invokeService(postRequestWithBasicAuth);
+    }
+
+    @Cacheable("service-token")
+    public OAuthToken getCachedOAuthServiceToken() {
+        OAuthToken oAuthToken = new OAuthToken();
+        ResponseEntity<?> tokenResponse = getOAuthServiceToken();
         if(tokenResponse.getStatusCode().is2xxSuccessful()) {
             oAuthToken = mapJsonStringToObject((String) tokenResponse.getBody(), OAuthToken.class);
             assert oAuthToken != null;

@@ -39,7 +39,7 @@ public class CslServiceUtilTest {
         mockIdentityServiceGetOAuthServiceToken(validOAuthToken);
         String bearerToken = getBearerToken();
         assertEquals(validOAuthToken.getAccessToken(), bearerToken);
-        verify(identityService, times(1)).getOAuthServiceToken();
+        verify(identityService, times(1)).getCachedOAuthServiceToken();
         verify(identityService, times(0)).removeServiceTokenFromCache();
     }
 
@@ -51,7 +51,7 @@ public class CslServiceUtilTest {
         mockIdentityServiceRemoveServiceTokenFromCache();
         String bearerToken = getBearerToken();
         assertEquals(validOAuthToken.getAccessToken(), bearerToken);
-        verify(identityService, times(2)).getOAuthServiceToken();
+        verify(identityService, times(2)).getCachedOAuthServiceToken();
         verify(identityService, times(1)).removeServiceTokenFromCache();
     }
 
@@ -61,12 +61,12 @@ public class CslServiceUtilTest {
         mockIdentityServiceRemoveServiceTokenFromCache();
         String bearerToken = getBearerToken();
         assertNull(bearerToken);
-        verify(identityService, times(2)).getOAuthServiceToken();
+        verify(identityService, times(2)).getCachedOAuthServiceToken();
         verify(identityService, times(1)).removeServiceTokenFromCache();
     }
 
     private void mockIdentityServiceGetOAuthServiceToken(OAuthToken oAuthToken) {
-        when(identityService.getOAuthServiceToken()).thenReturn(oAuthToken);
+        when(identityService.getCachedOAuthServiceToken()).thenReturn(oAuthToken);
     }
 
     private void mockIdentityServiceRemoveServiceTokenFromCache() {
