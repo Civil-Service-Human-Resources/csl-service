@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -35,6 +34,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 @Slf4j
 @Component
 public class CslServiceUtil {
@@ -56,13 +57,17 @@ public class CslServiceUtil {
             errorResponse = ex.getResponseBodyAs(ErrorResponse.class);
         } catch(Exception e) {
             errorResponse = new ErrorResponse();
+        }
+        if(errorResponse == null) {
+            errorResponse = new ErrorResponse();
+        }
+        if(isBlank(errorResponse.getMessage())) {
             errorResponse.setMessage(ex.getResponseBodyAsString());
         }
-        assert errorResponse != null;
-        errorResponse.setStatus(String.valueOf(ex.getStatusCode().value()));
-        if(StringUtils.isBlank(errorResponse.getError())) {
+        if(isBlank(errorResponse.getError())) {
             errorResponse.setError(ex.getStatusText());
         }
+        errorResponse.setStatus(String.valueOf(ex.getStatusCode().value()));
         errorResponse.setTimestamp(LocalDateTime.now().toString());
         errorResponse.setPath(path);
         log.error("Error received from the backend system: {}", errorResponse);
@@ -96,7 +101,7 @@ public class CslServiceUtil {
 
     public static String getBearerToken() {
         String bearerToken = getBearerTokenFromSecurityContext();
-        if(StringUtils.isBlank(bearerToken)) {
+        if(isBlank(bearerToken)) {
             OAuthToken serviceToken = identityService.getCachedOAuthServiceToken();
             log.debug("serviceToken: expiryDateTime: {}", serviceToken.getExpiryDateTime());
             long secondsRemainingToExpire = serviceToken.getExpiryDateTime() != null ?

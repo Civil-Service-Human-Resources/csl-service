@@ -23,6 +23,9 @@ public class ModuleRollupServiceTest {
     @Mock
     private LearnerRecordService learnerRecordService;
 
+    @Mock
+    private LearningCatalogueService learningCatalogueService;
+
     @InjectMocks
     private ModuleRollupService moduleRollupService;
 
@@ -38,7 +41,7 @@ public class ModuleRollupServiceTest {
 
     @BeforeEach
     public void setup() {
-        moduleRollupService = new ModuleRollupService(learnerRecordService);
+        moduleRollupService = new ModuleRollupService(learnerRecordService, learningCatalogueService);
         cslTestUtil = new CslTestUtil(learnerRecordService, learnerId, courseId, moduleId, uid,
                 currentDateTime, currentDateTime, currentDateTime);
         rusticiRollupData = createRusticiRollupData();

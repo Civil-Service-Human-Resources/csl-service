@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 
 import java.time.LocalDateTime;
@@ -20,8 +21,12 @@ public class ModuleRollupService {
 
     private final LearnerRecordService learnerRecordService;
 
-    public ModuleRollupService(LearnerRecordService learnerRecordService) {
+    private final LearningCatalogueService learningCatalogueService;
+
+    public ModuleRollupService(LearnerRecordService learnerRecordService,
+                               LearningCatalogueService learningCatalogueService) {
         this.learnerRecordService = learnerRecordService;
+        this.learningCatalogueService = learningCatalogueService;
     }
 
     public CourseRecord processRusticiRollupData(RusticiRollupData rusticiRollupData) {
@@ -63,6 +68,13 @@ public class ModuleRollupService {
                     //At this point courseRecord does not contain the above updated module in it
                     if(moduleRecord != null) {
                         //TODO: Calculate and update course completion status by calling learning-catalogue service
+                        Course catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
+                        log.debug("catalogueCourse: {}", catalogueCourse);
+                        if(catalogueCourse == null) {
+                            learningCatalogueService.removeCourseFromCache(courseId);
+                            catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
+                            log.debug("catalogueCourse: {}", catalogueCourse);
+                        }
                         //updateCourseRecordState(learnerId, courseId, State state, updated)
                     }
                 }
