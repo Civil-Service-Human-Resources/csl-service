@@ -15,9 +15,7 @@ public class RequestEntityWithBasicAuthFactory {
 
     public RequestEntity<?> createGetRequestWithBasicAuth(String strUri, String apiUsername, String apiPassword,
                                                           Map<String, String> additionalHeaderParams) {
-        URI uri = UriComponentsBuilder.fromUriString(strUri)
-                .build()
-                .toUri();
+        URI uri = UriComponentsBuilder.fromUriString(strUri).build().toUri();
         return createGetRequestWithBasicAuth(uri, apiUsername, apiPassword, additionalHeaderParams);
     }
 
@@ -31,9 +29,7 @@ public class RequestEntityWithBasicAuthFactory {
     public RequestEntity<?> createPostRequestWithBasicAuth(String strUri, Object body,
                                                            String apiUsername, String apiPassword,
                                                            Map<String, String> additionalHeaderParams) {
-        URI uri = UriComponentsBuilder.fromUriString(strUri)
-                .build()
-                .toUri();
+        URI uri = UriComponentsBuilder.fromUriString(strUri).build().toUri();
         return createPostRequestWithBasicAuth(uri, body, apiUsername, apiPassword, additionalHeaderParams);
     }
 
@@ -42,11 +38,15 @@ public class RequestEntityWithBasicAuthFactory {
                                                            Map<String, String> additionalHeaderParams) {
         HttpHeaders headers = createHttpHeadersWithBasicAuth(apiUsername, apiPassword, additionalHeaderParams,
                 MediaType.APPLICATION_JSON);
-        return RequestEntity.post(uri).headers(headers).body(body);
+        if(body != null) {
+            return RequestEntity.post(uri).headers(headers).body(body);
+        } else {
+            return RequestEntity.post(uri).headers(headers).build();
+        }
     }
 
-    private HttpHeaders createHttpHeadersWithBasicAuth(String apiUsername, String apiPassword,
-                                                       Map<String, String> additionalHeaderParams, MediaType mediaType) {
+    public HttpHeaders createHttpHeadersWithBasicAuth(String apiUsername, String apiPassword,
+                                                      Map<String, String> additionalHeaderParams, MediaType mediaType) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(mediaType));
         headers.setContentType(mediaType);

@@ -1,11 +1,9 @@
 package uk.gov.cabinetoffice.csl.service;
 
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.cabinetoffice.csl.util.CslServiceUtil;
 
 import java.net.URI;
 import java.util.Map;
@@ -13,10 +11,14 @@ import java.util.Map;
 @Component
 public class RequestEntityWithBearerAuthFactory {
 
+    private final CslServiceUtil cslServiceUtil;
+
+    public RequestEntityWithBearerAuthFactory(CslServiceUtil cslServiceUtil) {
+        this.cslServiceUtil = cslServiceUtil;
+    }
+
     public RequestEntity<?> createGetRequestWithBearerAuth(String strUri, Map<String, String> additionalHeaderParams) {
-        URI uri = UriComponentsBuilder.fromUriString(strUri)
-                .build()
-                .toUri();
+        URI uri = UriComponentsBuilder.fromUriString(strUri).build().toUri();
         return createGetRequestWithBearerAuth(uri, additionalHeaderParams);
     }
 
@@ -27,9 +29,7 @@ public class RequestEntityWithBearerAuthFactory {
 
     public RequestEntity<?> createPostRequestWithBearerAuth(String strUri, Object body,
                                                             Map<String, String> additionalHeaderParams) {
-        URI uri = UriComponentsBuilder.fromUriString(strUri)
-                .build()
-                .toUri();
+        URI uri = UriComponentsBuilder.fromUriString(strUri).build().toUri();
         return createPostRequestWithBearerAuth(uri, body, additionalHeaderParams);
     }
 
@@ -41,9 +41,7 @@ public class RequestEntityWithBearerAuthFactory {
 
     public RequestEntity<?> createPatchRequestWithBearerAuth(String strUri, Object body,
                                                             Map<String, String> additionalHeaderParams) {
-        URI uri = UriComponentsBuilder.fromUriString(strUri)
-                .build()
-                .toUri();
+        URI uri = UriComponentsBuilder.fromUriString(strUri).build().toUri();
         return createPatchRequestWithBearerAuth(uri, body, additionalHeaderParams);
     }
 
@@ -56,7 +54,7 @@ public class RequestEntityWithBearerAuthFactory {
 
     private HttpHeaders createHttpHeadersWithBearerAuth(Map<String, String> additionalHeaderParams,
                                                         MediaType mediaType) {
-        String bearerToken = getBearerTokenFromSecurityContext();
+        String bearerToken = cslServiceUtil.getBearerToken();
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(bearerToken);
         headers.setContentType(mediaType);
@@ -64,11 +62,5 @@ public class RequestEntityWithBearerAuthFactory {
             headers.setAll(additionalHeaderParams);
         }
         return headers;
-    }
-
-    private String getBearerTokenFromSecurityContext() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-        return jwtPrincipal.getTokenValue();
     }
 }

@@ -9,8 +9,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Learner {
+public class Course {
+
+    //This will be mapped to the <CourseRecord.courseId>.<ModuleRecord.moduleId>
     private String id;
-    private String firstName;
-    private String lastName;
+
+    //This will be mapped to the <CourseRecord.courseTitle>
+    private String title;
+
+    private Integer version;
 }

@@ -3,51 +3,38 @@ package uk.gov.cabinetoffice.csl.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestTemplate;
 import uk.gov.cabinetoffice.csl.domain.*;
 
-import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.addAdditionalHeaderParams;
-import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.*;
 
 @Service
 public class RusticiService {
 
     private final RequestEntityWithBasicAuthFactory requestEntityFactory;
 
-    private final String registrationLaunchLinkUrl;
+    @Value("${rustici.registrationLaunchLinkUrl}")
+    private String registrationLaunchLinkUrl;
 
-    private final String registrationWithLaunchLinkUrl;
+    @Value("${rustici.registrationWithLaunchLinkUrl}")
+    private String registrationWithLaunchLinkUrl;
 
-    private final String rusticiUsername;
+    @Value("${rustici.username}")
+    private String rusticiUsername;
 
-    private final String rusticiPassword;
+    @Value("${rustici.password}")
+    private String rusticiPassword;
 
-    private final String rusticiEngineTenantName;
+    @Value("${rustici.engineTenantName}")
+    private String rusticiEngineTenantName;
 
-    private final String rusticiRedirectOnExitUrl;
+    @Value("${rustici.redirectOnExitUrl}")
+    private String rusticiRedirectOnExitUrl;
 
-    private final int rusticiLaunchLinkExpiry;
+    @Value("${rustici.launchLinkExpirySeconds}")
+    private int rusticiLaunchLinkExpiry;
 
-    private final RestTemplate restTemplate;
-
-    public RusticiService(RequestEntityWithBasicAuthFactory requestEntityFactory, RestTemplate restTemplate,
-                          @Value("${rustici.registrationLaunchLinkUrl}") String registrationLaunchLinkUrl,
-                          @Value("${rustici.registrationWithLaunchLinkUrl}") String registrationWithLaunchLinkUrl,
-                          @Value("${rustici.username}") String rusticiUsername,
-                          @Value("${rustici.password}") String rusticiPassword,
-                          @Value("${rustici.engineTenantName}") String rusticiEngineTenantName,
-                          @Value("${rustici.redirectOnExitUrl}") String rusticiRedirectOnExitUrl,
-                          @Value("${rustici.launchLinkExpiry}") int rusticiLaunchLinkExpiry) {
+    public RusticiService(RequestEntityWithBasicAuthFactory requestEntityFactory) {
         this.requestEntityFactory = requestEntityFactory;
-        this.restTemplate = restTemplate;
-        this.registrationLaunchLinkUrl = registrationLaunchLinkUrl;
-        this.registrationWithLaunchLinkUrl = registrationWithLaunchLinkUrl;
-        this.rusticiUsername = rusticiUsername;
-        this.rusticiPassword = rusticiPassword;
-        this.rusticiEngineTenantName = rusticiEngineTenantName;
-        this.rusticiRedirectOnExitUrl = rusticiRedirectOnExitUrl;
-        this.rusticiLaunchLinkExpiry = rusticiLaunchLinkExpiry;
     }
 
     public ResponseEntity<?> getRegistrationLaunchLink(RegistrationInput registrationInput) {
@@ -56,14 +43,14 @@ public class RusticiService {
                 createLaunchLinkRequest(String.format(rusticiRedirectOnExitUrl, registrationInput.getCourseId(),
                         registrationInput.getModuleId())),
                 rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
-        return getLaunchLink(postRequestWithBasicAuth);
+        return invokeService(postRequestWithBasicAuth);
     }
 
     public ResponseEntity<?> createRegistrationAndLaunchLink(RegistrationInput registrationInput) {
         RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
                 registrationWithLaunchLinkUrl, createRegistrationRequest(registrationInput),
                 rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
-        return getLaunchLink(postRequestWithBasicAuth);
+        return invokeService(postRequestWithBasicAuth);
     }
 
     private LaunchLinkRequest createLaunchLinkRequest(String redirectOnExitUrl) {
@@ -89,15 +76,5 @@ public class RusticiService {
         registrationRequest.setLaunchLinkRequest(createLaunchLinkRequest(String.format(rusticiRedirectOnExitUrl,
                 registrationInput.getCourseId(), registrationInput.getModuleId())));
         return registrationRequest;
-    }
-
-    private ResponseEntity<?> getLaunchLink(RequestEntity<?> postRequestWithBasicAuth) {
-        ResponseEntity<?> response;
-        try {
-            response = restTemplate.exchange(postRequestWithBasicAuth, LaunchLink.class);
-        } catch (HttpStatusCodeException ex) {
-            response = returnError(ex, postRequestWithBasicAuth.getUrl().getPath());
-        }
-        return response;
     }
 }
