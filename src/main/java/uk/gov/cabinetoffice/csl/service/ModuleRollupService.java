@@ -47,6 +47,7 @@ public class ModuleRollupService {
         String result = rusticiRollupData.getRegistrationSuccess();
         CourseRecord courseRecord = null;
         ModuleRecord moduleRecord = null;
+        Course catalogueCourse = null;
         ResponseEntity<?> courseRecordResponse = learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
         if(courseRecordResponse.getStatusCode().is2xxSuccessful()) {
             CourseRecords courseRecords =
@@ -71,32 +72,34 @@ public class ModuleRollupService {
                         //Update the courseRecord with the above updated moduleRecord
                         courseRecord.updateModuleRecords(moduleRecord);
                         List<String> completedModuleIds = courseRecord.getModuleRecords().stream().map(m -> m.getModuleId()).toList();
-                        Course catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
+                        catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
                         log.debug("catalogueCourse: {}", catalogueCourse);
                         if(catalogueCourse == null) {
                             learningCatalogueService.removeCourseFromCache(courseId);
                             catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
                             log.debug("catalogueCourse: {}", catalogueCourse);
                         }
-                        List<String> mandatoryModulesIds = catalogueCourse.getModules().stream()
-                                .filter(m -> !m.isOptional()).map(Module::getId).toList();
-                        if(mandatoryModulesIds.size() > 0) {
-                            //TODO: check if all the mandatoryModulesIds are present in the completedModuleIds
-                            //if yes then set then update the course status to completed and completed date
-                            //updateCourseRecordState(learnerId, courseId, State state, updated)
-                        } else {
-                            //Get the optional modules Ids from
-                            List<String> optionalModulesIds = catalogueCourse.getModules().stream()
-                                    .filter(Module::isOptional).map(Module::getId).toList();
-                            //TODO: check if all the optionalModulesIds are present in the completedModuleIds
-                            //if yes then set then update the course status to completed and completed date
-                            //updateCourseRecordState(learnerId, courseId, State state, updated)
+                        if(catalogueCourse != null) {
+                            List<String> mandatoryModulesIds = catalogueCourse.getModules().stream()
+                                    .filter(m -> !m.isOptional()).map(Module::getId).toList();
+                            if(mandatoryModulesIds.size() > 0) {
+                                //TODO: check if all the mandatoryModulesIds are present in the completedModuleIds
+                                //if yes then set then update the course status to completed and completed date
+                                //updateCourseRecordState(learnerId, courseId, State state, updated)
+                            } else {
+                                //Get the optional modules Ids from
+                                List<String> optionalModulesIds = catalogueCourse.getModules().stream()
+                                        .filter(Module::isOptional).map(Module::getId).toList();
+                                //TODO: check if all the optionalModulesIds are present in the completedModuleIds
+                                //if yes then set then update the course status to completed and completed date
+                                //updateCourseRecordState(learnerId, courseId, State state, updated)
+                            }
                         }
                     }
                 }
             }
         }
-        if(courseRecord == null || moduleRecord == null) {
+        if(courseRecord == null || moduleRecord == null || catalogueCourse == null) {
             log.error("Unable to process the rustici rollup data: {}", rusticiRollupData);
         }
         log.debug("courseRecord after processing rollup data: {}", courseRecord);
