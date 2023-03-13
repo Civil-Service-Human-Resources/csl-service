@@ -20,8 +20,4 @@ public class Module {
     private BigDecimal cost;
     private Collection<Event> events;
     private boolean optional;
-
-    public Event getEvent(String eventId) {
-        return events.stream().filter(event -> eventId.equals(event.getId())).findFirst().orElse(null);
-    }
 }

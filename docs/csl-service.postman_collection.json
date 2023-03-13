@@ -523,6 +523,66 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "4. reset-cache",
+			"item": [
+				{
+					"name": "1. service-token",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{csl-base-url}}/reset-cache/service-token",
+							"host": [
+								"{{csl-base-url}}"
+							],
+							"path": [
+								"reset-cache",
+								"service-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. all-courses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{csl-base-url}}/reset-cache/all-courses",
+							"host": [
+								"{{csl-base-url}}"
+							],
+							"path": [
+								"reset-cache",
+								"all-courses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. course-by-course-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{csl-base-url}}/reset-cache/course/course-id",
+							"host": [
+								"{{csl-base-url}}"
+							],
+							"path": [
+								"reset-cache",
+								"course",
+								"course-id"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {

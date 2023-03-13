@@ -5,11 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -55,19 +57,19 @@ public class ModuleRollupService {
                 moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
                 if(moduleRecord != null) {
                     Map<String, String> updateFields = new HashMap<>();
-                    updateFields.put("updatedAt", updated.toString()); //rusticiRollupData.getUpdated()
-                    if(completedDate != null) { //rusticiRollupData.getCompletedDate()
-                        updateFields.put("state", State.COMPLETED.name()); //rusticiRollupData.getRegistrationCompletion()
+                    updateFields.put("updatedAt", updated.toString());
+                    if(completedDate != null) {
+                        updateFields.put("state", State.COMPLETED.name());
                         updateFields.put("completionDate", completedDate.toString());
                     }
                     if(isNotBlank(result) && Arrays.stream(Result.values()).anyMatch(v -> v.name().equals(result))) {
                         updateFields.put("result", result);
                     }
                     moduleRecord = learnerRecordService.updateModuleRecord(moduleRecord.getId(), updateFields);
-                    //Above moduleRecord does not contain the course record in it
-                    //At this point courseRecord does not contain the above updated module in it
                     if(moduleRecord != null) {
-                        //TODO: Calculate and update course completion status by calling learning-catalogue service
+                        //TODO: Code within this if can be moved to a private method
+                        //Update the courseRecord with the above updated moduleRecord
+                        courseRecord.updateModuleRecords(moduleRecord);
                         Course catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
                         log.debug("catalogueCourse: {}", catalogueCourse);
                         if(catalogueCourse == null) {
@@ -75,7 +77,20 @@ public class ModuleRollupService {
                             catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
                             log.debug("catalogueCourse: {}", catalogueCourse);
                         }
-                        //updateCourseRecordState(learnerId, courseId, State state, updated)
+                        List<String> mandatoryModulesIds = catalogueCourse.getModules().stream()
+                                .filter(m -> !m.isOptional()).map(Module::getId).toList();
+                        if(mandatoryModulesIds.size() > 0) {
+                            //TODO: check if all the mandatory modules are present in the courseRecord.getModuleRecords()
+                            //if yes then set then update the course status to completed and completed date
+                            //updateCourseRecordState(learnerId, courseId, State state, updated)
+                        } else {
+                            //Get the optional modules Ids from
+                            List<String> optionalModulesIds = catalogueCourse.getModules().stream()
+                                    .filter(Module::isOptional).map(Module::getId).toList();
+                            //TODO: check if all the optional modules are present in the courseRecord.getModuleRecords()
+                            //if yes then set then update the course status to completed and completed date
+                            //updateCourseRecordState(learnerId, courseId, State state, updated)
+                        }
                     }
                 }
             }

@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
+import static java.util.stream.Collectors.toList;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -55,5 +57,12 @@ public class CourseRecord {
                     .orElse(null);
         }
         return null;
+    }
+
+    public Collection<ModuleRecord> updateModuleRecords(ModuleRecord newModuleRecord) {
+        return moduleRecords.stream().map(existingModuleRecord ->
+                        existingModuleRecord.getModuleId().equals(newModuleRecord.getModuleId())
+                                ? newModuleRecord : existingModuleRecord)
+                .collect(toList());
     }
 }
