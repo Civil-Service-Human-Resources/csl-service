@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
@@ -59,10 +60,11 @@ public class CourseRecord {
         return null;
     }
 
-    public Collection<ModuleRecord> updateModuleRecords(ModuleRecord newModuleRecord) {
-        return moduleRecords.stream().map(existingModuleRecord ->
+    public void updateModuleRecords(ModuleRecord newModuleRecord) {
+        List<ModuleRecord> updatedModuleRecords = this.moduleRecords.stream().map(existingModuleRecord ->
                         existingModuleRecord.getModuleId().equals(newModuleRecord.getModuleId())
                                 ? newModuleRecord : existingModuleRecord)
                 .collect(toList());
+        this.setModuleRecords(updatedModuleRecords);
     }
 }
