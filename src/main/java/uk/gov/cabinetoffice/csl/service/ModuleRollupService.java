@@ -70,6 +70,7 @@ public class ModuleRollupService {
                         //TODO: Code within this if can be moved to a private method
                         //Update the courseRecord with the above updated moduleRecord
                         courseRecord.updateModuleRecords(moduleRecord);
+                        List<String> completedModuleIds = courseRecord.getModuleRecords().stream().map(m -> m.getModuleId()).toList();
                         Course catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
                         log.debug("catalogueCourse: {}", catalogueCourse);
                         if(catalogueCourse == null) {
@@ -80,14 +81,14 @@ public class ModuleRollupService {
                         List<String> mandatoryModulesIds = catalogueCourse.getModules().stream()
                                 .filter(m -> !m.isOptional()).map(Module::getId).toList();
                         if(mandatoryModulesIds.size() > 0) {
-                            //TODO: check if all the mandatory modules are present in the courseRecord.getModuleRecords()
+                            //TODO: check if all the mandatoryModulesIds are present in the completedModuleIds
                             //if yes then set then update the course status to completed and completed date
                             //updateCourseRecordState(learnerId, courseId, State state, updated)
                         } else {
                             //Get the optional modules Ids from
                             List<String> optionalModulesIds = catalogueCourse.getModules().stream()
                                     .filter(Module::isOptional).map(Module::getId).toList();
-                            //TODO: check if all the optional modules are present in the courseRecord.getModuleRecords()
+                            //TODO: check if all the optionalModulesIds are present in the completedModuleIds
                             //if yes then set then update the course status to completed and completed date
                             //updateCourseRecordState(learnerId, courseId, State state, updated)
                         }
