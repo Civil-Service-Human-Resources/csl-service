@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain;
+package uk.gov.cabinetoffice.csl.domain.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

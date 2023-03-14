@@ -2,7 +2,7 @@ package uk.gov.cabinetoffice.csl.util;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.cabinetoffice.csl.domain.*;
+import uk.gov.cabinetoffice.csl.domain.error.ErrorResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 

@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.cabinetoffice.csl.domain.*;
+import uk.gov.cabinetoffice.csl.domain.error.ErrorResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;

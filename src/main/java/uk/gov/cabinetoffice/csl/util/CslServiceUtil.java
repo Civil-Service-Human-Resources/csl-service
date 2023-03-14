@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.apache.hc.client5.http.classic.HttpClient;
-import uk.gov.cabinetoffice.csl.domain.ErrorResponse;
+import uk.gov.cabinetoffice.csl.domain.error.ErrorResponse;
 import uk.gov.cabinetoffice.csl.domain.identity.OAuthToken;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
 
