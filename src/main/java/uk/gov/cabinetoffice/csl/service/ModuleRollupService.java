@@ -47,18 +47,12 @@ public class ModuleRollupService {
             CourseRecords courseRecords =
                     mapJsonStringToObject((String) courseRecordResponse.getBody(), CourseRecords.class);
             log.debug("courseRecords: {}", courseRecords);
-            if (courseRecords != null) {
-                courseRecord = courseRecords.getCourseRecord(courseId);
-                moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
-                if(moduleRecord != null) {
-                    moduleRecord = updateModuleRecord(moduleRecord, rusticiRollupData);
-                    if(moduleRecord != null) {
-                        courseRecord.updateModuleRecords(moduleRecord);
-                        if(completedDate != null) {
-                            courseRecord = updateCourseCompletionStatus(courseRecord, completedDate);
-                        }
-                    }
-                }
+            courseRecord = courseRecords != null ? courseRecords.getCourseRecord(courseId) : null;
+            moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
+            moduleRecord = moduleRecord != null ? updateModuleRecord(moduleRecord, rusticiRollupData) : null;
+            if(moduleRecord != null) {
+                courseRecord.updateModuleRecords(moduleRecord);
+                courseRecord = completedDate != null ? updateCourseCompletionStatus(courseRecord, completedDate) : courseRecord;
             }
         }
         if(courseRecord == null || moduleRecord == null) {
