@@ -29,7 +29,7 @@ public class ModuleRollupService {
     }
 
     public CourseRecord processRusticiRollupData(RusticiRollupData rusticiRollupData) {
-        log.debug("rusticiRollupData: {}", rusticiRollupData);
+        log.info("rusticiRollupData: {}", rusticiRollupData);
         String courseIdDotModuleId = rusticiRollupData.getCourse().getId();
         if(!courseIdDotModuleId.contains(".")) {
             log.error("Invalid rustici rollup data. \".\" is missing from course.id: {}", rusticiRollupData);
