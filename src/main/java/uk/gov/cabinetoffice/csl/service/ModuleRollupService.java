@@ -66,30 +66,32 @@ public class ModuleRollupService {
                     moduleRecord = learnerRecordService.updateModuleRecord(moduleRecord.getId(), updateFields);
                     if(moduleRecord != null) {
                         //TODO: Code within this if can be moved to a private method
-                        //Update the courseRecord with the above updated moduleRecord
                         courseRecord.updateModuleRecords(moduleRecord);
-                        List<String> completedModuleIds = courseRecord.getModuleRecords().stream().map(m -> m.getModuleId()).toList();
-                        catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
-                        log.debug("catalogueCourse: {}", catalogueCourse);
-                        if(catalogueCourse == null) {
-                            learningCatalogueService.removeCourseFromCache(courseId);
+                        if(completedDate != null) {
+                            List<String> completedModuleIds = courseRecord.getModuleRecords().stream()
+                                    .map(ModuleRecord::getModuleId).toList();
                             catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
                             log.debug("catalogueCourse: {}", catalogueCourse);
-                        }
-                        if(catalogueCourse != null) {
-                            List<String> mandatoryModulesIds = catalogueCourse.getModules().stream()
-                                    .filter(m -> !m.isOptional()).map(Module::getId).toList();
-                            if(mandatoryModulesIds.size() > 0) {
-                                //TODO: check if all the mandatoryModulesIds are present in the completedModuleIds
-                                //if yes then set then update the course status to completed and completed date
-                                //updateCourseRecordState(learnerId, courseId, State state, updated)
-                            } else {
-                                //Get the optional modules Ids from
-                                List<String> optionalModulesIds = catalogueCourse.getModules().stream()
-                                        .filter(Module::isOptional).map(Module::getId).toList();
-                                //TODO: check if all the optionalModulesIds are present in the completedModuleIds
-                                //if yes then set then update the course status to completed and completed date
-                                //updateCourseRecordState(learnerId, courseId, State state, updated)
+                            if (catalogueCourse == null) {
+                                learningCatalogueService.removeCourseFromCache(courseId);
+                                catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
+                                log.debug("catalogueCourse: {}", catalogueCourse);
+                            }
+                            if (catalogueCourse != null) {
+                                List<String> difference;
+                                List<String> mandatoryModulesIds = catalogueCourse.getModules().stream()
+                                        .filter(m -> !m.isOptional()).map(Module::getId).toList();
+                                if (mandatoryModulesIds.size() > 0) {
+                                    difference = findDifference(mandatoryModulesIds, completedModuleIds);
+                                } else {
+                                    List<String> optionalModulesIds = catalogueCourse.getModules().stream()
+                                            .filter(Module::isOptional).map(Module::getId).toList();
+                                    difference = findDifference(optionalModulesIds, completedModuleIds);
+                                }
+                                if (difference.size() == 0) {
+                                    courseRecord = learnerRecordService.updateCourseRecordState(learnerId, courseId,
+                                            State.COMPLETED, completedDate);
+                                }
                             }
                         }
                     }
@@ -102,5 +104,12 @@ public class ModuleRollupService {
         log.debug("courseRecord after processing rollup data: {}", courseRecord);
         log.debug("moduleRecord after processing rollup data: {}", moduleRecord);
         return courseRecord;
+    }
+
+    private static <T> List<T> findDifference(List<T> first, List<T> second)
+    {
+        List<T> diff = new ArrayList<>(first);
+        diff.removeAll(second);
+        return diff;
     }
 }
