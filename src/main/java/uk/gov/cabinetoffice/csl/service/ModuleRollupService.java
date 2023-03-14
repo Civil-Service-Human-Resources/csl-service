@@ -52,7 +52,8 @@ public class ModuleRollupService {
             moduleRecord = moduleRecord != null ? updateModuleRecord(moduleRecord, rusticiRollupData) : null;
             if(moduleRecord != null) {
                 courseRecord.updateModuleRecords(moduleRecord);
-                courseRecord = completedDate != null ? updateCourseCompletionStatus(courseRecord, completedDate) : courseRecord;
+                courseRecord = completedDate != null ?
+                        updateCourseCompletionStatus(courseRecord, completedDate): courseRecord;
             }
         }
         if(courseRecord == null || moduleRecord == null) {
