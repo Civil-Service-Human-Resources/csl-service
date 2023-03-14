@@ -39,12 +39,9 @@ public class ModuleRollupService {
         String courseId = courseIdDotModuleIdParts[0];
         String moduleId = courseIdDotModuleIdParts[1];
         String learnerId = rusticiRollupData.getLearner().getId();
-        LocalDateTime updated = rusticiRollupData.getUpdated();
         LocalDateTime completedDate = rusticiRollupData.getCompletedDate();
-        String result = rusticiRollupData.getRegistrationSuccess();
         CourseRecord courseRecord = null;
         ModuleRecord moduleRecord = null;
-        Course catalogueCourse = null;
         ResponseEntity<?> courseRecordResponse = learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
         if(courseRecordResponse.getStatusCode().is2xxSuccessful()) {
             CourseRecords courseRecords =
@@ -54,55 +51,68 @@ public class ModuleRollupService {
                 courseRecord = courseRecords.getCourseRecord(courseId);
                 moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
                 if(moduleRecord != null) {
-                    Map<String, String> updateFields = new HashMap<>();
-                    updateFields.put("updatedAt", updated.toString());
-                    if(completedDate != null) {
-                        updateFields.put("state", State.COMPLETED.name());
-                        updateFields.put("completionDate", completedDate.toString());
-                    }
-                    if(isNotBlank(result) && Arrays.stream(Result.values()).anyMatch(v -> v.name().equals(result))) {
-                        updateFields.put("result", result);
-                    }
-                    moduleRecord = learnerRecordService.updateModuleRecord(moduleRecord.getId(), updateFields);
+                    moduleRecord = updateModuleRecord(moduleRecord, rusticiRollupData);
                     if(moduleRecord != null) {
-                        //TODO: Code within this if can be moved to a private method
                         courseRecord.updateModuleRecords(moduleRecord);
                         if(completedDate != null) {
-                            List<String> completedModuleIds = courseRecord.getModuleRecords().stream()
-                                    .map(ModuleRecord::getModuleId).toList();
-                            catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
-                            log.debug("catalogueCourse: {}", catalogueCourse);
-                            if (catalogueCourse == null) {
-                                learningCatalogueService.removeCourseFromCache(courseId);
-                                catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
-                                log.debug("catalogueCourse: {}", catalogueCourse);
-                            }
-                            if (catalogueCourse != null) {
-                                List<String> difference;
-                                List<String> mandatoryModulesIds = catalogueCourse.getModules().stream()
-                                        .filter(m -> !m.isOptional()).map(Module::getId).toList();
-                                if (mandatoryModulesIds.size() > 0) {
-                                    difference = findDifference(mandatoryModulesIds, completedModuleIds);
-                                } else {
-                                    List<String> optionalModulesIds = catalogueCourse.getModules().stream()
-                                            .filter(Module::isOptional).map(Module::getId).toList();
-                                    difference = findDifference(optionalModulesIds, completedModuleIds);
-                                }
-                                if (difference.size() == 0) {
-                                    courseRecord = learnerRecordService.updateCourseRecordState(learnerId, courseId,
-                                            State.COMPLETED, completedDate);
-                                }
-                            }
+                            courseRecord = updateCourseCompletionStatus(courseRecord, completedDate);
                         }
                     }
                 }
             }
         }
-        if(courseRecord == null || moduleRecord == null || catalogueCourse == null) {
+        if(courseRecord == null || moduleRecord == null) {
             log.error("Unable to process the rustici rollup data: {}", rusticiRollupData);
         }
         log.debug("courseRecord after processing rollup data: {}", courseRecord);
         log.debug("moduleRecord after processing rollup data: {}", moduleRecord);
+        return courseRecord;
+    }
+
+    private ModuleRecord updateModuleRecord(ModuleRecord moduleRecord, RusticiRollupData rusticiRollupData) {
+        LocalDateTime updated = rusticiRollupData.getUpdated();
+        LocalDateTime completedDate = rusticiRollupData.getCompletedDate();
+        String result = rusticiRollupData.getRegistrationSuccess();
+        Map<String, String> updateFields = new HashMap<>();
+        updateFields.put("updatedAt", updated.toString());
+        if(completedDate != null) {
+            updateFields.put("state", State.COMPLETED.name());
+            updateFields.put("completionDate", completedDate.toString());
+        }
+        if(isNotBlank(result) && Arrays.stream(Result.values()).anyMatch(v -> v.name().equals(result))) {
+            updateFields.put("result", result);
+        }
+        return learnerRecordService.updateModuleRecord(moduleRecord.getId(), updateFields);
+    }
+
+    private CourseRecord updateCourseCompletionStatus(CourseRecord courseRecord, LocalDateTime completedDate) {
+        String courseId = courseRecord.getCourseId();
+        String learnerId = courseRecord.getUserId();
+        List<String> completedModuleIds = courseRecord.getModuleRecords().stream()
+                .map(ModuleRecord::getModuleId).toList();
+        Course catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
+        log.debug("catalogueCourse: {}", catalogueCourse);
+        if (catalogueCourse == null) {
+            learningCatalogueService.removeCourseFromCache(courseId);
+            catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
+            log.debug("catalogueCourse: {}", catalogueCourse);
+        }
+        if (catalogueCourse != null) {
+            List<String> difference;
+            List<String> mandatoryModulesIds = catalogueCourse.getModules().stream()
+                    .filter(m -> !m.isOptional()).map(Module::getId).toList();
+            if (mandatoryModulesIds.size() > 0) {
+                difference = findDifference(mandatoryModulesIds, completedModuleIds);
+            } else {
+                List<String> optionalModulesIds = catalogueCourse.getModules().stream()
+                        .filter(Module::isOptional).map(Module::getId).toList();
+                difference = findDifference(optionalModulesIds, completedModuleIds);
+            }
+            if (difference.size() == 0) {
+                courseRecord = learnerRecordService.updateCourseRecordState(learnerId, courseId,
+                        State.COMPLETED, completedDate);
+            }
+        }
         return courseRecord;
     }
 
