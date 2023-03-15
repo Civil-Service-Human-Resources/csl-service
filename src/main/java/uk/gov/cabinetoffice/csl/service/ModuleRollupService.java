@@ -40,6 +40,7 @@ public class ModuleRollupService {
         String moduleId = courseIdDotModuleIdParts[1];
         String learnerId = rusticiRollupData.getLearner().getId();
         LocalDateTime completedDate = rusticiRollupData.getCompletedDate();
+        LocalDateTime updated = rusticiRollupData.getUpdated();
         CourseRecord courseRecord = null;
         ModuleRecord moduleRecord = null;
         ResponseEntity<?> courseRecordResponse = learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
@@ -53,7 +54,7 @@ public class ModuleRollupService {
             if(moduleRecord != null) {
                 courseRecord.updateModuleRecords(moduleRecord);
                 courseRecord = completedDate != null ?
-                        updateCourseCompletionStatus(courseRecord, completedDate): courseRecord;
+                        updateCourseCompletionStatus(courseRecord, updated): courseRecord;
             }
         }
         if(courseRecord == null || moduleRecord == null) {
