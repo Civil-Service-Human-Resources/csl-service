@@ -81,7 +81,7 @@ public class ModuleRollupService {
         return learnerRecordService.updateModuleRecord(moduleRecord.getId(), updateFields);
     }
 
-    private CourseRecord updateCourseCompletionStatus(CourseRecord courseRecord, LocalDateTime completedDate) {
+    private CourseRecord updateCourseCompletionStatus(CourseRecord courseRecord, LocalDateTime updated) {
         String courseId = courseRecord.getCourseId();
         String learnerId = courseRecord.getUserId();
         List<String> completedModuleIds = courseRecord.getModuleRecords().stream()
@@ -106,7 +106,7 @@ public class ModuleRollupService {
             }
             if (difference.size() == 0) {
                 courseRecord = learnerRecordService.updateCourseRecordState(learnerId, courseId,
-                        State.COMPLETED, completedDate);
+                        State.COMPLETED, updated);
             }
         }
         return courseRecord;
