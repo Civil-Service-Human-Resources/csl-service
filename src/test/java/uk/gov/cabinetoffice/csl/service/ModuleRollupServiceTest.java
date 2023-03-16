@@ -63,29 +63,19 @@ public class ModuleRollupServiceTest {
     @Test
     public void  testProcessRusticiRollupDataForSuccess() {
         cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(cslTestUtil.createSuccessResponseForCourseRecords());
-
-        Map<String, String> updateFields = new HashMap<>();
-        updateFields.put("updatedAt", rusticiRollupData.getUpdated().toString());
-        updateFields.put("completionDate", rusticiRollupData.getCompletedDate().toString());
-        updateFields.put("state", State.COMPLETED.name());
-        updateFields.put("result", rusticiRollupData.getRegistrationSuccess());
-
         CourseRecord courseRecord = cslTestUtil.createCourseRecord();
-        ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
-        moduleRecord.setUpdatedAt(rusticiRollupData.getUpdated());
-        moduleRecord.setCompletionDate(rusticiRollupData.getCompletedDate());
-        moduleRecord.setState(State.COMPLETED);
-        moduleRecord.setResult(Result.PASSED);
-        cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecord(moduleRecord.getId(), updateFields, moduleRecord);
-
-        courseRecord.setState(State.COMPLETED);
-        courseRecord.setLastUpdated(rusticiRollupData.getUpdated());
-        cslTestUtil.mockLearnerRecordServiceForUpdateCourseRecordState(
-                learnerId, courseId, State.COMPLETED, rusticiRollupData.getUpdated(), courseRecord);
-
-        mockLearningCatalogueServiceForGetCachedCourse(cslTestUtil.createCatalogueCourse());
-
+        mockCourseAndModuleCompletion(courseRecord);
+        uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse = cslTestUtil.createCatalogueCourse();
+        mockLearningCatalogueServiceForGetCachedCourse(catalogueCourse);
         CourseRecord updatedCourseRecord = invokeService();
+        verify(updatedCourseRecord);
+    }
+
+    private CourseRecord invokeService() {
+        return moduleRollupService.processRusticiRollupData(rusticiRollupData);
+    }
+
+    private void verify(CourseRecord updatedCourseRecord) {
         assertNotNull(updatedCourseRecord);
         assertEquals(courseId, updatedCourseRecord.getCourseId());
         assertEquals(rusticiRollupData.getUpdated(), updatedCourseRecord.getLastUpdated());
@@ -100,8 +90,29 @@ public class ModuleRollupServiceTest {
         assertEquals(Result.PASSED, updatedModuleRecord.getResult());
     }
 
-    private CourseRecord invokeService() {
-        return moduleRollupService.processRusticiRollupData(rusticiRollupData);
+    private void mockCourseAndModuleCompletion(CourseRecord courseRecord) {
+        Map<String, String> updateFields = new HashMap<>();
+        updateFields.put("updatedAt", rusticiRollupData.getUpdated().toString());
+        updateFields.put("completionDate", rusticiRollupData.getCompletedDate().toString());
+        updateFields.put("state", State.COMPLETED.name());
+        updateFields.put("result", rusticiRollupData.getRegistrationSuccess());
+
+        ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
+        moduleRecord.setUpdatedAt(rusticiRollupData.getUpdated());
+        moduleRecord.setCompletionDate(rusticiRollupData.getCompletedDate());
+        moduleRecord.setState(State.COMPLETED);
+        moduleRecord.setResult(Result.PASSED);
+        cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecord(moduleRecord.getId(), updateFields, moduleRecord);
+
+        courseRecord.setState(State.COMPLETED);
+        courseRecord.setLastUpdated(rusticiRollupData.getUpdated());
+        cslTestUtil.mockLearnerRecordServiceForUpdateCourseRecordState(
+                learnerId, courseId, State.COMPLETED, rusticiRollupData.getUpdated(), courseRecord);
+    }
+
+    private void mockLearningCatalogueServiceForGetCachedCourse(
+            uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse) {
+        when(learningCatalogueService.getCachedCourse(courseId)).thenReturn(catalogueCourse);
     }
 
     private RusticiRollupData createRusticiRollupData() {
@@ -116,10 +127,5 @@ public class ModuleRollupServiceTest {
         Learner learner = new Learner(learnerId, "learnerFirstName", "");
         rusticiRollupData.setLearner(learner);
         return rusticiRollupData;
-    }
-
-    private void mockLearningCatalogueServiceForGetCachedCourse(
-            uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse) {
-        when(learningCatalogueService.getCachedCourse(courseId)).thenReturn(catalogueCourse);
     }
 }
