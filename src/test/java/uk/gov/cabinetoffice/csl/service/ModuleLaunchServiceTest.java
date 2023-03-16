@@ -127,7 +127,7 @@ public class ModuleLaunchServiceTest {
         CourseRecords courseRecords = cslTestUtil.createCourseRecords();
         cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(
                 cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyModuleUid(courseRecords));
-        cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecord(createInternalServerErrorResponse());
+        cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecordForLearner(createInternalServerErrorResponse());
         verify5xxError(invokeService());
     }
 

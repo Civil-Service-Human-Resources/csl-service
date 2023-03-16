@@ -7,15 +7,20 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.Result;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.Learner;
 import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class ModuleRollupServiceTest {
@@ -48,32 +53,53 @@ public class ModuleRollupServiceTest {
     }
 
     @Test
-    public void  testProcessRusticiRollupDataForSuccess() {
-        //ModuleRecord moduleRecord = cslTestUtil.createModuleRecord();
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(cslTestUtil.createSuccessResponseForCourseRecords());
-        //cslTestUtil.mockLearnerRecordServiceForUpdateModuleUpdateDateTime(moduleRecord);
-        CourseRecord courseRecord = invokeService();
-        ModuleRecord updatedModuleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
-        assertNotNull(updatedModuleRecord);
-        assertEquals(moduleId, updatedModuleRecord.getModuleId());
-        assertEquals(rusticiRollupData.getUpdated(), updatedModuleRecord.getUpdatedAt());
-    }
-
-//    @Test
-//    public void  testProcessRusticiRollupDataForFailure() {
-//        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(cslTestUtil.createSuccessResponseForCourseRecords());
-//        cslTestUtil.mockLearnerRecordServiceForUpdateModuleUpdateDateTime(null);
-//        CourseRecord courseRecord = invokeService();
-//        ModuleRecord updatedModuleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
-//        assertNull(updatedModuleRecord);
-//    }
-
-    @Test
     public void  testProcessRusticiRollupDataForInvalidRollupData() {
         rusticiRollupData.getCourse().setId(courseId);
         CourseRecord courseRecord = invokeService();
         ModuleRecord updatedModuleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
         assertNull(updatedModuleRecord);
+    }
+
+    @Test
+    public void  testProcessRusticiRollupDataForSuccess() {
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(cslTestUtil.createSuccessResponseForCourseRecords());
+
+        Map<String, String> updateFields = new HashMap<>();
+        updateFields.put("updatedAt", rusticiRollupData.getUpdated().toString());
+        updateFields.put("completionDate", rusticiRollupData.getCompletedDate().toString());
+        updateFields.put("state", State.COMPLETED.name());
+        updateFields.put("result", rusticiRollupData.getRegistrationSuccess());
+
+        CourseRecord courseRecord = cslTestUtil.createCourseRecord();
+        ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
+        moduleRecord.setUpdatedAt(rusticiRollupData.getUpdated());
+        moduleRecord.setCompletionDate(rusticiRollupData.getCompletedDate());
+        moduleRecord.setState(State.COMPLETED);
+        moduleRecord.setResult(Result.PASSED);
+        cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecord(moduleRecord.getId(), updateFields, moduleRecord);
+
+        courseRecord.setState(State.COMPLETED);
+        courseRecord.setLastUpdated(rusticiRollupData.getUpdated());
+        when(learnerRecordService
+                .updateCourseRecordState(learnerId, courseId, State.COMPLETED, rusticiRollupData.getUpdated()))
+                .thenReturn(courseRecord);
+
+        uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse = cslTestUtil.createCatalogueCourse();
+        when(learningCatalogueService.getCachedCourse(courseId)).thenReturn(catalogueCourse);
+
+        CourseRecord updatedCourseRecord = invokeService();
+        assertNotNull(updatedCourseRecord);
+        assertEquals(courseId, updatedCourseRecord.getCourseId());
+        assertEquals(rusticiRollupData.getUpdated(), updatedCourseRecord.getLastUpdated());
+        assertEquals(State.COMPLETED, updatedCourseRecord.getState());
+
+        ModuleRecord updatedModuleRecord = updatedCourseRecord.getModuleRecord(moduleId);
+        assertNotNull(updatedModuleRecord);
+        assertEquals(moduleId, updatedModuleRecord.getModuleId());
+        assertEquals(rusticiRollupData.getUpdated(), updatedModuleRecord.getUpdatedAt());
+        assertEquals(rusticiRollupData.getUpdated(), updatedModuleRecord.getCompletionDate());
+        assertEquals(State.COMPLETED, updatedModuleRecord.getState());
+        assertEquals(Result.PASSED, updatedModuleRecord.getResult());
     }
 
     private CourseRecord invokeService() {
@@ -82,12 +108,12 @@ public class ModuleRollupServiceTest {
 
     private RusticiRollupData createRusticiRollupData() {
         RusticiRollupData rusticiRollupData = new RusticiRollupData();
-        rusticiRollupData.setId("rustici_test_course1662455183725");
-        rusticiRollupData.setRegistrationCompletion("IN_PROGRESS");
+        rusticiRollupData.setId("rustici_test_course_id");
+        rusticiRollupData.setRegistrationCompletion("COMPLETED");
         rusticiRollupData.setRegistrationSuccess("PASSED");
         rusticiRollupData.setUpdated(currentDateTime);
         rusticiRollupData.setCompletedDate(currentDateTime);
-        Course course = new Course(courseId + "." + moduleId, "courseTitle", 1);
+        Course course = new Course(courseId + "." + moduleId, "courseTitle", 0);
         rusticiRollupData.setCourse(course);
         Learner learner = new Learner(learnerId, "learnerFirstName", "");
         rusticiRollupData.setLearner(learner);

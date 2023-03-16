@@ -9,6 +9,7 @@ import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -75,8 +76,12 @@ public class CslTestUtil {
         when(learnerRecordService.createModuleRecordForLearner(moduleRecordInput)).thenReturn(responseForModuleRecord);
     }
 
-    public void mockLearnerRecordServiceForUpdateModuleRecord(ResponseEntity responseForModuleRecord) {
+    public void mockLearnerRecordServiceForUpdateModuleRecordForLearner(ResponseEntity responseForModuleRecord) {
         when(learnerRecordService.updateModuleRecordForLearner(any(), any())).thenReturn(responseForModuleRecord);
+    }
+
+    public void mockLearnerRecordServiceForUpdateModuleRecord(Long moduleId, Map<String, String> updateFields, ModuleRecord moduleRecord) {
+        when(learnerRecordService.updateModuleRecord(moduleId, updateFields)).thenReturn(moduleRecord);
     }
 
     public void mockLearnerRecordServiceForUpdateModuleUpdateDateTime(ModuleRecord moduleRecord) {
@@ -143,6 +148,29 @@ public class CslTestUtil {
         moduleRecord.setUpdatedAt(updatedAt);
         moduleRecord.setCompletionDate(completedAt);
         return moduleRecord;
+    }
+
+    public uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course createCatalogueCourse() {
+        uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course course = new uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course();
+        course.setId(courseId);
+        course.setTitle(courseTitle);
+        course.setModules(createCatalogueModules());
+        return course;
+    }
+
+    public List<uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module> createCatalogueModules() {
+        List<uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module> modules =  new ArrayList<>();
+        modules.add(createCatalogueModule());
+        return modules;
+    }
+
+    public uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module createCatalogueModule() {
+        uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module module = new uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module();
+        module.setId(moduleId);
+        module.setModuleType(moduleType);
+        module.setTitle(moduleTitle);
+        module.setOptional(false);
+        return module;
     }
 
     public ResponseEntity<?> createSuccessResponseForCourseRecords() {

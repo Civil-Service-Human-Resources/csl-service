@@ -50,7 +50,7 @@ public class ModuleRollupService {
             log.debug("courseRecords: {}", courseRecords);
             courseRecord = courseRecords != null ? courseRecords.getCourseRecord(courseId) : null;
             moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
-            moduleRecord = moduleRecord != null ? updateModuleRecord(moduleRecord, rusticiRollupData) : null;
+            moduleRecord = moduleRecord != null ? updateModuleRecord(moduleRecord.getId(), rusticiRollupData) : null;
             if(moduleRecord != null) {
                 courseRecord.updateModuleRecords(moduleRecord);
                 courseRecord = completedDate != null ?
@@ -65,7 +65,7 @@ public class ModuleRollupService {
         return courseRecord;
     }
 
-    private ModuleRecord updateModuleRecord(ModuleRecord moduleRecord, RusticiRollupData rusticiRollupData) {
+    private ModuleRecord updateModuleRecord(Long id, RusticiRollupData rusticiRollupData) {
         LocalDateTime updated = rusticiRollupData.getUpdated();
         LocalDateTime completedDate = rusticiRollupData.getCompletedDate();
         String result = rusticiRollupData.getRegistrationSuccess();
@@ -78,7 +78,7 @@ public class ModuleRollupService {
         if(isNotBlank(result) && Arrays.stream(Result.values()).anyMatch(v -> v.name().equals(result))) {
             updateFields.put("result", result);
         }
-        return learnerRecordService.updateModuleRecord(moduleRecord.getId(), updateFields);
+        return learnerRecordService.updateModuleRecord(id, updateFields);
     }
 
     private CourseRecord updateCourseCompletionStatus(CourseRecord courseRecord, LocalDateTime updated) {
@@ -93,7 +93,7 @@ public class ModuleRollupService {
             catalogueCourse = learningCatalogueService.getCachedCourse(courseId);
             log.debug("catalogueCourse: {}", catalogueCourse);
         }
-        if (catalogueCourse != null) {
+        if (catalogueCourse != null && catalogueCourse.getModules() != null) {
             List<String> difference;
             List<String> mandatoryModulesIds = catalogueCourse.getModules().stream()
                     .filter(m -> !m.isOptional()).map(Module::getId).toList();
