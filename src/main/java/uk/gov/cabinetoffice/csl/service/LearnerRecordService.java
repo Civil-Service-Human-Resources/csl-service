@@ -42,6 +42,17 @@ public class LearnerRecordService {
         return invokeService(requestWithBearerAuth);
     }
 
+    public CourseRecord getCourseRecord(String learnerId, String courseId) {
+        ResponseEntity<?> courseRecordResponse = getCourseRecordForLearner(learnerId, courseId);
+        if(courseRecordResponse.getStatusCode().is2xxSuccessful()) {
+            CourseRecords courseRecords =
+                    mapJsonStringToObject((String) courseRecordResponse.getBody(), CourseRecords.class);
+            log.debug("courseRecords: {}", courseRecords);
+            return courseRecords != null ? courseRecords.getCourseRecord(courseId) : null;
+        }
+        return null;
+    }
+
     public ResponseEntity<?> createCourseRecordForLearner(CourseRecordInput courseRecordInput) {
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPostRequestWithBearerAuth(
                 courseRecordsForLearnerUrl, courseRecordInput, null);

@@ -63,9 +63,9 @@ public class ModuleRollupServiceTest {
 
     @Test
     public void courseRecordShouldBeMarkedCompletedWhenOneOfOneMandatoryModuleIsCompleted() {
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(cslTestUtil.createSuccessResponseForCourseRecords());
         CourseRecord courseRecord = cslTestUtil.createCourseRecord();
-        mockCourseAndModuleCompletion(courseRecord);
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(learnerId, courseId, courseRecord);
+        mockCourseAndModuleState(courseRecord, State.COMPLETED);
         uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse = cslTestUtil.createCatalogueCourse();
         mockLearningCatalogueServiceForGetCachedCourse(catalogueCourse);
         CourseRecord updatedCourseRecord = invokeService();
@@ -74,16 +74,14 @@ public class ModuleRollupServiceTest {
 
     @Test
     public void courseRecordShouldRemainInProgressWhenOnlyOneOfTwoMandatoryModulesCompleted() {
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(cslTestUtil.createSuccessResponseForCourseRecords());
         CourseRecord courseRecord = cslTestUtil.createCourseRecord();
-        mockCourseAndModuleCompletion(courseRecord);
-
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(learnerId, courseId, courseRecord);
+        mockCourseAndModuleState(courseRecord, State.IN_PROGRESS);
         uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse = cslTestUtil.createCatalogueCourse();
         Module catalogueModule = cslTestUtil.createCatalogueModule();
         catalogueModule.setId("moduleId2");
         catalogueCourse.getModules().add(catalogueModule);
         mockLearningCatalogueServiceForGetCachedCourse(catalogueCourse);
-
         CourseRecord updatedCourseRecord = invokeService();
         verify(updatedCourseRecord, State.IN_PROGRESS);
     }
@@ -107,7 +105,7 @@ public class ModuleRollupServiceTest {
         assertEquals(Result.PASSED, updatedModuleRecord.getResult());
     }
 
-    private void mockCourseAndModuleCompletion(CourseRecord courseRecord) {
+    private void mockCourseAndModuleState(CourseRecord courseRecord, State courseState) {
         Map<String, String> updateFields = new HashMap<>();
         updateFields.put("updatedAt", rusticiRollupData.getUpdated().toString());
         updateFields.put("completionDate", rusticiRollupData.getCompletedDate().toString());
@@ -121,7 +119,7 @@ public class ModuleRollupServiceTest {
         moduleRecord.setResult(Result.PASSED);
         cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecord(moduleRecord.getId(), updateFields, moduleRecord);
 
-        courseRecord.setState(State.COMPLETED);
+        courseRecord.setState(courseState);
         courseRecord.setLastUpdated(rusticiRollupData.getUpdated());
         cslTestUtil.mockLearnerRecordServiceForUpdateCourseRecordState(
                 learnerId, courseId, State.COMPLETED, rusticiRollupData.getUpdated(), courseRecord);

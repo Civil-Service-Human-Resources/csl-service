@@ -97,14 +97,14 @@ public class ModuleLaunchServiceTest {
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordReturnsError() {
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecordForLearner(
                 cslTestUtil.createErrorResponseForCourseRecordsWithEmptyCourseRecord());
         verify5xxError(invokeService());
     }
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenCreateCourseRecordReturnsError() {
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecordForLearner(
                 cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyCourseRecord());
         cslTestUtil.mockLearnerRecordServiceForCreateCourseRecord(
                 cslTestUtil.createCourseRecordInput(learnerId, courseId, moduleId),
@@ -114,7 +114,7 @@ public class ModuleLaunchServiceTest {
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenCreateModuleRecordReturnsError() {
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecordForLearner(
                 cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyModule());
         cslTestUtil.mockLearnerRecordServiceForCreateModuleRecord(
                 cslTestUtil.createModuleRecordInput(learnerId, courseId, moduleId),
@@ -125,7 +125,7 @@ public class ModuleLaunchServiceTest {
     @Test
     public void createLaunchLinkShouldReturnErrorWhenUpdateModuleRecordUidReturnsError() {
         CourseRecords courseRecords = cslTestUtil.createCourseRecords();
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecordForLearner(
                 cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyModuleUid(courseRecords));
         cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecordForLearner(createInternalServerErrorResponse());
         verify5xxError(invokeService());
