@@ -71,6 +71,11 @@ public class CslTestUtil {
         when(learnerRecordService.createCourseRecordForLearner(courseRecordInput)).thenReturn(responseForCourseRecord);
     }
 
+    public void mockLearnerRecordServiceForUpdateCourseRecordState(
+            String learnerId, String courseId, State state, LocalDateTime updated, CourseRecord courseRecord) {
+        when(learnerRecordService.updateCourseRecordState(learnerId, courseId, state, updated)).thenReturn(courseRecord);
+    }
+
     public void mockLearnerRecordServiceForCreateModuleRecord(
             ModuleRecordInput moduleRecordInput, ResponseEntity responseForModuleRecord) {
         when(learnerRecordService.createModuleRecordForLearner(moduleRecordInput)).thenReturn(responseForModuleRecord);

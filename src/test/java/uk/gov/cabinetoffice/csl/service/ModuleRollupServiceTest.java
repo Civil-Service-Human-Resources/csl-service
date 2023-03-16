@@ -80,12 +80,10 @@ public class ModuleRollupServiceTest {
 
         courseRecord.setState(State.COMPLETED);
         courseRecord.setLastUpdated(rusticiRollupData.getUpdated());
-        when(learnerRecordService
-                .updateCourseRecordState(learnerId, courseId, State.COMPLETED, rusticiRollupData.getUpdated()))
-                .thenReturn(courseRecord);
+        cslTestUtil.mockLearnerRecordServiceForUpdateCourseRecordState(
+                learnerId, courseId, State.COMPLETED, rusticiRollupData.getUpdated(), courseRecord);
 
-        uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse = cslTestUtil.createCatalogueCourse();
-        when(learningCatalogueService.getCachedCourse(courseId)).thenReturn(catalogueCourse);
+        mockLearningCatalogueServiceForGetCachedCourse(cslTestUtil.createCatalogueCourse());
 
         CourseRecord updatedCourseRecord = invokeService();
         assertNotNull(updatedCourseRecord);
@@ -118,5 +116,10 @@ public class ModuleRollupServiceTest {
         Learner learner = new Learner(learnerId, "learnerFirstName", "");
         rusticiRollupData.setLearner(learner);
         return rusticiRollupData;
+    }
+
+    private void mockLearningCatalogueServiceForGetCachedCourse(
+            uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse) {
+        when(learningCatalogueService.getCachedCourse(courseId)).thenReturn(catalogueCourse);
     }
 }
