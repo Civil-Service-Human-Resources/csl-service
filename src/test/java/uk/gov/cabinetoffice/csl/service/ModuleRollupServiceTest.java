@@ -9,6 +9,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.Result;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.Learner;
 import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
@@ -53,7 +54,7 @@ public class ModuleRollupServiceTest {
     }
 
     @Test
-    public void  testProcessRusticiRollupDataForInvalidRollupData() {
+    public void invalidRollupDataShouldNotBeProcessed() {
         rusticiRollupData.getCourse().setId(courseId);
         CourseRecord courseRecord = invokeService();
         ModuleRecord updatedModuleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
@@ -61,25 +62,41 @@ public class ModuleRollupServiceTest {
     }
 
     @Test
-    public void  testProcessRusticiRollupDataForSuccess() {
+    public void courseRecordShouldBeMarkedCompletedWhenOneOfOneMandatoryModuleIsCompleted() {
         cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(cslTestUtil.createSuccessResponseForCourseRecords());
         CourseRecord courseRecord = cslTestUtil.createCourseRecord();
         mockCourseAndModuleCompletion(courseRecord);
         uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse = cslTestUtil.createCatalogueCourse();
         mockLearningCatalogueServiceForGetCachedCourse(catalogueCourse);
         CourseRecord updatedCourseRecord = invokeService();
-        verify(updatedCourseRecord);
+        verify(updatedCourseRecord, State.COMPLETED);
+    }
+
+    @Test
+    public void courseRecordShouldRemainInProgressWhenOnlyOneOfTwoMandatoryModulesCompleted() {
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(cslTestUtil.createSuccessResponseForCourseRecords());
+        CourseRecord courseRecord = cslTestUtil.createCourseRecord();
+        mockCourseAndModuleCompletion(courseRecord);
+
+        uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse = cslTestUtil.createCatalogueCourse();
+        Module catalogueModule = cslTestUtil.createCatalogueModule();
+        catalogueModule.setId("moduleId2");
+        catalogueCourse.getModules().add(catalogueModule);
+        mockLearningCatalogueServiceForGetCachedCourse(catalogueCourse);
+
+        CourseRecord updatedCourseRecord = invokeService();
+        verify(updatedCourseRecord, State.IN_PROGRESS);
     }
 
     private CourseRecord invokeService() {
         return moduleRollupService.processRusticiRollupData(rusticiRollupData);
     }
 
-    private void verify(CourseRecord updatedCourseRecord) {
+    private void verify(CourseRecord updatedCourseRecord, State expectedState) {
         assertNotNull(updatedCourseRecord);
         assertEquals(courseId, updatedCourseRecord.getCourseId());
         assertEquals(rusticiRollupData.getUpdated(), updatedCourseRecord.getLastUpdated());
-        assertEquals(State.COMPLETED, updatedCourseRecord.getState());
+        assertEquals(expectedState, updatedCourseRecord.getState());
 
         ModuleRecord updatedModuleRecord = updatedCourseRecord.getModuleRecord(moduleId);
         assertNotNull(updatedModuleRecord);
