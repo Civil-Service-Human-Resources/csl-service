@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.domain.identity.OAuthToken;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
 
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.getBearerToken;
 
 @SpringBootTest
+@ActiveProfiles("no-redis")
 public class CslServiceUtilTest {
 
     @Mock

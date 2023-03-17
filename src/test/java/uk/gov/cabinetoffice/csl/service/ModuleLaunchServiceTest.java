@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.domain.error.ErrorResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
@@ -25,6 +26,7 @@ import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.convertObjectToJsonSt
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.createInternalServerErrorResponse;
 
 @SpringBootTest
+@ActiveProfiles("no-redis")
 public class ModuleLaunchServiceTest {
 
     @Mock
