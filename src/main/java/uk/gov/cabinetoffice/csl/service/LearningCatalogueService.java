@@ -37,7 +37,7 @@ public class LearningCatalogueService {
         return invokeService(requestWithBearerAuth);
     }
 
-    @Cacheable(value="catalogue-courses", key="#courseId")
+    @Cacheable(value="catalogue-course", key="#courseId")
     public Course getCachedCourse(String courseId) {
         ResponseEntity<?> courseResponse = getCourse(courseId);
         if(courseResponse.getStatusCode().is2xxSuccessful()) {
@@ -50,13 +50,13 @@ public class LearningCatalogueService {
     }
 
     @Scheduled(fixedRate = COURSE_CACHE_EVICTION_SCHEDULE)
-    @CacheEvict(value = "catalogue-courses", allEntries = true)
+    @CacheEvict(value = "catalogue-course", allEntries = true)
     public void removeAllCoursesFromCache() {
         log.info("LearningCatalogueService.removeAllCoursesFromCache: All catalogue courses are removed from the" +
                 " cache after every {} seconds.", COURSE_CACHE_EVICTION_SCHEDULE);
     }
 
-    @CacheEvict(value = "catalogue-courses", key="#courseId")
+    @CacheEvict(value = "catalogue-course", key="#courseId")
     public void removeCourseFromCache(String courseId) {
         log.info("LearningCatalogueService.removeCourseFromCache: Catalogue course is removed from the cache for the" +
                 " key: {}.", courseId);
