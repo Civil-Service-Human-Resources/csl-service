@@ -13,7 +13,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Module  implements Serializable {
+public class Module implements Serializable {
     private String id;
     private String title;
     private String moduleType;

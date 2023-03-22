@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Audience  implements Serializable {
+public class Audience implements Serializable {
     public enum Type {
         OPEN,
         CLOSED_COURSE,

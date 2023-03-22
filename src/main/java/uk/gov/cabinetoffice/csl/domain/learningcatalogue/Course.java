@@ -12,7 +12,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Course  implements Serializable {
+public class Course implements Serializable {
     private String id;
     private String title;
     private Collection<Module> modules;
