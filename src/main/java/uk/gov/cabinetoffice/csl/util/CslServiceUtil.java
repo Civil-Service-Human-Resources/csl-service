@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -23,10 +22,10 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.cabinetoffice.csl.domain.*;
 import org.apache.hc.client5.http.classic.HttpClient;
+import uk.gov.cabinetoffice.csl.domain.error.ErrorResponse;
+import uk.gov.cabinetoffice.csl.domain.identity.OAuthToken;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
-import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -35,19 +34,21 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 @Slf4j
 @Component
 public class CslServiceUtil {
 
-    private final IdentityService identityService;
+    private static IdentityService identityService;
 
-    private final long refreshServiceTokenCacheBeforeSecondsToExpire;
+    private static long refreshServiceTokenCacheBeforeSecondsToExpire;
 
     public CslServiceUtil(IdentityService identityService,
                           @Value("${oauth.refresh.serviceTokenCache.beforeSecondsToExpire}")
                           long refreshServiceTokenCacheBeforeSecondsToExpire) {
-        this.identityService = identityService;
-        this.refreshServiceTokenCacheBeforeSecondsToExpire = refreshServiceTokenCacheBeforeSecondsToExpire;
+        CslServiceUtil.identityService = identityService;
+        CslServiceUtil.refreshServiceTokenCacheBeforeSecondsToExpire = refreshServiceTokenCacheBeforeSecondsToExpire;
     }
 
     public static ResponseEntity<?> returnError(HttpStatusCodeException ex, String path) {
@@ -56,13 +57,17 @@ public class CslServiceUtil {
             errorResponse = ex.getResponseBodyAs(ErrorResponse.class);
         } catch(Exception e) {
             errorResponse = new ErrorResponse();
+        }
+        if(errorResponse == null) {
+            errorResponse = new ErrorResponse();
+        }
+        if(isBlank(errorResponse.getMessage())) {
             errorResponse.setMessage(ex.getResponseBodyAsString());
         }
-        assert errorResponse != null;
-        errorResponse.setStatus(String.valueOf(ex.getStatusCode().value()));
-        if(StringUtils.isBlank(errorResponse.getError())) {
+        if(isBlank(errorResponse.getError())) {
             errorResponse.setError(ex.getStatusText());
         }
+        errorResponse.setStatus(String.valueOf(ex.getStatusCode().value()));
         errorResponse.setTimestamp(LocalDateTime.now().toString());
         errorResponse.setPath(path);
         log.error("Error received from the backend system: {}", errorResponse);
@@ -94,10 +99,10 @@ public class CslServiceUtil {
         return null;
     }
 
-    public String getBearerToken() {
+    public static String getBearerToken() {
         String bearerToken = getBearerTokenFromSecurityContext();
-        if(StringUtils.isBlank(bearerToken)) {
-            OAuthToken serviceToken = identityService.getOAuthServiceToken();
+        if(isBlank(bearerToken)) {
+            OAuthToken serviceToken = identityService.getCachedOAuthServiceToken();
             log.debug("serviceToken: expiryDateTime: {}", serviceToken.getExpiryDateTime());
             long secondsRemainingToExpire = serviceToken.getExpiryDateTime() != null ?
                     ChronoUnit.SECONDS.between(LocalDateTime.now(), serviceToken.getExpiryDateTime()) : 0;
@@ -106,7 +111,7 @@ public class CslServiceUtil {
                     (secondsRemainingToExpire - refreshServiceTokenCacheBeforeSecondsToExpire));
             if(secondsRemainingToExpire <= refreshServiceTokenCacheBeforeSecondsToExpire) {
                 identityService.removeServiceTokenFromCache();
-                serviceToken = identityService.getOAuthServiceToken();
+                serviceToken = identityService.getCachedOAuthServiceToken();
             }
             bearerToken = serviceToken.getAccessToken();
         }
@@ -181,51 +186,5 @@ public class CslServiceUtil {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return objectMapper;
-    }
-
-    public static ModuleRecord processCourseAndModuleData(LearnerRecordService learnerRecordService,
-                                                          CourseRecordInput courseRecordInput) {
-        ModuleRecord moduleRecord = null;
-        String learnerId = courseRecordInput.getUserId();
-        String courseId = courseRecordInput.getCourseId();
-        ModuleRecordInput moduleRecordInput = courseRecordInput.getModuleRecords().get(0);
-        String moduleId = moduleRecordInput.getModuleId();
-        ResponseEntity<?> courseRecordResponse = learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
-        if(courseRecordResponse.getStatusCode().is2xxSuccessful()) {
-            CourseRecords courseRecords =
-                    mapJsonStringToObject((String)courseRecordResponse.getBody(), CourseRecords.class);
-            log.debug("courseRecords: {}", courseRecords);
-            if(courseRecords != null) {
-                CourseRecord courseRecord = courseRecords.getCourseRecord(courseId);
-                if(courseRecord == null) {
-                    //If the course record is not present then create the course record along with module record
-                    courseRecord = learnerRecordService.createInProgressCourseRecordWithModuleRecord(courseRecordInput);
-                }
-                if(courseRecord != null) {
-                    if(courseRecord.getState() == null || courseRecord.getState().equals(State.ARCHIVED)) {
-                        //Update the course record status if it is null or ARCHIVED
-                        courseRecord = learnerRecordService.updateCourseRecordState(learnerId, courseId,
-                                State.IN_PROGRESS);
-                    }
-                    //Retrieve the relevant module record from the course record
-                    moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
-                    if(courseRecord != null && moduleRecord == null) {
-                        //If the relevant module record is not present then create the module record
-                        moduleRecord = learnerRecordService.createInProgressModuleRecord(moduleRecordInput);
-                    }
-                    if(moduleRecord != null) {
-                        if(StringUtils.isBlank(moduleRecord.getUid())) {
-                            //If the uid is not present then update the module record to assign the uid
-                            moduleRecord = learnerRecordService
-                                    .updateModuleRecordToAssignUid(moduleRecord, learnerId, courseId);
-                        }
-                    }
-                }
-            }
-        } else {
-            log.error("Unable to retrieve course record for learner id: {} and course id: {}. " +
-                    "Error response from learnerRecordService: {}", learnerId, courseId, courseRecordResponse);
-        }
-        return moduleRecord;
     }
 }

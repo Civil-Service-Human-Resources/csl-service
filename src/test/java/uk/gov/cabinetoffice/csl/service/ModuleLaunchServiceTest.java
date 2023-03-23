@@ -7,7 +7,13 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.cabinetoffice.csl.domain.*;
+import org.springframework.test.context.ActiveProfiles;
+import uk.gov.cabinetoffice.csl.domain.error.ErrorResponse;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
+import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
+import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationInput;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
 import java.time.LocalDateTime;
@@ -20,6 +26,7 @@ import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.convertObjectToJsonSt
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.createInternalServerErrorResponse;
 
 @SpringBootTest
+@ActiveProfiles("no-redis")
 public class ModuleLaunchServiceTest {
 
     @Mock
@@ -92,14 +99,14 @@ public class ModuleLaunchServiceTest {
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordReturnsError() {
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecordForLearner(
                 cslTestUtil.createErrorResponseForCourseRecordsWithEmptyCourseRecord());
         verify5xxError(invokeService());
     }
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenCreateCourseRecordReturnsError() {
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecordForLearner(
                 cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyCourseRecord());
         cslTestUtil.mockLearnerRecordServiceForCreateCourseRecord(
                 cslTestUtil.createCourseRecordInput(learnerId, courseId, moduleId),
@@ -109,7 +116,7 @@ public class ModuleLaunchServiceTest {
 
     @Test
     public void createLaunchLinkShouldReturnErrorWhenCreateModuleRecordReturnsError() {
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecordForLearner(
                 cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyModule());
         cslTestUtil.mockLearnerRecordServiceForCreateModuleRecord(
                 cslTestUtil.createModuleRecordInput(learnerId, courseId, moduleId),
@@ -120,9 +127,9 @@ public class ModuleLaunchServiceTest {
     @Test
     public void createLaunchLinkShouldReturnErrorWhenUpdateModuleRecordUidReturnsError() {
         CourseRecords courseRecords = cslTestUtil.createCourseRecords();
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(
+        cslTestUtil.mockLearnerRecordServiceForGetCourseRecordForLearner(
                 cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyModuleUid(courseRecords));
-        cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecord(createInternalServerErrorResponse());
+        cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecordForLearner(createInternalServerErrorResponse());
         verify5xxError(invokeService());
     }
 

@@ -34,9 +34,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().authorizeHttpRequests().requestMatchers("/rustici/**").authenticated()
+                .and().authorizeHttpRequests().requestMatchers(actuatorBasePath + "/**").permitAll()
+                .and().authorizeHttpRequests().requestMatchers("/rustici/**","/reset-cache/**").authenticated()
                 .and().httpBasic()
-                .and().authorizeHttpRequests().requestMatchers(actuatorBasePath + "/**", "/courses/**").authenticated()
+                .and().authorizeHttpRequests().requestMatchers("/courses/**").authenticated()
                 .and().oauth2ResourceServer().jwt(jwtSpec -> jwtSpec.decoder(jwtDecoder()))
                 .and().build();
     }

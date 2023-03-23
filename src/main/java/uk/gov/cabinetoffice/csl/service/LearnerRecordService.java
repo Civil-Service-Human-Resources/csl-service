@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.domain.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.factory.RequestEntityWithBearerAuthFactory;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,6 +42,17 @@ public class LearnerRecordService {
         return invokeService(requestWithBearerAuth);
     }
 
+    public CourseRecord getCourseRecord(String learnerId, String courseId) {
+        ResponseEntity<?> courseRecordResponse = getCourseRecordForLearner(learnerId, courseId);
+        if(courseRecordResponse.getStatusCode().is2xxSuccessful()) {
+            CourseRecords courseRecords =
+                    mapJsonStringToObject((String) courseRecordResponse.getBody(), CourseRecords.class);
+            log.debug("courseRecords: {}", courseRecords);
+            return courseRecords != null ? courseRecords.getCourseRecord(courseId) : null;
+        }
+        return null;
+    }
+
     public ResponseEntity<?> createCourseRecordForLearner(CourseRecordInput courseRecordInput) {
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPostRequestWithBearerAuth(
                 courseRecordsForLearnerUrl, courseRecordInput, null);
@@ -58,14 +70,13 @@ public class LearnerRecordService {
         return invokeService(requestWithBearerAuth);
     }
 
-    public CourseRecord updateCourseRecordState(String learnerId, String courseId, State state) {
+    public CourseRecord updateCourseRecordState(String learnerId, String courseId, State state, LocalDateTime updatedAt) {
         Map<String, String> updateFields = new HashMap<>();
         updateFields.put("state", state.name());
-        updateFields.put("lastUpdated", LocalDateTime.now().toString());
+        updateFields.put("lastUpdated", updatedAt.toString());
         ResponseEntity<?> updateResponse = updateCourseRecordForLearner(learnerId, courseId, updateFields);
         if(updateResponse.getStatusCode().is2xxSuccessful()) {
-            CourseRecord courseRecord =
-                    mapJsonStringToObject((String)updateResponse.getBody(), CourseRecord.class);
+            CourseRecord courseRecord = mapJsonStringToObject((String)updateResponse.getBody(), CourseRecord.class);
             log.debug("courseRecord: {}", courseRecord);
             log.info("Course record status and lastUpdated are update for learner id: {}, course id: {} and state: {}",
                     learnerId, courseId, state);
@@ -86,7 +97,6 @@ public class LearnerRecordService {
                                                           Map<String, String> updateFields) {
         List<PatchOp> jsonPatch = new ArrayList<>();
         updateFields.forEach((key, value) -> jsonPatch.add(new PatchOp("replace", "/" + key, value)));
-
         RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
                 moduleRecordsForLearnerUrl + "/" + moduleRecordId, jsonPatch, null);
         return invokeService(requestWithBearerAuth);
@@ -122,7 +132,6 @@ public class LearnerRecordService {
         }
         moduleRecordInput.setState(State.IN_PROGRESS.name());
         ResponseEntity<?> moduleRecordForLearnerResponse = createModuleRecordForLearner(moduleRecordInput);
-
         if(moduleRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
             ModuleRecord moduleRecord =
                     mapJsonStringToObject((String)moduleRecordForLearnerResponse.getBody(), ModuleRecord.class);
@@ -135,6 +144,20 @@ public class LearnerRecordService {
         log.error("Unable to create a new course record for learner id: {}, course id: {} and module id: {}. " +
                         "Error response from learnerRecordService: {}", moduleRecordInput.getUserId(),
                 moduleRecordInput.getCourseId(), moduleRecordInput.getModuleId(), moduleRecordForLearnerResponse);
+        return null;
+    }
+
+    public ModuleRecord updateModuleRecord(Long moduleId, Map<String, String> updateFields) {
+        ResponseEntity<?> updateResponse = updateModuleRecordForLearner(moduleId, updateFields);
+        if(updateResponse.getStatusCode().is2xxSuccessful()) {
+            ModuleRecord moduleRecord = mapJsonStringToObject((String)updateResponse.getBody(), ModuleRecord.class);
+            log.debug("moduleRecord: {}", moduleRecord);
+            assert moduleRecord != null;
+            log.info("Fields {} are updated for the module record for module id: {}", updateFields, moduleId);
+            return moduleRecord;
+        }
+        log.error("Unable to update fields {} for the module record for module id: {}."
+                + " Error response from learnerRecordService: {}", updateFields, moduleId, updateResponse);
         return null;
     }
 

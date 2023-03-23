@@ -5,7 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.cabinetoffice.csl.domain.OAuthToken;
+import org.springframework.test.context.ActiveProfiles;
+import uk.gov.cabinetoffice.csl.domain.identity.OAuthToken;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
 
 import java.time.LocalDateTime;
@@ -13,8 +14,10 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
+import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.getBearerToken;
 
 @SpringBootTest
+@ActiveProfiles("no-redis")
 public class CslServiceUtilTest {
 
     @Mock
@@ -36,9 +39,9 @@ public class CslServiceUtilTest {
     public void getBearerTokenShouldReturnValidTokenAndShouldNotRefreshTheCacheWhenIdentityServiceReturnValidOAuthToken() {
         OAuthToken validOAuthToken = createValidOAuthToken();
         mockIdentityServiceGetOAuthServiceToken(validOAuthToken);
-        String bearerToken = cslServiceUtil.getBearerToken();
+        String bearerToken = getBearerToken();
         assertEquals(validOAuthToken.getAccessToken(), bearerToken);
-        verify(identityService, times(1)).getOAuthServiceToken();
+        verify(identityService, times(1)).getCachedOAuthServiceToken();
         verify(identityService, times(0)).removeServiceTokenFromCache();
     }
 
@@ -48,9 +51,9 @@ public class CslServiceUtilTest {
         validOAuthToken.setExpiryDateTime(LocalDateTime.now().minusSeconds(5));
         mockIdentityServiceGetOAuthServiceToken(validOAuthToken);
         mockIdentityServiceRemoveServiceTokenFromCache();
-        String bearerToken = cslServiceUtil.getBearerToken();
+        String bearerToken = getBearerToken();
         assertEquals(validOAuthToken.getAccessToken(), bearerToken);
-        verify(identityService, times(2)).getOAuthServiceToken();
+        verify(identityService, times(2)).getCachedOAuthServiceToken();
         verify(identityService, times(1)).removeServiceTokenFromCache();
     }
 
@@ -58,14 +61,14 @@ public class CslServiceUtilTest {
     public void getBearerTokenShouldReturnEmptyTokenWhenIdentityServiceReturnInValidOAuthToken() {
         mockIdentityServiceGetOAuthServiceToken(new OAuthToken());
         mockIdentityServiceRemoveServiceTokenFromCache();
-        String bearerToken = cslServiceUtil.getBearerToken();
+        String bearerToken = getBearerToken();
         assertNull(bearerToken);
-        verify(identityService, times(2)).getOAuthServiceToken();
+        verify(identityService, times(2)).getCachedOAuthServiceToken();
         verify(identityService, times(1)).removeServiceTokenFromCache();
     }
 
     private void mockIdentityServiceGetOAuthServiceToken(OAuthToken oAuthToken) {
-        when(identityService.getOAuthServiceToken()).thenReturn(oAuthToken);
+        when(identityService.getCachedOAuthServiceToken()).thenReturn(oAuthToken);
     }
 
     private void mockIdentityServiceRemoveServiceTokenFromCache() {
