@@ -71,7 +71,8 @@ public class CslServiceUtil {
         errorResponse.setTimestamp(LocalDateTime.now().toString());
         errorResponse.setPath(path);
         log.error("Error received from the backend system: {}", errorResponse);
-        return new ResponseEntity<>(errorResponse, ex.getStatusCode());
+        errorResponse.setStatus(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public static  ResponseEntity<?> returnError(HttpStatusCode httpStatusCode, String error, String message, String path, String[] messages) {
