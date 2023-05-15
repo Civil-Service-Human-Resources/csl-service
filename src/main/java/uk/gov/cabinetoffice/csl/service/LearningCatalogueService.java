@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.factory.RequestEntityWithBearerAuthFactory;
-import javax.management.timer.Timer;
 
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.invokeService;
 import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.mapJsonStringToObject;
@@ -18,8 +17,6 @@ import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.mapJsonStringToObject
 @Slf4j
 @Service
 public class LearningCatalogueService {
-
-    private static final long COURSE_CACHE_EVICTION_SCHEDULE = Timer.ONE_DAY;
 
     private final RequestEntityWithBearerAuthFactory requestEntityFactory;
 
@@ -49,11 +46,10 @@ public class LearningCatalogueService {
         return null;
     }
 
-    @Scheduled(fixedRate = COURSE_CACHE_EVICTION_SCHEDULE)
+    @Scheduled(cron = "${learningCatalogue.courseCacheEvictionScheduleCron}")
     @CacheEvict(value = "catalogue-course", allEntries = true)
     public void removeAllCoursesFromCache() {
-        log.info("LearningCatalogueService.removeAllCoursesFromCache: All catalogue courses are removed from the" +
-                " cache after every {} seconds.", COURSE_CACHE_EVICTION_SCHEDULE);
+        log.info("LearningCatalogueService.removeAllCoursesFromCache: All catalogue courses are removed from the cache");
     }
 
     @CacheEvict(value = "catalogue-course", key="#courseId")
