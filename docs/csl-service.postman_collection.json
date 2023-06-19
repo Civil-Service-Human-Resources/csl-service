@@ -1,0 +1,675 @@
+{
+	"info": {
+		"_postman_id": "0d12eb0e-ca5c-4ed3-a9a0-3ef59d0054ae",
+		"name": "csl-service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. bearer-token",
+			"item": [
+				{
+					"name": "1. Generate Service Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{identity-base-url}}/oauth/token?grant_type=client_credentials",
+							"host": [
+								"{{identity-base-url}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							],
+							"query": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Generate User Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "{{usertoken_username}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{usertoken_pw}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{identity-base-url}}/oauth/token",
+							"host": [
+								"{{identity-base-url}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Check Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "bearer-token-value",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{identity-base-url}}/oauth/check_token",
+							"host": [
+								"{{identity-base-url}}"
+							],
+							"path": [
+								"oauth",
+								"check_token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Revoke Token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "bearer-token-value",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{identity-base-url}}/oauth/revoke",
+							"host": [
+								"{{identity-base-url}}"
+							],
+							"path": [
+								"oauth",
+								"revoke"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "basic",
+				"basic": [
+					{
+						"key": "password",
+						"value": "{{bearer_client_pw}}",
+						"type": "string"
+					},
+					{
+						"key": "username",
+						"value": "{{bearer_client_id}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "2. actuator",
+			"item": [
+				{
+					"name": "actuator",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/beans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/beans",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"beans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/caches",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/caches",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"caches"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/conditions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/conditions",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"conditions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/configprops",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/configprops",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"configprops"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/env",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/env",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"env"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/health",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/heapdump",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/heapdump",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"heapdump"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/info",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/loggers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/loggers",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"loggers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/mappings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/mappings",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"mappings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/metrics",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"metrics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/metrics/jvm.info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/metrics/jvm.info",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"metrics",
+								"jvm.info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/scheduledtasks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/scheduledtasks",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"scheduledtasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actuator/threaddump",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{actuator-csl-base-url}}/threaddump",
+							"host": [
+								"{{actuator-csl-base-url}}"
+							],
+							"path": [
+								"threaddump"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "3. rustici-service",
+			"item": [
+				{
+					"name": "1. create-module-launch-link",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"learnerFirstName\": \"Learner Firstname\",\n    \"learnerLastName\": \"\",\n    \"courseRecordInput\":\n        {\n            \"courseTitle\" : \"Test Course Title\",\n            \"isRequired\" : \"true\",\n            \"moduleRecords\" : [\n                {\n                    \"moduleTitle\" : \"Test Module Title\",\n                    \"optional\" : \"false\",\n                    \"moduleType\" : \"elearning\"\n                }\n            ]\n        }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{csl-base-url}}/courses/6iBnQ9nIQIuuzRave9bKGw/modules/sUmxgUeHSCS6Z7G3cwI1Iw/launch",
+							"host": [
+								"{{csl-base-url}}"
+							],
+							"path": [
+								"courses",
+								"6iBnQ9nIQIuuzRave9bKGw",
+								"modules",
+								"sUmxgUeHSCS6Z7G3cwI1Iw",
+								"launch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. process-rollup-data",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "user-password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user-name",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"rustici_test_course1662455183725\",\n    \"registrationCompletion\": \"COMPLETED\",\n    \"registrationSuccess\": \"UNKNOWN\",\n    \"updated\": \"2023-03-07T19:19:31Z\",\n    \"completedDate\": \"2022-09-06T09:07:31Z\",\n    \"course\": {\n        \"id\": \"2FN6iBnQ9nIQIuuzRave9bKGw.2FNsUmxgUeHSCS6Z7G3cwI1Iw\",\n        \"title\": \"6Mar23_3FN_Cou1_Test_CSL_Service\",\n        \"version\": 0\n    },\n    \"learner\": {\n        \"id\": \"2FNf406643b-8578-11ea-a19f-9cb9cbcda1c1\",\n        \"firstName\": \"Learner\",\n        \"lastName\": \"\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{csl-base-url}}/rustici/rollup",
+							"host": [
+								"{{csl-base-url}}"
+							],
+							"path": [
+								"rustici",
+								"rollup"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. reset-cache",
+			"item": [
+				{
+					"name": "1. service-token",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{csl-base-url}}/reset-cache/service-token",
+							"host": [
+								"{{csl-base-url}}"
+							],
+							"path": [
+								"reset-cache",
+								"service-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. all-courses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{csl-base-url}}/reset-cache/all-courses",
+							"host": [
+								"{{csl-base-url}}"
+							],
+							"path": [
+								"reset-cache",
+								"all-courses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. course-by-course-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{csl-base-url}}/reset-cache/course/course-id",
+							"host": [
+								"{{csl-base-url}}"
+							],
+							"path": [
+								"reset-cache",
+								"course",
+								"course-id"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "csl-base-url",
+			"value": "{{local-csl-base-url}}/api",
+			"type": "default"
+		},
+		{
+			"key": "actuator-csl-base-url",
+			"value": "{{csl-base-url}}/manage",
+			"type": "default"
+		},
+		{
+			"key": "local-csl-base-url",
+			"value": "http://localhost:9003",
+			"type": "default"
+		},
+		{
+			"key": "identity-base-url",
+			"value": "{{remote-identity-base-url}}",
+			"type": "default"
+		},
+		{
+			"key": "local-identity-base-url",
+			"value": "http://localhost:8080",
+			"type": "default"
+		},
+		{
+			"key": "remote-identity-base-url",
+			"value": "integration-identity-service-url",
+			"type": "default"
+		},
+		{
+			"key": "bearer_client_id",
+			"value": "client-id",
+			"type": "default"
+		},
+		{
+			"key": "bearer_client_pw",
+			"value": "client-secret",
+			"type": "default"
+		},
+		{
+			"key": "usertoken_username",
+			"value": "your-lpg-username",
+			"type": "default"
+		},
+		{
+			"key": "usertoken_pw",
+			"value": "your-lpg-username-pw",
+			"type": "default"
+		},
+		{
+			"key": "remote-csl-base-url",
+			"value": "integration-csl-service-url",
+			"type": "default"
+		}
+	]
+}
