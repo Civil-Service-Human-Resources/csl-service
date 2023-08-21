@@ -2,29 +2,30 @@ package uk.gov.cabinetoffice.csl.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.Result;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
+import uk.gov.cabinetoffice.csl.domain.rustici.CSLRusticiProps;
 import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.Learner;
 import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import static java.util.UUID.randomUUID;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
+//@SpringBootTest(classes = ModuleRollupService.class)
+@ExtendWith(MockitoExtension.class)
 @ActiveProfiles("no-redis")
 public class ModuleRollupServiceTest {
 
@@ -32,7 +33,7 @@ public class ModuleRollupServiceTest {
     private LearnerRecordService learnerRecordService;
 
     @Mock
-    private LearningCatalogueService learningCatalogueService;
+    private RusticiCSLDataService rusticiCSLDataService;
 
     @InjectMocks
     private ModuleRollupService moduleRollupService;
@@ -49,87 +50,61 @@ public class ModuleRollupServiceTest {
 
     @BeforeEach
     public void setup() {
-        moduleRollupService = new ModuleRollupService(learnerRecordService, learningCatalogueService);
+//        moduleRollupService = new ModuleRollupService(learnerRecordService, rusticiCSLDataService);
         cslTestUtil = new CslTestUtil(learnerRecordService, learnerId, courseId, moduleId, uid,
                 currentDateTime, currentDateTime, currentDateTime);
         rusticiRollupData = createRusticiRollupData();
+        reset(learnerRecordService);
     }
 
     @Test
-    public void invalidRollupDataShouldNotBeProcessed() {
-        rusticiRollupData.getCourse().setId(courseId);
-        CourseRecord courseRecord = invokeService();
-        ModuleRecord updatedModuleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
-        assertNull(updatedModuleRecord);
+    public void emptyPatchDataShouldNotBeProcessed() {
+        mockGetCSLDataFromRollup(new CSLRusticiProps("", "", "", List.of()));
+        invokeService();
+        verify(learnerRecordService, never()).getCourseRecord("", "");
+        verify(learnerRecordService, never()).updateModuleRecord(any(), any());
+        verify(learnerRecordService, never()).updateCourseRecord(any(), any(), any());
     }
 
     @Test
-    public void courseRecordShouldBeMarkedCompletedWhenOneOfOneMandatoryModuleIsCompleted() {
+    public void shouldApplyPatchesToModuleRecordOnly() {
         CourseRecord courseRecord = cslTestUtil.createCourseRecord();
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(learnerId, courseId, courseRecord);
-        mockCourseAndModuleState(courseRecord, State.COMPLETED);
-        uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse = cslTestUtil.createCatalogueCourse();
-        mockLearningCatalogueServiceForGetCachedCourse(catalogueCourse);
-        CourseRecord updatedCourseRecord = invokeService();
-        verify(updatedCourseRecord, State.COMPLETED);
-    }
-
-    @Test
-    public void courseRecordShouldRemainInProgressWhenOnlyOneOfTwoMandatoryModulesCompleted() {
-        CourseRecord courseRecord = cslTestUtil.createCourseRecord();
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecord(learnerId, courseId, courseRecord);
-        mockCourseAndModuleState(courseRecord, State.IN_PROGRESS);
-        uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse = cslTestUtil.createCatalogueCourse();
-        Module catalogueModule = cslTestUtil.createCatalogueModule();
-        catalogueModule.setId("moduleId2");
-        catalogueCourse.getModules().add(catalogueModule);
-        mockLearningCatalogueServiceForGetCachedCourse(catalogueCourse);
-        CourseRecord updatedCourseRecord = invokeService();
-        verify(updatedCourseRecord, State.IN_PROGRESS);
-    }
-
-    private CourseRecord invokeService() {
-        return moduleRollupService.processRusticiRollupData(rusticiRollupData);
-    }
-
-    private void verify(CourseRecord updatedCourseRecord, State expectedState) {
-        assertNotNull(updatedCourseRecord);
-        assertEquals(courseId, updatedCourseRecord.getCourseId());
-        assertEquals(rusticiRollupData.getUpdated(), updatedCourseRecord.getLastUpdated());
-        assertEquals(expectedState, updatedCourseRecord.getState());
-
-        ModuleRecord updatedModuleRecord = updatedCourseRecord.getModuleRecord(moduleId);
-        assertNotNull(updatedModuleRecord);
-        assertEquals(moduleId, updatedModuleRecord.getModuleId());
-        assertEquals(rusticiRollupData.getUpdated(), updatedModuleRecord.getUpdatedAt());
-        assertEquals(rusticiRollupData.getUpdated(), updatedModuleRecord.getCompletionDate());
-        assertEquals(State.COMPLETED, updatedModuleRecord.getState());
-        assertEquals(Result.PASSED, updatedModuleRecord.getResult());
-    }
-
-    private void mockCourseAndModuleState(CourseRecord courseRecord, State courseState) {
-        Map<String, String> updateFields = new HashMap<>();
-        updateFields.put("updatedAt", rusticiRollupData.getUpdated().toString());
-        updateFields.put("completionDate", rusticiRollupData.getCompletedDate().toString());
-        updateFields.put("state", State.COMPLETED.name());
-        updateFields.put("result", rusticiRollupData.getRegistrationSuccess());
-
         ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
-        moduleRecord.setUpdatedAt(rusticiRollupData.getUpdated());
-        moduleRecord.setCompletionDate(rusticiRollupData.getCompletedDate());
-        moduleRecord.setState(State.COMPLETED);
-        moduleRecord.setResult(Result.PASSED);
-        cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecord(moduleRecord.getId(), updateFields, moduleRecord);
-
-        courseRecord.setState(courseState);
-        courseRecord.setLastUpdated(rusticiRollupData.getUpdated());
-        cslTestUtil.mockLearnerRecordServiceForUpdateCourseRecordState(
-                learnerId, courseId, State.COMPLETED, rusticiRollupData.getUpdated(), courseRecord);
+        List<PatchOp> expPatches = List.of(
+                PatchOp.replacePatch("completionDate", rusticiRollupData.getCompletedDate().toString())
+        );
+        mockGetCSLDataFromRollup(new CSLRusticiProps(courseId, moduleId, learnerId, expPatches));
+        when(learnerRecordService.getCourseRecord(learnerId, courseId)).thenReturn(courseRecord);
+        when(learnerRecordService.updateModuleRecord(moduleRecord.getId(), expPatches)).thenReturn(moduleRecord);
+        when(learnerRecordService.isCourseCompleted(courseId, List.of())).thenReturn(false);
+        invokeService();
+        verify(learnerRecordService, never()).updateCourseRecord(any(), any(), any());
     }
 
-    private void mockLearningCatalogueServiceForGetCachedCourse(
-            uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course catalogueCourse) {
-        when(learningCatalogueService.getCachedCourse(courseId)).thenReturn(catalogueCourse);
+    @Test
+    public void shouldApplyPatchesToModuleRecordAndCompleteCourseRecord() {
+        CourseRecord courseRecord = cslTestUtil.createCourseRecord();
+        ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
+        List<PatchOp> expPatches = List.of(
+                PatchOp.replacePatch("completionDate", rusticiRollupData.getCompletedDate().toString())
+        );
+        moduleRecord.setState(State.COMPLETED);
+        mockGetCSLDataFromRollup(new CSLRusticiProps(courseId, moduleId, learnerId, expPatches));
+        when(learnerRecordService.getCourseRecord(learnerId, courseId)).thenReturn(courseRecord);
+        when(learnerRecordService.updateModuleRecord(moduleRecord.getId(), expPatches)).thenReturn(moduleRecord);
+        when(learnerRecordService.isCourseCompleted(courseId, List.of(moduleId))).thenReturn(true);
+        invokeService();
+        verify(learnerRecordService, atMostOnce()).updateCourseRecord(learnerId, courseId,
+                List.of(PatchOp.replacePatch("state", "COMPLETED")));
+    }
+
+    private void invokeService() {
+        moduleRollupService.processRusticiRollupData(rusticiRollupData);
+    }
+
+    private void mockGetCSLDataFromRollup(CSLRusticiProps returnProps) {
+        when(rusticiCSLDataService.getCSLDataFromRollUpData(rusticiRollupData))
+                .thenReturn(returnProps);
     }
 
     private RusticiRollupData createRusticiRollupData() {

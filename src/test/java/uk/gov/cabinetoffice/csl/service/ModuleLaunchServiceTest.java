@@ -2,30 +2,29 @@ package uk.gov.cabinetoffice.csl.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.cabinetoffice.csl.domain.error.ErrorResponse;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.cabinetoffice.csl.configuration.MockClockConfig;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
 import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationInput;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
+import uk.gov.cabinetoffice.csl.util.StringUtilService;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
-import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.convertObjectToJsonString;
-import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.createInternalServerErrorResponse;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @ActiveProfiles("no-redis")
 public class ModuleLaunchServiceTest {
 
@@ -35,6 +34,9 @@ public class ModuleLaunchServiceTest {
     @Mock
     private RusticiService rusticiService;
 
+    @Mock
+    private StringUtilService stringUtilService;
+
     @InjectMocks
     private ModuleLaunchService moduleLaunchService;
 
@@ -42,165 +44,144 @@ public class ModuleLaunchServiceTest {
     private final String learnerId = "learnerId";
     private final String courseId = "courseId";
     private final String moduleId = "moduleId";
-    private final String uid = randomUUID().toString();
+    private final long moduleRecordId = 1;
+    private final String uid = "uid";
     private final LocalDateTime currentDateTime = LocalDateTime.now();
     private final String learnerFirstName = "learnerFirstName";
     private final String learnerLastName = "";
-    private final String[] disabledBookmarkingModuleIDs = {moduleId, "moduleId1"};
+    CourseRecordStatus expectedCourseRecordStatus = CourseRecordStatus.builder().state("IN_PROGRESS").build();
+    ModuleRecordStatus expectedModuleRecordStatus = ModuleRecordStatus.builder()
+            .state("IN_PROGRESS").uid("uid").build();
 
     @BeforeEach
     public void setup() {
-        moduleLaunchService = new ModuleLaunchService(learnerRecordService, rusticiService, disabledBookmarkingModuleIDs);
-        cslTestUtil = new CslTestUtil(learnerRecordService, learnerId, courseId, moduleId, uid,
+        cslTestUtil = new CslTestUtil(learnerId, courseId, moduleId, uid,
                 currentDateTime, currentDateTime, currentDateTime);
+        when(stringUtilService.generateRandomUuid()).thenReturn(uid);
+        Clock clock = new MockClockConfig().getMockClock();
+        ReflectionTestUtils.setField(moduleLaunchService, "clock", clock);
+
+        String[] disabledBookmarkingModuleIDs = {"mockModuleID"};
+        ReflectionTestUtils.setField(moduleLaunchService, "disabledBookmarkingModuleIDs", disabledBookmarkingModuleIDs);
+        reset();
+    }
+
+    private void mockGetCourseRecord(CourseRecord returnCourseRecord) {
+        when(learnerRecordService.getCourseRecord(learnerId, courseId)).thenReturn(returnCourseRecord);
+    }
+
+    private void mockCreateModuleRecord(ModuleRecordStatus expectedModuleRecordStatus, ModuleRecord returnModuleRecord) {
+        when(learnerRecordService.createModuleRecord(learnerId, courseId, moduleId, expectedModuleRecordStatus))
+                .thenReturn(returnModuleRecord);
+    }
+
+    private void mockCreateCourseRecord(CourseRecordStatus expectedCourseRecordStatus, ModuleRecordStatus expectedModuleRecordStatus,
+                                        CourseRecord returnCourseRecord) {
+        when(learnerRecordService.createCourseRecord(learnerId, courseId, moduleId, expectedCourseRecordStatus, expectedModuleRecordStatus))
+                .thenReturn(returnCourseRecord);
+    }
+
+    private void mockUpdateCourseRecord(List<PatchOp> expectedPatches, CourseRecord returnCourseRecord) {
+        when(learnerRecordService.updateCourseRecord(learnerId, courseId, expectedPatches)).thenReturn(returnCourseRecord);
+    }
+
+    private void mockUpdateModuleRecord(List<PatchOp> expectedPatches, ModuleRecord returnModuleRecord) {
+        when(learnerRecordService.updateModuleRecord(moduleRecordId, expectedPatches)).thenReturn(returnModuleRecord);
+    }
+
+    private void mockCreateLaunchLink(LaunchLink returnLaunchLink) {
+        RegistrationInput registrationInput = createRegistrationInput();
+        when(rusticiService.createLaunchLink(registrationInput)).thenReturn(returnLaunchLink);
     }
 
     @Test
-    public void createLaunchLinkShouldCreateCourseAndModuleAndThenReturnLaunchLinkWithDisabledBookmark() {
-        cslTestUtil.mockLearnerRecordServiceGetAndUpdateCalls(
-                cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyCourseRecord(),
-                cslTestUtil.createSuccessResponseForModuleRecord());
-        cslTestUtil.mockLearnerRecordServiceForCreateInProgressCourseRecordWithModuleRecord(
-                cslTestUtil.createCourseRecordInput(learnerId, courseId, moduleId),
-                cslTestUtil.createCourseRecord());
-        cslTestUtil.mockLearnerRecordServiceCreateCalls(
-                cslTestUtil.createCourseRecordInput(learnerId, courseId, moduleId),
-                cslTestUtil.createSuccessResponseForCourseRecordWithEmptyModules(),
-                cslTestUtil.createModuleRecordInput(learnerId, courseId, moduleId),
-                cslTestUtil.createSuccessResponseForModuleRecord());
-        mockRusticiServiceCallGetRegistrationLaunchLink();
-        verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
+    public void shouldCreateCourseRecordAndGetLaunchLink() {
+        CourseRecord courseRecord = cslTestUtil.createCourseRecord();
+        LaunchLink launchLink = createLaunchLink();
+        ModuleLaunchLinkInput launchLinkInput = createModuleLaunchLinkInput();
+        mockGetCourseRecord(null);
+        expectedCourseRecordStatus.setIsRequired(true);
+        mockCreateCourseRecord(expectedCourseRecordStatus, expectedModuleRecordStatus, courseRecord);
+        mockCreateLaunchLink(launchLink);
+        LaunchLink result = moduleLaunchService.createLaunchLink(learnerId, courseId, moduleId, launchLinkInput);
+        assertEquals(launchLink, result);
     }
 
     @Test
-    public void createLaunchLinkShouldUpdateModuleUidThenReturnLaunchLinkWithDisabledBookmark() {
-        CourseRecords courseRecords = cslTestUtil.createCourseRecords();
-        cslTestUtil.mockLearnerRecordServiceGetAndUpdateCalls(
-                cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyModuleUid(courseRecords),
-                cslTestUtil.createSuccessResponseForModuleRecord());
-        ModuleRecord moduleRecord = courseRecords.getCourseRecord(courseId).getModuleRecord(moduleId);
-        cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecordToAssignUid(moduleRecord, learnerId, courseId);
-        mockRusticiServiceCallGetRegistrationLaunchLink();
-        verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
+    public void shouldUpdateCourseRecordWhenArchivedAndGetLaunchLink() {
+        CourseRecord courseRecord = cslTestUtil.createCourseRecord();
+        courseRecord.setState(null);
+        LaunchLink launchLink = createLaunchLink();
+        ModuleLaunchLinkInput launchLinkInput = createModuleLaunchLinkInput();
+        List<PatchOp> expectedCourseRecordPatches = List.of(PatchOp.replacePatch("state", "IN_PROGRESS"));
+        mockGetCourseRecord(courseRecord);
+        mockUpdateCourseRecord(expectedCourseRecordPatches, courseRecord);
+        mockCreateLaunchLink(launchLink);
+        LaunchLink result = moduleLaunchService.createLaunchLink(learnerId, courseId, moduleId, launchLinkInput);
+        assertEquals(launchLink, result);
     }
 
     @Test
-    public void createLaunchLinkShouldCreateRegistrationWhenRegistrationIdNotFoundThenReturnLaunchLinkWithDisabledBookmark() {
-        CourseRecords courseRecords = cslTestUtil.createCourseRecords();
-        cslTestUtil.mockLearnerRecordServiceGetAndUpdateCalls(
-                cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyModuleUid(courseRecords),
-                cslTestUtil.createSuccessResponseForModuleRecord());
-        ModuleRecord moduleRecord = courseRecords.getCourseRecord(courseId).getModuleRecord(moduleId);
-        cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecordToAssignUid(moduleRecord, learnerId, courseId);
-        mockRusticiServiceCallForRegistrationIdNotFoundError();
-        mockRusticiServiceCallCreateRegistrationAndLaunchLink();
-        verifySuccessAndLaunchLinkWithDisabledBookmark(invokeService());
+    public void shouldNotUpdateCourseRecordWhenArchivedAndGetLaunchLink() {
+        CourseRecord courseRecord = cslTestUtil.createCourseRecord();
+        LaunchLink launchLink = createLaunchLink();
+        ModuleLaunchLinkInput launchLinkInput = createModuleLaunchLinkInput();
+        List<PatchOp> expectedCourseRecordPatches = List.of(PatchOp.replacePatch("state", "IN_PROGRESS"));
+        courseRecord.setState(State.ARCHIVED);
+        mockGetCourseRecord(courseRecord);
+        mockUpdateCourseRecord(expectedCourseRecordPatches, courseRecord);
+        mockCreateLaunchLink(launchLink);
+        LaunchLink result = moduleLaunchService.createLaunchLink(learnerId, courseId, moduleId, launchLinkInput);
+        assertEquals(launchLink, result);
     }
 
     @Test
-    public void createLaunchLinkShouldReturnErrorWhenGetCourseRecordReturnsError() {
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecordForLearner(
-                cslTestUtil.createErrorResponseForCourseRecordsWithEmptyCourseRecord());
-        verify5xxError(invokeService());
+    public void shouldCreateModuleRecordAndGetLaunchLink() {
+        CourseRecord courseRecord = cslTestUtil.createCourseRecord();
+        courseRecord.setModuleRecords(Collections.emptyList());
+        ModuleRecord moduleRecord = cslTestUtil.createModuleRecord();
+        LaunchLink launchLink = createLaunchLink();
+        ModuleLaunchLinkInput launchLinkInput = createModuleLaunchLinkInput();
+        mockGetCourseRecord(courseRecord);
+        mockCreateModuleRecord(expectedModuleRecordStatus, moduleRecord);
+        mockCreateLaunchLink(launchLink);
+        LaunchLink result = moduleLaunchService.createLaunchLink(learnerId, courseId, moduleId, launchLinkInput);
+        assertEquals(launchLink, result);
     }
 
     @Test
-    public void createLaunchLinkShouldReturnErrorWhenCreateCourseRecordReturnsError() {
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecordForLearner(
-                cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyCourseRecord());
-        cslTestUtil.mockLearnerRecordServiceForCreateCourseRecord(
-                cslTestUtil.createCourseRecordInput(learnerId, courseId, moduleId),
-                cslTestUtil.createErrorResponseForCourseRecordsWithEmptyCourseRecord());
-        verify5xxError(invokeService());
+    public void shouldUpdateModuleRecordAndGetLaunchLink() {
+        CourseRecord courseRecord = cslTestUtil.createCourseRecord();
+        courseRecord.getModuleRecord(moduleId).setUid("");
+        LaunchLink launchLink = createLaunchLink();
+        ModuleLaunchLinkInput launchLinkInput = createModuleLaunchLinkInput();
+        mockGetCourseRecord(courseRecord);
+        List<PatchOp> expectedModuleRecordPatches = List.of(
+                PatchOp.replacePatch("updatedAt", "2023-01-01T10:00"),
+                PatchOp.replacePatch("uid", "uid"));
+        mockUpdateModuleRecord(expectedModuleRecordPatches, courseRecord.getModuleRecord(moduleId));
+        mockCreateLaunchLink(launchLink);
+        LaunchLink result = moduleLaunchService.createLaunchLink(learnerId, courseId, moduleId, launchLinkInput);
+        assertEquals(launchLink, result);
     }
 
     @Test
-    public void createLaunchLinkShouldReturnErrorWhenCreateModuleRecordReturnsError() {
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecordForLearner(
-                cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyModule());
-        cslTestUtil.mockLearnerRecordServiceForCreateModuleRecord(
-                cslTestUtil.createModuleRecordInput(learnerId, courseId, moduleId),
-                createInternalServerErrorResponse());
-        verify5xxError(invokeService());
-    }
-
-    @Test
-    public void createLaunchLinkShouldReturnErrorWhenUpdateModuleRecordUidReturnsError() {
-        CourseRecords courseRecords = cslTestUtil.createCourseRecords();
-        cslTestUtil.mockLearnerRecordServiceForGetCourseRecordForLearner(
-                cslTestUtil.createSuccessResponseForCourseRecordsWithEmptyModuleUid(courseRecords));
-        cslTestUtil.mockLearnerRecordServiceForUpdateModuleRecordForLearner(createInternalServerErrorResponse());
-        verify5xxError(invokeService());
-    }
-
-    @Test
-    public void createLaunchLinkShouldReturnErrorWhenRegistrationIdNotFoundAndThenNotAbleToCreateRegistrationInRustici() {
-        cslTestUtil.mockLearnerRecordServiceGetAndUpdateCalls(
-                cslTestUtil.createSuccessResponseForCourseRecords(),
-                cslTestUtil.createSuccessResponseForModuleRecord());
-        mockRusticiServiceCallForRegistrationIdNotFoundError();
-        mockRusticiServiceCallForInvalidCourseIdBadRequestError();
-        String invalidCourseIdMessage = "Course ID '" + courseId + "." + moduleId + "' is invalid";
-        verify4xxError(invalidCourseIdMessage, invokeService());
-    }
-
-    private ResponseEntity<?> invokeService() {
-        return moduleLaunchService.createLaunchLink(createModuleLaunchLinkInput());
-    }
-
-    private void verify5xxError(ResponseEntity<?> launchLinkResponse) {
-        assertTrue(launchLinkResponse.getStatusCode().is5xxServerError());
-        ErrorResponse responseBody = (ErrorResponse) launchLinkResponse.getBody();
-        assert responseBody != null;
-        assertEquals("Unable to retrieve module launch link for the learnerId: " + learnerId
-                + ", courseId: " + courseId + " and moduleId: " +  moduleId, responseBody.getMessage());
-        assertEquals("/courses/" + courseId + "/modules/" +  moduleId + "/launch", responseBody.getPath());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), responseBody.getError());
-    }
-
-    private void verify4xxError(String expectedMessage, ResponseEntity<?> launchLinkResponse) {
-        assertTrue(launchLinkResponse.getStatusCode().is4xxClientError());
-        ErrorResponse responseBody = (ErrorResponse) launchLinkResponse.getBody();
-        assert responseBody != null;
-        assertEquals(expectedMessage, responseBody.getMessage());
-    }
-
-    private void verifySuccessAndLaunchLinkWithDisabledBookmark(ResponseEntity<?> launchLinkResponse) {
-        assertTrue(launchLinkResponse.getStatusCode().is2xxSuccessful());
-        LaunchLink actualLaunchLink = (LaunchLink) launchLinkResponse.getBody();
-        LaunchLink expectedLaunchLink = createLaunchLink();
-        expectedLaunchLink.setLaunchLink(expectedLaunchLink.getLaunchLink() + "&clearbookmark=true");
-        assertEquals(expectedLaunchLink, actualLaunchLink);
-    }
-
-    private void mockRusticiServiceCallGetRegistrationLaunchLink() {
-        ResponseEntity responseForLaunchLink = createSuccessRusticiResponseForLaunchLink();
-        when(rusticiService.getRegistrationLaunchLink(createRegistrationInput())).thenReturn(responseForLaunchLink);
-    }
-
-    private void mockRusticiServiceCallCreateRegistrationAndLaunchLink() {
-        ResponseEntity responseForLaunchLink = createSuccessRusticiResponseForLaunchLink();
-        when(rusticiService.createRegistrationAndLaunchLink(createRegistrationInput())).thenReturn(responseForLaunchLink);
-    }
-
-    private void mockRusticiServiceCallForRegistrationIdNotFoundError() {
-        ResponseEntity rusticiResponseRegistrationIdNotFoundError = createErrorRusticiResponseForRegistrationNotFound();
-        when(rusticiService.getRegistrationLaunchLink(createRegistrationInput())).thenReturn(rusticiResponseRegistrationIdNotFoundError);
-    }
-
-    private void mockRusticiServiceCallForInvalidCourseIdBadRequestError() {
-        ResponseEntity createErrorRusticiResponseForInvalidCourseIdBadRequest =
-                cslTestUtil.createErrorRusticiResponseForInvalidCourseIdBadRequest();
-        when(rusticiService.createRegistrationAndLaunchLink(createRegistrationInput()))
-                .thenReturn(createErrorRusticiResponseForInvalidCourseIdBadRequest);
+    public void shouldNotUpdateModuleRecordAndGetLaunchLinkAndAppendBookmarking() {
+        CourseRecord courseRecord = cslTestUtil.createCourseRecord();
+        courseRecord.getModuleRecord(moduleId).setModuleId("mockModuleID");
+        LaunchLink launchLink = createLaunchLink();
+        launchLink.clearBookmarking();
+        ModuleLaunchLinkInput launchLinkInput = createModuleLaunchLinkInput();
+        mockGetCourseRecord(courseRecord);
+        RegistrationInput reg = new RegistrationInput(uid, courseId, "mockModuleID", learnerId, learnerFirstName, learnerLastName);
+        when(rusticiService.createLaunchLink(reg)).thenReturn(launchLink);
+        LaunchLink result = moduleLaunchService.createLaunchLink(learnerId, courseId, "mockModuleID", launchLinkInput);
+        assertEquals(launchLink, result);
+        verify(learnerRecordService, never()).updateCourseRecord(any(), any(), any());
     }
 
     private ModuleLaunchLinkInput createModuleLaunchLinkInput() {
-        ModuleLaunchLinkInput moduleLaunchLinkInput = new ModuleLaunchLinkInput();
-        moduleLaunchLinkInput.setLearnerFirstName(learnerFirstName);
-        moduleLaunchLinkInput.setLearnerLastName(learnerLastName);
-        moduleLaunchLinkInput.setCourseRecordInput(cslTestUtil.createCourseRecordInput(learnerId, courseId, moduleId));
-        return moduleLaunchLinkInput;
+        return new ModuleLaunchLinkInput(learnerFirstName, learnerLastName, true);
     }
 
     private RegistrationInput createRegistrationInput() {
@@ -212,17 +193,4 @@ public class ModuleLaunchServiceTest {
     }
 
 
-    private ResponseEntity<?> createSuccessRusticiResponseForLaunchLink() {
-        return new ResponseEntity<>(convertObjectToJsonString(createLaunchLink()), HttpStatus.OK);
-    }
-
-    private ResponseEntity<?> createErrorRusticiResponseForRegistrationNotFound() {
-        return new ResponseEntity<>(createErrorResponseForRegistrationDoesNotExist(), HttpStatus.NOT_FOUND);
-    }
-
-    private ErrorResponse createErrorResponseForRegistrationDoesNotExist() {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setMessage("Registration ID 'registration_id' does not exist");
-        return errorResponse;
-    }
 }

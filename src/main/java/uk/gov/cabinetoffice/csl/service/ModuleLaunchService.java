@@ -3,155 +3,97 @@ package uk.gov.cabinetoffice.csl.service;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.domain.error.GenericServerException;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
 import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationInput;
+import uk.gov.cabinetoffice.csl.util.StringUtilService;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
-
-import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.mapJsonStringToObject;
-import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.returnError;
+import java.util.List;
 
 @Slf4j
 @Service
 public class ModuleLaunchService {
 
     private final LearnerRecordService learnerRecordService;
-
     private final RusticiService rusticiService;
-
+    private final StringUtilService stringUtilService;
+    private final Clock clock;
     private final String[] disabledBookmarkingModuleIDs;
 
     public ModuleLaunchService(LearnerRecordService learnerRecordService, RusticiService rusticiService,
-        @Value("${rustici.disabledBookmarkingModuleIDs}") String[] disabledBookmarkingModuleIDs) {
+                               StringUtilService stringUtilService, Clock clock,
+                               @Value("${rustici.disabledBookmarkingModuleIDs}") String[] disabledBookmarkingModuleIDs) {
         this.learnerRecordService = learnerRecordService;
         this.rusticiService = rusticiService;
+        this.stringUtilService = stringUtilService;
+        this.clock = clock;
         this.disabledBookmarkingModuleIDs = disabledBookmarkingModuleIDs;
     }
 
-    public ResponseEntity<?> createLaunchLink(ModuleLaunchLinkInput moduleLaunchLinkInput) {
+    public LaunchLink createLaunchLink(String learnerId, String courseId,
+                                       String moduleId, ModuleLaunchLinkInput moduleLaunchLinkInput) {
+        log.info("User '{}' launching module '{}' in course '{}'", learnerId, moduleId, courseId);
         log.debug("moduleLaunchLinkInput: {}", moduleLaunchLinkInput);
-        CourseRecordInput courseRecordInput = moduleLaunchLinkInput.getCourseRecordInput();
-        String learnerId = courseRecordInput.getUserId();
-        String courseId = courseRecordInput.getCourseId();
-        String moduleId = courseRecordInput.getModuleRecords().get(0).getModuleId();
-        ModuleRecord moduleRecord = processCourseAndModuleData(learnerRecordService, courseRecordInput);
-        if(moduleRecord != null && StringUtils.isNotBlank(moduleRecord.getUid())) {
-            return createLaunchLink(moduleRecord, moduleLaunchLinkInput);
-        }
-        log.error("Unable to retrieve module launch link for the learnerId: {}, courseId: {} and moduleId: {}",
-                learnerId, courseId, moduleId);
-        return returnError(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                "Unable to retrieve module launch link for the learnerId: " + learnerId + ", courseId: "
-                        + courseId + " and moduleId: " +  moduleId, "/courses/" + courseId + "/modules/"
-                        +  moduleId + "/launch", null);
-    }
-
-    private ModuleRecord processCourseAndModuleData(LearnerRecordService learnerRecordService,
-                                                          CourseRecordInput courseRecordInput) {
-        ModuleRecord moduleRecord = null;
-        String learnerId = courseRecordInput.getUserId();
-        String courseId = courseRecordInput.getCourseId();
-        ModuleRecordInput moduleRecordInput = courseRecordInput.getModuleRecords().get(0);
-        String moduleId = moduleRecordInput.getModuleId();
-        ResponseEntity<?> courseRecordResponse = learnerRecordService.getCourseRecordForLearner(learnerId, courseId);
-        if(courseRecordResponse.getStatusCode().is2xxSuccessful()) {
-            CourseRecords courseRecords =
-                    mapJsonStringToObject((String)courseRecordResponse.getBody(), CourseRecords.class);
-            log.debug("courseRecords: {}", courseRecords);
-            if(courseRecords != null) {
-                CourseRecord courseRecord = courseRecords.getCourseRecord(courseId);
-                if(courseRecord == null) {
-                    //If the course record is not present then create the course record along with module record
-                    courseRecord = learnerRecordService.createInProgressCourseRecordWithModuleRecord(courseRecordInput);
-                }
-                if(courseRecord != null) {
-                    if(courseRecord.getState() == null || courseRecord.getState().equals(State.ARCHIVED)) {
-                        //Update the course record status if it is null or ARCHIVED
-                        courseRecord = learnerRecordService.updateCourseRecordState(learnerId, courseId,
-                                State.IN_PROGRESS, LocalDateTime.now());
-                    }
-                    //Retrieve the relevant module record from the course record
-                    moduleRecord = courseRecord != null ? courseRecord.getModuleRecord(moduleId) : null;
-                    if(courseRecord != null && moduleRecord == null) {
-                        //If the relevant module record is not present then create the module record
-                        moduleRecord = learnerRecordService.createInProgressModuleRecord(moduleRecordInput);
-                    }
-                    if(moduleRecord != null) {
-                        if(StringUtils.isBlank(moduleRecord.getUid())) {
-                            //If the uid is not present then update the module record to assign the uid
-                            moduleRecord = learnerRecordService
-                                    .updateModuleRecordToAssignUid(moduleRecord, learnerId, courseId);
-                        }
-                    }
-                }
+        LaunchLink launchLink = null;
+        String moduleRecordUid = stringUtilService.generateRandomUuid();
+        try {
+            CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
+            if (courseRecord == null) {
+                //If the course record is not present then create the course record along with module record
+                courseRecord = learnerRecordService.createCourseRecord(learnerId, courseId, moduleId,
+                        CourseRecordStatus.builder().state(State.IN_PROGRESS.name())
+                                .isRequired(moduleLaunchLinkInput.getCourseIsRequired()).build(),
+                        ModuleRecordStatus.builder().uid(moduleRecordUid).state(State.IN_PROGRESS.name()).build());
             }
-        } else {
-            log.error("Unable to retrieve course record for learner id: {} and course id: {}. " +
-                    "Error response from learnerRecordService: {}", learnerId, courseId, courseRecordResponse);
-        }
-        return moduleRecord;
-    }
-
-    private ResponseEntity<?> createLaunchLink(ModuleRecord moduleRecord, ModuleLaunchLinkInput moduleLaunchLinkInput) {
-        String learnerFirstName = moduleLaunchLinkInput.getLearnerFirstName();
-        String learnerLastName = moduleLaunchLinkInput.getLearnerLastName();
-        CourseRecordInput courseRecordInput = moduleLaunchLinkInput.getCourseRecordInput();
-        String learnerId = courseRecordInput.getUserId();
-        String courseId = courseRecordInput.getCourseId();
-        String moduleId = moduleRecord.getModuleId();
-
-        RegistrationInput registrationInput = new RegistrationInput();
-        registrationInput.setRegistrationId(moduleRecord.getUid());
-        registrationInput.setLearnerId(learnerId);
-        registrationInput.setCourseId(courseId);
-        registrationInput.setModuleId(moduleId);
-        registrationInput.setLearnerFirstName(learnerFirstName);
-        registrationInput.setLearnerLastName(learnerLastName == null ? "" : learnerLastName);
-
-        ResponseEntity<?> registrationResponse =
-                rusticiService.getRegistrationLaunchLink(registrationInput);
-        if(!registrationResponse.getStatusCode().is2xxSuccessful()) {
-            log.error("Module launch link could not be retrieved using launchLink endpoint for learner id: {}, " +
-                      "course id: {} and module id: {} due to {}. Now invoking withLaunchLink endpoint to retrieve " +
-                      "module launch link.", learnerId, courseId, moduleId, registrationResponse);
-            //If no launch link present then create the registration and launch link using withLaunchLink
-            registrationResponse = rusticiService.createRegistrationAndLaunchLink(registrationInput);
-        }
-        if(registrationResponse.getStatusCode().is2xxSuccessful()) {
-            log.info("Module launch link is successfully retrieved for learner id: {}, course id: "
-                    + "{} and module id: {}", learnerId, courseId, moduleId);
-            //Check and Update launchLink for disabledBookmarking
-            registrationResponse = checkAndSetDisabledBookMarking(moduleId, learnerId, courseId,
-                    registrationResponse);
-            //Update the module record for the last updated timestamp
-            learnerRecordService.updateModuleUpdateDateTime(moduleRecord, LocalDateTime.now(), learnerId, courseId);
-        } else {
-            log.error("Module launch link could not be retrieved using withLaunchLink endpoint for learner id: {}, " +
-                      "course id: {} and module id: {} due to {}", learnerId, courseId, moduleId, registrationResponse);
-        }
-        return registrationResponse;
-    }
-
-    private ResponseEntity<?> checkAndSetDisabledBookMarking(String moduleId, String learnerId, String courseId,
-                                                             ResponseEntity<?> registrationResponse) {
-        if(isDisabledBookmarkingModuleID(moduleId)) {
-            LaunchLink launchLink =
-                    mapJsonStringToObject((String)registrationResponse.getBody(), LaunchLink.class);
-            if(launchLink != null) {
-                String launchLinkWithDisabledBookmarking = launchLink.getLaunchLink() + "&clearbookmark=true";
-                launchLink.setLaunchLink(launchLinkWithDisabledBookmarking);
-                log.info("Module launch link is updated for clearbookmark=true for learner id: "
-                        + "{}, course id: {} and module id: {}", learnerId, courseId, moduleId);
-                return new ResponseEntity<>(launchLink, HttpStatus.OK);
+            if (courseRecord.getState() == null || courseRecord.getState().equals(State.ARCHIVED)) {
+                //Update the course record status if it is null or ARCHIVED
+                courseRecord = learnerRecordService.updateCourseRecord(learnerId, courseId,
+                        List.of(PatchOp.replacePatch("state", State.IN_PROGRESS.name())));
             }
+            //Retrieve the relevant module record from the course record
+            ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
+            if (moduleRecord == null) {
+                //If the relevant module record is not present then create the module record
+                moduleRecord = learnerRecordService.createModuleRecord(learnerId, courseId, moduleId,
+                        ModuleRecordStatus.builder().uid(moduleRecordUid).state(State.IN_PROGRESS.name()).build());
+            }
+            List<PatchOp> patches = new ArrayList<>();
+            patches.add(PatchOp.replacePatch("/updatedAt", LocalDateTime.now(clock).toString()));
+            if (StringUtils.isBlank(moduleRecord.getUid())) {
+                patches.add(PatchOp.replacePatch("uid", moduleRecordUid));
+            } else {
+                moduleRecordUid = moduleRecord.getUid();
+            }
+            learnerRecordService.updateModuleRecord(moduleRecord.getId(), patches);
+            if (StringUtils.isNotBlank(moduleRecordUid)) {
+                launchLink = createLaunchLink(learnerId, moduleId, moduleRecordUid, courseId, moduleLaunchLinkInput);
+            }
+        } catch (Exception e) {
+            throw new GenericServerException(String.format("Unable to retrieve launch link for learner id: %s course id: %s and module id: %s. " +
+                    "Error: %s", learnerId, courseId, moduleId, e));
         }
-        return registrationResponse;
+
+        return launchLink;
+    }
+
+    private LaunchLink createLaunchLink(String learnerId, String moduleId, String moduleRecordUid,
+                                        String courseId, ModuleLaunchLinkInput moduleLaunchLinkInput) {
+        RegistrationInput registrationInput = RegistrationInput.from(learnerId, moduleId, moduleRecordUid,
+                courseId, moduleLaunchLinkInput);
+        LaunchLink launchLink = rusticiService.createLaunchLink(registrationInput);
+        if (isDisabledBookmarkingModuleID(registrationInput.getModuleId())) {
+            launchLink.clearBookmarking();
+            log.info("Module launch link is updated for clearbookmark=true for learner id: "
+                    + "{}, course id: {} and module id: {}", registrationInput.getLearnerId(), registrationInput.getCourseId(), registrationInput.getModuleId());
+        }
+        return launchLink;
     }
 
     private boolean isDisabledBookmarkingModuleID(String moduleId) {

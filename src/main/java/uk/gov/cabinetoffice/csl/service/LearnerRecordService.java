@@ -1,201 +1,104 @@
 package uk.gov.cabinetoffice.csl.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.client.learnerRecord.ILearnerRecordClient;
+import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
-import uk.gov.cabinetoffice.csl.factory.RequestEntityWithBearerAuthFactory;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-
-import static java.util.UUID.randomUUID;
-import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.invokeService;
-import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.mapJsonStringToObject;
 
 @Slf4j
 @Service
 public class LearnerRecordService {
 
-    private final RequestEntityWithBearerAuthFactory requestEntityFactory;
+    private final ILearnerRecordClient client;
+    private final LearningCatalogueService learningCatalogueService;
 
-    @Value("${learnerRecord.courseRecordsForLearnerUrl}")
-    private String courseRecordsForLearnerUrl;
-
-    @Value("${learnerRecord.moduleRecordsForLearnerUrl}")
-    private String moduleRecordsForLearnerUrl;
-
-    public LearnerRecordService(RequestEntityWithBearerAuthFactory requestEntityFactory) {
-        this.requestEntityFactory = requestEntityFactory;
+    public LearnerRecordService(ILearnerRecordClient client, LearningCatalogueService learningCatalogueService) {
+        this.client = client;
+        this.learningCatalogueService = learningCatalogueService;
     }
 
-    public ResponseEntity<?> getCourseRecordForLearner(String learnerId, String courseId) {
-        RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createGetRequestWithBearerAuth(
-                courseRecordsForLearnerUrl + "?userId=" + learnerId + "&courseId=" + courseId,
-                null);
-        return invokeService(requestWithBearerAuth);
+    private Course getCourse(String courseId) {
+        Course course = learningCatalogueService.getCourse(courseId);
+        if (course != null) {
+            return course;
+        } else {
+            throw new LearningCatalogueResourceNotFoundException(String.format("Course '%s'", courseId));
+        }
+    }
+
+    private CourseWithModule getCourseWithModule(String courseId, String moduleId) {
+        Course course = getCourse(courseId);
+        Module module = course.getModule(moduleId);
+        if (module != null) {
+            return new CourseWithModule(course, module);
+        } else {
+            throw new LearningCatalogueResourceNotFoundException(String.format("Module '%s' in course '%s'", moduleId, courseId));
+        }
+    }
+
+    public boolean isCourseCompleted(String courseId, List<String> completedModuleIds) {
+        Course course = getCourse(courseId);
+        if (course.getModules() != null) {
+            List<String> mandatoryModulesIds = course.getModules().stream()
+                    .filter(m -> !m.isOptional()).map(Module::getId).toList();
+            if (mandatoryModulesIds.size() > 0) {
+                return new HashSet<>(completedModuleIds).containsAll(mandatoryModulesIds);
+            } else {
+                List<String> optionalModulesIds = course.getModules().stream()
+                        .filter(Module::isOptional).map(Module::getId).toList();
+                return new HashSet<>(completedModuleIds).containsAll(optionalModulesIds);
+            }
+        }
+        return false;
     }
 
     public CourseRecord getCourseRecord(String learnerId, String courseId) {
-        ResponseEntity<?> courseRecordResponse = getCourseRecordForLearner(learnerId, courseId);
-        if(courseRecordResponse.getStatusCode().is2xxSuccessful()) {
-            CourseRecords courseRecords =
-                    mapJsonStringToObject((String) courseRecordResponse.getBody(), CourseRecords.class);
-            log.debug("courseRecords: {}", courseRecords);
-            return courseRecords != null ? courseRecords.getCourseRecord(courseId) : null;
+        CourseRecords courseRecords = client.getCourseRecord(learnerId, courseId);
+        if (courseRecords == null) {
+            return null;
         }
-        return null;
+        return courseRecords.getCourseRecord(courseId);
     }
 
-    public ResponseEntity<?> createCourseRecordForLearner(CourseRecordInput courseRecordInput) {
-        RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPostRequestWithBearerAuth(
-                courseRecordsForLearnerUrl, courseRecordInput, null);
-        return invokeService(requestWithBearerAuth);
+    public CourseRecord createCourseRecord(String learnerId,
+                                           String courseId,
+                                           String moduleId,
+                                           CourseRecordStatus courseRecordStatus,
+                                           ModuleRecordStatus moduleRecordStatus) {
+        CourseWithModule courseWithModule = getCourseWithModule(courseId, moduleId);
+        CourseRecordInput input = CourseRecordInput.from(learnerId, courseWithModule.getCourse(),
+                courseRecordStatus, courseWithModule.getModule(), moduleRecordStatus);
+        return client.createCourseRecord(input);
     }
 
-    public ResponseEntity<?> updateCourseRecordForLearner(String learnerId, String courseId,
-                                                          Map<String, String> updateFields) {
-        List<PatchOp> jsonPatch = new ArrayList<>();
-        updateFields.forEach((key, value) -> jsonPatch.add(new PatchOp("replace", "/" + key, value)));
-
-        RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
-                courseRecordsForLearnerUrl + "?userId=" + learnerId + "&courseId=" + courseId,
-                jsonPatch, null);
-        return invokeService(requestWithBearerAuth);
+    public CourseRecord createCourseRecord(String learnerId, String courseId, CourseRecordStatus courseRecordStatus) {
+        Course course = getCourse(courseId);
+        CourseRecordInput input = CourseRecordInput.from(learnerId, course, courseRecordStatus);
+        return client.createCourseRecord(input);
     }
 
-    public CourseRecord updateCourseRecordState(String learnerId, String courseId, State state, LocalDateTime updatedAt) {
-        Map<String, String> updateFields = new HashMap<>();
-        updateFields.put("state", state.name());
-        updateFields.put("lastUpdated", updatedAt.toString());
-        ResponseEntity<?> updateResponse = updateCourseRecordForLearner(learnerId, courseId, updateFields);
-        if(updateResponse.getStatusCode().is2xxSuccessful()) {
-            CourseRecord courseRecord = mapJsonStringToObject((String)updateResponse.getBody(), CourseRecord.class);
-            log.debug("courseRecord: {}", courseRecord);
-            log.info("Course record status and lastUpdated are update for learner id: {}, course id: {} and state: {}",
-                    learnerId, courseId, state);
-            return courseRecord;
-        }
-        log.error("Unable to update course record status and lastUpdated for learner id: {}, course id: {} and state: {}",
-                learnerId, courseId, state);
-        return null;
+    public CourseRecord updateCourseRecord(String learnerId, String courseId, List<PatchOp> patches) {
+        return client.updateCourseRecord(learnerId, courseId, patches);
     }
 
-    public ResponseEntity<?> createModuleRecordForLearner(ModuleRecordInput moduleRecordInput) {
-        RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPostRequestWithBearerAuth(
-                moduleRecordsForLearnerUrl, moduleRecordInput, null);
-        return invokeService(requestWithBearerAuth);
+    public ModuleRecord createModuleRecord(String learnerId,
+                                           String courseId,
+                                           String moduleId,
+                                           ModuleRecordStatus moduleRecordStatus) {
+        CourseWithModule courseWithModule = getCourseWithModule(courseId, moduleId);
+        ModuleRecordInput input = ModuleRecordInput.from(learnerId, courseId, courseWithModule.getModule(), moduleRecordStatus);
+        return client.createModuleRecord(input);
     }
 
-    public ResponseEntity<?> updateModuleRecordForLearner(Long moduleRecordId,
-                                                          Map<String, String> updateFields) {
-        List<PatchOp> jsonPatch = new ArrayList<>();
-        updateFields.forEach((key, value) -> jsonPatch.add(new PatchOp("replace", "/" + key, value)));
-        RequestEntity<?> requestWithBearerAuth = requestEntityFactory.createPatchRequestWithBearerAuth(
-                moduleRecordsForLearnerUrl + "/" + moduleRecordId, jsonPatch, null);
-        return invokeService(requestWithBearerAuth);
+    public ModuleRecord updateModuleRecord(Long moduleRecordId, List<PatchOp> patches) {
+        return client.updateModuleRecord(moduleRecordId, patches);
     }
 
-    public CourseRecord createInProgressCourseRecordWithModuleRecord(CourseRecordInput courseRecordInput) {
-        courseRecordInput.setState(State.IN_PROGRESS.name());
-        String learnerId = courseRecordInput.getUserId();
-        String courseId = courseRecordInput.getCourseId();
-        ModuleRecordInput moduleRecordInput = courseRecordInput.getModuleRecords().get(0);
-        if(StringUtils.isBlank(moduleRecordInput.getUid())) {
-            moduleRecordInput.setUid(randomUUID().toString());
-        }
-        moduleRecordInput.setState(State.IN_PROGRESS.name());
-        ResponseEntity<?> courseRecordForLearnerResponse = createCourseRecordForLearner(courseRecordInput);
-        if(courseRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
-            CourseRecord courseRecord =
-                    mapJsonStringToObject((String)courseRecordForLearnerResponse.getBody(), CourseRecord.class);
-            log.debug("courseRecord: {}", courseRecord);
-            log.info("A new course record is created for learner id: {}, course id: {} and module id: {}",
-                    learnerId, courseId, moduleRecordInput.getModuleId());
-            return courseRecord;
-        }
-        log.error("Unable to create a new course record for learner id: {}, course id: {} and module id: {}. " +
-                    "Error response from learnerRecordService: {}", learnerId, courseId,
-                    moduleRecordInput.getModuleId(), courseRecordForLearnerResponse);
-        return null;
-    }
-
-    public ModuleRecord createInProgressModuleRecord(ModuleRecordInput moduleRecordInput) {
-        if(StringUtils.isBlank(moduleRecordInput.getUid())){
-            moduleRecordInput.setUid(randomUUID().toString());
-        }
-        moduleRecordInput.setState(State.IN_PROGRESS.name());
-        ResponseEntity<?> moduleRecordForLearnerResponse = createModuleRecordForLearner(moduleRecordInput);
-        if(moduleRecordForLearnerResponse.getStatusCode().is2xxSuccessful()) {
-            ModuleRecord moduleRecord =
-                    mapJsonStringToObject((String)moduleRecordForLearnerResponse.getBody(), ModuleRecord.class);
-            log.debug("moduleRecord: {}", moduleRecord);
-            assert moduleRecord != null;
-            log.info("A new module record is created for learner id: {}, course id: {} and module id: {}",
-                    moduleRecordInput.getUserId(), moduleRecordInput.getCourseId(), moduleRecord.getModuleId());
-            return moduleRecord;
-        }
-        log.error("Unable to create a new course record for learner id: {}, course id: {} and module id: {}. " +
-                        "Error response from learnerRecordService: {}", moduleRecordInput.getUserId(),
-                moduleRecordInput.getCourseId(), moduleRecordInput.getModuleId(), moduleRecordForLearnerResponse);
-        return null;
-    }
-
-    public ModuleRecord updateModuleRecord(Long moduleId, Map<String, String> updateFields) {
-        ResponseEntity<?> updateResponse = updateModuleRecordForLearner(moduleId, updateFields);
-        if(updateResponse.getStatusCode().is2xxSuccessful()) {
-            ModuleRecord moduleRecord = mapJsonStringToObject((String)updateResponse.getBody(), ModuleRecord.class);
-            log.debug("moduleRecord: {}", moduleRecord);
-            assert moduleRecord != null;
-            log.info("Fields {} are updated for the module record for module id: {}", updateFields, moduleId);
-            return moduleRecord;
-        }
-        log.error("Unable to update fields {} for the module record for module id: {}."
-                + " Error response from learnerRecordService: {}", updateFields, moduleId, updateResponse);
-        return null;
-    }
-
-    public ModuleRecord updateModuleRecordToAssignUid(ModuleRecord moduleRecord, String learnerId, String courseId) {
-        String moduleId = moduleRecord.getModuleId();
-        String currentDateAndTime = LocalDateTime.now().toString();
-        Map<String, String> updateFields = new HashMap<>();
-        updateFields.put("updatedAt", currentDateAndTime);
-        updateFields.put("uid", randomUUID().toString());
-        ResponseEntity<?> updateResponse = updateModuleRecordForLearner(moduleRecord.getId(), updateFields);
-        if(updateResponse.getStatusCode().is2xxSuccessful()) {
-            moduleRecord = mapJsonStringToObject((String)updateResponse.getBody(), ModuleRecord.class);
-            assert moduleRecord != null;
-            log.info("uid and updatedAt fields are updated for the module record for learner id: "
-                    + "{}, course id: {} and module id: {}", learnerId, courseId, moduleId);
-        } else {
-            log.error("Unable to update uid for the module record for learner id: {}, course id: {} and module id: {}."
-                      + " Error response from learnerRecordService: {}", learnerId, courseId, moduleId, updateResponse);
-        }
-        log.debug("moduleRecord: {}", moduleRecord);
-        return moduleRecord;
-    }
-
-    public ModuleRecord updateModuleUpdateDateTime(ModuleRecord moduleRecord, LocalDateTime updatedAt,
-                                                   String learnerId, String courseId) {
-        String moduleId = moduleRecord.getModuleId();
-        Map<String, String> updateFields = new HashMap<>();
-        updateFields.put("updatedAt", updatedAt.toString());
-        ResponseEntity<?> updateDateTimeResponse = updateModuleRecordForLearner(moduleRecord.getId(), updateFields);
-        if(updateDateTimeResponse.getStatusCode().is2xxSuccessful()) {
-            moduleRecord = mapJsonStringToObject((String)updateDateTimeResponse.getBody(), ModuleRecord.class);
-            log.debug("moduleRecord: {}", moduleRecord);
-            log.info("updatedAt field is updated for the module record for learner id: {}, course id: {} and "
-                    + "module id: {}", learnerId, courseId, moduleId);
-        } else {
-            log.error("Unable to update updatedAt for the module record for learner id: {}, course id: {} and "
-                    + "module id: {} due to {}", learnerId, courseId, moduleId, updateDateTimeResponse);
-        }
-        return moduleRecord;
-    }
 }

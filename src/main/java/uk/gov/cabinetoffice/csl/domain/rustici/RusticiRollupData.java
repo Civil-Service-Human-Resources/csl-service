@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.domain.rustici;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -34,4 +35,14 @@ public class RusticiRollupData {
     //This will be mapped to the <ModuleRecord.completionDate>
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime completedDate;
+
+    @JsonIgnore
+    public boolean isRollUpValid() {
+        if (getLearner() != null && getLearner().getId() != null
+                && getCourse() != null && getCourse().getId() != null) {
+            return course.getId().matches(".+\\..+");
+        } else {
+            return false;
+        }
+    }
 }

@@ -21,9 +21,7 @@ public class RusticiRollupController {
 
     @PostMapping(path = "/rustici/rollup", produces = "application/json")
     public ResponseEntity<?> processRusticiRollupData(@RequestBody RusticiRollupData rusticiRollupData) {
-        if(rusticiRollupData != null
-                && rusticiRollupData.getLearner() != null && rusticiRollupData.getLearner().getId() != null
-                && rusticiRollupData.getCourse() != null && rusticiRollupData.getCourse().getId() != null) {
+        if (rusticiRollupData != null && rusticiRollupData.isRollUpValid()) {
             moduleRollupService.processRusticiRollupData(rusticiRollupData);
         } else {
             log.error("Invalid rustici rollup data: {}", rusticiRollupData);
