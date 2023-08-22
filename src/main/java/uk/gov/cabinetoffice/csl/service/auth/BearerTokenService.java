@@ -26,17 +26,12 @@ public class BearerTokenService implements IBearerTokenService {
         this.userAuthService = userAuthService;
     }
 
-    private String getBearerTokenFromUserAuth() {
-        Object principal = userAuthService.getAuthentication().getPrincipal();
-        if (principal instanceof Jwt jwtPrincipal) {
-            return jwtPrincipal.getTokenValue();
-        } else {
-            return null;
-        }
-    }
-
     public String getBearerToken() {
-        String bearerToken = getBearerTokenFromUserAuth();
+        String bearerToken = "";
+        Jwt jwtPrincipal = userAuthService.getBearerTokenFromUserAuth();
+        if (jwtPrincipal != null) {
+            bearerToken = jwtPrincipal.getTokenValue();
+        }
         if (isBlank(bearerToken)) {
             OAuthToken serviceToken = identityService.getCachedOAuthServiceToken();
             log.debug("serviceToken: expiryDateTime: {}", serviceToken.getExpiryDateTime());
