@@ -4,11 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 
-@Service
+@Component
 @Slf4j
 public class LearningCatalogueClient implements ILearningCatalogueClient {
 

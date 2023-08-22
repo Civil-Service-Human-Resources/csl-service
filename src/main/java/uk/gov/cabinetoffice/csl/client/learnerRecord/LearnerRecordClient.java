@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
@@ -12,8 +12,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
 import java.util.Collections;
 import java.util.List;
 
-@Service
 @Slf4j
+@Component
 public class LearnerRecordClient implements ILearnerRecordClient {
 
     @Value("${learnerRecord.courseRecordsForLearnerUrl}")

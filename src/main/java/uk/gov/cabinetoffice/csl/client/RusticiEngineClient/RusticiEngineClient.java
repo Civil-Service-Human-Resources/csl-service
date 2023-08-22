@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
@@ -12,7 +12,7 @@ import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
 import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationRequest;
 
 @Slf4j
-@Service
+@Component
 public class RusticiEngineClient implements IRusticiEngineClient {
 
     @Value("${rustici.registrationLaunchLinkUrl}")
@@ -44,6 +44,7 @@ public class RusticiEngineClient implements IRusticiEngineClient {
 
     @Override
     public LaunchLink createLaunchLinkWithRegistration(RegistrationRequest registrationRequest) {
+        log.info("Creating launch link and registration {}", registrationRequest);
         RequestEntity<RegistrationRequest> request = RequestEntity.post(registrationWithLaunchLinkUrl).body(registrationRequest);
         return client.executeRequest(request, LaunchLink.class);
     }
