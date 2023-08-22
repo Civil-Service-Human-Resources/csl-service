@@ -58,8 +58,7 @@ public class RemoveCourseFromLearningPlanTest extends CSLServiceWireMockServer {
                 .expectBody()
                 .jsonPath("$.courseId").isEqualTo(courseId)
                 .jsonPath("$.courseTitle").isEqualTo(testDataService.getCourseTitle())
-                .jsonPath("$.message").isEqualTo("Successfully removed course from learning plan")
-                .jsonPath("$.success").isEqualTo("true");
+                .jsonPath("$.message").isEqualTo("Successfully removed course from learning plan");
 
     }
 

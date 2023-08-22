@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RemoveCourseFromLearningPlanResponse {
-    private boolean success;
+public class CourseResponse {
     private String message;
     private String courseTitle;
     private String courseId;

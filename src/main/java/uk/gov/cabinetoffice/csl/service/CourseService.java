@@ -2,9 +2,7 @@ package uk.gov.cabinetoffice.csl.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.controller.model.AddCourseToLearningPlanResponse;
-import uk.gov.cabinetoffice.csl.controller.model.RemoveCourseFromLearningPlanResponse;
-import uk.gov.cabinetoffice.csl.controller.model.RemoveCourseFromSuggestionsResponse;
+import uk.gov.cabinetoffice.csl.controller.model.CourseResponse;
 import uk.gov.cabinetoffice.csl.domain.error.GenericServerException;
 import uk.gov.cabinetoffice.csl.domain.error.RecordAlreadyExistsException;
 import uk.gov.cabinetoffice.csl.domain.error.RecordNotFoundException;
@@ -23,14 +21,14 @@ public class CourseService {
         this.learnerRecordService = learnerRecordService;
     }
 
-    public RemoveCourseFromLearningPlanResponse removeFromLearningPlan(String learnerId, String courseId) {
+    public CourseResponse removeFromLearningPlan(String learnerId, String courseId) {
         log.info("Removing course '{}' from user '{}' learning plan", courseId, learnerId);
         CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
         if (courseRecord != null) {
             try {
                 List<PatchOp> patches = Collections.singletonList(PatchOp.replacePatch("state", State.ARCHIVED.name()));
                 courseRecord = learnerRecordService.updateCourseRecord(learnerId, courseId, patches);
-                return new RemoveCourseFromLearningPlanResponse(true, "Successfully removed course from learning plan",
+                return new CourseResponse("Successfully removed course from learning plan",
                         courseRecord.getCourseTitle(), courseId);
             } catch (Exception e) {
                 String msg = String.format("Failed to remove course '%s' from user '%s' learning plan: %s", courseId, learnerId, e.getMessage());
@@ -41,7 +39,7 @@ public class CourseService {
         }
     }
 
-    public AddCourseToLearningPlanResponse addCourseToLearningPlan(String learnerId, String courseId) {
+    public CourseResponse addCourseToLearningPlan(String learnerId, String courseId) {
         log.info("Adding course '{}' to user '{}' learning plan", courseId, learnerId);
         CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
         try {
@@ -55,7 +53,7 @@ public class CourseService {
                 );
                 courseRecord = learnerRecordService.updateCourseRecord(learnerId, courseId, patches);
             }
-            return new AddCourseToLearningPlanResponse(true, "Successfully added course to learning plan",
+            return new CourseResponse("Successfully added course to learning plan",
                     courseRecord.getCourseTitle(), courseId);
         } catch (Exception e) {
             String msg = String.format("Failed to add course '%s' to user '%s' learning plan: %s", courseId, learnerId, e.getMessage());
@@ -63,14 +61,14 @@ public class CourseService {
         }
     }
 
-    public RemoveCourseFromSuggestionsResponse removeCourseFromSuggestions(String learnerId, String courseId) {
+    public CourseResponse removeCourseFromSuggestions(String learnerId, String courseId) {
         log.info("Removing course '{}' from user '{}' suggestions", courseId, learnerId);
         CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
         if (courseRecord == null) {
             try {
                 CourseRecordStatus status = CourseRecordStatus.builder().preference(Preference.DISLIKED.name()).build();
                 courseRecord = learnerRecordService.createCourseRecord(learnerId, courseId, status);
-                return new RemoveCourseFromSuggestionsResponse(true, "Successfully removed course from suggestions",
+                return new CourseResponse("Successfully removed course from suggestions",
                         courseRecord.getCourseTitle(), courseId);
             } catch (Exception e) {
                 String msg = String.format("Failed to remove course '%s' from user '%s' suggestions: %s", courseId, learnerId, e.getMessage());

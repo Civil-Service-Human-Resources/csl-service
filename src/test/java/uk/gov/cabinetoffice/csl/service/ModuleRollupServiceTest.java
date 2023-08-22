@@ -50,8 +50,7 @@ public class ModuleRollupServiceTest {
 
     @BeforeEach
     public void setup() {
-//        moduleRollupService = new ModuleRollupService(learnerRecordService, rusticiCSLDataService);
-        cslTestUtil = new CslTestUtil(learnerRecordService, learnerId, courseId, moduleId, uid,
+        cslTestUtil = new CslTestUtil(learnerId, courseId, moduleId, uid,
                 currentDateTime, currentDateTime, currentDateTime);
         rusticiRollupData = createRusticiRollupData();
         reset(learnerRecordService);
