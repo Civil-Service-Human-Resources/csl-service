@@ -2,11 +2,10 @@ package uk.gov.cabinetoffice.csl.client.identity;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
-import uk.gov.cabinetoffice.csl.domain.identity.GrantRequest;
 import uk.gov.cabinetoffice.csl.domain.identity.OAuthToken;
 
 @Component
@@ -14,6 +13,8 @@ import uk.gov.cabinetoffice.csl.domain.identity.OAuthToken;
 public class IdentityClient implements IIdentityClient {
 
     private final IHttpClient client;
+    @Value("${oauth.tokenUrl}")
+    private String token;
 
     public IdentityClient(@Qualifier("identityHttpClient") IHttpClient client) {
         this.client = client;
@@ -22,9 +23,8 @@ public class IdentityClient implements IIdentityClient {
     @Override
     public OAuthToken getServiceToken() {
         log.debug("Getting service token from identity service");
-        GrantRequest body = new GrantRequest("client_credentials");
-        RequestEntity<GrantRequest> request = RequestEntity
-                .post("/oauth/token").contentType(MediaType.MULTIPART_FORM_DATA).body(body);
+        String url = String.format("%s?grant_type=client_credentials", token);
+        RequestEntity<Void> request = RequestEntity.post(url).build();
         return client.executeRequest(request, OAuthToken.class);
     }
 }
