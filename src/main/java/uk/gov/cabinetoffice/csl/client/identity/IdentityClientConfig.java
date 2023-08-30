@@ -11,7 +11,7 @@ import uk.gov.cabinetoffice.csl.client.IHttpClient;
 @Configuration
 public class IdentityClientConfig {
 
-    @Value("${oauth.tokenUrl}")
+    @Value("${oauth.serviceUrl}")
     private String identityBaseUrl;
 
     @Value("${oauth.clientId}")
