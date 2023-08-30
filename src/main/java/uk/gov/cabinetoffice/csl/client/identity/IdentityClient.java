@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
-import uk.gov.cabinetoffice.csl.domain.identity.ClientCredentialsRequest;
+import uk.gov.cabinetoffice.csl.domain.identity.GrantRequest;
 import uk.gov.cabinetoffice.csl.domain.identity.OAuthToken;
 
 @Component
@@ -21,8 +21,8 @@ public class IdentityClient implements IIdentityClient {
     @Override
     public OAuthToken getServiceToken() {
         log.debug("Getting service token from identity service");
-        ClientCredentialsRequest body = new ClientCredentialsRequest("client_credentials");
-        RequestEntity<ClientCredentialsRequest> request = RequestEntity
+        GrantRequest body = new GrantRequest("client_credentials");
+        RequestEntity<GrantRequest> request = RequestEntity
                 .post("/oauth/token").body(body);
         return client.executeRequest(request, OAuthToken.class);
     }
