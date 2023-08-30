@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.client.identity;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
@@ -23,7 +24,7 @@ public class IdentityClient implements IIdentityClient {
         log.debug("Getting service token from identity service");
         GrantRequest body = new GrantRequest("client_credentials");
         RequestEntity<GrantRequest> request = RequestEntity
-                .post("/oauth/token").body(body);
+                .post("/oauth/token").contentType(MediaType.MULTIPART_FORM_DATA).body(body);
         return client.executeRequest(request, OAuthToken.class);
     }
 }
