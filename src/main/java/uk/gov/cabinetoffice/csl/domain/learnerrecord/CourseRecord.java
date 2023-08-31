@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +20,7 @@ import static java.util.stream.Collectors.toList;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CourseRecord {
+public class CourseRecord implements Serializable {
 
     private String courseId;
 
@@ -51,7 +52,7 @@ public class CourseRecord {
     }
 
     public ModuleRecord getModuleRecord(String moduleId) {
-        if(moduleRecords != null) {
+        if (moduleRecords != null) {
             return this.moduleRecords.stream()
                     .filter(moduleRecord -> moduleId.equals(moduleRecord.getModuleId()))
                     .findFirst()
