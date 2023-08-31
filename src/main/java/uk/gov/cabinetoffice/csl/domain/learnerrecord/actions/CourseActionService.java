@@ -14,11 +14,12 @@ public abstract class CourseActionService {
     }
 
     public CourseRecord createCourseRecord(String learnerId, String courseId) {
-        throw new RecordAlreadyExistsException(String.format("Course record with ID '%s' already exists for user '%s'", courseId, learnerId));
+        throw new RecordNotFoundException(String.format("Course record with ID '%s' does not exist for user '%s'",
+                courseId, learnerId));
     }
 
     public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
-        throw new RecordNotFoundException(String.format("Course record with ID '%s' does not exist for user '%s'",
+        throw new RecordAlreadyExistsException(String.format("Course record with ID '%s' already exists for user '%s'",
                 courseRecord.getCourseId(), courseRecord.getUserId()));
     }
 

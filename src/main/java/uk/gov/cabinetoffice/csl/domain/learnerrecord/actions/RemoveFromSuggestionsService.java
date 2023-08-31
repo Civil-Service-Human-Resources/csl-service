@@ -18,7 +18,7 @@ public class RemoveFromSuggestionsService extends CourseActionService {
         return CourseRecordAction.REMOVE_FROM_SUGGESTIONS;
     }
 
-    public CourseRecord updateCourseRecord(String learnerId, String courseId) {
+    public CourseRecord createCourseRecord(String learnerId, String courseId) {
         CourseRecordStatus status = CourseRecordStatus.builder().preference(Preference.DISLIKED.name()).build();
         return learnerRecordService.createCourseRecord(learnerId, courseId, status);
     }

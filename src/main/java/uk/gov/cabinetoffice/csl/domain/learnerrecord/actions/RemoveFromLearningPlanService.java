@@ -21,8 +21,8 @@ public class RemoveFromLearningPlanService extends CourseActionService {
         return CourseRecordAction.REMOVE_FROM_LEARNING_PLAN;
     }
 
-    public CourseRecord updateCourseRecord(String learnerId, String courseId) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
         List<PatchOp> patches = Collections.singletonList(PatchOp.replacePatch("state", State.ARCHIVED.name()));
-        return learnerRecordService.updateCourseRecord(learnerId, courseId, patches);
+        return learnerRecordService.updateCourseRecord(courseRecord, patches);
     }
 }

@@ -88,6 +88,10 @@ public class LearnerRecordService {
         return client.updateCourseRecord(learnerId, courseId, patches);
     }
 
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, List<PatchOp> patches) {
+        return client.updateCourseRecord(courseRecord.getUserId(), courseRecord.getCourseId(), patches);
+    }
+
     public ModuleRecord createModuleRecord(String learnerId,
                                            String courseId,
                                            String moduleId,
