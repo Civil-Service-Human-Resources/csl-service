@@ -1,6 +1,9 @@
 package uk.gov.cabinetoffice.csl.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.learnerRecord.ILearnerRecordClient;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
@@ -59,6 +62,15 @@ public class LearnerRecordService {
         return false;
     }
 
+    @CachePut(value = "course-records", key = "#courseRecord.userId-#courseRecord.courseId")
+    public void updateCourseRecordCache(CourseRecord courseRecord) {
+    }
+
+    @CacheEvict(value = "course-records", key = "#learnerId-#courseId")
+    public void clearCourseRecordCache(String learnerId, String courseId) {
+    }
+
+    @Cacheable(value = "course-records", key = "#learnerId-#courseId")
     public CourseRecord getCourseRecord(String learnerId, String courseId) {
         CourseRecords courseRecords = client.getCourseRecord(learnerId, courseId);
         if (courseRecords == null) {

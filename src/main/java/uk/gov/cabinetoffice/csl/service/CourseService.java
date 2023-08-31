@@ -30,6 +30,7 @@ public class CourseService {
         } else {
             courseRecord = actionService.updateCourseRecord(courseRecord);
         }
+        learnerRecordService.updateCourseRecordCache(courseRecord);
         return new CourseResponse(String.format("Successfully applied action '%s' to course record", action),
                 courseRecord.getCourseTitle(), courseId);
     }
