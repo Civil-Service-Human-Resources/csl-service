@@ -22,7 +22,7 @@ import static uk.gov.cabinetoffice.csl.util.stub.LearnerRecordStubService.getCou
 import static uk.gov.cabinetoffice.csl.util.stub.LearnerRecordStubService.patchCourseRecord;
 
 @Slf4j
-@ActiveProfiles({"wiremock"})
+@ActiveProfiles({"wiremock", "no-redis"})
 @Import(TestConfig.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
