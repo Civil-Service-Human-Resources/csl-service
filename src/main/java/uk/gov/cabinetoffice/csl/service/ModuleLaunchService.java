@@ -71,10 +71,12 @@ public class ModuleLaunchService {
             } else {
                 moduleRecordUid = moduleRecord.getUid();
             }
-            learnerRecordService.updateModuleRecord(moduleRecord.getId(), patches);
+            moduleRecord = learnerRecordService.updateModuleRecord(moduleRecord.getId(), patches);
             if (StringUtils.isNotBlank(moduleRecordUid)) {
                 launchLink = createLaunchLink(learnerId, moduleId, moduleRecordUid, courseId, moduleLaunchLinkInput);
             }
+            courseRecord.updateModuleRecords(moduleRecord);
+            learnerRecordService.updateCourseRecordCache(courseRecord);
         } catch (Exception e) {
             throw new GenericServerException(String.format("Unable to retrieve launch link for learner id: %s course id: %s and module id: %s. " +
                     "Error: %s", learnerId, courseId, moduleId, e));
