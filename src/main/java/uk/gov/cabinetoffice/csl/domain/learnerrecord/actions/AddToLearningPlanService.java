@@ -17,21 +17,22 @@ public class AddToLearningPlanService extends CourseActionService {
     }
 
     @Override
-    public CourseRecordAction getType() {
-        return CourseRecordAction.ADD_TO_LEARNING_PLAN;
+    public CourseRecord processNewCourseRecord(String learnerId, String courseId) {
+        CourseRecordStatus status = CourseRecordStatus.builder().preference(Preference.LIKED.name()).build();
+        return learnerRecordService.createCourseRecord(learnerId, courseId, status);
     }
 
-    public CourseRecord updateCourseRecord(String learnerId, String courseId) {
+    @Override
+    public CourseRecord processExistingCourseRecord(CourseRecord courseRecord) {
         List<PatchOp> patches = List.of(
                 PatchOp.replacePatch("preference", Preference.LIKED.name()),
                 PatchOp.removePatch("state")
         );
-        return learnerRecordService.updateCourseRecord(learnerId, courseId, patches);
+        return learnerRecordService.updateCourseRecord(courseRecord, patches);
     }
 
     @Override
-    public CourseRecord createCourseRecord(String learnerId, String courseId) {
-        CourseRecordStatus status = CourseRecordStatus.builder().preference(Preference.LIKED.name()).build();
-        return learnerRecordService.createCourseRecord(learnerId, courseId, status);
+    public CourseRecordAction getType() {
+        return CourseRecordAction.ADD_TO_LEARNING_PLAN;
     }
 }

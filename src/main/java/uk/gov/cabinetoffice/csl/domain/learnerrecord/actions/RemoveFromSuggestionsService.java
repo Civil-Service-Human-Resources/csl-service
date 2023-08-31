@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions;
 
 import org.springframework.stereotype.Component;
+import uk.gov.cabinetoffice.csl.domain.error.RecordAlreadyExistsException;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordStatus;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.Preference;
@@ -14,13 +15,20 @@ public class RemoveFromSuggestionsService extends CourseActionService {
     }
 
     @Override
-    public CourseRecordAction getType() {
-        return CourseRecordAction.REMOVE_FROM_SUGGESTIONS;
-    }
-
-    public CourseRecord createCourseRecord(String learnerId, String courseId) {
+    public CourseRecord processNewCourseRecord(String learnerId, String courseId) {
         CourseRecordStatus status = CourseRecordStatus.builder().preference(Preference.DISLIKED.name()).build();
         return learnerRecordService.createCourseRecord(learnerId, courseId, status);
+    }
+
+    @Override
+    public CourseRecord processExistingCourseRecord(CourseRecord courseRecord) {
+        throw new RecordAlreadyExistsException(String.format("Course record with ID '%s' already exists for user '%s'",
+                courseRecord.getCourseId(), courseRecord.getUserId()));
+    }
+
+    @Override
+    public CourseRecordAction getType() {
+        return CourseRecordAction.REMOVE_FROM_SUGGESTIONS;
     }
 
 }

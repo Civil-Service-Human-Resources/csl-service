@@ -26,9 +26,9 @@ public class CourseService {
         CourseActionService actionService = courseRecordActionServiceFactory.getService(action);
         CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
         if (courseRecord == null) {
-            courseRecord = actionService.createCourseRecord(learnerId, courseId);
+            courseRecord = actionService.processNewCourseRecord(learnerId, courseId);
         } else {
-            courseRecord = actionService.updateCourseRecord(courseRecord);
+            courseRecord = actionService.processExistingCourseRecord(courseRecord);
         }
         return new CourseResponse(String.format("Successfully applied action '%s' to course record", action),
                 courseRecord.getCourseTitle(), courseId);
