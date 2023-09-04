@@ -68,7 +68,7 @@ public class LearnerRecordService {
         return false;
     }
 
-    @CacheEvict(value = "course-record", key = "#learnerId-#courseId")
+    @CacheEvict(value = "course-record", key = "{#learnerId, #courseId}")
     public void bustCourseRecordCache(String learnerId, String courseId) {
 
     }
@@ -78,7 +78,7 @@ public class LearnerRecordService {
 
     }
 
-    @Cacheable(value = "course-record", key = "#learnerId-#courseId")
+    @Cacheable(value = "course-record", key = "{#learnerId, #courseId}")
     public CourseRecord getCourseRecord(String learnerId, String courseId) {
         CourseRecords courseRecords = client.getCourseRecord(learnerId, courseId);
         if (courseRecords == null) {
