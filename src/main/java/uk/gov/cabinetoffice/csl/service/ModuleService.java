@@ -45,8 +45,7 @@ public class ModuleService {
             courseRecord.updateModuleRecords(moduleRecord);
             courseRecord = learnerRecordActionProcessor.applyPatchUpdateToCourseRecord(courseRecord, update);
         }
-        learnerRecordService.updateCourseRecordCache(courseRecord);
-        return courseRecord;
+        return learnerRecordService.updateCourseRecordCache(courseRecord);
     }
 
 }

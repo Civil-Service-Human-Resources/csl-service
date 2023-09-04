@@ -74,8 +74,8 @@ public class LearnerRecordService {
     }
 
     @CachePut(value = "course-record", key = "{ #courseRecord.getUserId(), #courseRecord.getCourseId() }")
-    public void updateCourseRecordCache(CourseRecord courseRecord) {
-
+    public CourseRecord updateCourseRecordCache(CourseRecord courseRecord) {
+        return courseRecord;
     }
 
     @Cacheable(value = "course-record", key = "{#learnerId, #courseId}")
