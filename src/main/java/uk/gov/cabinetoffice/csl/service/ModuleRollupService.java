@@ -47,6 +47,7 @@ public class ModuleRollupService {
             } else {
                 throw new RecordNotFoundException(String.format("Unable to process the rustici rollup data: %s. Course record with id '%s' was null", rusticiRollupData, properties.getCourseId()));
             }
+            learnerRecordService.updateCourseRecordCache(courseRecord);
             log.debug("courseRecord after processing rollup data: {}", courseRecord);
         }
     }
