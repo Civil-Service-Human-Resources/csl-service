@@ -57,7 +57,7 @@ public class RemoveCourseFromSuggestionsTest extends CSLServiceWireMockServer {
                 .expectBody()
                 .jsonPath("$.courseId").isEqualTo(courseId)
                 .jsonPath("$.courseTitle").isEqualTo(testDataService.getCourseTitle())
-                .jsonPath("$.message").isEqualTo("Successfully applied action 'REMOVE_FROM_SUGGESTIONS' to course record");
+                .jsonPath("$.message").isEqualTo("Successfully applied action 'Remove from suggestions' to course record");
 
     }
 

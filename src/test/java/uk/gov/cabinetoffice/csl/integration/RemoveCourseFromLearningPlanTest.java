@@ -58,7 +58,7 @@ public class RemoveCourseFromLearningPlanTest extends CSLServiceWireMockServer {
                 .expectBody()
                 .jsonPath("$.courseId").isEqualTo(courseId)
                 .jsonPath("$.courseTitle").isEqualTo(testDataService.getCourseTitle())
-                .jsonPath("$.message").isEqualTo("Successfully applied action 'REMOVE_FROM_LEARNING_PLAN' to course record");
+                .jsonPath("$.message").isEqualTo("Successfully applied action 'Remove from Learning plan' to course record");
 
     }
 
@@ -75,10 +75,10 @@ public class RemoveCourseFromLearningPlanTest extends CSLServiceWireMockServer {
                 .header("Authorization", "Bearer fakeToken")
                 .exchange()
                 .expectStatus()
-                .isNotFound()
+                .isBadRequest()
                 .expectBody()
-                .jsonPath("$.title").isEqualTo("Record Not Found")
-                .jsonPath("$.status").isEqualTo("404")
+                .jsonPath("$.title").isEqualTo("Record is in the incorrect state")
+                .jsonPath("$.status").isEqualTo("400")
                 .jsonPath("$.instance").isEqualTo("/api/courses/courseId/remove_from_learning_plan");
     }
 }

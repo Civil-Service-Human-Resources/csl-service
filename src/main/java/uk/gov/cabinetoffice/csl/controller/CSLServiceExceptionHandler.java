@@ -24,7 +24,7 @@ public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(IncorrectStateException.class)
-    public ProblemDetail handleIncorrectStateException(RecordNotFoundException ex) {
+    public ProblemDetail handleIncorrectStateException(IncorrectStateException ex) {
         return createProblemDetail(400, ex, "Record is in the incorrect state");
     }
 
