@@ -75,7 +75,7 @@ public class ModuleRollupServiceTest {
         mockGetCSLDataFromRollup(new CSLRusticiProps(courseId, moduleId, learnerId, expPatches));
         when(learnerRecordService.getCourseRecord(learnerId, courseId)).thenReturn(courseRecord);
         when(learnerRecordService.updateModuleRecord(moduleRecord.getId(), expPatches)).thenReturn(moduleRecord);
-        when(learnerRecordService.isCourseCompleted(courseId, List.of())).thenReturn(false);
+        when(learnerRecordService.isCourseCompleted(courseRecord)).thenReturn(false);
         invokeService();
         verify(learnerRecordService, never()).updateCourseRecord(any(), any(), any());
     }
@@ -91,7 +91,7 @@ public class ModuleRollupServiceTest {
         mockGetCSLDataFromRollup(new CSLRusticiProps(courseId, moduleId, learnerId, expPatches));
         when(learnerRecordService.getCourseRecord(learnerId, courseId)).thenReturn(courseRecord);
         when(learnerRecordService.updateModuleRecord(moduleRecord.getId(), expPatches)).thenReturn(moduleRecord);
-        when(learnerRecordService.isCourseCompleted(courseId, List.of(moduleId))).thenReturn(true);
+        when(learnerRecordService.isCourseCompleted(courseRecord)).thenReturn(true);
         invokeService();
         verify(learnerRecordService, atMostOnce()).updateCourseRecord(learnerId, courseId,
                 List.of(PatchOp.replacePatch("state", "COMPLETED")));

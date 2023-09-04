@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions;
 
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.domain.error.IncorrectStateException;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordStatus;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
@@ -18,7 +19,7 @@ public class RemoveFromLearningPlanUpdate implements CourseRecordUpdate {
     }
 
     @Override
-    public List<PatchOp> getUpdateCourseRecordPatches() {
+    public List<PatchOp> getUpdateCourseRecordPatches(CourseRecord courseRecord) {
         return Collections.singletonList(PatchOp.replacePatch("state", State.ARCHIVED.name()));
     }
 

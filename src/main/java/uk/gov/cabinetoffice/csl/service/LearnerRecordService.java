@@ -43,7 +43,13 @@ public class LearnerRecordService {
         }
     }
 
-    public boolean isCourseCompleted(String courseId, List<String> completedModuleIds) {
+    public boolean isCourseCompleted(CourseRecord courseRecord) {
+        String courseId = courseRecord.getCourseId();
+        List<String> completedModuleIds = courseRecord.getModuleRecords()
+                .stream()
+                .filter(mr -> mr.getState().equals(State.COMPLETED))
+                .map(ModuleRecord::getModuleId)
+                .toList();
         Course course = getCourse(courseId);
         if (course.getModules() != null) {
             List<String> mandatoryModulesIds = course.getModules().stream()
@@ -86,10 +92,6 @@ public class LearnerRecordService {
 
     public CourseRecord updateCourseRecord(String learnerId, String courseId, List<PatchOp> patches) {
         return client.updateCourseRecord(learnerId, courseId, patches);
-    }
-
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord, List<PatchOp> patches) {
-        return client.updateCourseRecord(courseRecord.getUserId(), courseRecord.getCourseId(), patches);
     }
 
     public ModuleRecord createModuleRecord(String learnerId,

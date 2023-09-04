@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions;
 
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordStatus;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
 
@@ -9,7 +10,7 @@ public interface CourseRecordUpdate {
 
     CourseRecordStatus getCreateCourseRecordStatus();
 
-    List<PatchOp> getUpdateCourseRecordPatches();
+    List<PatchOp> getUpdateCourseRecordPatches(CourseRecord courseRecord);
 
     String getName();
 }

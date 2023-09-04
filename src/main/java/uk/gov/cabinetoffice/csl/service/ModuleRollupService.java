@@ -11,7 +11,6 @@ import uk.gov.cabinetoffice.csl.domain.rustici.CSLRusticiProps;
 import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -37,12 +36,7 @@ public class ModuleRollupService {
                 if (moduleRecord != null) {
                     moduleRecord = learnerRecordService.updateModuleRecord(moduleRecord.getId(), patches);
                     courseRecord.updateModuleRecords(moduleRecord);
-                    List<String> completedModuleIds = courseRecord.getModuleRecords()
-                            .stream()
-                            .filter(mr -> mr.getState().equals(State.COMPLETED))
-                            .map(ModuleRecord::getModuleId)
-                            .collect(Collectors.toList());
-                    if (learnerRecordService.isCourseCompleted(courseRecord.getCourseId(), completedModuleIds)) {
+                    if (learnerRecordService.isCourseCompleted(courseRecord)) {
                         List<PatchOp> courseRecordPatches = List.of(PatchOp.replacePatch("state", State.COMPLETED.name()));
                         courseRecord = learnerRecordService.updateCourseRecord(properties.getLearnerId(), properties.getCourseId(), courseRecordPatches);
                     }

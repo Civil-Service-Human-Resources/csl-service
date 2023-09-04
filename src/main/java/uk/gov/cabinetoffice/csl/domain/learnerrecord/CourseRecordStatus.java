@@ -9,4 +9,5 @@ public class CourseRecordStatus {
     private String state;
     private Boolean isRequired;
     private String preference;
+    private ModuleRecordStatus moduleRecordStatus;
 }

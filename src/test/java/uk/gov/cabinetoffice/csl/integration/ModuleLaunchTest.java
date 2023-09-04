@@ -75,6 +75,7 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
         moduleRecord.setUid(null);
         when(stringUtilService.generateRandomUuid()).thenReturn("uid");
         getCourseRecord(courseId, userId, courseRecords);
+        moduleRecord.setUid("uid");
         patchModuleRecord(1, List.of(
                 PatchOp.replacePatch("updatedAt", "2023-01-01T10:00"),
                 PatchOp.replacePatch("uid", "uid")
