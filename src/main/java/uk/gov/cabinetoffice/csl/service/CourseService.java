@@ -4,33 +4,49 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.model.CourseResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.CourseActionService;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.CourseRecordAction;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.CourseRecordActionServiceFactory;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordStatus;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.CourseRecordActionService;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.CourseRecordUpdate;
+
+import java.util.List;
 
 @Service
 @Slf4j
 public class CourseService {
 
     private final LearnerRecordService learnerRecordService;
-    private final CourseRecordActionServiceFactory courseRecordActionServiceFactory;
+    private final CourseRecordActionService courseRecordActionService;
 
-    public CourseService(LearnerRecordService learnerRecordService, CourseRecordActionServiceFactory courseRecordActionServiceFactory) {
+    public CourseService(LearnerRecordService learnerRecordService, CourseRecordActionService courseRecordActionService) {
         this.learnerRecordService = learnerRecordService;
-        this.courseRecordActionServiceFactory = courseRecordActionServiceFactory;
+        this.courseRecordActionService = courseRecordActionService;
     }
 
-    public CourseResponse processCourseRecordAction(String learnerId, String courseId, CourseRecordAction action) {
-        log.info(String.format("Applying action '%s' to course record for course '%s' and user '%s'",
-                action, courseId, learnerId));
-        CourseActionService actionService = courseRecordActionServiceFactory.getService(action);
+    public CourseResponse addToLearningPlan(String learnerId, String courseId) {
+        return processCourseRecordAction(learnerId, courseId, courseRecordActionService.getAddToLearningPlanUpdate());
+    }
+
+    public CourseResponse removeFromLearningPlan(String learnerId, String courseId) {
+        return processCourseRecordAction(learnerId, courseId, courseRecordActionService.getRemoveFromLearningPlanUpdate());
+    }
+
+    public CourseResponse removeFromSuggestions(String learnerId, String courseId) {
+        return processCourseRecordAction(learnerId, courseId, courseRecordActionService.getRemoveFromSuggestionsUpdate());
+    }
+
+    private CourseResponse processCourseRecordAction(String learnerId, String courseId, CourseRecordUpdate update) {
+        log.info(String.format("Applying update '%s' to course record for course '%s' and user '%s'",
+                update.getName(), courseId, learnerId));
         CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
         if (courseRecord == null) {
-            courseRecord = actionService.processNewCourseRecord(learnerId, courseId);
+            CourseRecordStatus courseRecordStatus = update.getCreateCourseRecordStatus();
+            courseRecord = learnerRecordService.createCourseRecord(learnerId, courseId, courseRecordStatus);
         } else {
-            courseRecord = actionService.processExistingCourseRecord(courseRecord);
+            List<PatchOp> patches = update.getUpdateCourseRecordPatches();
+            courseRecord = learnerRecordService.updateCourseRecord(learnerId, courseId, patches);
         }
-        return new CourseResponse(String.format("Successfully applied action '%s' to course record", action),
+        return new CourseResponse(String.format("Successfully applied action '%s' to course record", update.getName()),
                 courseRecord.getCourseTitle(), courseId);
     }
 }

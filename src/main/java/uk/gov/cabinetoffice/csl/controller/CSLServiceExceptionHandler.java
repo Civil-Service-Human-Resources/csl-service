@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.cabinetoffice.csl.domain.error.ClientAuthenticationErrorException;
 import uk.gov.cabinetoffice.csl.domain.error.GenericServerException;
+import uk.gov.cabinetoffice.csl.domain.error.IncorrectStateException;
 import uk.gov.cabinetoffice.csl.domain.error.RecordNotFoundException;
 
 import java.time.Instant;
@@ -20,6 +21,11 @@ public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
         body.setTitle(title);
         body.setProperty("timestamp", Instant.now());
         return body;
+    }
+
+    @ExceptionHandler(IncorrectStateException.class)
+    public ProblemDetail handleIncorrectStateException(RecordNotFoundException ex) {
+        return createProblemDetail(400, ex, "Record is in the incorrect state");
     }
 
     @ExceptionHandler(RecordNotFoundException.class)
