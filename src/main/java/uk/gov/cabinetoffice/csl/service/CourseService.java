@@ -49,6 +49,7 @@ public class CourseService {
         } else {
             courseRecord = learnerRecordActionProcessor.applyPatchUpdateToCourseRecord(courseRecord, update);
         }
+        learnerRecordService.updateCourseRecordCache(courseRecord);
         return courseRecord;
     }
 }
