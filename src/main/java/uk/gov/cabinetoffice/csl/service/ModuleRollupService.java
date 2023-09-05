@@ -7,6 +7,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.CSLRusticiProps;
 import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 
@@ -17,11 +18,14 @@ import java.util.List;
 public class ModuleRollupService {
 
     private final LearnerRecordService learnerRecordService;
+    private final LearningCatalogueService learningCatalogueService;
     private final RusticiCSLDataService rusticiCSLDataService;
 
     public ModuleRollupService(LearnerRecordService learnerRecordService,
+                               LearningCatalogueService learningCatalogueService,
                                RusticiCSLDataService rusticiCSLDataService) {
         this.learnerRecordService = learnerRecordService;
+        this.learningCatalogueService = learningCatalogueService;
         this.rusticiCSLDataService = rusticiCSLDataService;
     }
 
@@ -36,7 +40,8 @@ public class ModuleRollupService {
                 if (moduleRecord != null) {
                     moduleRecord = learnerRecordService.updateModuleRecord(moduleRecord.getId(), patches);
                     courseRecord.updateModuleRecords(moduleRecord);
-                    if (learnerRecordService.isCourseCompleted(courseRecord)) {
+                    Course course = learningCatalogueService.getCourse(courseRecord.getCourseId());
+                    if (course.isCourseComplete(courseRecord)) {
                         List<PatchOp> courseRecordPatches = List.of(PatchOp.replacePatch("state", State.COMPLETED.name()));
                         courseRecord = learnerRecordService.updateCourseRecord(properties.getLearnerId(), properties.getCourseId(), courseRecordPatches);
                     }

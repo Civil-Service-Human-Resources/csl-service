@@ -31,7 +31,7 @@ public class ModuleRecordInput {
                                          Module module, ModuleRecordStatus status) {
         return new ModuleRecordInput(status.getUid(), learnerId, courseId,
                 module.getId(), module.getTitle(), module.isOptional(),
-                module.getDuration(), module.getModuleType(), module.getCost(),
+                module.getDuration(), module.getModuleType().name(), module.getCost(),
                 status.getState(), status.getResult(), status.getEventDate(), status.getEventId(),
                 status.getCompletedDate());
     }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
 import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationInput;
@@ -16,12 +17,15 @@ public class ModuleLaunchService {
 
     private final ModuleService moduleService;
     private final RusticiService rusticiService;
+    private final LearningCatalogueService learningCatalogueService;
     private final String[] disabledBookmarkingModuleIDs;
 
     public ModuleLaunchService(ModuleService moduleService, RusticiService rusticiService,
+                               LearningCatalogueService learningCatalogueService,
                                @Value("${rustici.disabledBookmarkingModuleIDs}") String[] disabledBookmarkingModuleIDs) {
         this.moduleService = moduleService;
         this.rusticiService = rusticiService;
+        this.learningCatalogueService = learningCatalogueService;
         this.disabledBookmarkingModuleIDs = disabledBookmarkingModuleIDs;
     }
 
@@ -29,9 +33,21 @@ public class ModuleLaunchService {
                                        String moduleId, ModuleLaunchLinkInput moduleLaunchLinkInput) {
         log.info("User '{}' launching module '{}' in course '{}'", learnerId, moduleId, courseId);
         log.debug("moduleLaunchLinkInput: {}", moduleLaunchLinkInput);
-        ModuleRecord moduleRecord = moduleService.launchModule(learnerId, courseId, moduleId, moduleLaunchLinkInput);
+        LaunchLink launchLink;
+        CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
+        ModuleRecord moduleRecord = moduleService.launchModule(learnerId, courseWithModule.getCourse(),
+                courseWithModule.getModule(), moduleLaunchLinkInput);
+        launchLink = switch (courseWithModule.getModule().getModuleType()) {
+            case elearning -> getRusticiLaunchLink(moduleRecord, learnerId, courseId, moduleLaunchLinkInput);
+            case file, link, video -> new LaunchLink(courseWithModule.getModule().getUrl());
+        };
+        return launchLink;
+    }
+
+    private LaunchLink getRusticiLaunchLink(ModuleRecord moduleRecord, String learnerId, String courseId,
+                                            ModuleLaunchLinkInput moduleLaunchLinkInput) {
         String moduleRecordUid = moduleRecord.getUid();
-        RegistrationInput registrationInput = RegistrationInput.from(learnerId, moduleId, moduleRecordUid,
+        RegistrationInput registrationInput = RegistrationInput.from(learnerId, moduleRecord.getModuleId(), moduleRecordUid,
                 courseId, moduleLaunchLinkInput);
         LaunchLink launchLink = rusticiService.createLaunchLink(registrationInput);
         if (isDisabledBookmarkingModuleID(registrationInput.getModuleId())) {

@@ -5,9 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 @Data
@@ -28,5 +32,26 @@ public class Course implements Serializable {
         } else {
             return modules.get(0);
         }
+    }
+
+    @JsonIgnore
+    public boolean isCourseComplete(CourseRecord courseRecord) {
+        List<String> completedModuleIds = courseRecord.getModuleRecords()
+                .stream()
+                .filter(mr -> mr.getState().equals(State.COMPLETED))
+                .map(ModuleRecord::getModuleId)
+                .toList();
+        if (getModules() != null) {
+            List<String> mandatoryModulesIds = getModules().stream()
+                    .filter(m -> !m.isOptional()).map(Module::getId).toList();
+            if (mandatoryModulesIds.size() > 0) {
+                return new HashSet<>(completedModuleIds).containsAll(mandatoryModulesIds);
+            } else {
+                List<String> optionalModulesIds = getModules().stream()
+                        .filter(Module::isOptional).map(Module::getId).toList();
+                return new HashSet<>(completedModuleIds).containsAll(optionalModulesIds);
+            }
+        }
+        return false;
     }
 }

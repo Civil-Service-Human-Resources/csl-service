@@ -16,6 +16,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
 import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
@@ -27,6 +28,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static uk.gov.cabinetoffice.csl.util.stub.LearnerRecordStubService.*;
+import static uk.gov.cabinetoffice.csl.util.stub.LearningCatalogueStubService.getCourse;
 import static uk.gov.cabinetoffice.csl.util.stub.RusticiStubService.postLaunchLink;
 
 @Slf4j
@@ -53,6 +55,7 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
     private String moduleId;
     private CourseRecord courseRecord;
     private CourseRecords courseRecords;
+    private Course course;
     private ModuleRecord moduleRecord;
     private ModuleLaunchLinkInput input;
     private LaunchLink launchLink;
@@ -65,6 +68,7 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
         courseRecord = testDataService.generateCourseRecord(true);
         courseRecords = new CourseRecords(List.of(courseRecord));
         moduleRecord = courseRecord.getModuleRecord(moduleId);
+        course = testDataService.generateCourse(true);
         input = new ModuleLaunchLinkInput();
         input.setLearnerFirstName(testDataService.getLearnerFirstName());
         launchLink = new LaunchLink("http://launch.link");
@@ -74,6 +78,7 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
     public void testGetLaunchLink() {
         moduleRecord.setUid(null);
         when(stringUtilService.generateRandomUuid()).thenReturn("uid");
+        getCourse(courseId, course);
         getCourseRecord(courseId, userId, courseRecords);
         moduleRecord.setUid("uid");
         patchModuleRecord(1, List.of(

@@ -1,6 +1,8 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions;
 
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.util.StringUtilService;
 
 import java.time.Clock;
@@ -18,5 +20,9 @@ public class ModuleRecordActionService {
 
     public ModuleRecordUpdate getLaunchModuleUpdate(boolean isCourseRequired) {
         return new LaunchModuleUpdate(stringUtilService, isCourseRequired, clock);
+    }
+
+    public ModuleRecordUpdate getCompleteModuleUpdate(Course course, Module module) {
+        return new CompleteModuleUpdate(course, module);
     }
 }

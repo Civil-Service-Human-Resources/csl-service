@@ -6,7 +6,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
+import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 
 @Slf4j
 @Service
@@ -16,6 +19,16 @@ public class LearningCatalogueService {
 
     public LearningCatalogueService(ILearningCatalogueClient client) {
         this.client = client;
+    }
+
+    public CourseWithModule getCourseWithModule(String courseId, String moduleId) {
+        Course course = getCourse(courseId);
+        Module module = course.getModule(moduleId);
+        if (module != null) {
+            return new CourseWithModule(course, module);
+        } else {
+            throw new LearningCatalogueResourceNotFoundException(String.format("Module '%s' in course '%s'", moduleId, courseId));
+        }
     }
 
     @Cacheable(value = "catalogue-course", key = "#courseId")

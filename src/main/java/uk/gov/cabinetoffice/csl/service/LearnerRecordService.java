@@ -10,9 +10,7 @@ import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundEx
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 
-import java.util.HashSet;
 import java.util.List;
 
 @Slf4j
@@ -34,38 +32,6 @@ public class LearnerRecordService {
         } else {
             throw new LearningCatalogueResourceNotFoundException(String.format("Course '%s'", courseId));
         }
-    }
-
-    private CourseWithModule getCourseWithModule(String courseId, String moduleId) {
-        Course course = getCourse(courseId);
-        Module module = course.getModule(moduleId);
-        if (module != null) {
-            return new CourseWithModule(course, module);
-        } else {
-            throw new LearningCatalogueResourceNotFoundException(String.format("Module '%s' in course '%s'", moduleId, courseId));
-        }
-    }
-
-    public boolean isCourseCompleted(CourseRecord courseRecord) {
-        String courseId = courseRecord.getCourseId();
-        List<String> completedModuleIds = courseRecord.getModuleRecords()
-                .stream()
-                .filter(mr -> mr.getState().equals(State.COMPLETED))
-                .map(ModuleRecord::getModuleId)
-                .toList();
-        Course course = getCourse(courseId);
-        if (course.getModules() != null) {
-            List<String> mandatoryModulesIds = course.getModules().stream()
-                    .filter(m -> !m.isOptional()).map(Module::getId).toList();
-            if (mandatoryModulesIds.size() > 0) {
-                return new HashSet<>(completedModuleIds).containsAll(mandatoryModulesIds);
-            } else {
-                List<String> optionalModulesIds = course.getModules().stream()
-                        .filter(Module::isOptional).map(Module::getId).toList();
-                return new HashSet<>(completedModuleIds).containsAll(optionalModulesIds);
-            }
-        }
-        return false;
     }
 
     @CacheEvict(value = "course-record", key = "{#learnerId, #courseId}")
@@ -92,7 +58,7 @@ public class LearnerRecordService {
                                            String moduleId,
                                            CourseRecordStatus courseRecordStatus,
                                            ModuleRecordStatus moduleRecordStatus) {
-        CourseWithModule courseWithModule = getCourseWithModule(courseId, moduleId);
+        CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
         CourseRecordInput input = CourseRecordInput.from(learnerId, courseWithModule.getCourse(),
                 courseRecordStatus, courseWithModule.getModule(), moduleRecordStatus);
         return client.createCourseRecord(input);
@@ -112,7 +78,7 @@ public class LearnerRecordService {
                                            String courseId,
                                            String moduleId,
                                            ModuleRecordStatus moduleRecordStatus) {
-        CourseWithModule courseWithModule = getCourseWithModule(courseId, moduleId);
+        CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
         ModuleRecordInput input = ModuleRecordInput.from(learnerId, courseId, courseWithModule.getModule(), moduleRecordStatus);
         return client.createModuleRecord(input);
     }

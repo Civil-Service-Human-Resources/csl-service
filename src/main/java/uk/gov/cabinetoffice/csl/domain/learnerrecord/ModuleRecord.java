@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -24,7 +25,7 @@ public class ModuleRecord implements Serializable {
     private String uid;
     private String moduleId;
     private String moduleTitle;
-    private String moduleType;
+    private ModuleType moduleType;
     private Long duration;
     private String eventId;
     @JsonSerialize(using = LocalDateSerializer.class)

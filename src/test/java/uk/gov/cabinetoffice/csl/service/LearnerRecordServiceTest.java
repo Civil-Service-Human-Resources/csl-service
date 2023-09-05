@@ -7,9 +7,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.client.learnerRecord.ILearnerRecordClient;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordInput;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordStatus;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecordInput;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecordStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.util.AssertionErrors.assertFalse;
-import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("no-redis")
@@ -36,47 +39,6 @@ public class LearnerRecordServiceTest {
 
     private final String courseId = "courseId";
     private final String learnerId = "learnerId";
-
-    @Test
-    public void testCourseCompletedWithMandatoryModules() {
-        Course course = getCourse(3);
-        course.getModule("mod1").setOptional(false);
-        course.getModule("mod2").setOptional(false);
-        course.getModule("mod3").setOptional(true);
-        when(learningCatalogueService.getCourse("courseId")).thenReturn(course);
-        CourseRecord courseRecord = getCourseRecord(3);
-        courseRecord.getModuleRecord("mod1").setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod2").setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod3").setState(State.COMPLETED);
-        boolean result = learnerRecordService.isCourseCompleted(courseRecord);
-        assertTrue("Expected course to be completed", result);
-    }
-
-    @Test
-    public void testCourseCompletedWithOptionalModules() {
-        Course course = getCourse(3);
-        course.getModules().forEach(m -> m.setOptional(true));
-        when(learningCatalogueService.getCourse(courseId)).thenReturn(course);
-        CourseRecord courseRecord = getCourseRecord(3);
-        courseRecord.getModuleRecord("mod1").setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod2").setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod3").setState(State.COMPLETED);
-        boolean result = learnerRecordService.isCourseCompleted(courseRecord);
-        assertTrue("Expected course to be completed", result);
-    }
-
-    @Test
-    public void testCourseNotCompletedWithOptionalModules() {
-        Course course = getCourse(3);
-        course.getModule("mod3").setOptional(false);
-        when(learningCatalogueService.getCourse(courseId)).thenReturn(course);
-        CourseRecord courseRecord = getCourseRecord(3);
-        courseRecord.getModuleRecord("mod1").setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod2").setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod3").setState(State.IN_PROGRESS);
-        boolean result = learnerRecordService.isCourseCompleted(courseRecord);
-        assertFalse("Expected course to not be completed", result);
-    }
 
     @Test
     public void testCreateCourseRecordNoModule() {
@@ -99,7 +61,7 @@ public class LearnerRecordServiceTest {
         mod.setOptional(false);
         mod.setTitle("Module Title");
         mod.setDuration(10L);
-        mod.setModuleType("elearning");
+        mod.setModuleType(ModuleType.elearning);
         mod.setCost(BigDecimal.valueOf(10));
         CourseRecordInput expectedInput = getCourseRecordInput(true);
         CourseRecordStatus status = CourseRecordStatus.builder()
@@ -111,7 +73,8 @@ public class LearnerRecordServiceTest {
                 .state("IN_PROGRESS").result("PASSED").eventId("eventId")
                 .eventDate(LocalDate.now()).completedDate(LocalDateTime.now())
                 .build();
-        when(learningCatalogueService.getCourse(courseId)).thenReturn(course);
+        CourseWithModule courseWithModule = new CourseWithModule(course, mod);
+        when(learningCatalogueService.getCourseWithModule(courseId, mod.getId())).thenReturn(courseWithModule);
         learnerRecordService.createCourseRecord(learnerId, courseId, "mod1", status, moduleRecordStatus);
         verify(learnerRecordClient, atMostOnce()).createCourseRecord(expectedInput);
     }
@@ -134,23 +97,6 @@ public class LearnerRecordServiceTest {
                 "LIKED",
                 withModule ? List.of(getModuleRecordInput()) : List.of()
         );
-    }
-
-    private CourseRecord getCourseRecord(int moduleCount) {
-        CourseRecord courseRecord = new CourseRecord();
-        courseRecord.setCourseId(courseId);
-        List<ModuleRecord> mods = new ArrayList<>();
-        for (int i = 0; i < moduleCount; i++) {
-            mods.add(createBasicModuleRecord("mod" + (i + 1)));
-        }
-        courseRecord.setModuleRecords(mods);
-        return courseRecord;
-    }
-
-    private ModuleRecord createBasicModuleRecord(String id) {
-        ModuleRecord moduleRecord = new ModuleRecord();
-        moduleRecord.setModuleId(id);
-        return moduleRecord;
     }
 
     private Course getCourse(int moduleCount) {

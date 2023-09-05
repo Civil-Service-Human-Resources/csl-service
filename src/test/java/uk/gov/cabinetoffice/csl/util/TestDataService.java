@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.domain.rustici.*;
 
 import java.math.BigDecimal;
@@ -45,7 +46,7 @@ public class TestDataService {
 
     public Module generateModule() {
         Module module = new Module();
-        module.setModuleType("elearning");
+        module.setModuleType(ModuleType.elearning);
         module.setCost(BigDecimal.valueOf(10));
         module.setTitle(moduleTitle);
         module.setOptional(false);
