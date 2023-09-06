@@ -117,7 +117,7 @@ public class ModuleServiceTest {
         assertEquals(moduleId, result.getModuleId());
         assertEquals("Test Module", result.getModuleTitle());
         assertEquals(courseId, result.getCourseId());
-        assertEquals("Test course", result.getCourseTitle());
+        assertEquals("Test Course", result.getCourseTitle());
     }
 
     private ModuleLaunchLinkInput createModuleLaunchLinkInput() {
