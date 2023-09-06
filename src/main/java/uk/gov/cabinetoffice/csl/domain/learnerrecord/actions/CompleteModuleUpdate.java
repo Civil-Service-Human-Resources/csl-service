@@ -42,7 +42,7 @@ public class CompleteModuleUpdate implements IModuleRecordUpdate {
         if (!courseRecord.getState().equals(State.COMPLETED)) {
             if (course.isCourseComplete(courseRecord)) {
                 patches.add(PatchOp.replacePatch("state", State.COMPLETED.name()));
-            } else {
+            } else if (!courseRecord.getState().equals(State.IN_PROGRESS)) {
                 patches.add(PatchOp.replacePatch("state", State.IN_PROGRESS.name()));
             }
         }
