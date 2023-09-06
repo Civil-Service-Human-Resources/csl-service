@@ -12,11 +12,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
 import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
@@ -75,7 +73,7 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
     }
 
     @Test
-    public void testGetLaunchLink() {
+    public void testGetELearningLaunchLink() {
         moduleRecord.setUid(null);
         when(stringUtilService.generateRandomUuid()).thenReturn("uid");
         getCourse(courseId, course);
@@ -104,28 +102,35 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
                 .jsonPath("$.launchLink")
                 .isEqualTo("http://launch.link");
     }
-//
-//    @Test
-//    public void testGetLaunchLinkCreateRecords() {
-//        moduleRecord.setUid(null);
-//        when(stringUtilService.generateRandomUuid()).thenReturn("uid");
-//        learningCatalogueStubService.getCourse(courseId, course);
-//        learnerRecordStubService.getCourseRecord(courseId, userId, null);
-//        LaunchLinkRequest req = testDataService.generateLaunchLinkRequest();
-//        rusticiStubService.postLaunchLink("uid", req, launchLink);
-//
-//        String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
-//        webTestClient
-//                .post()
-//                .uri(url)
-//                .header("Authorization", "Bearer fakeToken")
-//                .body(Mono.just(input), ModuleLaunchLinkInput.class)
-//                .exchange()
-//                .expectStatus()
-//                .is2xxSuccessful()
-//                .expectBody()
-//                .jsonPath("$.launchLink")
-//                .isEqualTo("http://launch.link");
-//    }
+
+    @Test
+    public void testGetFileLaunchLink() {
+        moduleRecord.setUid(null);
+        when(stringUtilService.generateRandomUuid()).thenReturn("uid");
+        course.getModule(moduleId).setModuleType(ModuleType.file);
+        course.getModule(moduleId).setUrl("http://launch.link");
+        getCourse(courseId, course);
+        getCourseRecord(courseId, userId, courseRecords);
+        moduleRecord.setState(State.COMPLETED);
+        patchModuleRecord(1, List.of(
+                PatchOp.replacePatch("state", "COMPLETED")
+        ), moduleRecord);
+        courseRecord.setState(State.COMPLETED);
+        patchCourseRecord(List.of(
+                PatchOp.replacePatch("state", "COMPLETED")
+        ), courseRecord);
+        String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
+        webTestClient
+                .post()
+                .uri(url)
+                .header("Authorization", "Bearer fakeToken")
+                .body(Mono.just(input), ModuleLaunchLinkInput.class)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.launchLink")
+                .isEqualTo("http://launch.link");
+    }
 
 }
