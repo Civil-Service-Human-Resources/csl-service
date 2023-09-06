@@ -18,8 +18,11 @@ public class ModuleRecordActionService {
         this.stringUtilService = stringUtilService;
     }
 
-    public ModuleRecordUpdate getLaunchModuleUpdate(boolean isCourseRequired) {
-        return new LaunchModuleUpdate(stringUtilService, isCourseRequired, clock);
+    public ModuleRecordUpdate getLaunchModuleUpdate(Course course, Module module, boolean isCourseRequired) {
+        return switch (module.getModuleType()) {
+            case elearning, video -> new LaunchModuleUpdate(stringUtilService, isCourseRequired, clock);
+            case file, link -> new CompleteModuleUpdate(course, module);
+        };
     }
 
     public ModuleRecordUpdate getCompleteModuleUpdate(Course course, Module module) {

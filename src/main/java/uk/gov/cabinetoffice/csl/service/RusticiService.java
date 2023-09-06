@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.RusticiEngineClient.IRusticiEngineClient;
 import uk.gov.cabinetoffice.csl.domain.rustici.*;
 
+import java.util.Arrays;
+
 @Service
 @Slf4j
 public class RusticiService {
@@ -15,6 +17,9 @@ public class RusticiService {
 
     @Value("${rustici.launchLinkExpirySeconds}")
     private int rusticiLaunchLinkExpiry;
+
+    @Value("${rustici.disabledBookmarkingModuleIDs}")
+    private String[] disabledBookmarkingModuleIDs;
 
     private final IRusticiEngineClient rusticiEngineClient;
 
@@ -27,6 +32,11 @@ public class RusticiService {
         if (launchLink == null) {
             //If no launch link present then create the registration and launch link using withLaunchLink
             launchLink = createRegistrationAndLaunchLink(registrationInput);
+        }
+        if (Arrays.stream(disabledBookmarkingModuleIDs).anyMatch(registrationInput.getModuleId()::equalsIgnoreCase)) {
+            launchLink.clearBookmarking();
+            log.info("Module launch link is updated for clearbookmark=true for learner id: "
+                    + "{}, course id: {} and module id: {}", registrationInput.getLearnerId(), registrationInput.getCourseId(), registrationInput.getModuleId());
         }
         return launchLink;
     }

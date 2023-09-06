@@ -9,18 +9,18 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cabinetoffice.csl.domain.error.GenericServerException;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
-import uk.gov.cabinetoffice.csl.service.ModuleLaunchService;
+import uk.gov.cabinetoffice.csl.service.ModuleService;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 
 @Slf4j
 @RestController
 public class ModuleLaunchController {
 
-    private final ModuleLaunchService moduleLaunchService;
+    private final ModuleService moduleService;
     private final IUserAuthService userAuthService;
 
-    public ModuleLaunchController(ModuleLaunchService moduleLaunchService, IUserAuthService userAuthService) {
-        this.moduleLaunchService = moduleLaunchService;
+    public ModuleLaunchController(ModuleService moduleService, IUserAuthService userAuthService) {
+        this.moduleService = moduleService;
         this.userAuthService = userAuthService;
     }
 
@@ -30,7 +30,7 @@ public class ModuleLaunchController {
                                                     @RequestBody ModuleLaunchLinkInput moduleLaunchLinkInput) {
         log.debug("courseId: {}, moduleId: {}", courseId, moduleId);
         String learnerId = userAuthService.getUsername();
-        LaunchLink launchLink = moduleLaunchService.createLaunchLink(learnerId, courseId, moduleId, moduleLaunchLinkInput);
+        LaunchLink launchLink = moduleService.launchModule(learnerId, courseId, moduleId, moduleLaunchLinkInput);
         if (launchLink == null) {
             throw new GenericServerException("Unable to retrieve module launch link for the learnerId: " + learnerId + ", courseId: "
                     + courseId + " and moduleId: " + moduleId);

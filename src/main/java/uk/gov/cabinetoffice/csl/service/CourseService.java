@@ -12,13 +12,11 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordAction
 @Slf4j
 public class CourseService {
     private final LearnerRecordActionProcessor learnerRecordActionProcessor;
-    private final LearnerRecordService learnerRecordService;
     private final CourseRecordActionService courseRecordActionService;
 
     public CourseService(LearnerRecordActionProcessor learnerRecordActionProcessor,
-                         LearnerRecordService learnerRecordService, CourseRecordActionService courseRecordActionService) {
+                         CourseRecordActionService courseRecordActionService) {
         this.learnerRecordActionProcessor = learnerRecordActionProcessor;
-        this.learnerRecordService = learnerRecordService;
         this.courseRecordActionService = courseRecordActionService;
     }
 
@@ -35,20 +33,9 @@ public class CourseService {
     }
 
     private CourseResponse processCourseRecordActionWithResponse(String learnerId, String courseId, CourseRecordUpdate update) {
-        CourseRecord courseRecord = processCourseRecordAction(learnerId, courseId, update);
+        CourseRecord courseRecord = learnerRecordActionProcessor.processCourseRecordAction(learnerId, courseId, update);
         return new CourseResponse(String.format("Successfully applied action '%s' to course record", update.getName()),
                 courseRecord.getCourseTitle(), courseId);
     }
 
-    private CourseRecord processCourseRecordAction(String learnerId, String courseId, CourseRecordUpdate update) {
-        log.info(String.format("Applying update '%s' to course record for course '%s' and user '%s'",
-                update.getName(), courseId, learnerId));
-        CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
-        if (courseRecord == null) {
-            courseRecord = learnerRecordActionProcessor.applyCreateUpdateToCourseRecord(learnerId, courseId, update);
-        } else {
-            courseRecord = learnerRecordActionProcessor.applyPatchUpdateToCourseRecord(courseRecord, update);
-        }
-        return learnerRecordService.updateCourseRecordCache(courseRecord);
-    }
 }
