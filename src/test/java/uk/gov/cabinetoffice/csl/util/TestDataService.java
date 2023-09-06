@@ -40,6 +40,7 @@ public class TestDataService {
         ModuleRecord mr = new ModuleRecord();
         mr.setId(moduleRecordId);
         mr.setModuleId(moduleId);
+        mr.setModuleTitle(moduleTitle);
         mr.setUid(userId);
         return mr;
     }

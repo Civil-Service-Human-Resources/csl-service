@@ -105,8 +105,6 @@ public class ModuleServiceTest {
         Course course = testDataService.generateCourse(true);
         Module module = course.getModule(moduleId);
         CourseRecord courseRecord = testDataService.generateCourseRecord(true);
-        courseRecord.setCourseTitle("course title");
-        courseRecord.getModuleRecord(moduleId).setModuleTitle("module title");
         when(learningCatalogueService.getCourseWithModule(courseId, moduleId)).thenReturn(
                 new CourseWithModule(course, module)
         );
@@ -117,9 +115,9 @@ public class ModuleServiceTest {
         ModuleResponse result = moduleService.completeModule(learnerId, courseId, moduleId);
         assertEquals("Module was successfully completed", result.getMessage());
         assertEquals(moduleId, result.getModuleId());
-        assertEquals("module title", result.getModuleTitle());
+        assertEquals("Test module", result.getModuleTitle());
         assertEquals(courseId, result.getCourseId());
-        assertEquals("course title", result.getCourseTitle());
+        assertEquals("Test course", result.getCourseTitle());
     }
 
     private ModuleLaunchLinkInput createModuleLaunchLinkInput() {
