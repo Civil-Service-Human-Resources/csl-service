@@ -20,12 +20,12 @@ public class ModuleRecordUpdateService {
 
     public IModuleRecordUpdate getLaunchModuleUpdate(Course course, Module module, boolean isCourseRequired) {
         return switch (module.getModuleType()) {
-            case file, link -> new CompleteModuleUpdate(course, module);
+            case file, link -> new CompleteModuleUpdate(clock, course, module);
             default -> new LaunchModuleUpdate(stringUtilService, isCourseRequired, clock);
         };
     }
 
     public IModuleRecordUpdate getCompleteModuleUpdate(Course course, Module module) {
-        return new CompleteModuleUpdate(course, module);
+        return new CompleteModuleUpdate(clock, course, module);
     }
 }

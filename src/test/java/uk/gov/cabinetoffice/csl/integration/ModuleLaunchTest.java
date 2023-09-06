@@ -114,7 +114,8 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
         getCourseRecord(courseId, userId, courseRecords);
         moduleRecord.setState(State.COMPLETED);
         patchModuleRecord(1, List.of(
-                PatchOp.replacePatch("state", "COMPLETED")
+                PatchOp.replacePatch("state", "COMPLETED"),
+                PatchOp.replacePatch("completionDate", "2023-01-01T10:00")
         ), moduleRecord);
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
         webTestClient

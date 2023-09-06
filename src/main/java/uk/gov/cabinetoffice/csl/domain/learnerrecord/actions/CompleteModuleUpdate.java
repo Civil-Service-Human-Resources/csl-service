@@ -4,17 +4,20 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class CompleteModuleUpdate implements IModuleRecordUpdate {
 
+    private final Clock clock;
     private final Course course;
     private final Module module;
 
-    public CompleteModuleUpdate(Course course, Module module) {
-
+    public CompleteModuleUpdate(Clock clock, Course course, Module module) {
+        this.clock = clock;
         this.course = course;
         this.module = module;
     }
@@ -56,7 +59,10 @@ public class CompleteModuleUpdate implements IModuleRecordUpdate {
 
     @Override
     public List<PatchOp> getUpdateModuleRecordPatches(ModuleRecord moduleRecord) {
-        return List.of(PatchOp.replacePatch("state", State.COMPLETED.name()));
+        return List.of(
+                PatchOp.replacePatch("state", State.COMPLETED.name()),
+                PatchOp.replacePatch("/completionDate", LocalDateTime.now(clock).toString())
+        );
     }
 
     @Override
