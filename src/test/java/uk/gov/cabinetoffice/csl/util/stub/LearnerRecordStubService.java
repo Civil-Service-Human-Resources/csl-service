@@ -44,7 +44,7 @@ public class LearnerRecordStubService {
     public static void getCourseRecord(String courseId, String userId, CourseRecords response) {
         stubFor(
                 WireMock.get(urlPathEqualTo("/learner_record_api/course_records"))
-                        .withQueryParam("courseId", equalTo(courseId))
+                        .withQueryParam("courseIds", equalTo(courseId))
                         .withQueryParam("userId", equalTo(userId))
                         .withHeader("Authorization", equalTo("Bearer fakeToken"))
                         .willReturn(aResponse()
