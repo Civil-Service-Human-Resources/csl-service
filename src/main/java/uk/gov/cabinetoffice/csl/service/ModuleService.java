@@ -39,6 +39,7 @@ public class ModuleService {
         IModuleRecordUpdate update = moduleRecordUpdateService.getLaunchModuleUpdate(course, module, moduleLaunchLinkInput.getCourseIsRequired());
         CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, course.getId(), module.getId(), update);
         ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
+        log.info(String.format("Launching %s module '%s' for user '%s'", module.getModuleType(), moduleId, learnerId));
         return switch (module.getModuleType()) {
             case elearning -> rusticiService.createLaunchLink(RegistrationInput.from(
                     learnerId, moduleId, moduleRecord.getUid(), courseId, moduleLaunchLinkInput

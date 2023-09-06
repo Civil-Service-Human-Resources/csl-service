@@ -36,6 +36,7 @@ public class LearningCatalogueService {
         try {
             Course course = client.getCourse(courseId);
             log.info("Course is retrieved from the Learning-catalogue for the course id: {}", courseId);
+            log.debug(course.toString());
             return course;
         } catch (Exception e) {
             log.error("Unable to retrieve the course from the Learning-catalogue for the course id: {}. Exception: {}", courseId, e.getMessage());
