@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.cabinetoffice.csl.controller.model.ModuleResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordActionProcessor;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ModuleRecordActionService;
@@ -49,6 +50,7 @@ public class ModuleServiceTest {
     private final String uid = "uid";
     private final String learnerFirstName = "learnerFirstName";
     private final String learnerLastName = "";
+    private final ModuleRecordUpdate update = mock(ModuleRecordUpdate.class);
 
     @BeforeEach
     public void setup() {
@@ -63,7 +65,6 @@ public class ModuleServiceTest {
         module.setModuleType(ModuleType.link);
         module.setUrl("https://test.com");
         CourseRecord courseRecord = testDataService.generateCourseRecord(true);
-        ModuleRecordUpdate update = mock(ModuleRecordUpdate.class);
         when(moduleRecordActionService.getLaunchModuleUpdate(course, module, true))
                 .thenReturn(update);
         when(learnerRecordActionProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update))
@@ -84,7 +85,6 @@ public class ModuleServiceTest {
         module.setModuleType(ModuleType.elearning);
         CourseRecord courseRecord = testDataService.generateCourseRecord(true);
         courseRecord.getModuleRecord(moduleId).setUid("uid");
-        ModuleRecordUpdate update = mock(ModuleRecordUpdate.class);
         when(moduleRecordActionService.getLaunchModuleUpdate(course, module, true))
                 .thenReturn(update);
         when(learnerRecordActionProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update))
@@ -98,6 +98,28 @@ public class ModuleServiceTest {
         when(rusticiService.createLaunchLink(registrationInput)).thenReturn(launchLink);
         LaunchLink result = moduleService.launchModule(learnerId, courseId, moduleId, launchLinkInput);
         assertEquals(launchLink, result);
+    }
+
+    @Test
+    public void shouldCompleteModule() {
+        Course course = testDataService.generateCourse(true);
+        Module module = course.getModule(moduleId);
+        CourseRecord courseRecord = testDataService.generateCourseRecord(true);
+        courseRecord.setCourseTitle("course title");
+        courseRecord.getModuleRecord(moduleId).setModuleTitle("module title");
+        when(learningCatalogueService.getCourseWithModule(courseId, moduleId)).thenReturn(
+                new CourseWithModule(course, module)
+        );
+        when(moduleRecordActionService.getCompleteModuleUpdate(course, module))
+                .thenReturn(update);
+        when(learnerRecordActionProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update))
+                .thenReturn(courseRecord);
+        ModuleResponse result = moduleService.completeModule(learnerId, courseId, moduleId);
+        assertEquals("Module was successfully completed", result.getMessage());
+        assertEquals(moduleId, result.getModuleId());
+        assertEquals("module title", result.getModuleTitle());
+        assertEquals(courseId, result.getCourseId());
+        assertEquals("course title", result.getCourseTitle());
     }
 
     private ModuleLaunchLinkInput createModuleLaunchLinkInput() {
