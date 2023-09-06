@@ -6,7 +6,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
 
 import java.util.List;
 
-public interface ModuleRecordUpdate extends CourseRecordUpdate {
+public interface IModuleRecordUpdate extends ICourseRecordUpdate {
     ModuleRecordStatus getCreateModuleRecordStatus();
 
     List<PatchOp> getUpdateModuleRecordPatches(ModuleRecord moduleRecord);

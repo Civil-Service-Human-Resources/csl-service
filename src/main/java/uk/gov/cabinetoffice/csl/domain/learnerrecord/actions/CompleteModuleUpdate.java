@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class CompleteModuleUpdate implements ModuleRecordUpdate {
+public class CompleteModuleUpdate implements IModuleRecordUpdate {
 
     private final Course course;
     private final Module module;

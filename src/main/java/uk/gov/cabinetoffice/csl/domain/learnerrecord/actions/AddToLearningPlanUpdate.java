@@ -9,7 +9,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.Preference;
 import java.util.List;
 
 @Component
-public class AddToLearningPlanUpdate implements CourseRecordUpdate {
+public class AddToLearningPlanUpdate implements ICourseRecordUpdate {
 
     @Override
     public CourseRecordStatus getCreateCourseRecordStatus() {

@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.model.ModuleResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordActionProcessor;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ModuleRecordActionService;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ModuleRecordUpdate;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.IModuleRecordUpdate;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordUpdateProcessor;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ModuleRecordUpdateService;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
@@ -19,25 +19,25 @@ import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationInput;
 @Slf4j
 public class ModuleService {
 
-    private final LearnerRecordActionProcessor learnerRecordActionProcessor;
+    private final LearnerRecordUpdateProcessor learnerRecordUpdateProcessor;
     private final LearningCatalogueService learningCatalogueService;
     private final RusticiService rusticiService;
-    private final ModuleRecordActionService moduleRecordActionService;
+    private final ModuleRecordUpdateService moduleRecordUpdateService;
 
-    public ModuleService(LearnerRecordActionProcessor learnerRecordActionProcessor, LearningCatalogueService learningCatalogueService,
-                         RusticiService rusticiService, ModuleRecordActionService moduleRecordActionService) {
-        this.learnerRecordActionProcessor = learnerRecordActionProcessor;
+    public ModuleService(LearnerRecordUpdateProcessor learnerRecordUpdateProcessor, LearningCatalogueService learningCatalogueService,
+                         RusticiService rusticiService, ModuleRecordUpdateService moduleRecordUpdateService) {
+        this.learnerRecordUpdateProcessor = learnerRecordUpdateProcessor;
         this.learningCatalogueService = learningCatalogueService;
         this.rusticiService = rusticiService;
-        this.moduleRecordActionService = moduleRecordActionService;
+        this.moduleRecordUpdateService = moduleRecordUpdateService;
     }
 
     public LaunchLink launchModule(String learnerId, String courseId, String moduleId, ModuleLaunchLinkInput moduleLaunchLinkInput) {
         CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
         Course course = courseWithModule.getCourse();
         Module module = courseWithModule.getModule();
-        ModuleRecordUpdate update = moduleRecordActionService.getLaunchModuleUpdate(course, module, moduleLaunchLinkInput.getCourseIsRequired());
-        CourseRecord courseRecord = learnerRecordActionProcessor.processModuleRecordAction(learnerId, course.getId(), module.getId(), update);
+        IModuleRecordUpdate update = moduleRecordUpdateService.getLaunchModuleUpdate(course, module, moduleLaunchLinkInput.getCourseIsRequired());
+        CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, course.getId(), module.getId(), update);
         ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
         return switch (module.getModuleType()) {
             case elearning -> rusticiService.createLaunchLink(RegistrationInput.from(
@@ -49,8 +49,8 @@ public class ModuleService {
 
     public ModuleResponse completeModule(String learnerId, String courseId, String moduleId) {
         CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
-        ModuleRecordUpdate update = moduleRecordActionService.getCompleteModuleUpdate(courseWithModule.getCourse(), courseWithModule.getModule());
-        CourseRecord courseRecord = learnerRecordActionProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update);
+        IModuleRecordUpdate update = moduleRecordUpdateService.getCompleteModuleUpdate(courseWithModule.getCourse(), courseWithModule.getModule());
+        CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update);
         return new ModuleResponse("Module was successfully completed", courseRecord.getCourseTitle(),
                 courseRecord.getModuleRecord(moduleId).getModuleTitle(), courseId, moduleId);
     }

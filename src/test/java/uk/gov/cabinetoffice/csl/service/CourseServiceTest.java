@@ -9,9 +9,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.controller.model.CourseResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.CourseRecordActionService;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.CourseRecordUpdate;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordActionProcessor;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.CourseRecordUpdateFactory;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ICourseRecordUpdate;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordUpdateProcessor;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,10 +22,10 @@ import static org.mockito.Mockito.*;
 public class CourseServiceTest {
 
     @Mock
-    private LearnerRecordActionProcessor learnerRecordActionProcessor;
+    private LearnerRecordUpdateProcessor learnerRecordUpdateProcessor;
 
     @Mock
-    private CourseRecordActionService courseRecordActionService;
+    private CourseRecordUpdateFactory courseRecordUpdateFactory;
 
     @InjectMocks
     private CourseService courseService;
@@ -33,7 +33,7 @@ public class CourseServiceTest {
     private TestDataService testDataService;
     private final String learnerId = "learnerId";
     private final String courseId = "courseId";
-    private final CourseRecordUpdate update = mock(CourseRecordUpdate.class);
+    private final ICourseRecordUpdate update = mock(ICourseRecordUpdate.class);
 
     @BeforeEach
     public void setup() {
@@ -45,9 +45,9 @@ public class CourseServiceTest {
     @Test
     public void shouldAddToLearningPlan() {
         CourseRecord courseRecord = testDataService.generateCourseRecord(true);
-        when(courseRecordActionService.getAddToLearningPlanUpdate())
+        when(courseRecordUpdateFactory.getAddToLearningPlanUpdate())
                 .thenReturn(update);
-        when(learnerRecordActionProcessor.processCourseRecordAction(learnerId, courseId, update))
+        when(learnerRecordUpdateProcessor.processCourseRecordAction(learnerId, courseId, update))
                 .thenReturn(courseRecord);
         CourseResponse result = courseService.addToLearningPlan(learnerId, courseId);
         assertEquals("Successfully applied action 'fake update' to course record", result.getMessage());
@@ -58,9 +58,9 @@ public class CourseServiceTest {
     @Test
     public void shouldRemoveFromLearningPlan() {
         CourseRecord courseRecord = testDataService.generateCourseRecord(true);
-        when(courseRecordActionService.getRemoveFromLearningPlanUpdate())
+        when(courseRecordUpdateFactory.getRemoveFromLearningPlanUpdate())
                 .thenReturn(update);
-        when(learnerRecordActionProcessor.processCourseRecordAction(learnerId, courseId, update))
+        when(learnerRecordUpdateProcessor.processCourseRecordAction(learnerId, courseId, update))
                 .thenReturn(courseRecord);
         CourseResponse result = courseService.removeFromLearningPlan(learnerId, courseId);
         assertEquals("Successfully applied action 'fake update' to course record", result.getMessage());
@@ -71,9 +71,9 @@ public class CourseServiceTest {
     @Test
     public void shouldRemoveFromSuggestions() {
         CourseRecord courseRecord = testDataService.generateCourseRecord(true);
-        when(courseRecordActionService.getRemoveFromSuggestionsUpdate())
+        when(courseRecordUpdateFactory.getRemoveFromSuggestionsUpdate())
                 .thenReturn(update);
-        when(learnerRecordActionProcessor.processCourseRecordAction(learnerId, courseId, update))
+        when(learnerRecordUpdateProcessor.processCourseRecordAction(learnerId, courseId, update))
                 .thenReturn(courseRecord);
         CourseResponse result = courseService.removeFromSuggestions(learnerId, courseId);
         assertEquals("Successfully applied action 'fake update' to course record", result.getMessage());

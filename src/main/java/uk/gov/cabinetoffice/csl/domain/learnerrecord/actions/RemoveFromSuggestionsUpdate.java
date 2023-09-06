@@ -10,7 +10,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.Preference;
 import java.util.List;
 
 @Component
-public class RemoveFromSuggestionsUpdate implements CourseRecordUpdate {
+public class RemoveFromSuggestionsUpdate implements ICourseRecordUpdate {
     @Override
     public CourseRecordStatus getCreateCourseRecordStatus() {
         return CourseRecordStatus.builder().preference(Preference.DISLIKED.name()).build();

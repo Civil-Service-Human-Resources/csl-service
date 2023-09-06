@@ -9,9 +9,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.controller.model.ModuleResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordActionProcessor;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ModuleRecordActionService;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ModuleRecordUpdate;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.IModuleRecordUpdate;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordUpdateProcessor;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ModuleRecordUpdateService;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 public class ModuleServiceTest {
 
     @Mock
-    private LearnerRecordActionProcessor learnerRecordActionProcessor;
+    private LearnerRecordUpdateProcessor learnerRecordUpdateProcessor;
 
     @Mock
     private LearningCatalogueService learningCatalogueService;
@@ -38,7 +38,7 @@ public class ModuleServiceTest {
     private RusticiService rusticiService;
 
     @Mock
-    private ModuleRecordActionService moduleRecordActionService;
+    private ModuleRecordUpdateService moduleRecordUpdateService;
 
     @InjectMocks
     private ModuleService moduleService;
@@ -50,7 +50,7 @@ public class ModuleServiceTest {
     private final String uid = "uid";
     private final String learnerFirstName = "learnerFirstName";
     private final String learnerLastName = "";
-    private final ModuleRecordUpdate update = mock(ModuleRecordUpdate.class);
+    private final IModuleRecordUpdate update = mock(IModuleRecordUpdate.class);
 
     @BeforeEach
     public void setup() {
@@ -65,9 +65,9 @@ public class ModuleServiceTest {
         module.setModuleType(ModuleType.link);
         module.setUrl("https://test.com");
         CourseRecord courseRecord = testDataService.generateCourseRecord(true);
-        when(moduleRecordActionService.getLaunchModuleUpdate(course, module, true))
+        when(moduleRecordUpdateService.getLaunchModuleUpdate(course, module, true))
                 .thenReturn(update);
-        when(learnerRecordActionProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update))
+        when(learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update))
                 .thenReturn(courseRecord);
         when(learningCatalogueService.getCourseWithModule(courseId, moduleId)).thenReturn(
                 new CourseWithModule(course, module)
@@ -85,9 +85,9 @@ public class ModuleServiceTest {
         module.setModuleType(ModuleType.elearning);
         CourseRecord courseRecord = testDataService.generateCourseRecord(true);
         courseRecord.getModuleRecord(moduleId).setUid("uid");
-        when(moduleRecordActionService.getLaunchModuleUpdate(course, module, true))
+        when(moduleRecordUpdateService.getLaunchModuleUpdate(course, module, true))
                 .thenReturn(update);
-        when(learnerRecordActionProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update))
+        when(learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update))
                 .thenReturn(courseRecord);
         when(learningCatalogueService.getCourseWithModule(courseId, moduleId)).thenReturn(
                 new CourseWithModule(course, module)
@@ -108,9 +108,9 @@ public class ModuleServiceTest {
         when(learningCatalogueService.getCourseWithModule(courseId, moduleId)).thenReturn(
                 new CourseWithModule(course, module)
         );
-        when(moduleRecordActionService.getCompleteModuleUpdate(course, module))
+        when(moduleRecordUpdateService.getCompleteModuleUpdate(course, module))
                 .thenReturn(update);
-        when(learnerRecordActionProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update))
+        when(learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update))
                 .thenReturn(courseRecord);
         ModuleResponse result = moduleService.completeModule(learnerId, courseId, moduleId);
         assertEquals("Module was successfully completed", result.getMessage());

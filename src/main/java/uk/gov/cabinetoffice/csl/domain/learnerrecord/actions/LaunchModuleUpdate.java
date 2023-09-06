@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LaunchModuleUpdate implements ModuleRecordUpdate {
+public class LaunchModuleUpdate implements IModuleRecordUpdate {
 
     private final StringUtilService stringUtilService;
     private final boolean courseIsRequired;

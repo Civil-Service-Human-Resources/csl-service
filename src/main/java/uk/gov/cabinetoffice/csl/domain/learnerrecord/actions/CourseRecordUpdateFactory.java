@@ -3,17 +3,17 @@ package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CourseRecordActionService {
+public class CourseRecordUpdateFactory {
 
-    public CourseRecordUpdate getAddToLearningPlanUpdate() {
+    public ICourseRecordUpdate getAddToLearningPlanUpdate() {
         return new AddToLearningPlanUpdate();
     }
 
-    public CourseRecordUpdate getRemoveFromLearningPlanUpdate() {
+    public ICourseRecordUpdate getRemoveFromLearningPlanUpdate() {
         return new RemoveFromLearningPlanUpdate();
     }
 
-    public CourseRecordUpdate getRemoveFromSuggestionsUpdate() {
+    public ICourseRecordUpdate getRemoveFromSuggestionsUpdate() {
         return new RemoveFromSuggestionsUpdate();
     }
 }

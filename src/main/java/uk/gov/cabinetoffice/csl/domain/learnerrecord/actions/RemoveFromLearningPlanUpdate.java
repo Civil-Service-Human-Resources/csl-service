@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class RemoveFromLearningPlanUpdate implements CourseRecordUpdate {
+public class RemoveFromLearningPlanUpdate implements ICourseRecordUpdate {
 
     @Override
     public CourseRecordStatus getCreateCourseRecordStatus() {
