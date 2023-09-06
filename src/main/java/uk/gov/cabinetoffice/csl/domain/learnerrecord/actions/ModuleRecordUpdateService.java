@@ -20,8 +20,8 @@ public class ModuleRecordUpdateService {
 
     public IModuleRecordUpdate getLaunchModuleUpdate(Course course, Module module, boolean isCourseRequired) {
         return switch (module.getModuleType()) {
-            case elearning, video -> new LaunchModuleUpdate(stringUtilService, isCourseRequired, clock);
             case file, link -> new CompleteModuleUpdate(course, module);
+            default -> new LaunchModuleUpdate(stringUtilService, isCourseRequired, clock);
         };
     }
 

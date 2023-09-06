@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ModuleRecordUpdateS
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
 import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationInput;
@@ -40,12 +41,13 @@ public class ModuleService {
         CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, course.getId(), module.getId(), update);
         ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
         log.info(String.format("Launching %s module '%s' for user '%s'", module.getModuleType(), moduleId, learnerId));
-        return switch (module.getModuleType()) {
-            case elearning -> rusticiService.createLaunchLink(RegistrationInput.from(
+        if (module.getModuleType().equals(ModuleType.elearning)) {
+            return rusticiService.createLaunchLink(RegistrationInput.from(
                     learnerId, moduleId, moduleRecord.getUid(), courseId, moduleLaunchLinkInput
             ));
-            case file, link, video -> new LaunchLink(courseWithModule.getModule().getUrl());
-        };
+        } else {
+            return new LaunchLink(courseWithModule.getModule().getUrl());
+        }
     }
 
     public ModuleResponse completeModule(String learnerId, String courseId, String moduleId) {
