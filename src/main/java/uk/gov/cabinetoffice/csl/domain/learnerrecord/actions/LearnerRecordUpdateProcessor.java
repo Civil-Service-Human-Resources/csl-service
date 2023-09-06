@@ -18,32 +18,42 @@ public class LearnerRecordUpdateProcessor {
     }
 
     public CourseRecord processCourseRecordAction(String learnerId, String courseId, ICourseRecordUpdate update) {
-        log.info(String.format("Applying update '%s' to course record for course '%s' and user '%s'",
-                update.getName(), courseId, learnerId));
-        CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
-        if (courseRecord == null) {
-            courseRecord = applyCreateUpdateToCourseRecord(learnerId, courseId, update);
-        } else {
-            courseRecord = applyPatchUpdateToCourseRecord(courseRecord, update);
+        try {
+            log.info(String.format("Applying update '%s' to course record for course '%s' and user '%s'",
+                    update.getName(), courseId, learnerId));
+            CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
+            if (courseRecord == null) {
+                courseRecord = applyCreateUpdateToCourseRecord(learnerId, courseId, update);
+            } else {
+                courseRecord = applyPatchUpdateToCourseRecord(courseRecord, update);
+            }
+            return learnerRecordService.updateCourseRecordCache(courseRecord);
+        } catch (Exception e) {
+            learnerRecordService.bustCourseRecordCache(learnerId, courseId);
+            throw e;
         }
-        return learnerRecordService.updateCourseRecordCache(courseRecord);
     }
 
     public CourseRecord processModuleRecordAction(String learnerId, String courseId, String moduleId, IModuleRecordUpdate update) {
-        CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
-        if (courseRecord == null) {
-            courseRecord = applyCreateUpdateToCourseRecord(learnerId, courseId, moduleId, update);
-        } else {
-            ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
-            if (moduleRecord == null) {
-                moduleRecord = applyCreateUpdateToModuleRecord(courseRecord, moduleId, update);
+        try {
+            CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
+            if (courseRecord == null) {
+                courseRecord = applyCreateUpdateToCourseRecord(learnerId, courseId, moduleId, update);
             } else {
-                moduleRecord = applyPatchUpdateToModuleRecord(moduleRecord, update);
+                ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
+                if (moduleRecord == null) {
+                    moduleRecord = applyCreateUpdateToModuleRecord(courseRecord, moduleId, update);
+                } else {
+                    moduleRecord = applyPatchUpdateToModuleRecord(moduleRecord, update);
+                }
+                courseRecord.updateModuleRecords(moduleRecord);
+                courseRecord = applyPatchUpdateToCourseRecord(courseRecord, update);
             }
-            courseRecord.updateModuleRecords(moduleRecord);
-            courseRecord = applyPatchUpdateToCourseRecord(courseRecord, update);
+            return learnerRecordService.updateCourseRecordCache(courseRecord);
+        } catch (Exception e) {
+            learnerRecordService.bustCourseRecordCache(learnerId, courseId);
+            throw e;
         }
-        return learnerRecordService.updateCourseRecordCache(courseRecord);
     }
 
     private CourseRecord applyCreateUpdateToCourseRecord(String learnerId, String courseId, ICourseRecordUpdate update) {
