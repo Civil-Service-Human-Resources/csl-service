@@ -23,25 +23,29 @@ public class LearningCatalogueService {
 
     public CourseWithModule getCourseWithModule(String courseId, String moduleId) {
         Course course = getCourse(courseId);
-        Module module = course.getModule(moduleId);
-        if (module != null) {
-            return new CourseWithModule(course, module);
-        } else {
+        if (course == null) {
             throw new LearningCatalogueResourceNotFoundException(String.format("Module '%s' in course '%s'", moduleId, courseId));
+        } else {
+            Module module = course.getModule(moduleId);
+            if (module != null) {
+                return new CourseWithModule(course, module);
+            } else {
+                throw new LearningCatalogueResourceNotFoundException(String.format("Module '%s' in course '%s'", moduleId, courseId));
+            }
         }
     }
 
     @Cacheable(value = "catalogue-course", key = "#courseId")
     public Course getCourse(String courseId) {
-        try {
-            Course course = client.getCourse(courseId);
-            log.info("Course is retrieved from the Learning-catalogue for the course id: {}", courseId);
-            log.debug(course.toString());
-            return course;
-        } catch (Exception e) {
-            log.error("Unable to retrieve the course from the Learning-catalogue for the course id: {}. Exception: {}", courseId, e.getMessage());
-            return null;
-        }
+        Course course = client.getCourse(courseId);
+        log.info("Course is retrieved from the Learning-catalogue for the course id: {}", courseId);
+        log.debug(course.toString());
+        return course;
+//        try {
+//        } catch (Exception e) {
+//            log.error("Unable to retrieve the course from the Learning-catalogue for the course id: {}. Exception: {}", courseId, e.getMessage());
+//            return null;
+//        }
     }
 
     @Scheduled(cron = "${learningCatalogue.courseCacheEvictionScheduleCron}")
