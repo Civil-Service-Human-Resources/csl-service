@@ -115,7 +115,7 @@ public class ModuleServiceTest {
         ModuleResponse result = moduleService.completeModule(learnerId, courseId, moduleId);
         assertEquals("Module was successfully completed", result.getMessage());
         assertEquals(moduleId, result.getModuleId());
-        assertEquals("Test module", result.getModuleTitle());
+        assertEquals("Test Module", result.getModuleTitle());
         assertEquals(courseId, result.getCourseId());
         assertEquals("Test course", result.getCourseTitle());
     }
