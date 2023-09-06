@@ -39,10 +39,12 @@ public class CompleteModuleUpdate implements IModuleRecordUpdate {
     @Override
     public List<PatchOp> getUpdateCourseRecordPatches(CourseRecord courseRecord) {
         List<PatchOp> patches = new ArrayList<>();
-        if (course.isCourseComplete(courseRecord)) {
-            patches.add(PatchOp.replacePatch("state", State.COMPLETED.name()));
-        } else {
-            patches.add(PatchOp.replacePatch("state", State.IN_PROGRESS.name()));
+        if (!courseRecord.getState().equals(State.COMPLETED)) {
+            if (course.isCourseComplete(courseRecord)) {
+                patches.add(PatchOp.replacePatch("state", State.COMPLETED.name()));
+            } else {
+                patches.add(PatchOp.replacePatch("state", State.IN_PROGRESS.name()));
+            }
         }
         return patches;
     }

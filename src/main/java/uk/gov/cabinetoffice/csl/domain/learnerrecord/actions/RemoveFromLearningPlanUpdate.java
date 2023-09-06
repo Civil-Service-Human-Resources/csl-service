@@ -7,7 +7,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordStatus;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -20,7 +20,11 @@ public class RemoveFromLearningPlanUpdate implements ICourseRecordUpdate {
 
     @Override
     public List<PatchOp> getUpdateCourseRecordPatches(CourseRecord courseRecord) {
-        return Collections.singletonList(PatchOp.replacePatch("state", State.ARCHIVED.name()));
+        List<PatchOp> patches = new ArrayList<>();
+        if (!courseRecord.getState().equals(State.ARCHIVED)) {
+            patches.add(PatchOp.replacePatch("state", State.ARCHIVED.name()));
+        }
+        return patches;
     }
 
     @Override

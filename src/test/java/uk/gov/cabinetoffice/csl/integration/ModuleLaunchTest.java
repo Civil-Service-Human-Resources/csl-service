@@ -110,15 +110,12 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
         course.getModule(moduleId).setModuleType(ModuleType.file);
         course.getModule(moduleId).setUrl("http://launch.link");
         getCourse(courseId, course);
+        courseRecord.setState(State.COMPLETED);
         getCourseRecord(courseId, userId, courseRecords);
         moduleRecord.setState(State.COMPLETED);
         patchModuleRecord(1, List.of(
                 PatchOp.replacePatch("state", "COMPLETED")
         ), moduleRecord);
-        courseRecord.setState(State.COMPLETED);
-        patchCourseRecord(List.of(
-                PatchOp.replacePatch("state", "COMPLETED")
-        ), courseRecord);
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
         webTestClient
                 .post()
