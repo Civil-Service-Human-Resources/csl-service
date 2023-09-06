@@ -1,5 +1,9 @@
 package uk.gov.cabinetoffice.csl.domain.learningcatalogue;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ModuleType {
     elearning("elearning"),
     file("file"),
@@ -9,18 +13,17 @@ public enum ModuleType {
 
     private final String text;
 
-    /**
-     * @param text
-     */
     ModuleType(final String text) {
         this.text = text;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Enum#toString()
-     */
     @Override
     public String toString() {
+        return text;
+    }
+
+    @JsonValue
+    public String getName() {
         return text;
     }
 }
