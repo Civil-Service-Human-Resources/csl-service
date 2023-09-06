@@ -44,7 +44,7 @@ public class LearnerRecordService {
         return courseRecord;
     }
 
-    @Cacheable(value = "course-record", key = "{#learnerId, #courseId}")
+    @Cacheable(value = "course-record", key = "{#learnerId, #courseId}", unless = "#result == null")
     public CourseRecord getCourseRecord(String learnerId, String courseId) {
         CourseRecords courseRecords = client.getCourseRecord(learnerId, courseId);
         if (courseRecords == null) {

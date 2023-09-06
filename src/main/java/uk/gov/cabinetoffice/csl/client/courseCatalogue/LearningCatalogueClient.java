@@ -23,7 +23,7 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
-    @Cacheable(value = "catalogue-course", key = "#courseId")
+    @Cacheable(value = "catalogue-course", key = "#courseId", unless = "#result == null")
     public Course getCourse(String courseId) {
         log.info("Getting course with ID '{}'", courseId);
         String url = String.format("%s/%s", courses, courseId);
