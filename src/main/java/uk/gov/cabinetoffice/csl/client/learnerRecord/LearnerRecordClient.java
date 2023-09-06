@@ -44,7 +44,7 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     public CourseRecords getCourseRecords(String userId, List<String> courseIds) {
         log.debug("Getting course records with ids '{}' for user '{}'", courseIds, userId);
         String courseIdList = String.join(",", courseIds);
-        String url = String.format("%s?userId=%s&courseId=%s", courseRecords, userId, courseIdList);
+        String url = String.format("%s?userId=%s&courseIds=%s", courseRecords, userId, courseIdList);
         RequestEntity<Void> request = RequestEntity.get(url).build();
         return httpClient.executeRequest(request, CourseRecords.class);
     }
