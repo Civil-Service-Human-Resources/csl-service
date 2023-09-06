@@ -16,8 +16,9 @@ public class HttpClient implements IHttpClient {
     @Override
     public <T, R> T executeRequest(RequestEntity<R> request, Class<T> responseClass) {
         try {
+            log.debug("Sending request: {}", request);
             ResponseEntity<T> response = restTemplate.exchange(request, responseClass);
-            log.debug("Result was {}", response);
+            log.debug("Request response: {}", response);
             return response.getBody();
         } catch (RestClientResponseException e) {
             String msg = String.format("Error sending '%s' request to endpoint", request.getMethod());
