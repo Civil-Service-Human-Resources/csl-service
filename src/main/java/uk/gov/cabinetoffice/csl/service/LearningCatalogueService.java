@@ -2,7 +2,6 @@ package uk.gov.cabinetoffice.csl.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
@@ -34,18 +33,12 @@ public class LearningCatalogueService {
             }
         }
     }
-
-    @Cacheable(value = "catalogue-course", key = "#courseId")
+    
     public Course getCourse(String courseId) {
         Course course = client.getCourse(courseId);
         log.info("Course is retrieved from the Learning-catalogue for the course id: {}", courseId);
         log.debug(course.toString());
         return course;
-//        try {
-//        } catch (Exception e) {
-//            log.error("Unable to retrieve the course from the Learning-catalogue for the course id: {}. Exception: {}", courseId, e.getMessage());
-//            return null;
-//        }
     }
 
     @Scheduled(cron = "${learningCatalogue.courseCacheEvictionScheduleCron}")

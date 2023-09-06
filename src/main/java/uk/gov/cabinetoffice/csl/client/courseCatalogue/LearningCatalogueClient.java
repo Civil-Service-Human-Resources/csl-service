@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.client.courseCatalogue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
@@ -22,6 +23,7 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
+    @Cacheable(value = "catalogue-course", key = "#courseId")
     public Course getCourse(String courseId) {
         log.info("Getting course with ID '{}'", courseId);
         String url = String.format("%s/%s", courses, courseId);
