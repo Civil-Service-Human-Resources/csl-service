@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
@@ -65,6 +66,7 @@ public class CourseRecord implements Serializable {
         Map<String, ModuleRecord> records = moduleRecords.stream().
                 collect(Collectors.toMap(ModuleRecord::getModuleId, Function.identity()));
         records.put(newModuleRecord.getModuleId(), newModuleRecord);
-        this.setModuleRecords(records.values());
+        ArrayList<ModuleRecord> updatedRecords = new ArrayList<>(records.values());
+        this.setModuleRecords(updatedRecords);
     }
 }
