@@ -41,6 +41,8 @@ public class LearnerRecordService {
 
     @CachePut(value = "course-record", key = "{ #courseRecord.getUserId(), #courseRecord.getCourseId() }")
     public CourseRecord updateCourseRecordCache(CourseRecord courseRecord) {
+        log.debug("Saving course record to cache:");
+        log.debug(courseRecord.toString());
         return courseRecord;
     }
 

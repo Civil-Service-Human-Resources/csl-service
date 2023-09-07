@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -62,10 +62,9 @@ public class CourseRecord implements Serializable {
     }
 
     public void updateModuleRecords(ModuleRecord newModuleRecord) {
-        List<ModuleRecord> updatedModuleRecords = this.moduleRecords.stream().map(existingModuleRecord ->
-                        existingModuleRecord.getModuleId().equals(newModuleRecord.getModuleId())
-                                ? newModuleRecord : existingModuleRecord)
-                .collect(toList());
-        this.setModuleRecords(updatedModuleRecords);
+        Map<String, ModuleRecord> records = moduleRecords.stream().
+                collect(Collectors.toMap(ModuleRecord::getModuleId, Function.identity()));
+        records.put(newModuleRecord.getModuleId(), newModuleRecord);
+        this.setModuleRecords(records.values());
     }
 }

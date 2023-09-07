@@ -22,6 +22,7 @@ public class LearnerRecordUpdateProcessor {
             log.info(String.format("Applying update '%s' to course record for course '%s' and user '%s'",
                     update.getName(), courseId, learnerId));
             CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
+            log.debug("Course record: {}", courseRecord);
             if (courseRecord == null) {
                 courseRecord = applyCreateUpdateToCourseRecord(learnerId, courseId, update);
             } else {
@@ -37,6 +38,7 @@ public class LearnerRecordUpdateProcessor {
     public CourseRecord processModuleRecordAction(String learnerId, String courseId, String moduleId, IModuleRecordUpdate update) {
         try {
             CourseRecord courseRecord = learnerRecordService.getCourseRecord(learnerId, courseId);
+            log.debug("Course record: {}", courseRecord);
             if (courseRecord == null) {
                 courseRecord = applyCreateUpdateToCourseRecord(learnerId, courseId, moduleId, update);
             } else {
