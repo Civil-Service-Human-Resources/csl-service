@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.identity.OAuthToken;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -16,12 +17,14 @@ import static io.micrometer.common.util.StringUtils.isBlank;
 @Slf4j
 public class BearerTokenService implements IBearerTokenService {
 
+    private final Clock clock;
     private final IdentityService identityService;
     private final IUserAuthService userAuthService;
     @Value("${oauth.refresh.serviceTokenCache.beforeSecondsToExpire}")
     private long refreshServiceTokenCacheBeforeSecondsToExpire;
 
-    public BearerTokenService(IdentityService identityService, IUserAuthService userAuthService) {
+    public BearerTokenService(Clock clock, IdentityService identityService, IUserAuthService userAuthService) {
+        this.clock = clock;
         this.identityService = identityService;
         this.userAuthService = userAuthService;
     }
@@ -34,9 +37,10 @@ public class BearerTokenService implements IBearerTokenService {
         }
         if (isBlank(bearerToken)) {
             OAuthToken serviceToken = identityService.getCachedOAuthServiceToken();
-            log.debug("serviceToken: expiryDateTime: {}", serviceToken.getExpiryDateTime());
-            long secondsRemainingToExpire = serviceToken.getExpiryDateTime() != null ?
-                    ChronoUnit.SECONDS.between(LocalDateTime.now(), serviceToken.getExpiryDateTime()) : 0;
+            LocalDateTime tokenExpiry = serviceToken.getExpiryDateTime();
+            log.debug("serviceToken: expiryDateTime: {}", tokenExpiry);
+            long secondsRemainingToExpire = tokenExpiry != null ?
+                    ChronoUnit.SECONDS.between(LocalDateTime.now(clock), tokenExpiry) : 0;
             log.debug("serviceToken: seconds remaining to service token expiry: {}", secondsRemainingToExpire);
             log.debug("serviceToken: seconds remaining to refresh the service token cache: {}",
                     (secondsRemainingToExpire - refreshServiceTokenCacheBeforeSecondsToExpire));

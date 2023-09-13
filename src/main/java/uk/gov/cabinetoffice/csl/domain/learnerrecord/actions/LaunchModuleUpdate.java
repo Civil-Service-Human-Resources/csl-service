@@ -35,7 +35,6 @@ public class LaunchModuleUpdate implements IModuleRecordUpdate {
     public List<PatchOp> getUpdateCourseRecordPatches(CourseRecord courseRecord) {
         List<PatchOp> patches = new ArrayList<>();
         if (courseRecord.getState() == null || courseRecord.getState().equals(State.ARCHIVED)) {
-            //Update the course record status if it is null or ARCHIVED
             patches.add(PatchOp.replacePatch("state", State.IN_PROGRESS.name()));
         }
         return patches;
