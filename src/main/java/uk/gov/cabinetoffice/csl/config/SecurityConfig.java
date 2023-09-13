@@ -7,10 +7,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
+import uk.gov.cabinetoffice.csl.service.auth.UserAuthService;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -24,10 +27,15 @@ public class SecurityConfig {
     @Value("${management.endpoints.web.base-path}")
     private String actuatorBasePath;
 
-    private CustomBasicAuthenticationProvider basicAuthenticationProvider;
+    private final CustomBasicAuthenticationProvider basicAuthenticationProvider;
 
     public SecurityConfig(CustomBasicAuthenticationProvider basicAuthenticationProvider) {
         this.basicAuthenticationProvider = basicAuthenticationProvider;
+    }
+
+    @Bean
+    public IUserAuthService userAuthService() {
+        return new UserAuthService(SecurityContextHolder.getContext());
     }
 
     @Bean
@@ -35,7 +43,7 @@ public class SecurityConfig {
         return httpSecurity.cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeHttpRequests().requestMatchers(actuatorBasePath + "/**").permitAll()
-                .and().authorizeHttpRequests().requestMatchers("/rustici/**","/reset-cache/**").authenticated()
+                .and().authorizeHttpRequests().requestMatchers("/rustici/**", "/reset-cache/**").authenticated()
                 .and().httpBasic()
                 .and().authorizeHttpRequests().requestMatchers("/courses/**").authenticated()
                 .and().oauth2ResourceServer().jwt(jwtSpec -> jwtSpec.decoder(jwtDecoder()))

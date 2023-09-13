@@ -2,16 +2,20 @@ package uk.gov.cabinetoffice.csl.service.auth;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.domain.error.ClientAuthenticationErrorException;
 
-@Component
 public class UserAuthService implements IUserAuthService {
 
+    private final SecurityContext securityContext;
+
+    public UserAuthService(SecurityContext securityContext) {
+        this.securityContext = securityContext;
+    }
+
     public Authentication getAuthentication() {
-        return SecurityContextHolder.getContext().getAuthentication();
+        return this.securityContext.getAuthentication();
     }
 
     @Override

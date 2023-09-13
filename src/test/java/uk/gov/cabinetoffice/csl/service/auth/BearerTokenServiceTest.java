@@ -15,9 +15,9 @@ import static org.mockito.Mockito.*;
 
 public class BearerTokenServiceTest {
 
-    private IdentityService identityService = mock(IdentityService.class);
-    private IUserAuthService userAuthService = mock(IUserAuthService.class);
-    private Jwt jwt = mock(Jwt.class);
+    private final IdentityService identityService = mock(IdentityService.class);
+    private final IUserAuthService userAuthService = mock(IUserAuthService.class);
+    private final Jwt jwt = mock(Jwt.class);
     private BearerTokenService bearerTokenService;
 
     @Test
