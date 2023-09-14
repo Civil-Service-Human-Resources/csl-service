@@ -41,7 +41,7 @@ public class TestDataService {
         mr.setId(moduleRecordId);
         mr.setModuleId(moduleId);
         mr.setModuleTitle(moduleTitle);
-        mr.setUid(userId);
+        mr.setUid(moduleUid);
         return mr;
     }
 
@@ -88,9 +88,10 @@ public class TestDataService {
     public RegistrationRequest generateRegistrationRequest() {
         Learner learner = new Learner();
         learner.setFirstName(learnerFirstName);
+        learner.setId(userId);
         learner.setLastName("");
         Registration registration = new Registration();
-        registration.setCourseId(String.format("%s/%s", courseId, moduleId));
+        registration.setCourseId(String.format("%s.%s", courseId, moduleId));
         registration.setRegistrationId(moduleUid);
         registration.setLearner(learner);
 

@@ -28,9 +28,10 @@ public class RusticiService {
     }
 
     public LaunchLink createLaunchLink(RegistrationInput registrationInput) {
-        LaunchLink launchLink = getRegistrationLaunchLink(registrationInput);
-        if (launchLink == null) {
-            //If no launch link present then create the registration and launch link using withLaunchLink
+        LaunchLink launchLink;
+        if (rusticiEngineClient.doesRegistrationExist(registrationInput.getRegistrationId())) {
+            launchLink = getRegistrationLaunchLink(registrationInput);
+        } else {
             launchLink = createRegistrationAndLaunchLink(registrationInput);
         }
         if (Arrays.stream(disabledBookmarkingModuleIDs).anyMatch(registrationInput.getModuleId()::equalsIgnoreCase)) {

@@ -18,6 +18,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
 import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
+import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationRequest;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.StringUtilService;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
@@ -27,7 +28,7 @@ import java.util.List;
 import static org.mockito.Mockito.when;
 import static uk.gov.cabinetoffice.csl.util.stub.LearnerRecordStubService.*;
 import static uk.gov.cabinetoffice.csl.util.stub.LearningCatalogueStubService.getCourse;
-import static uk.gov.cabinetoffice.csl.util.stub.RusticiStubService.postLaunchLink;
+import static uk.gov.cabinetoffice.csl.util.stub.RusticiStubService.*;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -73,7 +74,7 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
     }
 
     @Test
-    public void testGetELearningLaunchLink() {
+    public void testGetELearningLaunchLinkNoUid() {
         moduleRecord.setUid(null);
         when(stringUtilService.generateRandomUuid()).thenReturn("uid");
         getCourse(courseId, course);
@@ -86,7 +87,36 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
         patchCourseRecord(List.of(
                 PatchOp.replacePatch("state", "IN_PROGRESS")
         ), courseRecord);
+        RegistrationRequest req = testDataService.generateRegistrationRequest();
+        headDoesRegistrationExist("uid", false);
+        postLaunchLinkWithRegistration(req, launchLink);
+
+        String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
+        webTestClient
+                .post()
+                .uri(url)
+                .header("Authorization", "Bearer fakeToken")
+                .body(Mono.just(input), ModuleLaunchLinkInput.class)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.launchLink")
+                .isEqualTo("http://launch.link");
+    }
+
+    @Test
+    public void testGetELearningLaunchLinkUidExists() {
+        getCourse(courseId, course);
+        getCourseRecord(courseId, userId, courseRecords);
+        patchModuleRecord(1, List.of(
+                PatchOp.replacePatch("updatedAt", "2023-01-01T10:00")
+        ), moduleRecord);
+        patchCourseRecord(List.of(
+                PatchOp.replacePatch("state", "IN_PROGRESS")
+        ), courseRecord);
         LaunchLinkRequest req = testDataService.generateLaunchLinkRequest();
+        headDoesRegistrationExist("uid", true);
         postLaunchLink("uid", req, launchLink);
 
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
