@@ -28,7 +28,8 @@ import java.util.List;
 import static org.mockito.Mockito.when;
 import static uk.gov.cabinetoffice.csl.util.stub.LearnerRecordStubService.*;
 import static uk.gov.cabinetoffice.csl.util.stub.LearningCatalogueStubService.getCourse;
-import static uk.gov.cabinetoffice.csl.util.stub.RusticiStubService.*;
+import static uk.gov.cabinetoffice.csl.util.stub.RusticiStubService.postLaunchLink;
+import static uk.gov.cabinetoffice.csl.util.stub.RusticiStubService.postLaunchLinkWithRegistration;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -88,7 +89,7 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
                 PatchOp.replacePatch("state", "IN_PROGRESS")
         ), courseRecord);
         RegistrationRequest req = testDataService.generateRegistrationRequest();
-        headDoesRegistrationExist("uid", false);
+        postLaunchLink("uid", req.getLaunchLinkRequest(), launchLink, true);
         postLaunchLinkWithRegistration(req, launchLink);
 
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
@@ -116,8 +117,7 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
                 PatchOp.replacePatch("state", "IN_PROGRESS")
         ), courseRecord);
         LaunchLinkRequest req = testDataService.generateLaunchLinkRequest();
-        headDoesRegistrationExist("uid", true);
-        postLaunchLink("uid", req, launchLink);
+        postLaunchLink("uid", req, launchLink, false);
 
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
         webTestClient

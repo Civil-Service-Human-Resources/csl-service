@@ -15,9 +15,6 @@ import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationRequest;
 @Component
 public class RusticiEngineClient implements IRusticiEngineClient {
 
-    @Value("${rustici.registrations}")
-    private String registrations;
-
     @Value("${rustici.registrationLaunchLinkUrl}")
     private String registrationLaunchLinkUrl;
 
@@ -28,21 +25,6 @@ public class RusticiEngineClient implements IRusticiEngineClient {
 
     public RusticiEngineClient(@Qualifier("rusticiHttpClient") IHttpClient client) {
         this.client = client;
-    }
-
-    @Override
-    public boolean doesRegistrationExist(String registrationId) {
-        try {
-            String url = String.format("%s/%s", registrations, registrationId);
-            RequestEntity<Void> request = RequestEntity.head(url).build();
-            client.executeRequest(request, Void.class);
-            return true;
-        } catch (RestClientResponseException e) {
-            if (e.getStatusCode().value() == 404) {
-                log.debug("Registration '{}' doesn't exist.", registrationId);
-            }
-            return false;
-        }
     }
 
     @Override
