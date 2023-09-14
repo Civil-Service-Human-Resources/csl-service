@@ -7,13 +7,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
-import uk.gov.cabinetoffice.csl.service.auth.UserAuthService;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -31,11 +28,6 @@ public class SecurityConfig {
 
     public SecurityConfig(CustomBasicAuthenticationProvider basicAuthenticationProvider) {
         this.basicAuthenticationProvider = basicAuthenticationProvider;
-    }
-
-    @Bean
-    public IUserAuthService userAuthService() {
-        return new UserAuthService(SecurityContextHolder.getContext());
     }
 
     @Bean
