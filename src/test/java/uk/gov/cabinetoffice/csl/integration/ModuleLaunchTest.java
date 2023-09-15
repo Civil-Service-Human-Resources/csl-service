@@ -161,4 +161,30 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
                 .isEqualTo("http://launch.link");
     }
 
+    @Test
+    public void testLaunchNewCourse() {
+        when(stringUtilService.generateRandomUuid()).thenReturn("uid");
+        course.getModule(moduleId).setModuleType(ModuleType.file);
+        course.getModule(moduleId).setUrl("http://launch.link");
+        getCourse(courseId, course);
+        getCourseRecord(courseId, userId, null);
+        CourseRecordInput courseRecordInput = CourseRecordInput.from(
+                userId, course, CourseRecordStatus.builder().state("COMPLETED")
+                        .isRequired(true).build(), course.getModule(moduleId), ModuleRecordStatus.builder().state("COMPLETED").uid(null).build());
+        createCourseRecord(courseRecordInput, courseRecord);
+        String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
+        input.setCourseIsRequired(true);
+        webTestClient
+                .post()
+                .uri(url)
+                .header("Authorization", "Bearer fakeToken")
+                .body(Mono.just(input), ModuleLaunchLinkInput.class)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.launchLink")
+                .isEqualTo("http://launch.link");
+    }
+
 }

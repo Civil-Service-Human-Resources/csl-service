@@ -15,11 +15,20 @@ public class CompleteModuleUpdate implements IModuleRecordUpdate {
     private final Clock clock;
     private final Course course;
     private final Module module;
+    private final boolean isRequired;
+
+    public CompleteModuleUpdate(Clock clock, Course course, Module module, boolean isRequired) {
+        this.clock = clock;
+        this.course = course;
+        this.module = module;
+        this.isRequired = isRequired;
+    }
 
     public CompleteModuleUpdate(Clock clock, Course course, Module module) {
         this.clock = clock;
         this.course = course;
         this.module = module;
+        this.isRequired = false;
     }
 
     @Override
@@ -29,6 +38,7 @@ public class CompleteModuleUpdate implements IModuleRecordUpdate {
                 .moduleRecordStatus(
                         ModuleRecordStatus.builder().state(State.COMPLETED.name()).build()
                 )
+                .isRequired(isRequired)
                 .state(State.IN_PROGRESS.name());
         Collection<Module> modules = course.getModules();
         if (modules.size() == 1 ||
