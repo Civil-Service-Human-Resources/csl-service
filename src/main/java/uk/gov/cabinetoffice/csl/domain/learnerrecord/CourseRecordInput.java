@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
@@ -16,6 +17,7 @@ public class CourseRecordInput {
     private String userId;
     private String courseTitle;
     private String state;
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Boolean isRequired;
     private String preference;
     private List<ModuleRecordInput> moduleRecords;
