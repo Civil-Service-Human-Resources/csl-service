@@ -1,32 +1,16 @@
 package uk.gov.cabinetoffice.csl.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.client.RusticiEngineClient.IRusticiEngineClient;
 import uk.gov.cabinetoffice.csl.domain.rustici.*;
-import uk.gov.cabinetoffice.csl.factory.RequestEntityWithBasicAuthFactory;
 
-import static uk.gov.cabinetoffice.csl.util.CslServiceUtil.*;
+import java.util.Arrays;
 
 @Service
+@Slf4j
 public class RusticiService {
-
-    private final RequestEntityWithBasicAuthFactory requestEntityFactory;
-
-    @Value("${rustici.registrationLaunchLinkUrl}")
-    private String registrationLaunchLinkUrl;
-
-    @Value("${rustici.registrationWithLaunchLinkUrl}")
-    private String registrationWithLaunchLinkUrl;
-
-    @Value("${rustici.username}")
-    private String rusticiUsername;
-
-    @Value("${rustici.password}")
-    private String rusticiPassword;
-
-    @Value("${rustici.engineTenantName}")
-    private String rusticiEngineTenantName;
 
     @Value("${rustici.redirectOnExitUrl}")
     private String rusticiRedirectOnExitUrl;
@@ -34,24 +18,38 @@ public class RusticiService {
     @Value("${rustici.launchLinkExpirySeconds}")
     private int rusticiLaunchLinkExpiry;
 
-    public RusticiService(RequestEntityWithBasicAuthFactory requestEntityFactory) {
-        this.requestEntityFactory = requestEntityFactory;
+    @Value("${rustici.disabledBookmarkingModuleIDs}")
+    private String[] disabledBookmarkingModuleIDs;
+
+    private final IRusticiEngineClient rusticiEngineClient;
+
+    public RusticiService(IRusticiEngineClient rusticiEngineClient) {
+        this.rusticiEngineClient = rusticiEngineClient;
     }
 
-    public ResponseEntity<?> getRegistrationLaunchLink(RegistrationInput registrationInput) {
-        RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
-                String.format(registrationLaunchLinkUrl, registrationInput.getRegistrationId()),
-                createLaunchLinkRequest(String.format(rusticiRedirectOnExitUrl, registrationInput.getCourseId(),
-                        registrationInput.getModuleId())),
-                rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
-        return invokeService(postRequestWithBasicAuth);
+    public LaunchLink createLaunchLink(RegistrationInput registrationInput) {
+        LaunchLink launchLink = getRegistrationLaunchLink(registrationInput);
+        if (launchLink == null) {
+            //If no launch link present then create the registration and launch link using withLaunchLink
+            launchLink = createRegistrationAndLaunchLink(registrationInput);
+        }
+        if (Arrays.stream(disabledBookmarkingModuleIDs).anyMatch(registrationInput.getModuleId()::equalsIgnoreCase)) {
+            launchLink.clearBookmarking();
+            log.info("Module launch link is updated for clearbookmark=true for learner id: "
+                    + "{}, course id: {} and module id: {}", registrationInput.getLearnerId(), registrationInput.getCourseId(), registrationInput.getModuleId());
+        }
+        return launchLink;
     }
 
-    public ResponseEntity<?> createRegistrationAndLaunchLink(RegistrationInput registrationInput) {
-        RequestEntity<?> postRequestWithBasicAuth = requestEntityFactory.createPostRequestWithBasicAuth(
-                registrationWithLaunchLinkUrl, createRegistrationRequest(registrationInput),
-                rusticiUsername, rusticiPassword, addAdditionalHeaderParams("EngineTenantName", rusticiEngineTenantName));
-        return invokeService(postRequestWithBasicAuth);
+    private LaunchLink getRegistrationLaunchLink(RegistrationInput registrationInput) {
+        String redirectOnExitUrl = createRedirectOnExitUrl(registrationInput.getCourseId(), registrationInput.getModuleId());
+        LaunchLinkRequest requestBody = createLaunchLinkRequest(redirectOnExitUrl);
+        return rusticiEngineClient.createLaunchLink(registrationInput.getRegistrationId(), requestBody);
+    }
+
+    private LaunchLink createRegistrationAndLaunchLink(RegistrationInput registrationInput) {
+        RegistrationRequest requestBody = createRegistrationRequest(registrationInput);
+        return rusticiEngineClient.createLaunchLinkWithRegistration(requestBody);
     }
 
     private LaunchLinkRequest createLaunchLinkRequest(String redirectOnExitUrl) {
@@ -74,8 +72,12 @@ public class RusticiService {
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
         registrationRequest.setRegistration(registration);
-        registrationRequest.setLaunchLinkRequest(createLaunchLinkRequest(String.format(rusticiRedirectOnExitUrl,
-                registrationInput.getCourseId(), registrationInput.getModuleId())));
+        String redirectOnExitUrl = createRedirectOnExitUrl(registrationInput.getCourseId(), registrationInput.getModuleId());
+        registrationRequest.setLaunchLinkRequest(createLaunchLinkRequest(redirectOnExitUrl));
         return registrationRequest;
+    }
+
+    private String createRedirectOnExitUrl(String courseId, String moduleId) {
+        return String.format(rusticiRedirectOnExitUrl, courseId, moduleId);
     }
 }

@@ -9,17 +9,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CourseRecord {
+public class CourseRecord implements Serializable {
 
     private String courseId;
 
@@ -51,7 +53,7 @@ public class CourseRecord {
     }
 
     public ModuleRecord getModuleRecord(String moduleId) {
-        if(moduleRecords != null) {
+        if (moduleRecords != null) {
             return this.moduleRecords.stream()
                     .filter(moduleRecord -> moduleId.equals(moduleRecord.getModuleId()))
                     .findFirst()
@@ -61,10 +63,10 @@ public class CourseRecord {
     }
 
     public void updateModuleRecords(ModuleRecord newModuleRecord) {
-        List<ModuleRecord> updatedModuleRecords = this.moduleRecords.stream().map(existingModuleRecord ->
-                        existingModuleRecord.getModuleId().equals(newModuleRecord.getModuleId())
-                                ? newModuleRecord : existingModuleRecord)
-                .collect(toList());
-        this.setModuleRecords(updatedModuleRecords);
+        Map<String, ModuleRecord> records = moduleRecords.stream().
+                collect(Collectors.toMap(ModuleRecord::getModuleId, Function.identity()));
+        records.put(newModuleRecord.getModuleId(), newModuleRecord);
+        ArrayList<ModuleRecord> updatedRecords = new ArrayList<>(records.values());
+        this.setModuleRecords(updatedRecords);
     }
 }

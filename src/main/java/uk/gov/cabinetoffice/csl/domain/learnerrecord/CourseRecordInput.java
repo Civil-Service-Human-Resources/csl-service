@@ -1,31 +1,46 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import uk.gov.cabinetoffice.csl.annotations.ValidEnum;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 
+import java.util.Collections;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class CourseRecordInput {
 
     private String courseId;
-
     private String userId;
-
-    @NotBlank(message = "courseTitle is required")
     private String courseTitle;
-
-    @ValidEnum(enumClass = State.class)
     private String state;
-
-    @NotBlank(message = "isRequired is required")
-    private Boolean isRequired = false;
-
-    @ValidEnum(enumClass = Preference.class)
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    private Boolean isRequired;
     private String preference;
-
-    @Valid
     private List<ModuleRecordInput> moduleRecords;
+
+    public static CourseRecordInput from(String learnerId, Course course,
+                                         CourseRecordStatus status) {
+        return new CourseRecordInput(
+                course.getId(), learnerId, course.getTitle(),
+                status.getState(), status.getIsRequired(),
+                status.getPreference(), Collections.emptyList()
+        );
+    }
+
+    public static CourseRecordInput from(String learnerId, Course course,
+                                         CourseRecordStatus status,
+                                         Module module, ModuleRecordStatus moduleRecordStatus) {
+        ModuleRecordInput moduleRecordInput = ModuleRecordInput.from(
+                learnerId, course.getId(), module, moduleRecordStatus
+        );
+        return new CourseRecordInput(
+                course.getId(), learnerId, course.getTitle(),
+                status.getState(), status.getIsRequired(),
+                status.getPreference(), Collections.singletonList(moduleRecordInput)
+        );
+    }
 }

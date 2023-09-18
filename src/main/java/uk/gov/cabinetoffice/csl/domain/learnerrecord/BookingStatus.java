@@ -2,7 +2,9 @@ package uk.gov.cabinetoffice.csl.domain.learnerrecord;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum BookingStatus {
+import java.io.Serializable;
+
+public enum BookingStatus implements Serializable {
     REQUESTED("Requested"), CONFIRMED("Confirmed"), CANCELLED("Cancelled");
 
     private String value;

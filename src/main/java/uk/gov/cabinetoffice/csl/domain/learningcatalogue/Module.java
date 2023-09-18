@@ -16,9 +16,10 @@ import java.util.Collection;
 public class Module implements Serializable {
     private String id;
     private String title;
-    private String moduleType;
+    private ModuleType moduleType;
     private Long duration;
     private BigDecimal cost;
     private Collection<Event> events;
     private boolean optional;
+    private String url;
 }

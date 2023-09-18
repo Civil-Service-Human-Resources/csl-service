@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
+import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.LearningCatalogueService;
 
 @Slf4j
@@ -15,11 +16,14 @@ import uk.gov.cabinetoffice.csl.service.LearningCatalogueService;
 @RequestMapping("/reset-cache")
 public class CacheResetController {
 
+    private final LearnerRecordService learnerRecordService;
     private final IdentityService identityService;
 
     private final LearningCatalogueService learningCatalogueService;
 
-    public CacheResetController(IdentityService identityService, LearningCatalogueService learningCatalogueService) {
+    public CacheResetController(LearnerRecordService learnerRecordService,
+                                IdentityService identityService, LearningCatalogueService learningCatalogueService) {
+        this.learnerRecordService = learnerRecordService;
         this.identityService = identityService;
         this.learningCatalogueService = learningCatalogueService;
     }
@@ -39,6 +43,13 @@ public class CacheResetController {
     @GetMapping(path = "/course/{courseId}", produces = "application/json")
     public ResponseEntity<?> removeCoursesFromCache(@PathVariable String courseId) {
         learningCatalogueService.removeCourseFromCache(courseId);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping(path = "/learner/{learnerId}/course_record/{courseId}")
+    public ResponseEntity<?> removeCourseRecordFromCache(@PathVariable String learnerId,
+                                                         @PathVariable String courseId) {
+        learnerRecordService.bustCourseRecordCache(learnerId, courseId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

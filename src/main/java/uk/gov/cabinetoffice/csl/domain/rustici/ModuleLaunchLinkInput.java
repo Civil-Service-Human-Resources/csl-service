@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordInput;
 
 @Data
 @NoArgsConstructor
@@ -16,5 +15,5 @@ public class ModuleLaunchLinkInput {
 
     private String learnerLastName;
 
-    private CourseRecordInput courseRecordInput;
+    private Boolean courseIsRequired = false;
 }
