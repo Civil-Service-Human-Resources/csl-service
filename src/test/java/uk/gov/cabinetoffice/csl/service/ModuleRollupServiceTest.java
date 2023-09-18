@@ -18,7 +18,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-//@SpringBootTest(classes = ModuleRollupService.class)
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("no-redis")
 public class ModuleRollupServiceTest {
@@ -53,38 +52,6 @@ public class ModuleRollupServiceTest {
         verify(learnerRecordService, never()).updateModuleRecord(any(), any());
         verify(learnerRecordService, never()).updateCourseRecord(any(), any(), any());
     }
-
-//    @Test
-//    public void shouldApplyPatchesToModuleRecordOnly() {
-//        CourseRecord courseRecord = cslTestUtil.createCourseRecord();
-//        ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
-//        List<PatchOp> expPatches = List.of(
-//                PatchOp.replacePatch("completionDate", rusticiRollupData.getCompletedDate().toString())
-//        );
-//        mockGetCSLDataFromRollup(new CSLRusticiProps(courseId, moduleId, learnerId, expPatches));
-//        when(learnerRecordService.getCourseRecord(learnerId, courseId)).thenReturn(courseRecord);
-//        when(learnerRecordService.updateModuleRecord(moduleRecord.getId(), expPatches)).thenReturn(moduleRecord);
-//        when(learnerRecordService.isCourseCompleted(courseRecord)).thenReturn(false);
-//        invokeService();
-//        verify(learnerRecordService, never()).updateCourseRecord(any(), any(), any());
-//    }
-
-//    @Test
-//    public void shouldApplyPatchesToModuleRecordAndCompleteCourseRecord() {
-//        CourseRecord courseRecord = cslTestUtil.createCourseRecord();
-//        ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
-//        List<PatchOp> expPatches = List.of(
-//                PatchOp.replacePatch("completionDate", rusticiRollupData.getCompletedDate().toString())
-//        );
-//        moduleRecord.setState(State.COMPLETED);
-//        mockGetCSLDataFromRollup(new CSLRusticiProps(courseId, moduleId, learnerId, expPatches));
-//        when(learnerRecordService.getCourseRecord(learnerId, courseId)).thenReturn(courseRecord);
-//        when(learnerRecordService.updateModuleRecord(moduleRecord.getId(), expPatches)).thenReturn(moduleRecord);
-//        when(learnerRecordService.isCourseCompleted(courseRecord)).thenReturn(true);
-//        invokeService();
-//        verify(learnerRecordService, atMostOnce()).updateCourseRecord(learnerId, courseId,
-//                List.of(PatchOp.replacePatch("state", "COMPLETED")));
-//    }
 
     private void invokeService() {
         moduleRollupService.processRusticiRollupData(rusticiRollupData);
