@@ -24,7 +24,7 @@ public class SecurityConfig {
     @Value("${management.endpoints.web.base-path}")
     private String actuatorBasePath;
 
-    private CustomBasicAuthenticationProvider basicAuthenticationProvider;
+    private final CustomBasicAuthenticationProvider basicAuthenticationProvider;
 
     public SecurityConfig(CustomBasicAuthenticationProvider basicAuthenticationProvider) {
         this.basicAuthenticationProvider = basicAuthenticationProvider;
@@ -35,7 +35,7 @@ public class SecurityConfig {
         return httpSecurity.cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeHttpRequests().requestMatchers(actuatorBasePath + "/**").permitAll()
-                .and().authorizeHttpRequests().requestMatchers("/rustici/**","/reset-cache/**").authenticated()
+                .and().authorizeHttpRequests().requestMatchers("/rustici/**", "/reset-cache/**").authenticated()
                 .and().httpBasic()
                 .and().authorizeHttpRequests().requestMatchers("/courses/**").authenticated()
                 .and().oauth2ResourceServer().jwt(jwtSpec -> jwtSpec.decoder(jwtDecoder()))

@@ -1,54 +1,38 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import uk.gov.cabinetoffice.csl.annotations.ValidEnum;
-
 @Data
+@AllArgsConstructor
 public class ModuleRecordInput {
 
     private String uid;
-
     private String userId;
-
     private String courseId;
-
     private String moduleId;
-
-    @NotBlank(message = "ModuleTitle is required")
     private String moduleTitle;
-
-    @NotBlank(message = "optional is required")
     private Boolean optional;
-
-    @NotBlank(message = "moduleType is required")
-    private String moduleType;
-
-    @ValidEnum(enumClass = State.class)
-    private String state;
-
-    @ValidEnum(enumClass = Result.class)
-    private String result;
-
-    private BigDecimal cost;
-
     private Long duration;
-
-    @JsonSerialize(using = LocalDateSerializer.class)
+    private String moduleType;
+    private BigDecimal cost;
+    private String state;
+    private String result;
     private LocalDate eventDate;
-
     private String eventId;
-
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime updated;
-
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime completedDate;
+
+    public static ModuleRecordInput from(String learnerId, String courseId,
+                                         Module module, ModuleRecordStatus status) {
+        return new ModuleRecordInput(status.getUid(), learnerId, courseId,
+                module.getId(), module.getTitle(), module.isOptional(),
+                module.getDuration(), module.getModuleType().name(), module.getCost(),
+                status.getState(), status.getResult(), status.getEventDate(), status.getEventId(),
+                status.getCompletedDate());
+    }
 }

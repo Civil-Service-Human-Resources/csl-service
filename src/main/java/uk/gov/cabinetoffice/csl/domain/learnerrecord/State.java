@@ -1,6 +1,8 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord;
 
-public enum State {
+import java.io.Serializable;
+
+public enum State implements Serializable {
     APPROVED,
     ARCHIVED,
     COMPLETED,

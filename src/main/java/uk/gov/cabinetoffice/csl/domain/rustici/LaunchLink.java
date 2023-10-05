@@ -9,4 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LaunchLink {
     private String launchLink;
+
+    public void clearBookmarking() {
+        setLaunchLink(String.format("%s&clearbookmark=true", this.launchLink));
+    }
 }
