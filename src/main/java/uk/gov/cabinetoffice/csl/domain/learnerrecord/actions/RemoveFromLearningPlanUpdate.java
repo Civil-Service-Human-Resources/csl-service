@@ -21,7 +21,7 @@ public class RemoveFromLearningPlanUpdate implements ICourseRecordUpdate {
     @Override
     public List<PatchOp> getUpdateCourseRecordPatches(CourseRecord courseRecord) {
         List<PatchOp> patches = new ArrayList<>();
-        if (courseRecord.getState() == null || !courseRecord.getState().equals(State.ARCHIVED)) {
+        if (!courseRecord.getStateSafe().equals(State.ARCHIVED)) {
             patches.add(PatchOp.replacePatch("state", State.ARCHIVED.name()));
         }
         return patches;
