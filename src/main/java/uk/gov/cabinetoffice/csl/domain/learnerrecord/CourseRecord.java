@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,11 @@ public class CourseRecord implements Serializable {
     @JsonProperty("modules")
     public Collection<ModuleRecord> getModuleRecords() {
         return moduleRecords;
+    }
+
+    @JsonIgnore
+    public State getStateSafe() {
+        return Objects.requireNonNullElse(this.state, State.NULL);
     }
 
     public ModuleRecord getModuleRecord(String moduleId) {

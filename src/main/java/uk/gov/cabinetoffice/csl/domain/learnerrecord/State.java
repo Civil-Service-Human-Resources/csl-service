@@ -9,5 +9,6 @@ public enum State implements Serializable {
     IN_PROGRESS,
     REGISTERED,
     SKIPPED,
-    UNREGISTERED
+    UNREGISTERED,
+    NULL
 }
