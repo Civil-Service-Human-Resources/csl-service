@@ -2,7 +2,6 @@ package uk.gov.cabinetoffice.csl.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
@@ -33,18 +32,12 @@ public class LearningCatalogueService {
             }
         }
     }
-    
+
     public Course getCourse(String courseId) {
         Course course = client.getCourse(courseId);
         log.info("Course is retrieved from the Learning-catalogue for the course id: {}", courseId);
         log.debug(course.toString());
         return course;
-    }
-
-    @Scheduled(cron = "${learningCatalogue.courseCacheEvictionScheduleCron}")
-    @CacheEvict(value = "catalogue-course", allEntries = true)
-    public void removeAllCoursesFromCache() {
-        log.info("LearningCatalogueService.removeAllCoursesFromCache: All catalogue courses are removed from the cache");
     }
 
     @CacheEvict(value = "catalogue-course", key = "#courseId")
