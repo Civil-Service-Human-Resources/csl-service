@@ -34,12 +34,6 @@ public class CacheResetController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @GetMapping(path = "/all-courses", produces = "application/json")
-    public ResponseEntity<?> removeAllCoursesFromCache() {
-        learningCatalogueService.removeAllCoursesFromCache();
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
     @GetMapping(path = "/course/{courseId}", produces = "application/json")
     public ResponseEntity<?> removeCoursesFromCache(@PathVariable String courseId) {
         learningCatalogueService.removeCourseFromCache(courseId);

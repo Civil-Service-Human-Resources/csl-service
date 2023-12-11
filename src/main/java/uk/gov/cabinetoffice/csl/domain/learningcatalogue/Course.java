@@ -38,7 +38,7 @@ public class Course implements Serializable {
     public boolean isCourseComplete(CourseRecord courseRecord) {
         List<String> completedModuleIds = courseRecord.getModuleRecords()
                 .stream()
-                .filter(mr -> mr.getState().equals(State.COMPLETED))
+                .filter(mr -> mr.getStateSafe().equals(State.COMPLETED))
                 .map(ModuleRecord::getModuleId)
                 .toList();
         if (getModules() != null) {
