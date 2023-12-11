@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Data
 @AllArgsConstructor
@@ -47,4 +48,9 @@ public class ModuleRecord implements Serializable {
     private BookingStatus bookingStatus;
     @JsonIgnore
     private CourseRecord courseRecord;
+    
+    @JsonIgnore
+    public State getStateSafe() {
+        return Objects.requireNonNullElse(this.state, State.NULL);
+    }
 }
