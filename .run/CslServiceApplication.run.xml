@@ -1,0 +1,26 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="CslServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <module name="csl-service" />
+    <selectedOptions>
+      <option name="spring.boot.profiles" visible="false" />
+    </selectedOptions>
+    <option name="SPRING_BOOT_MAIN_CLASS" value="uk.gov.cabinetoffice.csl.CslServiceApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+  <configuration default="false" name="CslServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <module name="csl-service" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="uk.gov.cabinetoffice.csl.CslServiceApplication" />
+    <option name="VM_PARAMETERS" value="-ea -DWEBSITES_PORT=9003 -DAPP_CONTEXT_PATH=/api -DCSL_SERVICE_SECURITY_USERNAME=changeme -DCSL_SERVICE_SECURITY_PASSWORD=changeme -DJWT_KEY=changeme -DOAUTH_SERVICE_URL=http://localhost:9005 -DCLIENT_ID=9fbd4ae2-2db3-44c7-9544-88e80255b56e -DCLIENT_SECRET=test -DREFRESH_SERVICETOKENCACHE_BEFORE_SECONDS_TOEXPIRE=0 -DLEARNER_RECORD_SERVICE_URL=http://localhost:9000 -DLEARNING_CATALOGUE_SERVICE_URL=http://localhost:9001 -DOAUTH_TOKEN_ENDPOINT=/oauth/token -DRUSTICI_USERNAME=changeme -DRUSTICI_PASSWORD=changeme -DRUSTICI_ENGINE_TENANT_NAME=default -DRUSTICI_SERVICE_URL=http://localhost:8000 -DRUSTICI_REDIRECT_ON_EXIT_SERVICE_URL=http://localhost:9000/learning-record -DRUSTICI_LAUNCH_LINK_EXPIRY_SECONDS=0 -DREDIS_HOST=localhost -DREDIS_PORT=6379 -DREDIS_PASSWORD=changeme" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="uk.gov.cabinetoffice.csl.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
