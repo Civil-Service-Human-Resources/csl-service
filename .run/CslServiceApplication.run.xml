@@ -1,0 +1,26 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="CslServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <module name="csl-service" />
+    <selectedOptions>
+      <option name="spring.boot.profiles" visible="false" />
+    </selectedOptions>
+    <option name="SPRING_BOOT_MAIN_CLASS" value="uk.gov.cabinetoffice.csl.CslServiceApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+  <configuration default="false" name="CslServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <module name="csl-service" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="uk.gov.cabinetoffice.csl.CslServiceApplication" />
+    <option name="VM_PARAMETERS" value="-ea -DWEBSITES_PORT=9003 -DAPP_CONTEXT_PATH=/api -DCSL_SERVICE_SECURITY_USERNAME=csl-service-security-user -DCSL_SERVICE_SECURITY_PASSWORD=csl-service-security-password -DJWT_KEY=MWb08AxHUVPUG7gwLhXIZ30udqAi2lOQhdr52ztx -DOAUTH_SERVICE_URL=https://identity.integration.learn.civilservice.gov.uk -DCLIENT_ID=9fbd4ae2-2db3-44c8-9544-88e80255b56e -DCLIENT_SECRET=test -DREFRESH_SERVICETOKENCACHE_BEFORE_SECONDS_TOEXPIRE=0 -DLEARNER_RECORD_SERVICE_URL=https://learning-record.integration.learn.civilservice.gov.uk -DLEARNING_CATALOGUE_SERVICE_URL=https://learning-resources.integration.learn.civilservice.gov.uk -DOAUTH_TOKEN_ENDPOINT=/oauth/token -DRUSTICI_USERNAME=aD81V5&amp;b1qvk -DRUSTICI_PASSWORD=lV975$0#7d9! -DRUSTICI_ENGINE_TENANT_NAME=default -DRUSTICI_SERVICE_URL=https://rustici-engine.integration.learn.civilservice.gov.uk -DRUSTICI_REDIRECT_ON_EXIT_SERVICE_URL=https://integration.learn.civilservice.gov.uk/learning-record -DRUSTICI_LAUNCH_LINK_EXPIRY_SECONDS=0 -DREDIS_HOST=lpg-lpgintegration-redis.redis.cache.windows.net -DREDIS_PORT=6379 -DREDIS_PASSWORD=0MyKy6eeDX8P9GJtRupqarISMRJJy65UuPbsNy7FfuY=" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="uk.gov.cabinetoffice.csl.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
