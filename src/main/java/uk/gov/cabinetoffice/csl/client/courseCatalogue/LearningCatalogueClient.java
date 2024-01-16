@@ -30,4 +30,5 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         RequestEntity<Void> request = RequestEntity.get(url).build();
         return httpClient.executeRequest(request, Course.class);
     }
+
 }

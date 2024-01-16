@@ -15,12 +15,9 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.Preference;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
+import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.util.List;
-
-import static uk.gov.cabinetoffice.csl.util.stub.LearnerRecordStubService.createCourseRecord;
-import static uk.gov.cabinetoffice.csl.util.stub.LearnerRecordStubService.getCourseRecord;
-import static uk.gov.cabinetoffice.csl.util.stub.LearningCatalogueStubService.getCourse;
 
 @Slf4j
 @ActiveProfiles({"wiremock", "no-redis"})
@@ -35,18 +32,19 @@ public class RemoveCourseFromSuggestionsTest extends CSLServiceWireMockServer {
     @Autowired
     private TestDataService testDataService;
 
+    @Autowired
+    private CSLStubService cslStubService;
+
     @Test
     public void TestRemoveCourseFromSuggestions() {
         CourseRecord courseRecord = testDataService.generateCourseRecord(false);
         String courseId = testDataService.getCourseId();
         String userId = testDataService.getUserId();
-        Course course = testDataService.generateCourse(true);
-        getCourseRecord(courseId, userId, null);
+        Course course = testDataService.generateCourse(true, false);
         CourseRecordInput expectedInput = new CourseRecordInput(courseId, userId,
                 course.getTitle(), null, null, Preference.DISLIKED.name(),
                 List.of());
-        getCourse(courseId, course);
-        createCourseRecord(expectedInput, courseRecord);
+        cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedInput, courseRecord);
         webTestClient
                 .post()
                 .uri(String.format("/courses/%s/remove_from_suggestions", courseId))

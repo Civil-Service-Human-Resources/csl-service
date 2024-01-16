@@ -35,4 +35,5 @@ public class DateRange implements Serializable {
     @JsonSerialize(using = LocalTimeSerializer.class)
     @JsonDeserialize(using = LocalTimeDeserializer.class)
     LocalTime endTime;
+
 }

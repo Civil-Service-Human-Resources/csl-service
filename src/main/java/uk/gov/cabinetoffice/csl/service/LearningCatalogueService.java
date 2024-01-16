@@ -5,9 +5,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 
 @Slf4j
 @Service
@@ -32,6 +31,17 @@ public class LearningCatalogueService {
             }
         }
     }
+
+    public CourseWithModuleWithEvent getCourseWithModuleWithEvent(String courseId, String moduleId, String eventId) {
+        CourseWithModule courseWithModule = getCourseWithModule(courseId, moduleId);
+        Event event = courseWithModule.getModule().getEvent(eventId);
+        if (event != null) {
+            return new CourseWithModuleWithEvent(courseWithModule, event);
+        } else {
+            throw new LearningCatalogueResourceNotFoundException(String.format("Event '%s' in module '%s' and course '%s'", eventId, moduleId, courseId));
+        }
+    }
+
 
     public Course getCourse(String courseId) {
         Course course = client.getCourse(courseId);

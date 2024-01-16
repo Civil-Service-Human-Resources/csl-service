@@ -15,11 +15,9 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
+import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.util.List;
-
-import static uk.gov.cabinetoffice.csl.util.stub.LearnerRecordStubService.getCourseRecord;
-import static uk.gov.cabinetoffice.csl.util.stub.LearnerRecordStubService.patchCourseRecord;
 
 @Slf4j
 @ActiveProfiles({"wiremock", "no-redis"})
@@ -34,6 +32,9 @@ public class RemoveCourseFromLearningPlanTest extends CSLServiceWireMockServer {
     @Autowired
     private TestDataService testDataService;
 
+    @Autowired
+    private CSLStubService cslStubService;
+
     @Test
     public void TestRemoveCourseFromLearningPlan() {
         String courseId = testDataService.getCourseId();
@@ -41,12 +42,12 @@ public class RemoveCourseFromLearningPlanTest extends CSLServiceWireMockServer {
         CourseRecord inProgressCourseRecord = testDataService.generateCourseRecord(false);
         inProgressCourseRecord.setState(State.IN_PROGRESS);
         CourseRecords courseRecords = new CourseRecords(List.of(inProgressCourseRecord));
-        getCourseRecord(courseId, userId, courseRecords);
+        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
 
         CourseRecord archivedCourseRecord = testDataService.generateCourseRecord(false);
         archivedCourseRecord.setState(State.ARCHIVED);
         List<PatchOp> expectedPatches = List.of(PatchOp.replacePatch("state", "ARCHIVED"));
-        patchCourseRecord(expectedPatches, archivedCourseRecord);
+        cslStubService.getLearnerRecord().patchCourseRecord(expectedPatches, archivedCourseRecord);
 
         webTestClient
                 .post()
@@ -67,7 +68,7 @@ public class RemoveCourseFromLearningPlanTest extends CSLServiceWireMockServer {
         String courseId = testDataService.getCourseId();
         String userId = testDataService.getUserId();
         CourseRecords courseRecords = new CourseRecords();
-        getCourseRecord(courseId, userId, courseRecords);
+        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
 
         webTestClient
                 .post()

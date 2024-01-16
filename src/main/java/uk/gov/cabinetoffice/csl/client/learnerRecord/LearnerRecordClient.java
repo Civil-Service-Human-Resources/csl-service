@@ -20,6 +20,8 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     private String courseRecords;
     @Value("${learnerRecord.moduleRecordsForLearnerUrl}")
     private String moduleRecords;
+    @Value("${learnerRecord.eventsUrl}")
+    private String event;
 
     private final IHttpClient httpClient;
 
@@ -81,5 +83,14 @@ public class LearnerRecordClient implements ILearnerRecordClient {
                 .patch(url).headers(httpHeaders -> httpHeaders.add("Content-Type", "application/json-patch+json"))
                 .body(patches);
         return httpClient.executeRequest(request, ModuleRecord.class);
+    }
+
+    @Override
+    public BookingDto bookEvent(String eventId, BookingDto booking) {
+        log.debug("Booking event {} with data {}", eventId, booking);
+        String url = String.format("%s/%s/booking", event, eventId);
+        RequestEntity<BookingDto> request = RequestEntity
+                .post(url).body(booking);
+        return httpClient.executeRequest(request, BookingDto.class);
     }
 }

@@ -1,5 +1,8 @@
 package uk.gov.cabinetoffice.csl.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +20,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Configuration
-@Import(MockClockConfig.class)
+@Import({MockClockConfig.class})
 public class TestConfig {
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return JsonMapper.builder()
+                .build().registerModule(new JavaTimeModule());
+    }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

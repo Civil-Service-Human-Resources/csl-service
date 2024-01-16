@@ -60,7 +60,7 @@ public class ModuleServiceTest {
 
     @Test
     public void shouldLaunchModule() {
-        Course course = testDataService.generateCourse(true);
+        Course course = testDataService.generateCourse(true, false);
         Module module = course.getModule(moduleId);
         module.setModuleType(ModuleType.link);
         module.setUrl("https://test.com");
@@ -80,7 +80,7 @@ public class ModuleServiceTest {
 
     @Test
     public void shouldLaunchELearning() {
-        Course course = testDataService.generateCourse(true);
+        Course course = testDataService.generateCourse(true, false);
         Module module = course.getModule(moduleId);
         module.setModuleType(ModuleType.elearning);
         CourseRecord courseRecord = testDataService.generateCourseRecord(true);
@@ -102,7 +102,7 @@ public class ModuleServiceTest {
 
     @Test
     public void shouldCompleteModule() {
-        Course course = testDataService.generateCourse(true);
+        Course course = testDataService.generateCourse(true, false);
         Module module = course.getModule(moduleId);
         CourseRecord courseRecord = testDataService.generateCourseRecord(true);
         when(learningCatalogueService.getCourseWithModule(courseId, moduleId)).thenReturn(
