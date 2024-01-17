@@ -37,6 +37,6 @@ public class Module implements Serializable {
     }
 
     public boolean isFree() {
-        return this.cost.equals(BigDecimal.valueOf(0));
+        return BigDecimal.ZERO.equals(this.cost);
     }
 }
