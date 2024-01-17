@@ -1,6 +1,5 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +12,6 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BookingDto {
     private Integer id;
     private String learner;
