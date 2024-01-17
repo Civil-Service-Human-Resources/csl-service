@@ -88,7 +88,7 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     @Override
     public BookingDto bookEvent(String eventId, BookingDto booking) {
         log.debug("Booking event {} with data {}", eventId, booking);
-        String url = String.format("%s/%s/booking", event, eventId);
+        String url = String.format("%s/%s/booking/", event, eventId);
         RequestEntity<BookingDto> request = RequestEntity
                 .post(url).body(booking);
         return httpClient.executeRequest(request, BookingDto.class);
