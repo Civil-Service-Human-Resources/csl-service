@@ -19,4 +19,7 @@ public class BookEventDto {
     @NotNull
     @NotEmpty
     private String learnerEmail;
+    @NotNull
+    @NotEmpty
+    private String learnerName;
 }

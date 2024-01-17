@@ -23,7 +23,8 @@ public class BookingDtoFactory {
         BookingDto.BookingDtoBuilder bookingBuilder = BookingDto.builder()
                 .event(URI.create(eventUrl))
                 .learner(learnerUid)
-                .learnerEmail(dto.getLearnerEmail());
+                .learnerEmail(dto.getLearnerEmail())
+                .learnerName(dto.getLearnerName());
 
         if (!dto.getAccessibilityOptions().isEmpty()) {
             String joinedAccessibilityOptions = String.join(",", dto.getAccessibilityOptions());

@@ -69,7 +69,8 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 .event(URI.create(String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
                 .status(BookingStatus.CONFIRMED)
                 .learner(userId)
-                .learnerEmail(userEmail).build();
+                .learnerEmail(userEmail)
+                .learnerName("testName").build();
         CourseRecordInput expectedCourseRecordInput = CourseRecordInput.from(
                 userId, course, CourseRecordStatus.builder().state("APPROVED").build(),
                 course.getModule(moduleId), ModuleRecordStatus.builder()
@@ -77,7 +78,7 @@ public class BookEventTest extends CSLServiceWireMockServer {
                         .eventId(eventId).eventDate(LocalDate.of(2023, 1, 1)).build());
         cslStubService.getLearnerRecord().bookEvent(eventId, dto, dto);
         cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordInput, courseRecord);
-        BookEventDto inputDto = new BookEventDto(List.of("access1", "access2"), "", "userEmail@email.com");
+        BookEventDto inputDto = new BookEventDto(List.of("access1", "access2"), "", "userEmail@email.com", "testName");
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
         webTestClient
                 .post()
@@ -100,7 +101,8 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 .event(URI.create(String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
                 .status(BookingStatus.CONFIRMED)
                 .learner(userId)
-                .learnerEmail(userEmail).build();
+                .learnerEmail(userEmail)
+                .learnerName("testName").build();
         List<PatchOp> expectedCourseRecordPatches = List.of();
         List<PatchOp> expectedModuleRecordPatches = List.of(
                 PatchOp.replacePatch("state", "APPROVED"),
@@ -113,7 +115,7 @@ public class BookEventTest extends CSLServiceWireMockServer {
         cslStubService.getLearnerRecord().bookEvent(eventId, dto, dto);
         cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords,
                 1, expectedModuleRecordPatches, moduleRecord, expectedCourseRecordPatches, courseRecord);
-        BookEventDto inputDto = new BookEventDto(List.of(), "", "userEmail@email.com");
+        BookEventDto inputDto = new BookEventDto(List.of(), "", "userEmail@email.com", "testName");
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
         webTestClient
                 .post()
@@ -137,7 +139,8 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 .status(BookingStatus.REQUESTED)
                 .learner(userId)
                 .poNumber("poNumber123")
-                .learnerEmail(userEmail).build();
+                .learnerEmail(userEmail)
+                .learnerName("testName").build();
         CourseRecordInput expectedCourseRecordInput = CourseRecordInput.from(
                 userId, course, CourseRecordStatus.builder().state("REGISTERED").build(),
                 course.getModule(moduleId), ModuleRecordStatus.builder()
@@ -145,7 +148,7 @@ public class BookEventTest extends CSLServiceWireMockServer {
                         .eventId(eventId).eventDate(LocalDate.of(2023, 1, 1)).build());
         cslStubService.getLearnerRecord().bookEvent(eventId, dto, dto);
         cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordInput, courseRecord);
-        BookEventDto inputDto = new BookEventDto(List.of("access1"), "poNumber123", "userEmail@email.com");
+        BookEventDto inputDto = new BookEventDto(List.of("access1"), "poNumber123", "userEmail@email.com", "testName");
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
         webTestClient
                 .post()
