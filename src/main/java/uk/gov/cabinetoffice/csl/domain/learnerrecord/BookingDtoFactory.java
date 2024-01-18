@@ -6,13 +6,17 @@ import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 
 import java.net.URI;
+import java.time.Clock;
+import java.time.Instant;
 
 @Component
 public class BookingDtoFactory {
     private final String catalogueUrl;
+    private final Clock clock;
 
-    public BookingDtoFactory(@Value("${learningCatalogue.serviceUrl}") String catalogueUrl) {
+    public BookingDtoFactory(@Value("${learningCatalogue.serviceUrl}") String catalogueUrl, Clock clock) {
         this.catalogueUrl = catalogueUrl;
+        this.clock = clock;
     }
 
     public BookingDto createBooking(String learnerUid, CourseWithModuleWithEvent courseWithModuleWithEvent,
@@ -24,7 +28,8 @@ public class BookingDtoFactory {
                 .event(URI.create(eventUrl))
                 .learner(learnerUid)
                 .learnerEmail(dto.getLearnerEmail())
-                .learnerName(dto.getLearnerName());
+                .learnerName(dto.getLearnerName())
+                .bookingTime(Instant.now(clock));
 
         if (!dto.getAccessibilityOptions().isEmpty()) {
             String joinedAccessibilityOptions = String.join(",", dto.getAccessibilityOptions());

@@ -12,6 +12,9 @@ import uk.gov.cabinetoffice.csl.util.TestDataService;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,7 +31,8 @@ public class BookingDtoFactoryTest {
 
     @BeforeEach
     public void setup() {
-        bookingDtoFactory = new BookingDtoFactory("catalogue_url");
+        bookingDtoFactory = new BookingDtoFactory("catalogue_url",
+                Clock.fixed(Instant.parse("2023-01-01T10:00:00.000Z"), ZoneId.of("Europe/London")));
         reset();
     }
 

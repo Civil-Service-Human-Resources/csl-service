@@ -74,12 +74,12 @@ public class LearnerRecordStubService {
         );
     }
 
-    public void bookEvent(String eventId, BookingDto expectedInput, BookingDto response) {
+    public void bookEvent(String eventId, String expectedInput, BookingDto response) {
         stubFor(
                 WireMock.post(urlPathEqualTo(String.format("/learner_record_api/event/%s/booking/", eventId)))
                         .withHeader("Authorization", equalTo("Bearer fakeToken"))
                         .withRequestBody(equalToJson(
-                                utils.toJson(expectedInput)
+                                expectedInput
                         ))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")

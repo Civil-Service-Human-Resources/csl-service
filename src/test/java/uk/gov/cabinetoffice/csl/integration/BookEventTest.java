@@ -76,7 +76,12 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 course.getModule(moduleId), ModuleRecordStatus.builder()
                         .state("APPROVED").uid(null)
                         .eventId(eventId).eventDate(LocalDate.of(2023, 1, 1)).build());
-        cslStubService.getLearnerRecord().bookEvent(eventId, dto, dto);
+        String expectedBookingJsonInput = String.format("""
+                        {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
+                        "accessibilityOptions": "%s", "status": "%s"}
+                        """, dto.getEvent(), userId, userEmail, "testName", "2023-01-01T10:00:00Z", "access1,access2",
+                "Confirmed");
+        cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
         cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordInput, courseRecord);
         BookEventDto inputDto = new BookEventDto(List.of("access1", "access2"), "", "userEmail@email.com", "testName");
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
@@ -112,7 +117,11 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 PatchOp.replacePatch("eventId", eventId),
                 PatchOp.replacePatch("eventDate", "2023-01-01")
         );
-        cslStubService.getLearnerRecord().bookEvent(eventId, dto, dto);
+        String expectedBookingJsonInput = String.format("""
+                {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
+                "status": "%s"}
+                """, dto.getEvent(), userId, userEmail, "testName", "2023-01-01T10:00:00Z", "Confirmed");
+        cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
         cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords,
                 1, expectedModuleRecordPatches, moduleRecord, expectedCourseRecordPatches, courseRecord);
         BookEventDto inputDto = new BookEventDto(List.of(), "", "userEmail@email.com", "testName");
@@ -146,7 +155,12 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 course.getModule(moduleId), ModuleRecordStatus.builder()
                         .state("REGISTERED").uid(null)
                         .eventId(eventId).eventDate(LocalDate.of(2023, 1, 1)).build());
-        cslStubService.getLearnerRecord().bookEvent(eventId, dto, dto);
+        String expectedBookingJsonInput = String.format("""
+                        {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
+                        "accessibilityOptions": "%s", "status": "%s", "poNumber":"%s"}
+                        """, dto.getEvent(), userId, userEmail, "testName", "2023-01-01T10:00:00Z", "access1",
+                "Requested", "poNumber123");
+        cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
         cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordInput, courseRecord);
         BookEventDto inputDto = new BookEventDto(List.of("access1"), "poNumber123", "userEmail@email.com", "testName");
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
