@@ -122,7 +122,7 @@ public class BookEventTest extends CSLServiceWireMockServer {
         );
         String expectedBookingJsonInput = String.format("""
                 {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
-                "status": "%s"}
+                "status": "%s", "accessibilityOptions" : ""}
                 """, dto.getEvent(), userId, userEmail, "testName", "2023-01-01T10:00:00Z", "Confirmed");
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
         cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords,

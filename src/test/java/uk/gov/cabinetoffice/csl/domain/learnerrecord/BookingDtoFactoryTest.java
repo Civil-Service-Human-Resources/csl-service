@@ -18,7 +18,6 @@ import java.time.ZoneId;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.reset;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,7 +51,7 @@ public class BookingDtoFactoryTest {
         assertEquals(dto.getEvent(), URI.create("catalogue_url/courses/courseId/modules/moduleId/events/eventId"));
         assertEquals(dto.getLearner(), "learnerUID");
         assertEquals(dto.getLearnerEmail(), "learner@domain.com");
-        assertNull(dto.getAccessibilityOptions());
+        assertEquals(dto.getAccessibilityOptions(), "");
         assertEquals(dto.getStatus(), BookingStatus.CONFIRMED);
     }
 

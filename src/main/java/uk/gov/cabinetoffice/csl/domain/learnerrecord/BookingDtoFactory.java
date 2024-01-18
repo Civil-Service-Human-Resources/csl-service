@@ -34,6 +34,8 @@ public class BookingDtoFactory {
         if (!dto.getAccessibilityOptions().isEmpty()) {
             String joinedAccessibilityOptions = String.join(",", dto.getAccessibilityOptions());
             bookingBuilder.accessibilityOptions(joinedAccessibilityOptions);
+        } else {
+            bookingBuilder.accessibilityOptions("");
         }
 
         if (courseWithModuleWithEvent.getModule().isFree()) {
