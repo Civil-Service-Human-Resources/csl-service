@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.domain.learnerrecord;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,7 +20,7 @@ public class ModuleRecordInput {
     private String moduleTitle;
     private Boolean optional;
     private Long duration;
-    private String moduleType;
+    private ModuleType moduleType;
     private BigDecimal cost;
     private String state;
     private String result;
@@ -31,7 +32,7 @@ public class ModuleRecordInput {
                                          Module module, ModuleRecordStatus status) {
         return new ModuleRecordInput(status.getUid(), learnerId, courseId,
                 module.getId(), module.getTitle(), module.isOptional(),
-                module.getDuration(), module.getModuleType().name(), module.getCost(),
+                module.getDuration(), module.getModuleType(), module.getCost(),
                 status.getState(), status.getResult(), status.getEventDate(), status.getEventId(),
                 status.getCompletedDate());
     }

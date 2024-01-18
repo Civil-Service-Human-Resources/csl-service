@@ -14,6 +14,7 @@ import uk.gov.cabinetoffice.csl.configuration.TestConfig;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
@@ -64,6 +65,7 @@ public class BookEventTest extends CSLServiceWireMockServer {
     @Test
     public void testBookFreeEventAndCreateCourseRecord() {
         course.getModule(moduleId).setCost(BigDecimal.valueOf(0L));
+        course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         BookingDto dto = BookingDto.builder()
                 .accessibilityOptions("access1,access2")
                 .event(URI.create(String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
@@ -101,6 +103,7 @@ public class BookEventTest extends CSLServiceWireMockServer {
     @Test
     public void testBookFreeEventAndUpdateCourseRecord() {
         course.getModule(moduleId).setCost(BigDecimal.valueOf(0L));
+        course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         courseRecord.setState(State.IN_PROGRESS);
         BookingDto dto = BookingDto.builder()
                 .event(URI.create(String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
@@ -142,6 +145,7 @@ public class BookEventTest extends CSLServiceWireMockServer {
     @Test
     public void testBookPaidEventAndCreateCourseRecord() {
         course.getModule(moduleId).setCost(BigDecimal.valueOf(5L));
+        course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         BookingDto dto = BookingDto.builder()
                 .accessibilityOptions("access1")
                 .event(URI.create(String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
