@@ -36,7 +36,8 @@ public class Module implements Serializable {
         }
     }
 
+    @JsonIgnore
     public boolean isFree() {
-        return BigDecimal.ZERO.equals(this.cost);
+        return this.cost.signum() == 0;
     }
 }
