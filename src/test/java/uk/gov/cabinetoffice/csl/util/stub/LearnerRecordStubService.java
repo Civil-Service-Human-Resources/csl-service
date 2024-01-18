@@ -86,4 +86,15 @@ public class LearnerRecordStubService {
                                 .withBody(utils.toJson(response)))
         );
     }
+
+    public void cancelBooking(String eventId, String userId, String expectedInput, BookingDto response) {
+        stubFor(
+                WireMock.patch(urlPathEqualTo(String.format("/learner_record_api/event/%s/learner/%s", eventId, userId)))
+                        .withHeader("Authorization", equalTo("Bearer fakeToken"))
+                        .withRequestBody(equalToJson(expectedInput))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(utils.toJson(response)))
+        );
+    }
 }

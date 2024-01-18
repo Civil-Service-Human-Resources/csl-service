@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
+import uk.gov.cabinetoffice.csl.controller.model.CancelBookingDto;
 import uk.gov.cabinetoffice.csl.controller.model.EventResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.IModuleRecordUpdate;
@@ -40,6 +41,15 @@ public class EventService {
         }
         CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update);
         return new EventResponse("Module was successfully booked", courseRecord.getCourseTitle(),
+                courseRecord.getModuleRecord(moduleId).getModuleTitle(), courseId, moduleId, eventId, courseWithModuleWithEvent.getEvent().getStartTime());
+    }
+
+    public EventResponse cancelBooking(String learnerId, String courseId, String moduleId, String eventId, CancelBookingDto dto) {
+        CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
+        bookingService.cancelBooking(learnerId, eventId, dto.getReason());
+        IModuleRecordUpdate update = moduleRecordUpdateService.getCancelBookingUpdate();
+        CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update);
+        return new EventResponse("Module booking was successfully cancelled", courseRecord.getCourseTitle(),
                 courseRecord.getModuleRecord(moduleId).getModuleTitle(), courseId, moduleId, eventId, courseWithModuleWithEvent.getEvent().getStartTime());
     }
 }

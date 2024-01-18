@@ -93,4 +93,13 @@ public class LearnerRecordClient implements ILearnerRecordClient {
                 .post(url).body(booking);
         return httpClient.executeRequest(request, BookingDto.class);
     }
+
+    @Override
+    public BookingDto cancelBooking(String userId, String eventId, BookingDto cancellationDto) {
+        log.debug("Cancelling booking for event {} with data {}", eventId, cancellationDto);
+        String url = String.format("%s/%s/learner/%s", event, eventId, userId);
+        RequestEntity<BookingDto> request = RequestEntity
+                .patch(url).body(cancellationDto);
+        return httpClient.executeRequest(request, BookingDto.class);
+    }
 }

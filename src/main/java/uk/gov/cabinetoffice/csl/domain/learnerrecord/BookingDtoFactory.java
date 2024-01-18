@@ -19,6 +19,13 @@ public class BookingDtoFactory {
         this.clock = clock;
     }
 
+    public BookingDto createCancellation(BookingCancellationReason reason) {
+        return BookingDto
+                .builder()
+                .cancellationReason(reason)
+                .status(BookingStatus.CANCELLED).build();
+    }
+
     public BookingDto createBooking(String learnerUid, CourseWithModuleWithEvent courseWithModuleWithEvent,
                                     BookEventDto dto) {
 

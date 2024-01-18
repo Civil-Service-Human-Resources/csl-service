@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
+import uk.gov.cabinetoffice.csl.controller.model.CancelBookingDto;
 import uk.gov.cabinetoffice.csl.controller.model.EventResponse;
 import uk.gov.cabinetoffice.csl.service.EventService;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
@@ -29,5 +30,16 @@ public class EventController {
         log.debug("courseId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
         String learnerId = userAuthService.getUsername();
         return eventService.bookEvent(learnerId, courseId, moduleId, eventId, bookEventDto);
+    }
+
+    @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/events/{eventId}/cancel_booking", produces = "application/json")
+    @ResponseBody
+    public EventResponse cancelBooking(@PathVariable("courseId") String courseId,
+                                       @PathVariable("moduleId") String moduleId,
+                                       @PathVariable("eventId") String eventId,
+                                       @Valid @RequestBody CancelBookingDto cancelBookingDto) {
+        log.debug("courseId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
+        String learnerId = userAuthService.getUsername();
+        return eventService.cancelBooking(learnerId, courseId, moduleId, eventId, cancelBookingDto);
     }
 }
