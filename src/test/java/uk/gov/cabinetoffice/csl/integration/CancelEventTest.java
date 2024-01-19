@@ -11,7 +11,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
-import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
 import uk.gov.cabinetoffice.csl.controller.model.CancelBookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
@@ -22,7 +21,6 @@ import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.math.BigDecimal;
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -83,12 +81,12 @@ public class CancelEventTest extends CSLServiceWireMockServer {
                 PatchOp.removePatch("completionDate")
         );
         String expectedCancellationJsonInput = """
-                {"cancellationReason": "ILLNESS", "status":"Cancelled"}
+                {"cancellationReason": "PRIORITIES", "status":"Cancelled"}
                 """;
         cslStubService.getLearnerRecord().cancelBooking(eventId, userId, expectedCancellationJsonInput, dto);
         cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords,
                 1, expectedModuleRecordPatches, moduleRecord, expectedCourseRecordPatches, courseRecord);
-        CancelBookingDto inputDto = new CancelBookingDto(BookingCancellationReason.ILLNESS);
+        CancelBookingDto inputDto = new CancelBookingDto(BookingCancellationReason.PRIORITIES);
         String url = String.format("/courses/%s/modules/%s/events/%s/cancel_booking", courseId, moduleId, eventId);
         webTestClient
                 .post()
@@ -103,42 +101,4 @@ public class CancelEventTest extends CSLServiceWireMockServer {
                 .isEqualTo("Module booking was successfully cancelled");
     }
 
-    @Test
-    public void testBookPaidEventAndCreateCourseRecord() {
-        course.getModule(moduleId).setCost(BigDecimal.valueOf(5L));
-        course.getModule(moduleId).setModuleType(ModuleType.facetoface);
-        BookingDto dto = BookingDto.builder()
-                .accessibilityOptions("access1")
-                .event(URI.create(String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
-                .status(BookingStatus.REQUESTED)
-                .learner(userId)
-                .poNumber("poNumber123")
-                .learnerEmail(userEmail)
-                .learnerName("testName").build();
-        CourseRecordInput expectedCourseRecordInput = CourseRecordInput.from(
-                userId, course, CourseRecordStatus.builder().state("REGISTERED").build(),
-                course.getModule(moduleId), ModuleRecordStatus.builder()
-                        .state("REGISTERED").uid(null)
-                        .eventId(eventId).eventDate(LocalDate.of(2023, 1, 1)).build());
-        String expectedBookingJsonInput = String.format("""
-                        {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
-                        "accessibilityOptions": "%s", "status": "%s", "poNumber":"%s"}
-                        """, dto.getEvent(), userId, userEmail, "testName", "2023-01-01T10:00:00Z", "access1",
-                "Requested", "poNumber123");
-        cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
-        cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordInput, courseRecord);
-        BookEventDto inputDto = new BookEventDto(List.of("access1"), "poNumber123", "userEmail@email.com", "testName");
-        String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
-        webTestClient
-                .post()
-                .uri(url)
-                .header("Authorization", "Bearer fakeToken")
-                .body(Mono.just(inputDto), BookEventDto.class)
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.message")
-                .isEqualTo("Module was successfully booked");
-    }
 }
