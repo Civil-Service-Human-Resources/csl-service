@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.util.stub;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
 import java.util.List;
@@ -87,14 +88,14 @@ public class LearnerRecordStubService {
         );
     }
 
-    public void cancelBooking(String eventId, String userId, String expectedInput, BookingDto response) {
+    public void cancelBooking(String eventId, String userId, String expectedInput, String response) {
         stubFor(
                 WireMock.patch(urlPathEqualTo(String.format("/learner_record_api/event/%s/learner/%s", eventId, userId)))
                         .withHeader("Authorization", equalTo("Bearer fakeToken"))
                         .withRequestBody(equalToJson(expectedInput))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
-                                .withBody(utils.toJson(response)))
+                                .withBody(response))
         );
     }
 }

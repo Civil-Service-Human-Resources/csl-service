@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.cabinetoffice.csl.annotations.ValidEnum;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.BookingCancellationReason;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingCancellationReason;
 
 @AllArgsConstructor
 @NoArgsConstructor

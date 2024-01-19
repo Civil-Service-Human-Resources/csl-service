@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain.learnerrecord;
+package uk.gov.cabinetoffice.csl.domain.learnerrecord.booking;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

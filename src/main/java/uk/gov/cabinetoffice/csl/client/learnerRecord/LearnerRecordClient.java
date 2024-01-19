@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.client.learnerRecord;
 
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain.learnerrecord;
+package uk.gov.cabinetoffice.csl.domain.learnerrecord.booking;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

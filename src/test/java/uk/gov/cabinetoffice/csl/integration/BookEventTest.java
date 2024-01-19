@@ -13,6 +13,8 @@ import reactor.core.publisher.Mono;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;

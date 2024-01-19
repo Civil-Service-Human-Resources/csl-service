@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions;
 
 import uk.gov.cabinetoffice.csl.domain.error.IncorrectStateException;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 
 import java.util.ArrayList;
 import java.util.List;

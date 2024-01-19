@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.learnerRecord.ILearnerRecordClient;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.BookingCancellationReason;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.BookingDto;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.BookingDtoFactory;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingCancellationReason;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDtoFactory;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 
 
