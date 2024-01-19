@@ -120,7 +120,7 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 PatchOp.removePatch("score"),
                 PatchOp.removePatch("completionDate"),
                 PatchOp.replacePatch("eventId", eventId),
-                PatchOp.replacePatch("eventDate", "2023-01-01")
+                PatchOp.replacePatch("eventDate", "2023-01-01T00:00:00")
         );
         String expectedBookingJsonInput = String.format("""
                 {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
