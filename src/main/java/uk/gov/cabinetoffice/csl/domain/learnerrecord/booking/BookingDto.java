@@ -27,7 +27,7 @@ public class BookingDto {
     private URI paymentDetails;
     private String poNumber;
     private String bookingReference;
-    private String accessibilityOptions;
+    private String accessibilityOptions = "";
     private String lineManagerEmail;
     private String lineManagerName;
     private BookingCancellationReason cancellationReason;
