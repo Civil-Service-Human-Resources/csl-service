@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 
 import java.util.Collections;
 import java.util.List;
@@ -91,6 +92,15 @@ public class LearnerRecordClient implements ILearnerRecordClient {
         String url = String.format("%s/%s/booking/", event, eventId);
         RequestEntity<BookingDto> request = RequestEntity
                 .post(url).body(booking);
+        return httpClient.executeRequest(request, BookingDto.class);
+    }
+
+    @Override
+    public BookingDto cancelBooking(String userId, String eventId, BookingDto cancellationDto) {
+        log.debug("Cancelling booking for event {} with data {}", eventId, cancellationDto);
+        String url = String.format("%s/%s/learner/%s", event, eventId, userId);
+        RequestEntity<BookingDto> request = RequestEntity
+                .patch(url).body(cancellationDto);
         return httpClient.executeRequest(request, BookingDto.class);
     }
 }

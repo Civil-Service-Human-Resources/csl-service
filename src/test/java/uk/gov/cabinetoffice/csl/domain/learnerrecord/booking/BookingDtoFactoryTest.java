@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain.learnerrecord;
+package uk.gov.cabinetoffice.csl.domain.learnerrecord.booking;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

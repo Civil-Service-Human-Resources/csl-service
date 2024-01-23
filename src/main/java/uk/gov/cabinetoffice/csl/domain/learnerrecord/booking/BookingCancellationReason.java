@@ -1,5 +1,8 @@
-package uk.gov.cabinetoffice.csl.domain.learnerrecord;
+package uk.gov.cabinetoffice.csl.domain.learnerrecord.booking;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(using = BookingCancellationReasonDeserializer.class)
 public enum BookingCancellationReason {
     PAYMENT("the booking has not been paid"),
     REQUESTED("the learner has requested that the booking be cancelled"),

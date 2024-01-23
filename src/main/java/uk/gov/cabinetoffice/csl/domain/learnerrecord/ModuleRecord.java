@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 
 import java.io.Serializable;
@@ -48,7 +49,7 @@ public class ModuleRecord implements Serializable {
     private BookingStatus bookingStatus;
     @JsonIgnore
     private CourseRecord courseRecord;
-    
+
     @JsonIgnore
     public State getStateSafe() {
         return Objects.requireNonNullElse(this.state, State.NULL);

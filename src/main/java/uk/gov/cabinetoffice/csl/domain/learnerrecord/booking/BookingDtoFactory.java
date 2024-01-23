@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain.learnerrecord;
+package uk.gov.cabinetoffice.csl.domain.learnerrecord.booking;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,6 +17,13 @@ public class BookingDtoFactory {
     public BookingDtoFactory(@Value("${learningCatalogue.serviceUrl}") String catalogueUrl, Clock clock) {
         this.catalogueUrl = catalogueUrl;
         this.clock = clock;
+    }
+
+    public BookingDto createCancellation(BookingCancellationReason reason) {
+        return BookingDto
+                .builder()
+                .cancellationReason(reason)
+                .status(BookingStatus.CANCELLED).build();
     }
 
     public BookingDto createBooking(String learnerUid, CourseWithModuleWithEvent courseWithModuleWithEvent,

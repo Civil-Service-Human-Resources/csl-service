@@ -53,7 +53,7 @@ public class RegisterEventUpdate implements IModuleRecordUpdate {
                 PatchOp.removePatch("score"),
                 PatchOp.removePatch("completionDate"),
                 PatchOp.replacePatch("eventId", event.getId()),
-                PatchOp.replacePatch("eventDate", event.getStartTime().format(DateTimeFormatter.ISO_DATE_TIME))
+                PatchOp.replacePatch("eventDate", event.getStartTime().atStartOfDay().format(DateTimeFormatter.ISO_DATE_TIME))
         );
     }
 }

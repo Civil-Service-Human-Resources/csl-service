@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain.learnerrecord;
+package uk.gov.cabinetoffice.csl.domain.learnerrecord.booking;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ public class BookingDto {
     private URI paymentDetails;
     private String poNumber;
     private String bookingReference;
-    private String accessibilityOptions;
+    private String accessibilityOptions = "";
     private String lineManagerEmail;
     private String lineManagerName;
     private BookingCancellationReason cancellationReason;

@@ -37,4 +37,8 @@ public class ModuleRecordUpdateService {
     public IModuleRecordUpdate getRegisterEventUpdate(Event event) {
         return new RegisterEventUpdate(event);
     }
+
+    public IModuleRecordUpdate getCancelBookingUpdate() {
+        return new CancelBookingUpdate();
+    }
 }
