@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Configuration
-@Import(MockClockConfig.class)
+@Import({MockClockConfig.class})
 public class TestConfig {
 
     @Bean

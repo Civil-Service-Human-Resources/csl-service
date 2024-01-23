@@ -5,11 +5,14 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
+import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -18,13 +21,21 @@ public class TestDataService {
 
     private final String courseId = "courseId";
     private final String moduleId = "moduleId";
+    private final String eventId = "eventId";
     private final String moduleTitle = "Test Module";
     private final String moduleUid = "uid";
     private final long moduleRecordId = 1;
     private final String userId = "userId";
+    private final String useremail = "userEmail@email.com";
     private final String learnerFirstName = "Learner";
     private final String courseTitle = "Test Course";
 
+    /**
+     * Generate a course record with a blank status
+     *
+     * @param withModule
+     * @return
+     */
     public CourseRecord generateCourseRecord(boolean withModule) {
         CourseRecord cr = new CourseRecord();
         cr.setCourseId(courseId);
@@ -45,6 +56,20 @@ public class TestDataService {
         return mr;
     }
 
+    public Event generateEvent() {
+        Event event = new Event();
+        event.setId(eventId);
+        event.setDateRanges(List.of(
+                new DateRange(
+                        LocalDate.of(2023, 1, 1),
+                        LocalTime.of(9, 0, 0),
+                        LocalTime.of(10, 0, 0)
+                )
+        ));
+        event.setVenue(new Venue("London", "London", 10, 5));
+        return event;
+    }
+
     public Module generateModule() {
         Module module = new Module();
         module.setModuleType(ModuleType.elearning);
@@ -55,13 +80,17 @@ public class TestDataService {
         return module;
     }
 
-    public uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course generateCourse(boolean withModule) {
+    public uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course generateCourse(boolean withModule, boolean withEvent) {
         uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course course =
                 new uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course();
         course.setId(courseId);
         course.setTitle(courseTitle);
         if (withModule) {
-            course.setModules(List.of(generateModule()));
+            Module m = generateModule();
+            if (withEvent) {
+                m.setEvents(List.of(generateEvent()));
+            }
+            course.setModules(List.of(m));
         }
         return course;
     }
@@ -100,4 +129,5 @@ public class TestDataService {
         req.setLaunchLinkRequest(generateLaunchLinkRequest());
         return req;
     }
+
 }

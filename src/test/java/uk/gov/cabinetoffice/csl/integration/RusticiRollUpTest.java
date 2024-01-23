@@ -17,11 +17,9 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
 import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
+import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.util.List;
-
-import static uk.gov.cabinetoffice.csl.util.stub.LearnerRecordStubService.getCourseRecord;
-import static uk.gov.cabinetoffice.csl.util.stub.LearnerRecordStubService.patchModuleRecord;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -35,6 +33,9 @@ public class RusticiRollUpTest extends CSLServiceWireMockServer {
 
     @Autowired
     private TestDataService testDataService;
+
+    @Autowired
+    private CSLStubService cslStubService;
 
     CourseRecord courseRecord;
     CourseRecords courseRecords;
@@ -50,9 +51,9 @@ public class RusticiRollUpTest extends CSLServiceWireMockServer {
 
     @Test
     public void testRollUpCompletedModuleRecord() {
-        getCourseRecord(testDataService.getCourseId(),
+        cslStubService.getLearnerRecord().getCourseRecord(testDataService.getCourseId(),
                 testDataService.getUserId(), courseRecords);
-        patchModuleRecord(1, List.of(
+        cslStubService.getLearnerRecord().patchModuleRecord(1, List.of(
                 PatchOp.replacePatch("state", "COMPLETED"),
                 PatchOp.replacePatch("completionDate", "2023-02-02T10:00")
         ), courseRecord.getModuleRecords().stream().findFirst().get());

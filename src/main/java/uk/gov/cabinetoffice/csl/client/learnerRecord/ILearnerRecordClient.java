@@ -17,4 +17,6 @@ public interface ILearnerRecordClient {
     CourseRecord updateCourseRecord(String userId, String courseId, List<PatchOp> patches);
 
     ModuleRecord updateModuleRecord(Long moduleRecordId, List<PatchOp> patches);
+
+    BookingDto bookEvent(String eventId, BookingDto booking);
 }
