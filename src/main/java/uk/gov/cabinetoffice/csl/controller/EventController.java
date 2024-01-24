@@ -42,4 +42,14 @@ public class EventController {
         String learnerId = userAuthService.getUsername();
         return eventService.cancelBooking(learnerId, courseId, moduleId, eventId, cancelBookingDto);
     }
+
+    @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/events/{eventId}/complete_booking", produces = "application/json")
+    @ResponseBody
+    public EventResponse completeBooking(@PathVariable("courseId") String courseId,
+                                         @PathVariable("moduleId") String moduleId,
+                                         @PathVariable("eventId") String eventId) {
+        log.debug("courseId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
+        String learnerId = userAuthService.getUsername();
+        return eventService.completeBooking(learnerId, courseId, moduleId, eventId);
+    }
 }

@@ -26,7 +26,7 @@ public class CancelBookingUpdate implements IModuleRecordUpdate {
 
     @Override
     public String getName() {
-        return "Book event";
+        return "Cancel booking";
     }
 
     @Override
