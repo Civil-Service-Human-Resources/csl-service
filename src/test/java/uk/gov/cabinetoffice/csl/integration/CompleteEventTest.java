@@ -33,7 +33,6 @@ public class CompleteEventTest extends CSLServiceWireMockServer {
     private TestDataService testDataService;
     private String courseId;
     private String userId;
-    private String userEmail;
     private String moduleId;
     private String eventId;
     private CourseRecord courseRecord;
@@ -48,7 +47,6 @@ public class CompleteEventTest extends CSLServiceWireMockServer {
     public void populateTestData() {
         courseId = testDataService.getCourseId();
         userId = testDataService.getUserId();
-        userEmail = testDataService.getUseremail();
         moduleId = testDataService.getModuleId();
         eventId = testDataService.getEventId();
         courseRecord = testDataService.generateCourseRecord(true);
@@ -60,16 +58,15 @@ public class CompleteEventTest extends CSLServiceWireMockServer {
     @Test
     public void testCompleteBookingAndUpdateCourseRecord() {
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
-        ModuleRecord mr = courseRecord.getModuleRecord(moduleId);
-        mr.setState(State.APPROVED);
+        moduleRecord.setState(State.APPROVED);
         cslStubService.getLearningCatalogue().getCourse(courseId, course);
         cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
-        mr.setState(State.COMPLETED);
+        moduleRecord.setState(State.COMPLETED);
         List<PatchOp> expectedModuleRecordPatches = List.of(
                 PatchOp.replacePatch("state", "COMPLETED"),
                 PatchOp.replacePatch("completionDate", "2023-01-01T10:00")
         );
-        cslStubService.getLearnerRecord().patchModuleRecord(mr.getId(), expectedModuleRecordPatches, mr);
+        cslStubService.getLearnerRecord().patchModuleRecord(moduleRecord.getId(), expectedModuleRecordPatches, moduleRecord);
         List<PatchOp> expectedCourseRecordPatches = List.of(PatchOp.replacePatch("state", "COMPLETED"));
         cslStubService.getLearnerRecord().patchCourseRecord(expectedCourseRecordPatches, courseRecord);
         String url = String.format("/courses/%s/modules/%s/events/%s/complete_booking", courseId, moduleId, eventId);
@@ -83,6 +80,22 @@ public class CompleteEventTest extends CSLServiceWireMockServer {
                 .expectBody()
                 .jsonPath("$.message")
                 .isEqualTo("Module booking was successfully completed");
+    }
+
+    @Test
+    public void testCompleteBookingNotApproved() {
+        course.getModule(moduleId).setModuleType(ModuleType.facetoface);
+        moduleRecord.setState(State.REGISTERED);
+        cslStubService.getLearningCatalogue().getCourse(courseId, course);
+        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
+        String url = String.format("/courses/%s/modules/%s/events/%s/complete_booking", courseId, moduleId, eventId);
+        webTestClient
+                .post()
+                .uri(url)
+                .header("Authorization", "Bearer fakeToken")
+                .exchange()
+                .expectStatus()
+                .is4xxClientError();
     }
 
 }
