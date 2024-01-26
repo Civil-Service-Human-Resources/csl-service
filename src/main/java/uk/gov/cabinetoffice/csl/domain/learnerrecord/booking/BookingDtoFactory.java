@@ -26,6 +26,12 @@ public class BookingDtoFactory {
                 .status(BookingStatus.CANCELLED).build();
     }
 
+    public BookingDto createApprovedBooking() {
+        return BookingDto
+                .builder()
+                .status(BookingStatus.CONFIRMED).build();
+    }
+
     public BookingDto createBooking(String learnerUid, CourseWithModuleWithEvent courseWithModuleWithEvent,
                                     BookEventDto dto) {
 
