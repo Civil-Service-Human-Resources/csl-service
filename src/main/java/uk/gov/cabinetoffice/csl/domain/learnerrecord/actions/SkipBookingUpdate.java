@@ -15,7 +15,7 @@ public class SkipBookingUpdate implements IModuleRecordUpdate {
     @Override
     public List<PatchOp> getUpdateCourseRecordPatches(CourseRecord courseRecord) {
         List<PatchOp> patches = new ArrayList<>();
-        if (courseRecord.getStateSafe().equals(State.REGISTERED)) {
+        if (courseRecord.getStateSafe().equals(State.APPROVED)) {
             patches.add(PatchOp.replacePatch("state", State.SKIPPED.name()));
         }
         return patches;
