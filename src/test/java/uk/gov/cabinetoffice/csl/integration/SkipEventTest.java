@@ -56,10 +56,10 @@ public class SkipEventTest extends CSLServiceWireMockServer {
     }
 
     @Test
-    public void testCompleteBookingAndUpdateCourseRecord() {
+    public void testSkipBookingAndUpdateCourseRecord() {
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         moduleRecord.setState(State.APPROVED);
-        courseRecord.setState(State.REGISTERED);
+        courseRecord.setState(State.APPROVED);
         cslStubService.getLearningCatalogue().getCourse(courseId, course);
         cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
         List<PatchOp> expectedModuleRecordPatches = List.of(
