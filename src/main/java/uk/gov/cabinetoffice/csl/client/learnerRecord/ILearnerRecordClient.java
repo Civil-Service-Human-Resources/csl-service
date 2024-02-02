@@ -23,5 +23,5 @@ public interface ILearnerRecordClient {
 
     BookingDto updateBooking(String userId, String eventId, BookingDto cancellationDto);
 
-    BookingDto updateBooking(String bookingId, BookingDto bookingDto);
+    BookingDto updateBookingWithId(String eventId, String bookingId, BookingDto bookingDto);
 }

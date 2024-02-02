@@ -107,10 +107,10 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     }
 
     @Override
-    public BookingDto updateBooking(String bookingId, BookingDto bookingDto) {
+    public BookingDto updateBookingWithId(String eventId, String bookingId, BookingDto bookingDto) {
         log.debug("Updating booking {} with data {}", bookingId, bookingDto);
-        String url = String.format("/%s/%s", booking, bookingId);
-        RequestEntity<BookingDto> request = RequestEntity.put(url).body(bookingDto);
+        String url = String.format("%s/%s%s/%s", event, eventId, booking, bookingId);
+        RequestEntity<BookingDto> request = RequestEntity.patch(url).body(bookingDto);
         return httpClient.executeRequest(request, BookingDto.class);
     }
 }

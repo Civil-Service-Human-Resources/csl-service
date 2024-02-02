@@ -28,9 +28,9 @@ public class BookingService {
         learnerRecordClient.bookEvent(courseWithModuleWithEvent.getEvent().getId(), booking);
     }
 
-    public BookingDto approveBookingWithId(String bookingId) {
+    public BookingDto approveBookingWithId(String eventId, String bookingId) {
         BookingDto dto = dtoFactory.createApprovedBooking();
-        return learnerRecordClient.updateBooking(bookingId, dto);
+        return learnerRecordClient.updateBookingWithId(eventId, bookingId, dto);
     }
 
     public void cancelBooking(String learnerUid, String eventId, BookingCancellationReason reason) {
@@ -38,9 +38,9 @@ public class BookingService {
         learnerRecordClient.updateBooking(learnerUid, eventId, cancellationDto);
     }
 
-    public BookingDto cancelBookingWithId(String bookingId, BookingCancellationReason reason) {
+    public BookingDto cancelBookingWithId(String eventId, String bookingId, BookingCancellationReason reason) {
         BookingDto cancellationDto = dtoFactory.createCancellation(reason);
-        return learnerRecordClient.updateBooking(bookingId, cancellationDto);
+        return learnerRecordClient.updateBookingWithId(eventId, bookingId, cancellationDto);
     }
 
 }

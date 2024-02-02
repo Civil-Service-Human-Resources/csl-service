@@ -71,16 +71,16 @@ public class EventService {
 
     public EventResponse cancelBookingWithBookingId(String courseId, String moduleId, String eventId, String bookingId, CancelBookingDto cancelBookingDto) {
         CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
-        BookingDto dto = bookingService.cancelBookingWithId(bookingId, cancelBookingDto.getReason());
+        BookingDto dto = bookingService.cancelBookingWithId(eventId, bookingId, cancelBookingDto.getReason());
         return cancelBooking(dto.getLearner(), courseId, moduleId, courseWithModuleWithEvent.getEvent());
     }
 
     public EventResponse approveBookingWithBookingId(String courseId, String moduleId, String eventId, String bookingId) {
         CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
-        BookingDto dto = bookingService.approveBookingWithId(bookingId);
+        BookingDto dto = bookingService.approveBookingWithId(eventId, bookingId);
         IModuleRecordUpdate update = moduleRecordUpdateService.getApproveEventUpdate(courseWithModuleWithEvent.getEvent());
         CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(dto.getLearner(), courseId, moduleId, update);
-        return new EventResponse("Module was successfully booked", courseRecord.getCourseTitle(),
+        return new EventResponse("Module booking was successfully approved", courseRecord.getCourseTitle(),
                 courseRecord.getModuleRecord(moduleId).getModuleTitle(), courseId, moduleId, eventId, courseWithModuleWithEvent.getEvent().getStartTime());
     }
 }
