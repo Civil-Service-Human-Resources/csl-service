@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .and().authorizeHttpRequests().requestMatchers("/rustici/**", "/reset-cache/**").authenticated()
                 .and().httpBasic()
                 .and().authorizeHttpRequests().requestMatchers("/courses/**").authenticated()
+                .and().authorizeHttpRequests().requestMatchers("/admin/**").authenticated()
                 .and().oauth2ResourceServer().jwt(jwtSpec -> jwtSpec.decoder(jwtDecoder()))
                 .and().build();
     }
