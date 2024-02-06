@@ -52,4 +52,20 @@ public class EventService {
         return new EventResponse("Module booking was successfully cancelled", courseRecord.getCourseTitle(),
                 courseRecord.getModuleRecord(moduleId).getModuleTitle(), courseId, moduleId, eventId, courseWithModuleWithEvent.getEvent().getStartTime());
     }
+
+    public EventResponse completeBooking(String learnerId, String courseId, String moduleId, String eventId) {
+        CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
+        IModuleRecordUpdate update = moduleRecordUpdateService.getCompleteBookingUpdate(courseWithModuleWithEvent.getCourse());
+        CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update);
+        return new EventResponse("Module booking was successfully completed", courseRecord.getCourseTitle(),
+                courseRecord.getModuleRecord(moduleId).getModuleTitle(), courseId, moduleId, eventId, courseWithModuleWithEvent.getEvent().getStartTime());
+    }
+
+    public EventResponse skipBooking(String learnerId, String courseId, String moduleId, String eventId) {
+        CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
+        IModuleRecordUpdate update = moduleRecordUpdateService.getSkipBookingUpdate();
+        CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update);
+        return new EventResponse("Module booking was successfully skipped", courseRecord.getCourseTitle(),
+                courseRecord.getModuleRecord(moduleId).getModuleTitle(), courseId, moduleId, eventId, courseWithModuleWithEvent.getEvent().getStartTime());
+    }
 }

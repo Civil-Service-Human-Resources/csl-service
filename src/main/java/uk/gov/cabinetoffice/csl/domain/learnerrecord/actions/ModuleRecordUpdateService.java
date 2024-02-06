@@ -41,4 +41,12 @@ public class ModuleRecordUpdateService {
     public IModuleRecordUpdate getCancelBookingUpdate() {
         return new CancelBookingUpdate();
     }
+
+    public IModuleRecordUpdate getCompleteBookingUpdate(Course course) {
+        return new CompleteBookingUpdate(course, clock);
+    }
+
+    public IModuleRecordUpdate getSkipBookingUpdate() {
+        return new SkipBookingUpdate();
+    }
 }
