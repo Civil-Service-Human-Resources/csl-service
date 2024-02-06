@@ -98,4 +98,15 @@ public class LearnerRecordStubService {
                                 .withBody(response))
         );
     }
+
+    public void updateBookingWithId(String eventId, Integer bookingId, String expectedInput, String response) {
+        stubFor(
+                WireMock.patch(urlPathEqualTo(String.format("/learner_record_api/event/%s/booking/%s", eventId, bookingId)))
+                        .withHeader("Authorization", equalTo("Bearer fakeToken"))
+                        .withRequestBody(equalToJson(expectedInput))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
 }

@@ -23,6 +23,8 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     private String moduleRecords;
     @Value("${learnerRecord.eventsUrl}")
     private String event;
+    @Value("${learnerRecord.bookingsUrl}")
+    private String booking;
 
     private final IHttpClient httpClient;
 
@@ -96,11 +98,19 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     }
 
     @Override
-    public BookingDto cancelBooking(String userId, String eventId, BookingDto cancellationDto) {
-        log.debug("Cancelling booking for event {} with data {}", eventId, cancellationDto);
+    public BookingDto updateBooking(String userId, String eventId, BookingDto bookingDto) {
+        log.debug("Updating booking for event {} with data {}", eventId, bookingDto);
         String url = String.format("%s/%s/learner/%s", event, eventId, userId);
         RequestEntity<BookingDto> request = RequestEntity
-                .patch(url).body(cancellationDto);
+                .patch(url).body(bookingDto);
+        return httpClient.executeRequest(request, BookingDto.class);
+    }
+
+    @Override
+    public BookingDto updateBookingWithId(String eventId, String bookingId, BookingDto bookingDto) {
+        log.debug("Updating booking {} with data {}", bookingId, bookingDto);
+        String url = String.format("%s/%s%s/%s", event, eventId, booking, bookingId);
+        RequestEntity<BookingDto> request = RequestEntity.patch(url).body(bookingDto);
         return httpClient.executeRequest(request, BookingDto.class);
     }
 }
