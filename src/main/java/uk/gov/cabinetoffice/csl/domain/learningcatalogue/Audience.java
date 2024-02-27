@@ -22,7 +22,8 @@ public class Audience implements Serializable {
         OPEN,
         CLOSED_COURSE,
         PRIVATE_COURSE,
-        REQUIRED_LEARNING
+        REQUIRED_LEARNING,
+        NULL
     }
 
     private List<String> areasOfWork;
@@ -31,6 +32,10 @@ public class Audience implements Serializable {
     private String frequency;
     private Type type;
     private LocalDate requiredBy;
+
+    public Type getType() {
+        return Optional.ofNullable(this.type).orElse(Type.NULL);
+    }
 
     @JsonIgnore
     public boolean isRequired() {
