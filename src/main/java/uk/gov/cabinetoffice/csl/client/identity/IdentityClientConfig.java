@@ -28,4 +28,5 @@ public class IdentityClientConfig {
                 .build();
         return new HttpClient(restTemplate);
     }
+
 }

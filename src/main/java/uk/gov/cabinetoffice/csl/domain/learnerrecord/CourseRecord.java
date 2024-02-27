@@ -8,13 +8,12 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.cabinetoffice.csl.domain.error.RecordNotFoundException;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,19 +30,13 @@ public class CourseRecord implements Serializable {
     private String courseTitle;
 
     private State state;
-
-    private String preference;
-
-    @JsonIgnore
-    private String profession;
-
-    @JsonIgnore
-    private String department;
+    
+    private Preference preference;
 
     @JsonIgnore
     private boolean isRequired;
 
-    private Collection<ModuleRecord> moduleRecords;
+    private Collection<ModuleRecord> moduleRecords = new ArrayList<>();
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime lastUpdated;
@@ -53,26 +46,66 @@ public class CourseRecord implements Serializable {
         return moduleRecords;
     }
 
-    @JsonIgnore
-    public State getStateSafe() {
+    @JsonProperty("state")
+    public State getStateJson() {
+        return this.state;
+    }
+
+    public State getState() {
         return Objects.requireNonNullElse(this.state, State.NULL);
     }
 
-    public ModuleRecord getModuleRecord(String moduleId) {
-        if (moduleRecords != null) {
-            return this.moduleRecords.stream()
-                    .filter(moduleRecord -> moduleId.equals(moduleRecord.getModuleId()))
-                    .findFirst()
-                    .orElse(null);
-        }
-        return null;
+    @JsonIgnore
+    public ModuleRecord getOrCreateModuleRecord(Module module) {
+        return getModuleRecord(module.getId()).orElseGet(() -> createModuleRecord(module));
     }
 
-    public void updateModuleRecords(ModuleRecord newModuleRecord) {
+    @JsonIgnore
+    public Optional<ModuleRecord> getModuleRecord(String moduleId) {
+        return moduleRecords.stream()
+                .filter(mr -> mr.getModuleId().equals(moduleId))
+                .findFirst();
+    }
+
+    @JsonIgnore
+    public ModuleRecord createModuleRecord(Module module) {
+        ModuleRecord moduleRecord = new ModuleRecord(module.getId(), module.getTitle(), module.getModuleType(),
+                module.getDuration(), module.isOptional(), module.getCost());
+        this.moduleRecords.add(moduleRecord);
+        return moduleRecord;
+    }
+
+    @JsonIgnore
+    public ModuleRecord getModuleRecordAndThrowIfNotFound(String moduleId) {
+        return getModuleRecord(moduleId).orElseThrow(() -> new RecordNotFoundException(String.format("Module '%s' in course '%s'", moduleId, courseId)));
+    }
+
+    @JsonIgnore
+    public void updateModuleRecord(ModuleRecord moduleRecord) {
+        updateModuleRecords(List.of(moduleRecord));
+    }
+
+    @JsonIgnore
+    public void updateModuleRecords(Collection<ModuleRecord> recordUpdates) {
         Map<String, ModuleRecord> records = moduleRecords.stream().
                 collect(Collectors.toMap(ModuleRecord::getModuleId, Function.identity()));
-        records.put(newModuleRecord.getModuleId(), newModuleRecord);
+        recordUpdates.forEach(mr -> {
+            ModuleRecord moduleRecord = records.get(mr.getModuleId());
+            if (moduleRecord == null) {
+                records.put(mr.getModuleId(), mr);
+            } else {
+                records.replace(mr.getModuleId(), mr);
+            }
+        });
         ArrayList<ModuleRecord> updatedRecords = new ArrayList<>(records.values());
         this.setModuleRecords(updatedRecords);
+    }
+
+    @JsonIgnore
+    public void update(CourseRecord input) {
+        this.state = input.getState();
+        this.preference = input.getPreference();
+        this.lastUpdated = input.getLastUpdated();
+        this.updateModuleRecords(input.getModuleRecords());
     }
 }

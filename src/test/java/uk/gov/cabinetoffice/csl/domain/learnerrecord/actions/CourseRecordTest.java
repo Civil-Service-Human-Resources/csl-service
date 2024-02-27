@@ -33,12 +33,12 @@ public class CourseRecordTest {
 
     @Test
     public void shouldUpdateExistingModuleRecord() {
-        courseRecord.getModuleRecord("one").setState(State.IN_PROGRESS);
+        courseRecord.getModuleRecord("one").get().setState(State.IN_PROGRESS);
         ModuleRecord moduleRecord1 = new ModuleRecord();
         moduleRecord1.setModuleId("one");
         moduleRecord1.setState(State.COMPLETED);
-        courseRecord.updateModuleRecords(moduleRecord1);
-        assertEquals(State.COMPLETED, courseRecord.getModuleRecord("one").getState());
+        courseRecord.updateModuleRecord(moduleRecord1);
+        assertEquals(State.COMPLETED, courseRecord.getModuleRecord("one").get().getState());
         assertEquals(3, courseRecord.getModuleRecords().size());
     }
 
@@ -47,8 +47,8 @@ public class CourseRecordTest {
         ModuleRecord moduleRecord4 = new ModuleRecord();
         moduleRecord4.setModuleId("four");
         moduleRecord4.setState(State.COMPLETED);
-        courseRecord.updateModuleRecords(moduleRecord4);
-        assertEquals(State.COMPLETED, courseRecord.getModuleRecord("four").getState());
+        courseRecord.updateModuleRecord(moduleRecord4);
+        assertEquals(State.COMPLETED, courseRecord.getModuleRecord("four").get().getState());
         assertEquals(4, courseRecord.getModuleRecords().size());
     }
 }

@@ -11,8 +11,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
@@ -37,17 +37,23 @@ public class RemoveCourseFromLearningPlanTest extends CSLServiceWireMockServer {
 
     @Test
     public void TestRemoveCourseFromLearningPlan() {
+        Course course = this.testDataService.generateCourse(false, false);
         String courseId = testDataService.getCourseId();
         String userId = testDataService.getUserId();
         CourseRecord inProgressCourseRecord = testDataService.generateCourseRecord(false);
         inProgressCourseRecord.setState(State.IN_PROGRESS);
         CourseRecords courseRecords = new CourseRecords(List.of(inProgressCourseRecord));
-        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
-
         CourseRecord archivedCourseRecord = testDataService.generateCourseRecord(false);
         archivedCourseRecord.setState(State.ARCHIVED);
-        List<PatchOp> expectedPatches = List.of(PatchOp.replacePatch("state", "ARCHIVED"));
-        cslStubService.getLearnerRecord().patchCourseRecord(expectedPatches, archivedCourseRecord);
+        String expectedCourseRecordPUT = """
+                {
+                    "courseId" : "courseId",
+                    "userId" : "userId",
+                    "courseTitle" : "Test Course",
+                    "state" : "ARCHIVED"
+                }
+                """;
+        cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, archivedCourseRecord);
 
         webTestClient
                 .post()
@@ -59,7 +65,7 @@ public class RemoveCourseFromLearningPlanTest extends CSLServiceWireMockServer {
                 .expectBody()
                 .jsonPath("$.courseId").isEqualTo(courseId)
                 .jsonPath("$.courseTitle").isEqualTo(testDataService.getCourseTitle())
-                .jsonPath("$.message").isEqualTo("Successfully applied action 'Remove from Learning plan' to course record");
+                .jsonPath("$.message").isEqualTo("Successfully applied action 'Remove from learning plan' to course record");
 
     }
 
@@ -67,8 +73,8 @@ public class RemoveCourseFromLearningPlanTest extends CSLServiceWireMockServer {
     public void TestRemoveCourseFromLearningPlanCourseRecordNotFound() {
         String courseId = testDataService.getCourseId();
         String userId = testDataService.getUserId();
-        CourseRecords courseRecords = new CourseRecords();
-        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
+        cslStubService.getLearningCatalogue().getCourse(courseId, this.testDataService.generateCourse(false, false));
+        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, null);
 
         webTestClient
                 .post()

@@ -11,13 +11,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
-import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
-import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationRequest;
+import uk.gov.cabinetoffice.csl.domain.rustici.UserDetailsDto;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
@@ -50,7 +52,7 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
     private CourseRecords courseRecords;
     private Course course;
     private ModuleRecord moduleRecord;
-    private ModuleLaunchLinkInput input;
+    private UserDetailsDto input;
     private LaunchLink launchLink;
 
     @PostConstruct
@@ -60,52 +62,32 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
         moduleId = testDataService.getModuleId();
         courseRecord = testDataService.generateCourseRecord(true);
         courseRecords = new CourseRecords(List.of(courseRecord));
-        moduleRecord = courseRecord.getModuleRecord(moduleId);
+        moduleRecord = courseRecord.getModuleRecord(moduleId).get();
         course = testDataService.generateCourse(true, false);
-        input = new ModuleLaunchLinkInput();
-        input.setLearnerFirstName(testDataService.getLearnerFirstName());
+        input = testDataService.generateUserDetailsDto();
         launchLink = new LaunchLink("http://launch.link");
     }
 
     @Test
-    public void testGetELearningLaunchLinkNoUid() {
-        moduleRecord.setUid(null);
-        cslStubService.getLearningCatalogue().getCourse(courseId, course);
-        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
-        moduleRecord.setUid("uid");
-        cslStubService.getLearnerRecord().patchModuleRecord(1, List.of(
-                PatchOp.replacePatch("updatedAt", "2023-01-01T10:00")
-        ), moduleRecord);
-        cslStubService.getLearnerRecord().patchCourseRecord(List.of(
-                PatchOp.replacePatch("state", "IN_PROGRESS")
-        ), courseRecord);
-        RegistrationRequest req = testDataService.generateRegistrationRequest();
-        cslStubService.getRustici().postLaunchLink("uid", req.getLaunchLinkRequest(), launchLink, true);
-        cslStubService.getRustici().postLaunchLinkWithRegistration(req, launchLink);
-
-        String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
-        webTestClient
-                .post()
-                .uri(url)
-                .header("Authorization", "Bearer fakeToken")
-                .body(Mono.just(input), ModuleLaunchLinkInput.class)
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.launchLink")
-                .isEqualTo("http://launch.link");
-    }
-
-    @Test
     public void testGetELearningLaunchLinkUidExists() {
-        cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, 1,
-                List.of(
-                        PatchOp.replacePatch("updatedAt", "2023-01-01T10:00")
-                ), moduleRecord,
-                List.of(
-                        PatchOp.replacePatch("state", "IN_PROGRESS")
-                ), courseRecord);
+        String expectedCourseRecordPUT = """
+                {
+                    "courseId" : "courseId",
+                    "userId" : "userId",
+                    "courseTitle" : "Test Course",
+                    "state" : "IN_PROGRESS",
+                    "modules": [
+                        {
+                            "id" : 1,
+                            "moduleId" : "moduleId",
+                            "moduleTitle" : "Test Module",
+                            "state": "IN_PROGRESS"
+                        }
+                    ]
+                }
+                """;
+        moduleRecord.setState(State.IN_PROGRESS);
+        cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, courseRecord);
         LaunchLinkRequest req = testDataService.generateLaunchLinkRequest();
         cslStubService.getRustici().postLaunchLink("uid", req, launchLink, false);
 
@@ -114,7 +96,7 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
                 .post()
                 .uri(url)
                 .header("Authorization", "Bearer fakeToken")
-                .body(Mono.just(input), ModuleLaunchLinkInput.class)
+                .body(Mono.just(input), UserDetailsDto.class)
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
@@ -129,19 +111,30 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
         course.getModule(moduleId).setModuleType(ModuleType.file);
         course.getModule(moduleId).setUrl("http://launch.link");
         cslStubService.getLearningCatalogue().getCourse(courseId, course);
-        courseRecord.setState(State.COMPLETED);
         cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
-        moduleRecord.setState(State.COMPLETED);
-        cslStubService.getLearnerRecord().patchModuleRecord(1, List.of(
-                PatchOp.replacePatch("state", "COMPLETED"),
-                PatchOp.replacePatch("completionDate", "2023-01-01T10:00")
-        ), moduleRecord);
+        String expectedCourseRecordPOST = """
+                {
+                    "courseId" : "courseId",
+                    "userId" : "userId",
+                    "courseTitle" : "Test Course",
+                    "state" : "COMPLETED",
+                    "modules": [
+                        {
+                            "id" : 1,
+                            "moduleId" : "moduleId",
+                            "moduleTitle" : "Test Module",
+                            "state": "COMPLETED"
+                        }
+                    ]
+                }
+                """;
+        cslStubService.getLearnerRecord().updateCourseRecord(expectedCourseRecordPOST, courseRecord);
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
         webTestClient
                 .post()
                 .uri(url)
                 .header("Authorization", "Bearer fakeToken")
-                .body(Mono.just(input), ModuleLaunchLinkInput.class)
+                .body(Mono.just(input), UserDetailsDto.class)
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
@@ -154,19 +147,30 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
     public void testLaunchNewCourse() {
         course.getModule(moduleId).setModuleType(ModuleType.file);
         course.getModule(moduleId).setUrl("http://launch.link");
-        CourseRecordInput courseRecordInput = CourseRecordInput.from(
-                userId, course, CourseRecordStatus.builder().state("COMPLETED")
-                        .isRequired(true).build(), course.getModule(moduleId), ModuleRecordStatus.builder().state("COMPLETED").uid(null).build());
-
-        cslStubService.stubCreateCourseRecord(courseId, course, userId, courseRecordInput, courseRecord);
+        String expectedCourseRecordPOST = """
+                {
+                    "courseId" : "courseId",
+                    "userId" : "userId",
+                    "courseTitle" : "Test Course",
+                    "state" : "COMPLETED",
+                    "modules": [
+                        {
+                            "id" : null,
+                            "moduleId" : "moduleId",
+                            "moduleTitle" : "Test Module",
+                            "state": "COMPLETED"
+                        }
+                    ]
+                }
+                """;
+        cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);
 
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
-        input.setCourseIsRequired(true);
         webTestClient
                 .post()
                 .uri(url)
                 .header("Authorization", "Bearer fakeToken")
-                .body(Mono.just(input), ModuleLaunchLinkInput.class)
+                .body(Mono.just(input), UserDetailsDto.class)
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()

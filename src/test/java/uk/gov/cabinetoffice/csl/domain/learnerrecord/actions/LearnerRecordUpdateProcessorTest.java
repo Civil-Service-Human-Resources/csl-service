@@ -8,70 +8,68 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordStatus;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
+import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("no-redis")
-public class LearnerRecordUpdateProcessorTest {
+public class LearnerRecordUpdateProcessorTest extends TestDataService {
 
     @Mock
     private LearnerRecordService learnerRecordService;
 
+    @Mock
+    private IMessagingClient iMessagingClient;
+
     @InjectMocks
     private LearnerRecordUpdateProcessor learnerRecordUpdateProcessor;
+    private final Course course = generateCourse(true, false);
 
-    private TestDataService testDataService;
-    private String courseId;
-    private String learnerId;
-    private ICourseRecordUpdate update = mock(ICourseRecordUpdate.class);
+    private final ICourseRecordAction action = mock(ICourseRecordAction.class);
 
     @BeforeEach
     public void before() {
-        testDataService = new TestDataService();
-        courseId = testDataService.getCourseId();
-        learnerId = testDataService.getUserId();
         reset();
     }
 
     @Test
     public void shouldCreateCourseRecord() {
-        CourseRecord courseRecord = testDataService.generateCourseRecord(false);
-        CourseRecordStatus status = CourseRecordStatus.builder().build();
-        when(learnerRecordService.getCourseRecord(learnerId, courseId))
+        CourseRecord courseRecord = generateCourseRecord(false);
+        when(learnerRecordService.getCourseRecord(getUserId(), getCourseId()))
                 .thenReturn(null);
-        when(update.getCreateCourseRecordStatus())
-                .thenReturn(status);
-        when(learnerRecordService.createCourseRecord(learnerId, courseId, status))
+        when(action.generateNewCourseRecord())
+                .thenReturn(courseRecord);
+        when(action.getCourseId()).thenReturn(courseRecord.getCourseId());
+        when(action.getUserId()).thenReturn(courseRecord.getUserId());
+        when(learnerRecordService.createCourseRecord(courseRecord))
                 .thenReturn(courseRecord);
         when(learnerRecordService.updateCourseRecordCache(courseRecord))
                 .thenReturn(courseRecord);
-        CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(learnerId, courseId, update);
-        verify(learnerRecordService, never()).updateCourseRecord(any(), any(), any());
+        CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(action);
+        verify(learnerRecordService, never()).updateCourseRecord(courseRecord);
         assertEquals(courseRecord, resp);
     }
 
     @Test
     public void shouldUpdateCourseRecord() {
-        CourseRecord courseRecord = testDataService.generateCourseRecord(false);
-        List<PatchOp> patches = List.of(PatchOp.replacePatch("state", "COMPLETED"));
-        when(learnerRecordService.getCourseRecord(learnerId, courseId))
+        CourseRecord courseRecord = generateCourseRecord(false);
+        when(learnerRecordService.getCourseRecord(getUserId(), getCourseId()))
                 .thenReturn(courseRecord);
-        when(update.getUpdateCourseRecordPatches(courseRecord))
-                .thenReturn(patches);
-        when(learnerRecordService.updateCourseRecord(learnerId, courseId, patches))
+        when(action.getCourseId()).thenReturn(courseRecord.getCourseId());
+        when(action.getUserId()).thenReturn(courseRecord.getUserId());
+        when(action.applyUpdatesToCourseRecord(courseRecord))
+                .thenReturn(courseRecord);
+        when(learnerRecordService.updateCourseRecord(courseRecord))
                 .thenReturn(courseRecord);
         when(learnerRecordService.updateCourseRecordCache(courseRecord))
                 .thenReturn(courseRecord);
-        CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(learnerId, courseId, update);
-        verify(learnerRecordService, never()).createCourseRecord(any(), any(), any());
+        CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(action);
+        verify(learnerRecordService, never()).createCourseRecord(courseRecord);
         assertEquals(courseRecord, resp);
     }
 }

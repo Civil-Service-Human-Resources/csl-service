@@ -1,61 +1,58 @@
 package uk.gov.cabinetoffice.csl.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.model.ModuleResponse;
+import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.IModuleRecordUpdate;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordUpdateProcessor;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ModuleRecordUpdateService;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.module.ModuleRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
-import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
-import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
-import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationInput;
+import uk.gov.cabinetoffice.csl.domain.rustici.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ModuleService {
 
     private final LearnerRecordUpdateProcessor learnerRecordUpdateProcessor;
     private final LearningCatalogueService learningCatalogueService;
     private final RusticiService rusticiService;
-    private final ModuleRecordUpdateService moduleRecordUpdateService;
+    private final UserDetailsService userDetailsService;
 
-    public ModuleService(LearnerRecordUpdateProcessor learnerRecordUpdateProcessor, LearningCatalogueService learningCatalogueService,
-                         RusticiService rusticiService, ModuleRecordUpdateService moduleRecordUpdateService) {
-        this.learnerRecordUpdateProcessor = learnerRecordUpdateProcessor;
-        this.learningCatalogueService = learningCatalogueService;
-        this.rusticiService = rusticiService;
-        this.moduleRecordUpdateService = moduleRecordUpdateService;
-    }
-
-    public LaunchLink launchModule(String learnerId, String courseId, String moduleId, ModuleLaunchLinkInput moduleLaunchLinkInput) {
+    public LaunchLink launchModule(User user, String courseId, String moduleId, UserDetailsDto userDetailsDto) {
         CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
-        Course course = courseWithModule.getCourse();
         Module module = courseWithModule.getModule();
-        IModuleRecordUpdate update = moduleRecordUpdateService.getLaunchModuleUpdate(course, module, moduleLaunchLinkInput.getCourseIsRequired());
-        CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, course.getId(), module.getId(), update);
-        ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
-        log.info(String.format("Launching %s module '%s' for user '%s'", module.getModuleType(), moduleId, learnerId));
-        if (module.getModuleType().equals(ModuleType.elearning)) {
+        ModuleRecordAction actionType = module.isType(ModuleType.link) || module.isType(ModuleType.file) ? ModuleRecordAction.COMPLETE_MODULE : ModuleRecordAction.LAUNCH_MODULE;
+        CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, actionType);
+        if (module.isType(ModuleType.elearning)) {
+            ModuleRecord moduleRecord = courseRecord.getModuleRecordAndThrowIfNotFound(moduleId);
             return rusticiService.createLaunchLink(RegistrationInput.from(
-                    learnerId, moduleId, moduleRecord.getUid(), courseId, moduleLaunchLinkInput
+                    user.getId(), moduleId, moduleRecord.getUid(), courseId, userDetailsDto
             ));
         } else {
             return new LaunchLink(courseWithModule.getModule().getUrl());
         }
     }
 
-    public ModuleResponse completeModule(String learnerId, String courseId, String moduleId) {
+    public ModuleResponse completeModule(User user, String courseId, String moduleId) {
         CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
-        IModuleRecordUpdate update = moduleRecordUpdateService.getCompleteModuleUpdate(courseWithModule.getCourse(), courseWithModule.getModule());
-        CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(learnerId, courseId, moduleId, update);
-        return new ModuleResponse("Module was successfully completed", courseRecord.getCourseTitle(),
-                courseRecord.getModuleRecord(moduleId).getModuleTitle(), courseId, moduleId);
+        learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, ModuleRecordAction.COMPLETE_MODULE);
+        return ModuleResponse.fromMetada(ModuleRecordAction.COMPLETE_MODULE, courseWithModule);
+    }
+
+    public void processRusticiRollupData(RusticiRollupData rusticiRollupData) {
+        log.info("rusticiRollupData: {}", rusticiRollupData);
+        CSLRusticiProps properties = rusticiService.getCSLDataFromRollUpData(rusticiRollupData);
+        if (!properties.getModuleRecordActions().isEmpty()) {
+            CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(properties.getCourseId(), properties.getModuleId());
+            User user = userDetailsService.getUserWithUid(properties.getLearnerId());
+            learnerRecordUpdateProcessor.processModuleRecordActions(courseWithModule, user, properties.getModuleRecordActions());
+        }
     }
 
 }

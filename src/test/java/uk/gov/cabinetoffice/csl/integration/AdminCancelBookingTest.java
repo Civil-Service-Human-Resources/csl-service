@@ -12,7 +12,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
@@ -57,7 +60,7 @@ public class AdminCancelBookingTest extends CSLServiceWireMockServer {
         eventId = testDataService.getEventId();
         courseRecord = testDataService.generateCourseRecord(true);
         courseRecords = new CourseRecords(List.of(courseRecord));
-        moduleRecord = courseRecord.getModuleRecord(moduleId);
+        moduleRecord = courseRecord.getModuleRecord(moduleId).get();
         course = testDataService.generateCourse(true, true);
         bookingId = 1;
     }
@@ -67,14 +70,6 @@ public class AdminCancelBookingTest extends CSLServiceWireMockServer {
         course.getModule(moduleId).setCost(BigDecimal.valueOf(0L));
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         courseRecord.setState(State.REGISTERED);
-        List<PatchOp> expectedCourseRecordPatches = List.of(PatchOp.replacePatch("state", "UNREGISTERED"));
-        List<PatchOp> expectedModuleRecordPatches = List.of(
-                PatchOp.replacePatch("state", "UNREGISTERED"),
-                PatchOp.replacePatch("bookingStatus", "CANCELLED"),
-                PatchOp.removePatch("result"),
-                PatchOp.removePatch("score"),
-                PatchOp.removePatch("completionDate")
-        );
         String expectedCancellationJsonInput = """
                 {"cancellationReason": "PAYMENT", "status":"Cancelled"}
                 """;
@@ -83,9 +78,25 @@ public class AdminCancelBookingTest extends CSLServiceWireMockServer {
                 {"event": "%s", "status":"Cancelled", "learner": "%s",
                 "learnerEmail": "%s", "learnerName":"testName", "cancellationReason": "the booking has not been paid"}
                 """, event, userId, userEmail);
+        String expectedCourseRecordPUT = """
+                {
+                    "courseId" : "courseId",
+                    "userId" : "userId",
+                    "courseTitle" : "Test Course",
+                    "state" : "UNREGISTERED",
+                    "modules": [
+                        {
+                            "id" : 1,
+                            "moduleId" : "moduleId",
+                            "moduleTitle" : "Test Module",
+                            "state": "UNREGISTERED",
+                            "bookingStatus": "Cancelled"
+                        }
+                    ]
+                }
+                """;
         cslStubService.getLearnerRecord().updateBookingWithId(eventId, bookingId, expectedCancellationJsonInput, bookingDtoJsonResponse);
-        cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords,
-                1, expectedModuleRecordPatches, moduleRecord, expectedCourseRecordPatches, courseRecord);
+        cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, courseRecord);
         String inputJson = """
                 {"reason": "PAYMENT"}
                 """;
@@ -101,7 +112,7 @@ public class AdminCancelBookingTest extends CSLServiceWireMockServer {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.message")
-                .isEqualTo("Module booking was successfully cancelled");
+                .isEqualTo("Successfully applied action 'Cancel a booking' to course record");
     }
 
 }

@@ -7,7 +7,8 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 
 import java.util.Collections;
@@ -55,37 +56,17 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     }
 
     @Override
-    public CourseRecord createCourseRecord(CourseRecordInput body) {
+    public CourseRecord createCourseRecord(CourseRecord body) {
         log.debug("Creating course record '{}'", body);
-        RequestEntity<CourseRecordInput> request = RequestEntity.post(courseRecords).body(body);
+        RequestEntity<CourseRecord> request = RequestEntity.post(courseRecords).body(body);
         return httpClient.executeRequest(request, CourseRecord.class);
     }
 
     @Override
-    public ModuleRecord createModuleRecord(ModuleRecordInput body) {
-        log.debug("Creating module record '{}'", body);
-        RequestEntity<ModuleRecordInput> request = RequestEntity.post(moduleRecords).body(body);
-        return httpClient.executeRequest(request, ModuleRecord.class);
-    }
-
-    @Override
-    public CourseRecord updateCourseRecord(String userId, String courseId, List<PatchOp> patches) {
-        log.debug("Updating course record for user '{}' and course '{}' with patches '{}'", userId, courseId, patches);
-        String url = String.format("%s?userId=%s&courseId=%s", courseRecords, userId, courseId);
-        RequestEntity<List<PatchOp>> request = RequestEntity
-                .patch(url).headers(httpHeaders -> httpHeaders.add("Content-Type", "application/json-patch+json"))
-                .body(patches);
+    public CourseRecord updateCourseRecord(CourseRecord body) {
+        log.debug("Updating course record '{}'", body);
+        RequestEntity<CourseRecord> request = RequestEntity.put(courseRecords).body(body);
         return httpClient.executeRequest(request, CourseRecord.class);
-    }
-
-    @Override
-    public ModuleRecord updateModuleRecord(Long moduleRecordId, List<PatchOp> patches) {
-        log.debug("Updating module record with ID '{}' with patches '{}'", moduleRecordId, patches);
-        String url = String.format("%s/%s", moduleRecords, moduleRecordId);
-        RequestEntity<List<PatchOp>> request = RequestEntity
-                .patch(url).headers(httpHeaders -> httpHeaders.add("Content-Type", "application/json-patch+json"))
-                .body(patches);
-        return httpClient.executeRequest(request, ModuleRecord.class);
     }
 
     @Override

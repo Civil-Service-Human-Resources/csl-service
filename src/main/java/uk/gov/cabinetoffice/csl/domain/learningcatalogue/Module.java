@@ -40,4 +40,9 @@ public class Module implements Serializable {
     public boolean isFree() {
         return this.cost.signum() == 0;
     }
+
+    @JsonIgnore
+    public boolean isType(ModuleType type) {
+        return this.getModuleType().equals(type);
+    }
 }

@@ -2,6 +2,11 @@ package uk.gov.cabinetoffice.csl.util;
 
 import lombok.Getter;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.domain.User;
+import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
+import uk.gov.cabinetoffice.csl.domain.csrs.Grade;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
+import uk.gov.cabinetoffice.csl.domain.csrs.Profession;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
@@ -29,6 +34,15 @@ public class TestDataService {
     private final String useremail = "userEmail@email.com";
     private final String learnerFirstName = "Learner";
     private final String courseTitle = "Test Course";
+    private final List<String> departmentCodes = List.of("CO", "DWP", "HMRC");
+    private final Grade grade = new Grade(1L, "SEO", "Senior Executive Officer");
+    private final OrganisationalUnit organisationalUnit = new OrganisationalUnit(2L, "Cabinet Office", "CO", "CO");
+    private final Profession profession = new Profession(3L, "DDaT");
+
+
+    public UserDetailsDto generateUserDetailsDto() {
+        return new UserDetailsDto("", useremail, learnerFirstName, 1, 1, 1, departmentCodes);
+    }
 
     /**
      * Generate a course record with a blank status
@@ -80,6 +94,11 @@ public class TestDataService {
         return module;
     }
 
+    public User generateUser() {
+        return new User(userId, useremail, organisationalUnit.getId().intValue(), profession.getId().intValue(),
+                grade.getId().intValue(), departmentCodes);
+    }
+
     public uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course generateCourse(boolean withModule, boolean withEvent) {
         uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course course =
                 new uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course();
@@ -98,9 +117,10 @@ public class TestDataService {
     public RusticiRollupData generateRusticiRollupData() {
         RusticiRollupData rollupData = new RusticiRollupData();
         Course course = new Course();
-        course.setId(String.format("%s/%s", courseId, moduleId));
+        course.setId(String.format("%s.%s", courseId, moduleId));
         Learner learner = new Learner();
         learner.setId(userId);
+        learner.setFirstName(getLearnerFirstName());
         rollupData.setLearner(learner);
         rollupData.setCourse(course);
         rollupData.setCompletedDate(LocalDateTime.of(2023, 2, 2, 10, 0));
@@ -114,20 +134,7 @@ public class TestDataService {
         return launchLinkRequest;
     }
 
-    public RegistrationRequest generateRegistrationRequest() {
-        Learner learner = new Learner();
-        learner.setFirstName(learnerFirstName);
-        learner.setId(userId);
-        learner.setLastName("");
-        Registration registration = new Registration();
-        registration.setCourseId(String.format("%s.%s", courseId, moduleId));
-        registration.setRegistrationId(moduleUid);
-        registration.setLearner(learner);
-
-        RegistrationRequest req = new RegistrationRequest();
-        req.setRegistration(registration);
-        req.setLaunchLinkRequest(generateLaunchLinkRequest());
-        return req;
+    public CivilServant generateCivilServant() {
+        return new CivilServant(getLearnerFirstName(), useremail, userId, grade, organisationalUnit, profession, departmentCodes);
     }
-
 }

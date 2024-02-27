@@ -1,16 +1,16 @@
 package uk.gov.cabinetoffice.csl.domain.rustici;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
+import lombok.RequiredArgsConstructor;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.module.ModuleRecordAction;
 
 import java.util.List;
 
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CSLRusticiProps {
-    private String courseId;
-    private String moduleId;
-    private String learnerId;
-    private List<PatchOp> moduleRecordPatches;
+    private final String courseId;
+    private final String moduleId;
+    private final String learnerId;
+    private final List<ModuleRecordAction> moduleRecordActions;
 }
