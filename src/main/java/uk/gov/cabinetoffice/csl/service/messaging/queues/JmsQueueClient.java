@@ -19,7 +19,11 @@ public class JmsQueueClient implements IQueueClient<IMessageMetadata> {
     @Override
     public void sendMessage(Message<IMessageMetadata> message) {
         log.debug(String.format("Sending message: %s to queue: %s", message, message.getQueue()));
-        jmsTemplate.convertAndSend(message.getQueue(), message);
+        try {
+            jmsTemplate.convertAndSend(message.getQueue(), message);
+        } catch (Exception e) {
+            
+        }
     }
 
 }

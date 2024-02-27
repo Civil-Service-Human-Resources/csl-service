@@ -17,10 +17,11 @@ public class ServiceBusJmsConfigProperties implements JmsConnection {
     public ConnectionFactory buildConnectionFactory() {
         var connectionFactory = new ServiceBusJmsConnectionFactory();
         var serviceBusConnectionString = new ServiceBusConnectionString(connectionString);
-        var remoteUri = String.format("amqps://%s?amqp.idleTimeout=%d", serviceBusConnectionString.getEndpointUri(), 600000);
+        var remoteUri = String.format("amqps://%s?amqp.idleTimeout=%d", serviceBusConnectionString.getEndpointUri(), 10);
         connectionFactory.setRemoteURI(remoteUri);
         connectionFactory.setUsername(serviceBusConnectionString.getSharedAccessKeyName());
         connectionFactory.setPassword(serviceBusConnectionString.getSharedAccessKey());
+        connectionFactory.setExceptionListener(new CustomServiceBusExceptionListener());
         return new CachingConnectionFactory(connectionFactory);
     }
 
