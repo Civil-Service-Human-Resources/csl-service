@@ -17,7 +17,7 @@ public class RedisCacheConfig {
     @Value("${learningCatalogue.cache.ttlSeconds}")
     private int learningCatalogueCacheTTlSeconds;
 
-    @Value("${identity.cache.ttlSeconds}")
+    @Value("${csrs.cache.ttlSeconds}")
     private int userCacheTTlSeconds;
 
     @Bean
