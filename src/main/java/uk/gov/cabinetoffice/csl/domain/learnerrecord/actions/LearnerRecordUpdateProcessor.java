@@ -57,7 +57,7 @@ public class LearnerRecordUpdateProcessor {
             messagingClient.sendMessages(action.getMessages());
             return learnerRecordService.updateCourseRecordCache(courseRecord);
         } catch (Exception e) {
-            learnerRecordService.bustCourseRecordCache(action.getCourseId(), action.getUserId());
+            learnerRecordService.bustCourseRecordCache(action.getUserId(), action.getCourseId());
             throw e;
         }
     }

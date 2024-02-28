@@ -14,6 +14,7 @@ import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,5 +72,14 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
         CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(action);
         verify(learnerRecordService, never()).createCourseRecord(courseRecord);
         assertEquals(courseRecord, resp);
+    }
+
+    @Test
+    public void shouldBustLearnerRecordCacheOnError() {
+        when(learnerRecordService.getCourseRecord(getUserId(), getCourseId())).thenThrow(new RuntimeException("Error"));
+        assertThrowsExactly(RuntimeException.class, () -> {
+            learnerRecordUpdateProcessor.processCourseRecordAction(action);
+        });
+        verify(learnerRecordService, atMostOnce()).bustCourseRecordCache(getUserId(), getCourseId());
     }
 }
