@@ -77,6 +77,8 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
     @Test
     public void shouldBustLearnerRecordCacheOnError() {
         when(learnerRecordService.getCourseRecord(getUserId(), getCourseId())).thenThrow(new RuntimeException("Error"));
+        when(action.getCourseId()).thenReturn(getCourseId());
+        when(action.getUserId()).thenReturn(getUserId());
         assertThrowsExactly(RuntimeException.class, () -> {
             learnerRecordUpdateProcessor.processCourseRecordAction(action);
         });
