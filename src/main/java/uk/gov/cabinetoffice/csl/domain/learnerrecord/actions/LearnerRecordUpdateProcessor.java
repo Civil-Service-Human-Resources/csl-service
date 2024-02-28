@@ -52,8 +52,10 @@ public class LearnerRecordUpdateProcessor {
                 courseRecord = learnerRecordService.createCourseRecord(action.generateNewCourseRecord());
             } else {
                 CourseRecord updatedRecord = learnerRecordService.updateCourseRecord(action.applyUpdatesToCourseRecord(courseRecord));
+                log.debug(String.format("Updating course record %s with course record %s", courseRecord, updatedRecord));
                 courseRecord.update(updatedRecord);
             }
+            log.debug(String.format("Updated course record %s ", courseRecord));
             messagingClient.sendMessages(action.getMessages());
             return learnerRecordService.updateCourseRecordCache(courseRecord);
         } catch (Exception e) {

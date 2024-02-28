@@ -30,7 +30,7 @@ public class CourseRecord implements Serializable {
     private String courseTitle;
 
     private State state;
-    
+
     private Preference preference;
 
     @JsonIgnore
@@ -97,8 +97,7 @@ public class CourseRecord implements Serializable {
                 records.replace(mr.getModuleId(), mr);
             }
         });
-        ArrayList<ModuleRecord> updatedRecords = new ArrayList<>(records.values());
-        this.setModuleRecords(updatedRecords);
+        this.setModuleRecords(records.values());
     }
 
     @JsonIgnore

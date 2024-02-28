@@ -56,12 +56,6 @@ public class ModuleRecord implements Serializable {
                 module.getDuration(), module.isOptional(), module.getCost());
     }
 
-    public static ModuleRecord fromModuleWithState(Module module, State state) {
-        ModuleRecord moduleRecord = fromModule(module);
-        moduleRecord.setState(state);
-        return moduleRecord;
-    }
-
     public ModuleRecord(String moduleId, String moduleTitle, ModuleType moduleType,
                         Long duration, Boolean optional, BigDecimal cost) {
         this.moduleId = moduleId;
@@ -72,7 +66,6 @@ public class ModuleRecord implements Serializable {
         this.cost = cost;
     }
 
-    //    @JsonIgnore
     public State getState() {
         return Objects.requireNonNullElse(this.state, State.NULL);
     }
