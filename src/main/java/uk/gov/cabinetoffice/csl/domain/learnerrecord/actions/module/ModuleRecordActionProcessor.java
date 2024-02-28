@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.module;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ICourseRecordActionType;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 public abstract class ModuleRecordActionProcessor extends CourseRecordActionProcessor {
 
     protected final Module module;
@@ -38,7 +40,9 @@ public abstract class ModuleRecordActionProcessor extends CourseRecordActionProc
     }
 
     protected boolean willModuleCompletionCompleteCourse(CourseRecord courseRecord) {
+        log.debug(String.format("Checking if %s completion will complete course", module.getId()));
         List<Module> remainingModules = new ArrayList<>(course.getRemainingModulesForCompletion(courseRecord, user));
+        log.debug(String.format("Remaining modules left for completion: %s", remainingModules.stream().map(Module::getId)));
         return (remainingModules.size() == 1 && Objects.equals(remainingModules.get(0).getId(), getModuleId()));
     }
 

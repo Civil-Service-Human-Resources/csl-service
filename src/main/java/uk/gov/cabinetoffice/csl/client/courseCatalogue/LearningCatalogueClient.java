@@ -8,8 +8,13 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Audience;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseFactory;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
+
+import java.util.Collection;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -34,12 +39,19 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
             String url = String.format("%s/%s", courses, courseId);
             RequestEntity<Void> request = RequestEntity.get(url).build();
             Course course = httpClient.executeRequest(request, Course.class);
-            return courseFactory.buildCourseData(course);
+            return buildCourseData(course);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode().value() == 404) {
                 return null;
             }
             throw e;
         }
+    }
+
+    private Course buildCourseData(Course course) {
+        Collection<Audience> audiences = course.getAudiences();
+        Map<String, LearningPeriod> departmentDeadlineMap = courseFactory.buildDepartmentDeadlineMap(audiences);
+        course.setDepartmentDeadlineMap(departmentDeadlineMap);
+        return course;
     }
 }

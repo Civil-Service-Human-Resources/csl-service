@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -58,6 +59,22 @@ public class TestDataService {
         if (withModule) {
             cr.setModuleRecords(List.of(generateModuleRecord()));
         }
+        return cr;
+    }
+
+    public CourseRecord generateCourseRecord(int moduleCount) {
+        CourseRecord cr = new CourseRecord();
+        cr.setCourseId(courseId);
+        cr.setUserId(userId);
+        cr.setCourseTitle(courseTitle);
+        List<ModuleRecord> moduleRecords = new ArrayList<>();
+        for (int i = 1; i <= moduleCount; i++) {
+            ModuleRecord moduleRecord = generateModuleRecord();
+            moduleRecord.setId(moduleRecordId + i);
+            moduleRecord.setModuleId(moduleId + i);
+            moduleRecords.add(moduleRecord);
+        }
+        cr.setModuleRecords(moduleRecords);
         return cr;
     }
 

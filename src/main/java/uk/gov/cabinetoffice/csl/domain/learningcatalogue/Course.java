@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
@@ -15,6 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
+@Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -79,9 +81,12 @@ public class Course implements Serializable {
                 completedModuleDates.put(mr.getModuleId(), mr.getCompletionDate());
             }
         });
+        log.debug(String.format("Getting learning period for course %s and department codes %s", this.getId(), user.getDepartmentCodes()));
         LearningPeriod learningPeriod = getLearningPeriodForDepartmentHierarchy(user.getDepartmentCodes()).orElse(null);
+        log.debug(String.format("Selected learning period: %s", learningPeriod));
         return getModulesRequiredForCompletion().stream().filter(m -> {
             LocalDateTime completionDate = completedModuleDates.get(m.getId());
+            log.debug(String.format("Completion date for module %s is %s", m.getId(), completionDate));
             return completionDate == null || (learningPeriod != null && !learningPeriod.isDateWithinPeriod(completionDate));
         }).collect(Collectors.toSet());
     }
