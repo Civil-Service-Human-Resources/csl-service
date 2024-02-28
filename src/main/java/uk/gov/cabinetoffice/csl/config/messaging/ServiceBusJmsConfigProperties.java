@@ -12,12 +12,13 @@ import org.springframework.jms.connection.CachingConnectionFactory;
 public class ServiceBusJmsConfigProperties implements JmsConnection {
 
     private final String connectionString;
+    private final Integer idleTimeout;
 
     @Override
     public ConnectionFactory buildConnectionFactory() {
         var connectionFactory = new ServiceBusJmsConnectionFactory();
         var serviceBusConnectionString = new ServiceBusConnectionString(connectionString);
-        var remoteUri = String.format("amqps://%s?amqp.idleTimeout=%d", serviceBusConnectionString.getEndpointUri(), 10);
+        var remoteUri = String.format("amqps://%s?amqp.idleTimeout=%d", serviceBusConnectionString.getEndpointUri(), idleTimeout);
         connectionFactory.setRemoteURI(remoteUri);
         connectionFactory.setUsername(serviceBusConnectionString.getSharedAccessKeyName());
         connectionFactory.setPassword(serviceBusConnectionString.getSharedAccessKey());
