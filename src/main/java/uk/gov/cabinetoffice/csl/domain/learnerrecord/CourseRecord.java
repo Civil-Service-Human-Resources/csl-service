@@ -97,7 +97,7 @@ public class CourseRecord implements Serializable {
                 records.replace(mr.getModuleId(), mr);
             }
         });
-        this.setModuleRecords(records.values());
+        this.setModuleRecords(new ArrayList<>(records.values()));
     }
 
     @JsonIgnore

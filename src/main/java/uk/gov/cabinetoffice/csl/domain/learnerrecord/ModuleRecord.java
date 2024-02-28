@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 
 import java.io.Serializable;
@@ -50,11 +49,6 @@ public class ModuleRecord implements Serializable {
     private BookingStatus bookingStatus;
     @JsonIgnore
     private CourseRecord courseRecord;
-
-    public static ModuleRecord fromModule(Module module) {
-        return new ModuleRecord(module.getId(), module.getTitle(), module.getModuleType(),
-                module.getDuration(), module.isOptional(), module.getCost());
-    }
 
     public ModuleRecord(String moduleId, String moduleTitle, ModuleType moduleType,
                         Long duration, Boolean optional, BigDecimal cost) {
