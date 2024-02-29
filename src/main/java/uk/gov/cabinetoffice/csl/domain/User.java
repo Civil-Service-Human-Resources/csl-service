@@ -5,13 +5,14 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import uk.gov.cabinetoffice.csl.domain.rustici.UserDetailsDto;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements Serializable {
     private final String id;
     private String email;
     private Integer organisationId;
@@ -23,4 +24,5 @@ public class User {
         return new User(uid, userDetailsDto.getLearnerEmail(), userDetailsDto.getOrganisationId(),
                 userDetailsDto.getProfessionId(), userDetailsDto.getGradeId(), userDetailsDto.getUserDepartmentHierarchy());
     }
+    
 }
