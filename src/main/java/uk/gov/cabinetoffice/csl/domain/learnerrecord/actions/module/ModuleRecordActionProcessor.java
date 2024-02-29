@@ -28,9 +28,9 @@ public abstract class ModuleRecordActionProcessor extends CourseRecordActionProc
 
     @Override
     public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord) {
-        courseRecord = this.updateCourseRecord(courseRecord);
-        courseRecord.setModuleRecords(courseRecord.getModuleRecords().stream().filter(mr -> Objects.equals(mr.getModuleId(), getModuleId())).collect(Collectors.toSet()));
-        return courseRecord;
+        CourseRecord updatedRecord = this.updateCourseRecord(courseRecord);
+        updatedRecord.setModuleRecords(courseRecord.getModuleRecords().stream().filter(mr -> Objects.equals(mr.getModuleId(), getModuleId())).collect(Collectors.toSet()));
+        return updatedRecord;
     }
 
     protected abstract CourseRecord updateCourseRecord(CourseRecord courseRecord);

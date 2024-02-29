@@ -51,7 +51,8 @@ public class LearnerRecordUpdateProcessor {
             if (courseRecord == null) {
                 courseRecord = learnerRecordService.createCourseRecord(action.generateNewCourseRecord());
             } else {
-                CourseRecord updatedRecord = learnerRecordService.updateCourseRecord(action.applyUpdatesToCourseRecord(courseRecord));
+                CourseRecord updatedRecord = action.applyUpdatesToCourseRecord(courseRecord);
+                updatedRecord = learnerRecordService.updateCourseRecord(updatedRecord);
                 log.debug(String.format("Updating course record %s with course record %s", courseRecord, updatedRecord));
                 courseRecord.update(updatedRecord);
             }
