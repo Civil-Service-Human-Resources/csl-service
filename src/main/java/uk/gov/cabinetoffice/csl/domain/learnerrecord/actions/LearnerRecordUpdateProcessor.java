@@ -48,12 +48,13 @@ public class LearnerRecordUpdateProcessor {
         try {
             log.info(String.format("Applying update %s", action.toString()));
             CourseRecord courseRecord = learnerRecordService.getCourseRecord(action.getUserId(), action.getCourseId());
+            log.debug(String.format("Fetched course record: %s", courseRecord));
             if (courseRecord == null) {
                 courseRecord = learnerRecordService.createCourseRecord(action.generateNewCourseRecord());
             } else {
                 CourseRecord updatedRecord = action.applyUpdatesToCourseRecord(courseRecord);
                 updatedRecord = learnerRecordService.updateCourseRecord(updatedRecord);
-                log.debug(String.format("Updating course record %s with course record %s", courseRecord, updatedRecord));
+                log.debug(String.format("Updating with course record %s", updatedRecord));
                 courseRecord.update(updatedRecord);
             }
             log.debug(String.format("Updated course record %s ", courseRecord));
