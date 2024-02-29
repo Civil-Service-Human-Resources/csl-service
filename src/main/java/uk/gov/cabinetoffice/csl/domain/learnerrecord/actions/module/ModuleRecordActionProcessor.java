@@ -43,7 +43,7 @@ public abstract class ModuleRecordActionProcessor extends CourseRecordActionProc
     protected boolean willModuleCompletionCompleteCourse(CourseRecord courseRecord) {
         log.debug(String.format("Checking if %s completion will complete course", module.getId()));
         List<Module> remainingModules = new ArrayList<>(course.getRemainingModulesForCompletion(courseRecord, user));
-        log.debug(String.format("Remaining modules left for completion: %s", remainingModules.stream().map(Module::getId)));
+        log.debug(String.format("Remaining modules left for completion: %s", remainingModules.stream().map(Module::getId).collect(Collectors.toList())));
         return (remainingModules.size() == 1 && Objects.equals(remainingModules.get(0).getId(), getModuleId()));
     }
 
