@@ -44,10 +44,7 @@ public abstract class CourseRecordActionProcessor implements ICourseRecordAction
     }
 
     protected CourseRecord createCourseRecord() {
-        CourseRecord courseRecord = new CourseRecord();
-        courseRecord.setUserId(user.getId());
-        courseRecord.setCourseId(course.getId());
-        courseRecord.setCourseTitle(course.getTitle());
+        CourseRecord courseRecord = new CourseRecord(course.getId(), user.getId(), course.getTitle());
         courseRecord.setRequired(course.isMandatoryLearningForUser(user));
         return courseRecord;
     }

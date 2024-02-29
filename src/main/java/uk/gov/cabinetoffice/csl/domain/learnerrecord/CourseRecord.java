@@ -55,6 +55,12 @@ public class CourseRecord implements Serializable {
         return Objects.requireNonNullElse(this.state, State.NULL);
     }
 
+    public CourseRecord(String courseId, String userId, String courseTitle) {
+        this.courseId = courseId;
+        this.userId = userId;
+        this.courseTitle = courseTitle;
+    }
+
     @JsonIgnore
     public ModuleRecord getOrCreateModuleRecord(Module module) {
         return getModuleRecord(module.getId()).orElseGet(() -> createModuleRecord(module));
