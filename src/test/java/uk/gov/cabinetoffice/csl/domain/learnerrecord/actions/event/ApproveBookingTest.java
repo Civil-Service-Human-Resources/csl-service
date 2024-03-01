@@ -15,7 +15,7 @@ public class ApproveBookingTest extends BaseEventModuleRecordActionTest<ApproveB
 
     @Override
     protected ApproveBooking buildProcessor() {
-        return new ApproveBooking(courseWithModuleWithEvent, user);
+        return new ApproveBooking(utilService, courseWithModuleWithEvent, user);
     }
 
     @Test

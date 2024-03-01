@@ -6,18 +6,22 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ICourseRecordAction
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ICourseRecordActionType;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.messaging.model.IMessageMetadata;
+import uk.gov.cabinetoffice.csl.util.UtilService;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 public abstract class CourseRecordActionProcessor implements ICourseRecordAction {
 
+    protected final UtilService utilService;
     protected final Course course;
     protected final User user;
     protected final Collection<IMessageMetadata> messages = new ArrayList<>();
     protected final ICourseRecordActionType actionType;
 
-    protected CourseRecordActionProcessor(Course course, User user, ICourseRecordActionType actionType) {
+    protected CourseRecordActionProcessor(UtilService utilService, Course course, User user,
+                                          ICourseRecordActionType actionType) {
+        this.utilService = utilService;
         this.course = course;
         this.user = user;
         this.actionType = actionType;

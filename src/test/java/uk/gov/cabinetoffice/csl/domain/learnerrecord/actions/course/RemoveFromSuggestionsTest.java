@@ -12,7 +12,7 @@ public class RemoveFromSuggestionsTest extends BaseCourseRecordActionTest<Remove
 
     @Override
     protected RemoveFromSuggestions buildProcessor() {
-        return new RemoveFromSuggestions(course, user);
+        return new RemoveFromSuggestions(utilService, course, user);
     }
 
     @Test

@@ -7,11 +7,12 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
+import uk.gov.cabinetoffice.csl.util.UtilService;
 
 public class CancelBooking extends EventModuleRecordActionProcessor {
 
-    public CancelBooking(CourseWithModuleWithEvent courseWithModuleWithEvent, User user) {
-        super(courseWithModuleWithEvent, user, EventModuleRecordAction.CANCEL_BOOKING);
+    public CancelBooking(UtilService utilService, CourseWithModuleWithEvent courseWithModuleWithEvent, User user) {
+        super(utilService, courseWithModuleWithEvent, user, EventModuleRecordAction.CANCEL_BOOKING);
     }
 
     @Override

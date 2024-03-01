@@ -85,7 +85,8 @@ public class CompleteEventTest extends CSLServiceWireMockServer {
                             "id" : 1,
                             "moduleId" : "moduleId",
                             "moduleTitle" : "Test Module",
-                            "state": "COMPLETED"
+                            "state": "COMPLETED",
+                            "completionDate": "2023-01-01T10:00:00"
                         }
                     ]
                 }

@@ -12,7 +12,7 @@ public class PassModuleTest extends BaseModuleRecordActionTest<PassModule> {
 
     @Override
     protected PassModule buildProcessor() {
-        return new PassModule(courseWithModule, user);
+        return new PassModule(utilService, courseWithModule, user);
     }
 
     @Test

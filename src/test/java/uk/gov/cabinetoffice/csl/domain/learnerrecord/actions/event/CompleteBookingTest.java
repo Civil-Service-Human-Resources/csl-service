@@ -13,7 +13,7 @@ public class CompleteBookingTest extends BaseEventModuleRecordActionTest<Complet
 
     @Override
     protected CompleteBooking buildProcessor() {
-        return new CompleteBooking(courseWithModuleWithEvent, user);
+        return new CompleteBooking(utilService, courseWithModuleWithEvent, user);
     }
 
     @Test

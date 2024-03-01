@@ -5,11 +5,12 @@ import uk.gov.cabinetoffice.csl.domain.error.IncorrectStateException;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.util.UtilService;
 
 public class RemoveFromLearningPlan extends CourseRecordActionProcessor {
 
-    public RemoveFromLearningPlan(Course course, User user) {
-        super(course, user, CourseRecordAction.REMOVE_FROM_LEARNING_PLAN);
+    public RemoveFromLearningPlan(UtilService utilService, Course course, User user) {
+        super(utilService, course, user, CourseRecordAction.REMOVE_FROM_LEARNING_PLAN);
     }
 
     @Override

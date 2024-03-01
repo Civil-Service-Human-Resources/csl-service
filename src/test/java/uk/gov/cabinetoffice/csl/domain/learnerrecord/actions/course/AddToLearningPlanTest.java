@@ -11,7 +11,7 @@ public class AddToLearningPlanTest extends BaseCourseRecordActionTest<AddToLearn
 
     @Override
     protected AddToLearningPlan buildProcessor() {
-        return new AddToLearningPlan(course, user);
+        return new AddToLearningPlan(utilService, course, user);
     }
 
     @Test

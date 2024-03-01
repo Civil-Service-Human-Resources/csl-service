@@ -6,11 +6,12 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.Result;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
+import uk.gov.cabinetoffice.csl.util.UtilService;
 
 public class FailModule extends ModuleRecordActionProcessor {
 
-    public FailModule(CourseWithModule courseWithModule, User user) {
-        super(courseWithModule, user, ModuleRecordAction.FAIL_MODULE);
+    public FailModule(UtilService utilService, CourseWithModule courseWithModule, User user) {
+        super(utilService, courseWithModule, user, ModuleRecordAction.FAIL_MODULE);
     }
 
     @Override

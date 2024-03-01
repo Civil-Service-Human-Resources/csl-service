@@ -12,7 +12,7 @@ public class FailModuleTest extends BaseModuleRecordActionTest<FailModule> {
 
     @Override
     protected FailModule buildProcessor() {
-        return new FailModule(courseWithModule, user);
+        return new FailModule(utilService, courseWithModule, user);
     }
 
     @Test

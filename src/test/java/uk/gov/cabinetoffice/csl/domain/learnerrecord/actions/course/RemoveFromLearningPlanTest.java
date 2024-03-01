@@ -10,7 +10,7 @@ public class RemoveFromLearningPlanTest extends BaseCourseRecordActionTest<Remov
 
     @Override
     protected RemoveFromLearningPlan buildProcessor() {
-        return new RemoveFromLearningPlan(course, user);
+        return new RemoveFromLearningPlan(utilService, course, user);
     }
 
     @Test

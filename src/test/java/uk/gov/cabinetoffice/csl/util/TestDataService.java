@@ -116,6 +116,21 @@ public class TestDataService {
                 grade.getId().intValue(), departmentCodes);
     }
 
+    public uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course generateCourse(int moduleCount) {
+        uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course course =
+                new uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course();
+        course.setId(courseId);
+        course.setTitle(courseTitle);
+        List<Module> modules = new ArrayList<>();
+        for (int i = 0; i <= moduleCount; i++) {
+            Module m = generateModule();
+            m.setId(moduleId + i);
+            modules.add(m);
+        }
+        course.setModules(modules);
+        return course;
+    }
+
     public uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course generateCourse(boolean withModule, boolean withEvent) {
         uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course course =
                 new uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course();

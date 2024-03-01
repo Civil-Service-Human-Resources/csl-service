@@ -4,12 +4,14 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.io.Serial;
+import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Data
 public final class CourseCompletionMessage implements IMessageMetadata {
     @Serial
     private static final long serialVersionUID = 0L;
+    private final LocalDateTime completionDate;
     private final String userId;
     private final String userEmail;
     private final String courseId;

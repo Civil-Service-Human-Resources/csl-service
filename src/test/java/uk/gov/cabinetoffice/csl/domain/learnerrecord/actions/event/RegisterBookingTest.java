@@ -16,7 +16,7 @@ public class RegisterBookingTest extends BaseEventModuleRecordActionTest<Registe
 
     @Override
     protected RegisterEvent buildProcessor() {
-        return new RegisterEvent(courseWithModuleWithEvent, user);
+        return new RegisterEvent(utilService, courseWithModuleWithEvent, user);
     }
 
     @Test

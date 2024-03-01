@@ -6,11 +6,12 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
+import uk.gov.cabinetoffice.csl.util.UtilService;
 
 public class SkipBooking extends EventModuleRecordActionProcessor {
 
-    public SkipBooking(CourseWithModuleWithEvent courseWithModuleWithEvent, User user) {
-        super(courseWithModuleWithEvent, user, EventModuleRecordAction.SKIP_BOOKING);
+    public SkipBooking(UtilService utilService, CourseWithModuleWithEvent courseWithModuleWithEvent, User user) {
+        super(utilService, courseWithModuleWithEvent, user, EventModuleRecordAction.SKIP_BOOKING);
     }
 
     @Override

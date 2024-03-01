@@ -12,7 +12,7 @@ public class CompleteModuleTest extends BaseModuleRecordActionTest<CompleteModul
 
     @Override
     protected CompleteModule buildProcessor() {
-        return new CompleteModule(courseWithModule, user);
+        return new CompleteModule(utilService, courseWithModule, user);
     }
 
     @Test

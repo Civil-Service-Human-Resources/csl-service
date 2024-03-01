@@ -16,7 +16,7 @@ public class CancelBookingTest extends BaseEventModuleRecordActionTest<CancelBoo
 
     @Override
     protected CancelBooking buildProcessor() {
-        return new CancelBooking(courseWithModuleWithEvent, user);
+        return new CancelBooking(utilService, courseWithModuleWithEvent, user);
     }
 
     @Test

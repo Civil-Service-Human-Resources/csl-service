@@ -4,11 +4,12 @@ import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.Preference;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.util.UtilService;
 
 public class AddToLearningPlan extends CourseRecordActionProcessor {
 
-    public AddToLearningPlan(Course course, User user) {
-        super(course, user, CourseRecordAction.ADD_TO_LEARNING_PLAN);
+    public AddToLearningPlan(UtilService utilService, Course course, User user) {
+        super(utilService, course, user, CourseRecordAction.ADD_TO_LEARNING_PLAN);
     }
 
     @Override

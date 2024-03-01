@@ -8,7 +8,9 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecord
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.service.messaging.model.CourseCompletionMessage;
+import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,8 +22,9 @@ public abstract class ModuleRecordActionProcessor extends CourseRecordActionProc
     protected final Module module;
     protected final ICourseRecordActionType actionType;
 
-    protected ModuleRecordActionProcessor(CourseWithModule courseWithModule, User user, ICourseRecordActionType actionType) {
-        super(courseWithModule.getCourse(), user, actionType);
+    protected ModuleRecordActionProcessor(UtilService utilService, CourseWithModule courseWithModule, User user,
+                                          ICourseRecordActionType actionType) {
+        super(utilService, courseWithModule.getCourse(), user, actionType);
         this.module = courseWithModule.getModule();
         this.actionType = actionType;
     }
@@ -47,8 +50,8 @@ public abstract class ModuleRecordActionProcessor extends CourseRecordActionProc
         return (remainingModules.size() == 1 && Objects.equals(remainingModules.get(0).getId(), getModuleId()));
     }
 
-    protected CourseCompletionMessage generateCompletionMessage() {
-        return new CourseCompletionMessage(user.getId(), user.getEmail(), course.getId(), course.getTitle(),
+    protected CourseCompletionMessage generateCompletionMessage(LocalDateTime completionDate) {
+        return new CourseCompletionMessage(completionDate, user.getId(), user.getEmail(), course.getId(), course.getTitle(),
                 user.getOrganisationId(), user.getProfessionId(), user.getGradeId());
     }
 

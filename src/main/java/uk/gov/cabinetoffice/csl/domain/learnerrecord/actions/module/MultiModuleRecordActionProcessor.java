@@ -5,13 +5,15 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ICourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.MultiCourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
+import uk.gov.cabinetoffice.csl.util.UtilService;
 
 public class MultiModuleRecordActionProcessor extends ModuleRecordActionProcessor {
 
     private final MultiCourseRecordAction actionTypes;
 
-    public MultiModuleRecordActionProcessor(CourseWithModule courseWithModule, User user, MultiCourseRecordAction actionTypes) {
-        super(courseWithModule, user, actionTypes);
+    public MultiModuleRecordActionProcessor(UtilService utilService, CourseWithModule courseWithModule,
+                                            User user, MultiCourseRecordAction actionTypes) {
+        super(utilService, courseWithModule, user, actionTypes);
         this.actionTypes = actionTypes;
     }
 

@@ -15,7 +15,7 @@ public class SkipBookingTest extends BaseEventModuleRecordActionTest<SkipBooking
 
     @Override
     protected SkipBooking buildProcessor() {
-        return new SkipBooking(courseWithModuleWithEvent, user);
+        return new SkipBooking(utilService, courseWithModuleWithEvent, user);
     }
 
     @Test

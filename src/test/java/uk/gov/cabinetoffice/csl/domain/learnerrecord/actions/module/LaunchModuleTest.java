@@ -11,7 +11,7 @@ public class LaunchModuleTest extends BaseModuleRecordActionTest<LaunchModule> {
 
     @Override
     protected LaunchModule buildProcessor() {
-        return new LaunchModule(courseWithModule, user);
+        return new LaunchModule(utilService, courseWithModule, user);
     }
 
     @Test

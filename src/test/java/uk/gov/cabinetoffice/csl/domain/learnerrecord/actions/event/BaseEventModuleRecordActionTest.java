@@ -6,9 +6,13 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEve
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
+import uk.gov.cabinetoffice.csl.util.UtilService;
+
+import static org.mockito.Mockito.mock;
 
 public abstract class BaseEventModuleRecordActionTest<T extends EventModuleRecordActionProcessor> extends TestDataService {
 
+    protected UtilService utilService = mock(UtilService.class);
     protected Course course = generateCourse(true, true);
     protected User user = generateUser();
     protected Module module = course.getModule(getModuleId());
