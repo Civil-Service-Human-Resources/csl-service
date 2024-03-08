@@ -1,7 +1,9 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.util.StringUtilService;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -11,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class LaunchModuleUpdate implements IModuleRecordUpdate {
 
+    private final StringUtilService stringUtilService;
     private final boolean courseIsRequired;
     private final Clock clock;
 
@@ -31,12 +34,19 @@ public class LaunchModuleUpdate implements IModuleRecordUpdate {
 
     @Override
     public ModuleRecordStatus getCreateModuleRecordStatus() {
-        return ModuleRecordStatus.builder().state(State.IN_PROGRESS.name()).build();
+        String moduleRecordUid = stringUtilService.generateRandomUuid();
+        return ModuleRecordStatus.builder().uid(moduleRecordUid).state(State.IN_PROGRESS.name()).build();
     }
 
     @Override
     public List<PatchOp> getUpdateModuleRecordPatches(ModuleRecord moduleRecord) {
-        return List.of(PatchOp.replacePatch("/updatedAt", LocalDateTime.now(clock).toString()));
+        List<PatchOp> patches = new ArrayList<>();
+        patches.add(PatchOp.replacePatch("/updatedAt", LocalDateTime.now(clock).toString()));
+        if (StringUtils.isBlank(moduleRecord.getUid())) {
+            String moduleRecordUid = stringUtilService.generateRandomUuid();
+            patches.add(PatchOp.replacePatch("uid", moduleRecordUid));
+        }
+        return patches;
     }
 
     @Override
