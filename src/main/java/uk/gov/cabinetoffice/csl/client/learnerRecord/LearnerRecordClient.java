@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +21,10 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     private String courseRecords;
     @Value("${learnerRecord.moduleRecordsForLearnerUrl}")
     private String moduleRecords;
+    @Value("${learnerRecord.eventsUrl}")
+    private String event;
+    @Value("${learnerRecord.bookingsUrl}")
+    private String booking;
 
     private final IHttpClient httpClient;
 
@@ -81,5 +86,31 @@ public class LearnerRecordClient implements ILearnerRecordClient {
                 .patch(url).headers(httpHeaders -> httpHeaders.add("Content-Type", "application/json-patch+json"))
                 .body(patches);
         return httpClient.executeRequest(request, ModuleRecord.class);
+    }
+
+    @Override
+    public BookingDto bookEvent(String eventId, BookingDto booking) {
+        log.debug("Booking event {} with data {}", eventId, booking);
+        String url = String.format("%s/%s/booking/", event, eventId);
+        RequestEntity<BookingDto> request = RequestEntity
+                .post(url).body(booking);
+        return httpClient.executeRequest(request, BookingDto.class);
+    }
+
+    @Override
+    public BookingDto updateBooking(String userId, String eventId, BookingDto bookingDto) {
+        log.debug("Updating booking for event {} with data {}", eventId, bookingDto);
+        String url = String.format("%s/%s/learner/%s", event, eventId, userId);
+        RequestEntity<BookingDto> request = RequestEntity
+                .patch(url).body(bookingDto);
+        return httpClient.executeRequest(request, BookingDto.class);
+    }
+
+    @Override
+    public BookingDto updateBookingWithId(String eventId, String bookingId, BookingDto bookingDto) {
+        log.debug("Updating booking {} with data {}", bookingId, bookingDto);
+        String url = String.format("%s/%s%s/%s", event, eventId, booking, bookingId);
+        RequestEntity<BookingDto> request = RequestEntity.patch(url).body(bookingDto);
+        return httpClient.executeRequest(request, BookingDto.class);
     }
 }

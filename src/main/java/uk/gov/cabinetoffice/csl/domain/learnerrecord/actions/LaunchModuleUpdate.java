@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions;
 
-import org.apache.commons.lang3.StringUtils;
+import io.micrometer.common.util.StringUtils;
+import lombok.AllArgsConstructor;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
 import uk.gov.cabinetoffice.csl.util.StringUtilService;
 
@@ -9,26 +10,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@AllArgsConstructor
 public class LaunchModuleUpdate implements IModuleRecordUpdate {
 
     private final StringUtilService stringUtilService;
     private final boolean courseIsRequired;
     private final Clock clock;
 
-    public LaunchModuleUpdate(StringUtilService stringUtilService, boolean courseIsRequired, Clock clock) {
-
-        this.stringUtilService = stringUtilService;
-        this.courseIsRequired = courseIsRequired;
-        this.clock = clock;
-    }
-
     @Override
     public CourseRecordStatus getCreateCourseRecordStatus() {
-        String moduleRecordUid = stringUtilService.generateRandomUuid();
         return CourseRecordStatus.builder().state(State.IN_PROGRESS.name())
-                .isRequired(courseIsRequired).moduleRecordStatus(
-                        ModuleRecordStatus.builder().uid(moduleRecordUid).state(State.IN_PROGRESS.name()).build()
-                ).build();
+                .isRequired(courseIsRequired).moduleRecordStatus(getCreateModuleRecordStatus()).build();
     }
 
     @Override

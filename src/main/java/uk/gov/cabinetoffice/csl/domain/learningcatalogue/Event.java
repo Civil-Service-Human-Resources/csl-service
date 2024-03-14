@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,4 +19,8 @@ public class Event implements Serializable {
     private String id;
     private List<DateRange> dateRanges = new ArrayList<>();
     private Venue venue;
+
+    public LocalDate getStartTime() {
+        return dateRanges.get(0).date;
+    }
 }

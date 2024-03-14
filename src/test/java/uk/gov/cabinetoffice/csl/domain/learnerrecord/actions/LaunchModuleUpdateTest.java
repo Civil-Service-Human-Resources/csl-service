@@ -34,7 +34,6 @@ public class LaunchModuleUpdateTest {
         CourseRecordStatus status = launchModuleUpdate.getCreateCourseRecordStatus();
         assertEquals("IN_PROGRESS", status.getState());
         assertEquals(true, status.getIsRequired());
-        assertEquals("test", status.getModuleRecordStatus().getUid());
         assertEquals("IN_PROGRESS", status.getModuleRecordStatus().getState());
     }
 

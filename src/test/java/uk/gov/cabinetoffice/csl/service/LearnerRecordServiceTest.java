@@ -82,7 +82,7 @@ public class LearnerRecordServiceTest {
     private ModuleRecordInput getModuleRecordInput() {
         return new ModuleRecordInput(
                 "uid", learnerId, courseId, "mod1", "Module Title",
-                false, 10L, "elearning", BigDecimal.valueOf(10),
+                false, 10L, ModuleType.elearning, BigDecimal.valueOf(10),
                 "IN_PROGRESS", "PASSED", LocalDate.now(), "eventId", LocalDateTime.now()
         );
     }
