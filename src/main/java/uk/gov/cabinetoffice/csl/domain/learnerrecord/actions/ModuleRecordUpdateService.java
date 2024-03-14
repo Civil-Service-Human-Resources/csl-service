@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
+import uk.gov.cabinetoffice.csl.util.StringUtilService;
 
 import java.time.Clock;
 
@@ -13,11 +14,12 @@ import java.time.Clock;
 public class ModuleRecordUpdateService {
 
     private final Clock clock;
+    private final StringUtilService stringUtilService;
 
     public IModuleRecordUpdate getLaunchModuleUpdate(Course course, Module module, boolean isCourseRequired) {
         return switch (module.getModuleType()) {
             case file, link -> new CompleteModuleUpdate(clock, course, module, isCourseRequired);
-            default -> new LaunchModuleUpdate(isCourseRequired, clock);
+            default -> new LaunchModuleUpdate(stringUtilService, isCourseRequired, clock);
         };
     }
 

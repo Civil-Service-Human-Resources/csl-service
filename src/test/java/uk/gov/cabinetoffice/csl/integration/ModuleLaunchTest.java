@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -19,10 +20,13 @@ import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
 import uk.gov.cabinetoffice.csl.domain.rustici.ModuleLaunchLinkInput;
 import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationRequest;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
+import uk.gov.cabinetoffice.csl.util.StringUtilService;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.util.List;
+
+import static org.mockito.Mockito.when;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -36,6 +40,9 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
 
     @Autowired
     private TestDataService testDataService;
+
+    @MockBean
+    private StringUtilService stringUtilService;
 
     @Autowired
     private CSLStubService cslStubService;
@@ -70,11 +77,13 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
     @Test
     public void testGetELearningLaunchLinkNoUid() {
         moduleRecord.setUid(null);
+        when(stringUtilService.generateRandomUuid()).thenReturn("uid");
         cslStubService.getLearningCatalogue().getCourse(courseId, course);
         cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
         moduleRecord.setUid("uid");
         cslStubService.getLearnerRecord().patchModuleRecord(1, List.of(
-                PatchOp.replacePatch("updatedAt", "2023-01-01T10:00")
+                PatchOp.replacePatch("updatedAt", "2023-01-01T10:00"),
+                PatchOp.replacePatch("uid", "uid")
         ), moduleRecord);
         cslStubService.getLearnerRecord().patchCourseRecord(List.of(
                 PatchOp.replacePatch("state", "IN_PROGRESS")
@@ -126,6 +135,7 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
     @Test
     public void testGetFileLaunchLink() {
         moduleRecord.setUid(null);
+        when(stringUtilService.generateRandomUuid()).thenReturn("uid");
         course.getModule(moduleId).setModuleType(ModuleType.file);
         course.getModule(moduleId).setUrl("http://launch.link");
         cslStubService.getLearningCatalogue().getCourse(courseId, course);
@@ -152,6 +162,7 @@ public class ModuleLaunchTest extends CSLServiceWireMockServer {
 
     @Test
     public void testLaunchNewCourse() {
+        when(stringUtilService.generateRandomUuid()).thenReturn("uid");
         course.getModule(moduleId).setModuleType(ModuleType.file);
         course.getModule(moduleId).setUrl("http://launch.link");
         CourseRecordInput courseRecordInput = CourseRecordInput.from(
