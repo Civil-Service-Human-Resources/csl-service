@@ -9,8 +9,6 @@ public class CustomServiceBusExceptionListener implements ExceptionListener {
 
     @Override
     public void onException(JMSException exception) {
-        log.error("Custom JMSerror handler");
-        log.error("Error code:" + exception.getErrorCode());
-        log.error("Msg:" + exception.getMessage());
+        log.error("Custom JMSerror handler: Error code: {}. Msg: {}.", exception.getErrorCode(), exception.getMessage());
     }
 }
