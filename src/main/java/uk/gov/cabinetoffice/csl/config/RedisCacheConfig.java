@@ -17,12 +17,17 @@ public class RedisCacheConfig {
     @Value("${learningCatalogue.cache.ttlSeconds}")
     private int learningCatalogueCacheTTlSeconds;
 
+    @Value("${csrs.cache.ttlSeconds}")
+    private int userCacheTTlSeconds;
+
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
         return (builder) -> builder
                 .withCacheConfiguration("course-record",
                         RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(learnerRecordCacheTTlSeconds)))
                 .withCacheConfiguration("catalogue-course",
-                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(learningCatalogueCacheTTlSeconds)));
+                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(learningCatalogueCacheTTlSeconds)))
+                .withCacheConfiguration("user",
+                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(userCacheTTlSeconds)));
     }
 }

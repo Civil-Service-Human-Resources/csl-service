@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -10,13 +11,10 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class LearningCatalogueService {
 
     private final ILearningCatalogueClient client;
-
-    public LearningCatalogueService(ILearningCatalogueClient client) {
-        this.client = client;
-    }
 
     public CourseWithModule getCourseWithModule(String courseId, String moduleId) {
         Course course = getCourse(courseId);
@@ -44,10 +42,16 @@ public class LearningCatalogueService {
 
 
     public Course getCourse(String courseId) {
-        Course course = client.getCourse(courseId);
-        log.info("Course is retrieved from the Learning-catalogue for the course id: {}", courseId);
-        log.debug(course.toString());
-        return course;
+        try {
+            Course course = client.getCourse(courseId);
+            if (course == null) {
+                throw new LearningCatalogueResourceNotFoundException(String.format("Course '%s'", courseId));
+            }
+            return course;
+        } catch (Exception e) {
+            removeCourseFromCache(courseId);
+            throw e;
+        }
     }
 
     @CacheEvict(value = "catalogue-course", key = "#courseId")

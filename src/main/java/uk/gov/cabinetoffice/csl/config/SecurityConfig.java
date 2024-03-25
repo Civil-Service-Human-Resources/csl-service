@@ -1,8 +1,10 @@
 package uk.gov.cabinetoffice.csl.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +18,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
+@Slf4j
 public class SecurityConfig {
 
     @Value("${oauth.jwtKey}")
@@ -31,16 +34,35 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity.cors().and().csrf().disable()
+    @Order(1)
+    public SecurityFilterChain permittedChain(HttpSecurity httpSecurity) throws Exception {
+        log.info("Building base filter chain");
+        httpSecurity.securityMatcher("/error", actuatorBasePath + "/**").cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().authorizeHttpRequests().requestMatchers(actuatorBasePath + "/**").permitAll()
-                .and().authorizeHttpRequests().requestMatchers("/rustici/**", "/reset-cache/**").authenticated()
-                .and().httpBasic()
-                .and().authorizeHttpRequests().requestMatchers("/courses/**").authenticated()
-                .and().authorizeHttpRequests().requestMatchers("/admin/**").authenticated()
-                .and().oauth2ResourceServer().jwt(jwtSpec -> jwtSpec.decoder(jwtDecoder()))
-                .and().build();
+                .and().authorizeHttpRequests(requests -> requests.anyRequest().permitAll());
+        return httpSecurity.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain basicAuthChain(HttpSecurity httpSecurity) throws Exception {
+        log.info("Building basic auth filter chain");
+        httpSecurity.securityMatcher("/rustici/**", "/swagger-ui/**", "/v3/api-docs/**").cors().and().csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().authorizeHttpRequests(requests -> requests.anyRequest().authenticated())
+                .httpBasic();
+        return httpSecurity.build();
+    }
+
+    @Bean
+    @Order(3)
+    public SecurityFilterChain oauthChain(HttpSecurity httpSecurity) throws Exception {
+        log.info("Building oauth filter chain");
+        httpSecurity.securityMatcher("/courses/**", "/admin/**", "/reset-cache/**").cors().and().csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().authorizeHttpRequests(requests -> requests.anyRequest().authenticated())
+                .oauth2ResourceServer().jwt(jwtSpec -> jwtSpec.decoder(jwtDecoder()));
+        return httpSecurity.build();
     }
 
     @Bean

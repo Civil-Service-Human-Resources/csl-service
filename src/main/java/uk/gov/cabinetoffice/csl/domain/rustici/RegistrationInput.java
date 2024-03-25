@@ -16,9 +16,9 @@ public class RegistrationInput {
     private String learnerLastName;
 
     public static RegistrationInput from(String learnerId, String moduleId, String moduleRecordUid, String courseId,
-                                         ModuleLaunchLinkInput moduleLaunchLinkInput) {
-        String learnerFirstName = moduleLaunchLinkInput.getLearnerFirstName();
-        String learnerLastName = moduleLaunchLinkInput.getLearnerLastName();
+                                         UserDetailsDto userDetailsDto) {
+        String learnerFirstName = userDetailsDto.getLearnerName();
+        String learnerLastName = userDetailsDto.getLearnerLastName();
         return new RegistrationInput(
                 moduleRecordUid,
                 courseId,

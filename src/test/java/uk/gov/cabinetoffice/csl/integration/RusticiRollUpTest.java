@@ -11,9 +11,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
+import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.PatchOp;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
@@ -24,7 +25,7 @@ import java.util.List;
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-@ActiveProfiles({"wiremock", "no-redis"})
+@ActiveProfiles({"wiremock", "no-redis", "jms"})
 @Import(TestConfig.class)
 public class RusticiRollUpTest extends CSLServiceWireMockServer {
 
@@ -51,17 +52,70 @@ public class RusticiRollUpTest extends CSLServiceWireMockServer {
 
     @Test
     public void testRollUpCompletedModuleRecord() {
-        cslStubService.getLearnerRecord().getCourseRecord(testDataService.getCourseId(),
-                testDataService.getUserId(), courseRecords);
-        cslStubService.getLearnerRecord().patchModuleRecord(1, List.of(
-                PatchOp.replacePatch("state", "COMPLETED"),
-                PatchOp.replacePatch("completionDate", "2023-02-02T10:00")
-        ), courseRecord.getModuleRecords().stream().findFirst().get());
+        Course course = testDataService.generateCourse(true, false);
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
+        String expectedCourseRecordPUT = """
+                {
+                    "courseId" : "courseId",
+                    "userId" : "userId",
+                    "courseTitle" : "Test Course",
+                    "state" : "COMPLETED",
+                    "modules": [
+                        {
+                            "id" : 1,
+                            "moduleId" : "moduleId",
+                            "moduleTitle" : "Test Module",
+                            "state": "COMPLETED",
+                            "completionDate": "2023-01-01T10:00:00"
+                        }
+                    ]
+                }
+                """;
+        cslStubService.stubUpdateCourseRecord(testDataService.getCourseId(), course, testDataService.getUserId(),
+                courseRecords, expectedCourseRecordPUT, courseRecord);
 
         webTestClient
                 .post()
                 .uri("/rustici/rollup")
                 .body(Mono.just(rollupData), RusticiRollupData.class)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+    }
+
+    @Test
+    public void testRollUpFailedModuleRecord() {
+        Course course = testDataService.generateCourse(true, false);
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
+        RusticiRollupData failedRollUpData = testDataService.generateRusticiRollupData();
+        failedRollUpData.setRegistrationSuccess("FAILED");
+        failedRollUpData.setCompletedDate(null);
+        String expectedCourseRecordPUT = """
+                {
+                    "courseId" : "courseId",
+                    "userId" : "userId",
+                    "courseTitle" : "Test Course",
+                    "state" : "NULL",
+                    "modules": [
+                        {
+                            "id" : 1,
+                            "moduleId" : "moduleId",
+                            "moduleTitle" : "Test Module",
+                            "state": "NULL",
+                            "result": "FAILED"
+                        }
+                    ]
+                }
+                """;
+        cslStubService.stubUpdateCourseRecord(testDataService.getCourseId(), course, testDataService.getUserId(),
+                courseRecords, expectedCourseRecordPUT, courseRecord);
+
+        webTestClient
+                .post()
+                .uri("/rustici/rollup")
+                .body(Mono.just(failedRollUpData), RusticiRollupData.class)
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();

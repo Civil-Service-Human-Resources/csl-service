@@ -8,6 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
+import uk.gov.cabinetoffice.csl.domain.rustici.UserDetailsDto;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 
 import java.math.BigDecimal;
@@ -44,15 +45,16 @@ public class BookingDtoFactoryTest {
         CourseWithModuleWithEvent courseWithModuleWithEvent = new CourseWithModuleWithEvent(
                 new CourseWithModule(course, module), event
         );
+        UserDetailsDto userDetailsDto = testDataService.generateUserDetailsDto();
         BookEventDto bookEventDto = new BookEventDto();
-        bookEventDto.setLearnerEmail("learner@domain.com");
+        bookEventDto.setUserDetailsDto(userDetailsDto);
         BookingDto dto = bookingDtoFactory.createBooking("learnerUID", courseWithModuleWithEvent, bookEventDto);
 
         assertEquals(dto.getEvent(), URI.create("catalogue_url/courses/courseId/modules/moduleId/events/eventId"));
-        assertEquals(dto.getLearner(), "learnerUID");
-        assertEquals(dto.getLearnerEmail(), "learner@domain.com");
-        assertEquals(dto.getAccessibilityOptions(), "");
-        assertEquals(dto.getStatus(), BookingStatus.CONFIRMED);
+        assertEquals("learnerUID", dto.getLearner());
+        assertEquals("userEmail@email.com", dto.getLearnerEmail());
+        assertEquals("", dto.getAccessibilityOptions());
+        assertEquals(BookingStatus.CONFIRMED, dto.getStatus());
     }
 
     @Test
@@ -64,9 +66,11 @@ public class BookingDtoFactoryTest {
         CourseWithModuleWithEvent courseWithModuleWithEvent = new CourseWithModuleWithEvent(
                 new CourseWithModule(course, module), event
         );
+        UserDetailsDto userDetailsDto = testDataService.generateUserDetailsDto();
         BookEventDto bookEventDto = new BookEventDto();
+        bookEventDto.setUserDetailsDto(userDetailsDto);
         bookEventDto.setAccessibilityOptions(List.of("accessibilityOption1", "accessibilityOption2"));
-        bookEventDto.setLearnerEmail("learner@domain.com");
+        bookEventDto.getUserDetailsDto().setLearnerEmail("learner@domain.com");
         BookingDto dto = bookingDtoFactory.createBooking("learnerUID", courseWithModuleWithEvent, bookEventDto);
 
         assertEquals(dto.getEvent(), URI.create("catalogue_url/courses/courseId/modules/moduleId/events/eventId"));

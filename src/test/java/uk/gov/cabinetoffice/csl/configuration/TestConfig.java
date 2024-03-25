@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Configuration
-@Import({MockClockConfig.class})
+@Import({MockClockConfig.class, MockJmsConfig.class})
 public class TestConfig {
 
     @Bean
@@ -33,9 +33,7 @@ public class TestConfig {
         return fakeTokenService;
     }
 
-    @Bean(name = "stubLearnerRecordHttpClient")
-    @Primary
-    public IHttpClient learnerRecordClient(@Value("${learnerRecord.serviceUrl}") String baseUri) {
+    private IHttpClient buildOAuthClient(String baseUri) {
         RestTemplateOAuthInterceptor interceptor = new RestTemplateOAuthInterceptor(getBearerTokenService());
         return new HttpClient(
                 new RestTemplateBuilder()
@@ -44,15 +42,26 @@ public class TestConfig {
                         .build());
     }
 
+    @Bean(name = "stubIdentityAPIHttpClient")
+    public IHttpClient identityAPIClient(@Value("${oauth.serviceUrl}") String baseUri) {
+        return buildOAuthClient(baseUri);
+    }
+
+    @Bean(name = "stubcsrsHttpClient")
+    public IHttpClient csrsClient(@Value("${csrs.serviceUrl}") String baseUri) {
+        return buildOAuthClient(baseUri);
+    }
+
+    @Bean(name = "stubLearnerRecordHttpClient")
+    @Primary
+    public IHttpClient learnerRecordClient(@Value("${learnerRecord.serviceUrl}") String baseUri) {
+        return buildOAuthClient(baseUri);
+    }
+
     @Bean(name = "stubLearningCatalogueHttpClient")
     @Primary
     public IHttpClient learningCatalogueClient(@Value("${learningCatalogue.serviceUrl}") String baseUri) {
-        RestTemplateOAuthInterceptor interceptor = new RestTemplateOAuthInterceptor(getBearerTokenService());
-        return new HttpClient(
-                new RestTemplateBuilder()
-                        .rootUri(baseUri)
-                        .additionalInterceptors(interceptor)
-                        .build());
+        return buildOAuthClient(baseUri);
     }
 
     @Bean(name = "stubRusticiHttpClient")

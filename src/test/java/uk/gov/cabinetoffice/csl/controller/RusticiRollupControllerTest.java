@@ -13,10 +13,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import uk.gov.cabinetoffice.csl.controller.model.ErrorDtoFactory;
 import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.Learner;
 import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
-import uk.gov.cabinetoffice.csl.service.ModuleRollupService;
+import uk.gov.cabinetoffice.csl.service.ModuleService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.never;
@@ -30,7 +31,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RusticiRollupControllerTest {
 
     @MockBean
-    private ModuleRollupService moduleRollupService;
+    private ModuleService moduleService;
+
+    @MockBean
+    private ErrorDtoFactory errorDtoFactory;
 
     @Autowired
     private MockMvc mockMvc;
@@ -49,7 +53,7 @@ public class RusticiRollupControllerTest {
         String responseAsString = result.getResponse().getContentAsString();
         log.debug("responseAsString: {}", responseAsString);
         assertEquals("", responseAsString);
-        verify(moduleRollupService, never()).processRusticiRollupData(rusticiRollupData);
+        verify(moduleService, never()).processRusticiRollupData(rusticiRollupData);
     }
 
     @Test
@@ -70,7 +74,7 @@ public class RusticiRollupControllerTest {
         String responseAsString = result.getResponse().getContentAsString();
         log.debug("responseAsString: {}", responseAsString);
         assertEquals("", responseAsString);
-        verify(moduleRollupService, never()).processRusticiRollupData(rusticiRollupData);
+        verify(moduleService, never()).processRusticiRollupData(rusticiRollupData);
     }
 
 }
