@@ -17,14 +17,9 @@ public class JmsConfig {
 
 
     @Bean
-    @ConditionalOnProperty(value = "spring.jms.servicebus.enabled", havingValue = "ACTIVEMQ")
+    @ConditionalOnProperty(value = "spring.jms.servicebus.enabled", havingValue = "false")
     public ConnectionFactory getActiveMQConnectionFactory(ActiveMQJmsConfigProperties properties) {
-        return properties.buildConnectionFactory();
-    }
-
-    @Bean
-    @ConditionalOnProperty(value = "messaging.config.preferred-connection", havingValue = "SERVICEBUS")
-    public ConnectionFactory getServiceBusConnectionFactory(ServiceBusJmsConfigProperties properties) {
+        log.info("Service bus is disabled; defaulting to activeMQ/Artemis");
         return properties.buildConnectionFactory();
     }
 
