@@ -10,11 +10,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ActiveMQJmsConfigProperties implements JmsConnection {
 
     private final String url;
+    private final String username;
+    private final String password;
 
     @Override
     public ConnectionFactory buildConnectionFactory() {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
         connectionFactory.setBrokerURL(url);
+        connectionFactory.setUserName(username);
+        connectionFactory.setPassword(password);
         return connectionFactory;
     }
 
