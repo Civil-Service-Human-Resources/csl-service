@@ -16,6 +16,7 @@ public class CSLStubService {
     private final LearnerRecordStubService learnerRecord;
     private final LearningCatalogueStubService learningCatalogue;
     private final RusticiStubService rustici;
+    private final ReportServiceStubService reportServiceStubService;
     private final CSRSStubService csrsStubService;
 
     public void stubGetUserDetails(String uid, CivilServant civilServant) {

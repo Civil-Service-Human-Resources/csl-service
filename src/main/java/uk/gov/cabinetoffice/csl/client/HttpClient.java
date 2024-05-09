@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.client;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
@@ -13,11 +14,10 @@ public class HttpClient implements IHttpClient {
 
     private final RestTemplate restTemplate;
 
-    @Override
-    public <T, R> T executeRequest(RequestEntity<R> request, Class<T> responseClass) {
+    private <T, R> T executeRawRequest(RequestEntity<R> request, ParameterizedTypeReference<T> parameterizedTypeReference) {
         try {
             log.debug("Sending request: {}", request);
-            ResponseEntity<T> response = restTemplate.exchange(request, responseClass);
+            ResponseEntity<T> response = restTemplate.exchange(request, parameterizedTypeReference);
             log.debug("Request response: {}", response);
             return response.getBody();
         } catch (RestClientResponseException e) {
@@ -29,5 +29,16 @@ public class HttpClient implements IHttpClient {
             log.error(msg);
             throw e;
         }
+    }
+
+    @Override
+    public <T, R> T executeRequest(RequestEntity<R> request, Class<T> responseClass) {
+        return executeRawRequest(request, new ParameterizedTypeReference<>() {
+        });
+    }
+
+    @Override
+    public <T, R> T executeTypeReferenceRequest(RequestEntity<R> request, ParameterizedTypeReference<T> parameterizedTypeReference) {
+        return executeRawRequest(request, parameterizedTypeReference);
     }
 }
