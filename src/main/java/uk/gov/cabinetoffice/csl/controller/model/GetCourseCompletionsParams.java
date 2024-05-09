@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationBinDelimiter;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class GetCourseCompletionsParams {
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -36,9 +38,6 @@ public class GetCourseCompletionsParams {
     private List<String> gradeIds;
 
     private AggregationBinDelimiter binDelimiter = AggregationBinDelimiter.DAY;
-
-    public GetCourseCompletionsParams() {
-    }
 
     @JsonIgnore
     public String getProfessionIdsAsString() {
