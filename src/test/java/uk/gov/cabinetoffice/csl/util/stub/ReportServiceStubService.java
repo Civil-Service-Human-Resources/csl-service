@@ -4,6 +4,8 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
 
+import java.time.format.DateTimeFormatter;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @Service
@@ -17,6 +19,8 @@ public class ReportServiceStubService {
                         .withQueryParam("professionIds", equalTo(expectedParams.getProfessionIdsAsString()))
                         .withQueryParam("gradeIds", equalTo(expectedParams.getGradeIdsAsString()))
                         .withQueryParam("binDelimiter", equalTo(expectedParams.getBinDelimiter().name()))
+                        .withQueryParam("startDate", equalTo(expectedParams.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE)))
+                        .withQueryParam("endDate", equalTo(expectedParams.getEndDate().format(DateTimeFormatter.ISO_LOCAL_DATE)))
                         .withHeader("Authorization", equalTo("Bearer fakeToken"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")

@@ -88,7 +88,7 @@ public class ReportTest extends CSLServiceWireMockServer {
         );
         webTestClient
                 .get()
-                .uri("/admin/reporting/course-completions?startDate=2024-01-01&endDate=2024-01-01&courseIds=course1&organisationIds=1,2&binDelimiter=HOUR")
+                .uri("/admin/reporting/course-completions?startDate=2024-01-01&endDate=2024-01-02&courseIds=course1&organisationIds=1,2&binDelimiter=HOUR")
                 .header("Authorization", "Bearer fakeToken")
                 .exchange()
                 .expectStatus()

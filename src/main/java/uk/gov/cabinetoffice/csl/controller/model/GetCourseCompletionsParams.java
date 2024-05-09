@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.controller.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -38,18 +39,22 @@ public class GetCourseCompletionsParams {
 
     private AggregationBinDelimiter binDelimiter = AggregationBinDelimiter.DAY;
 
+    @JsonIgnore
     public String getProfessionIdsAsString() {
         return Optional.ofNullable(professionIds).map(p -> String.join(",", p)).orElse("");
     }
 
+    @JsonIgnore
     public String getGradeIdsAsString() {
         return Optional.ofNullable(gradeIds).map(g -> String.join(",", g)).orElse("");
     }
 
+    @JsonIgnore
     public String getCourseIdsAsString() {
         return String.join(",", courseIds);
     }
 
+    @JsonIgnore
     public String getOrganisationIdsAsString() {
         return String.join(",", organisationIds);
     }
