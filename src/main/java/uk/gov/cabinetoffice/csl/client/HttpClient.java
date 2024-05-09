@@ -14,10 +14,11 @@ public class HttpClient implements IHttpClient {
 
     private final RestTemplate restTemplate;
 
-    private <T, R> T executeRawRequest(RequestEntity<R> request, ParameterizedTypeReference<T> parameterizedTypeReference) {
+    @Override
+    public <T, R> T executeRequest(RequestEntity<R> request, Class<T> responseClass) {
         try {
             log.debug("Sending request: {}", request);
-            ResponseEntity<T> response = restTemplate.exchange(request, parameterizedTypeReference);
+            ResponseEntity<T> response = restTemplate.exchange(request, responseClass);
             log.debug("Request response: {}", response);
             return response.getBody();
         } catch (RestClientResponseException e) {
@@ -32,13 +33,20 @@ public class HttpClient implements IHttpClient {
     }
 
     @Override
-    public <T, R> T executeRequest(RequestEntity<R> request, Class<T> responseClass) {
-        return executeRawRequest(request, new ParameterizedTypeReference<>() {
-        });
-    }
-
-    @Override
     public <T, R> T executeTypeReferenceRequest(RequestEntity<R> request, ParameterizedTypeReference<T> parameterizedTypeReference) {
-        return executeRawRequest(request, parameterizedTypeReference);
+        try {
+            log.debug("Sending request: {}", request);
+            ResponseEntity<T> response = restTemplate.exchange(request, parameterizedTypeReference);
+            log.debug("Request response: {}", response);
+            return response.getBody();
+        } catch (RestClientResponseException e) {
+            String msg = String.format("Error sending '%s' request to endpoint", request.getMethod());
+            if (request.getBody() != null) {
+                msg = String.format("%s Body was: %s.", msg, request.getBody().toString());
+            }
+            msg = String.format("%s Error was: %s", msg, e.getMessage());
+            log.error(msg);
+            throw e;
+        }
     }
 }
