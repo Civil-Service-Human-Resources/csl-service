@@ -2,7 +2,7 @@ package uk.gov.cabinetoffice.csl.util.stub;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.domain.reportservice.GetCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 

@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
+import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationBinDelimiter;
-import uk.gov.cabinetoffice.csl.domain.reportservice.GetCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 

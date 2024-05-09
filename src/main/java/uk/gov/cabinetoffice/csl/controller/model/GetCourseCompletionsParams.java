@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain.reportservice;
+package uk.gov.cabinetoffice.csl.controller.model;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationBinDelimiter;
 
 import java.time.LocalDate;
 import java.util.List;
