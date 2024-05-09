@@ -6,16 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
-import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
-import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationBinDelimiter;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -79,16 +76,23 @@ public class ReportTest extends CSLServiceWireMockServer {
                   ]
                 }
                 """;
-        GetCourseCompletionsParams expParams = new GetCourseCompletionsParams(
-                LocalDate.of(2024, 1, 1),
-                LocalDate.of(2024, 1, 2), List.of("course1"),
-                List.of("1", "2"), List.of(""), List.of(""), AggregationBinDelimiter.HOUR);
+        String expectedInput = """
+                {
+                    "startDate":"2024-05-08",
+                    "endDate":"2024-05-09",
+                    "courseIds":["course1"],
+                    "organisationIds":["1","2"],
+                    "binDelimiter":"HOUR"
+                }
+                """;
         cslStubService.getReportServiceStubService().getCourseCompletionAggregations(
-                expParams, response
+                expectedInput, response
         );
         webTestClient
-                .get()
-                .uri("/admin/reporting/course-completions?startDate=2024-01-01&endDate=2024-01-02&courseIds=course1&organisationIds=1,2&binDelimiter=HOUR")
+                .post()
+                .uri("/admin/reporting/course-completions/generate-graph")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(expectedInput))
                 .header("Authorization", "Bearer fakeToken")
                 .exchange()
                 .expectStatus()
