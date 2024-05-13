@@ -1,6 +1,5 @@
 package uk.gov.cabinetoffice.csl.controller.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -9,21 +8,20 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationBinDelimiter;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetCourseCompletionsParams {
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate startDate;
+    @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ssZ")
+    private ZonedDateTime startDate;
 
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate endDate;
+    @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ssZ")
+    private ZonedDateTime endDate;
 
     @Size(min = 1, max = 10)
     @NotNull
@@ -38,25 +36,5 @@ public class GetCourseCompletionsParams {
     private List<String> gradeIds;
 
     private AggregationBinDelimiter binDelimiter = AggregationBinDelimiter.DAY;
-
-    @JsonIgnore
-    public String getProfessionIdsAsString() {
-        return Optional.ofNullable(professionIds).map(p -> String.join(",", p)).orElse("");
-    }
-
-    @JsonIgnore
-    public String getGradeIdsAsString() {
-        return Optional.ofNullable(gradeIds).map(g -> String.join(",", g)).orElse("");
-    }
-
-    @JsonIgnore
-    public String getCourseIdsAsString() {
-        return String.join(",", courseIds);
-    }
-
-    @JsonIgnore
-    public String getOrganisationIdsAsString() {
-        return String.join(",", organisationIds);
-    }
 
 }
