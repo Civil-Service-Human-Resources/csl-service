@@ -23,7 +23,7 @@ public class GetCourseCompletionsParams {
     @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ssZ")
     private ZonedDateTime endDate;
 
-    @Size(min = 1, max = 10)
+    @Size(min = 1, max = 30)
     @NotNull
     private List<String> courseIds;
 
