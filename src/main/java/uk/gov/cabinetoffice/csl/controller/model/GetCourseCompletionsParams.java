@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationBinDelimiter;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -16,12 +16,12 @@ import java.util.List;
 @NoArgsConstructor
 public class GetCourseCompletionsParams {
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ssZ")
-    private ZonedDateTime startDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
 
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ssZ")
-    private ZonedDateTime endDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
 
     @Size(min = 1, max = 30)
     @NotNull

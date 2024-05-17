@@ -78,8 +78,8 @@ public class ReportTest extends CSLServiceWireMockServer {
                 """;
         String expectedInput = """
                 {
-                    "startDate":"2024-05-08T00:00:00Z",
-                    "endDate":"2024-05-09T00:00:00Z",
+                    "startDate":"2024-05-08",
+                    "endDate":"2024-05-09",
                     "courseIds":["course1"],
                     "organisationIds":["1","2"],
                     "binDelimiter":"HOUR"
