@@ -80,7 +80,7 @@ public class ReportTest extends CSLServiceWireMockServer {
                 {
                     "startDate":"2024-05-08",
                     "endDate":"2024-05-09",
-                    "courseIds":["course1"],
+                    "courseIds":["course1", "course2"],
                     "organisationIds":["1","2"],
                     "binDelimiter":"HOUR"
                 }
@@ -106,7 +106,10 @@ public class ReportTest extends CSLServiceWireMockServer {
                 .jsonPath("$.chart[2].x").isEqualTo("2024-01-01T12:00:00Z[UTC]")
                 .jsonPath("$.chart[2].y").isEqualTo("103")
                 .jsonPath("$.chart[3].x").isEqualTo("2024-01-01T13:00:00Z[UTC]")
-                .jsonPath("$.chart[3].y").isEqualTo("21");
+                .jsonPath("$.chart[3].y").isEqualTo("21")
+                .jsonPath("$.total").isEqualTo("218")
+                .jsonPath("$.courseBreakdown.course1").isEqualTo("85")
+                .jsonPath("$.courseBreakdown.course2").isEqualTo("133");
     }
 
 }
