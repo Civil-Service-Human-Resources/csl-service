@@ -64,6 +64,12 @@ public class TestConfig {
         return buildOAuthClient(baseUri);
     }
 
+    @Bean(name = "stubReportServiceHttpClient")
+    @Primary
+    public IHttpClient reportServiceClient(@Value("${reportService.serviceUrl}") String baseUri) {
+        return buildOAuthClient(baseUri);
+    }
+
     @Bean(name = "stubRusticiHttpClient")
     @Primary
     IHttpClient rusticiClient(@Value("${rustici.serviceUrl}") String baseUri) {
