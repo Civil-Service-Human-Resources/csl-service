@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.util.stub;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.springframework.stereotype.Component;
+import uk.gov.cabinetoffice.csl.client.courseCatalogue.model.GetCoursesResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
@@ -23,13 +24,14 @@ public class LearningCatalogueStubService {
     }
 
     public void getCourses(List<String> courseIds, List<Course> response) {
+        GetCoursesResponse coursesResponse = new GetCoursesResponse(response);
         stubFor(
                 WireMock.get(urlPathEqualTo("/learning_catalogue/courses"))
                         .withQueryParam("courseIds", equalTo(String.join(",", courseIds)))
                         .withHeader("Authorization", equalTo("Bearer fakeToken"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
-                                .withBody(utils.toJson(response)))
+                                .withBody(utils.toJson(coursesResponse)))
         );
     }
 
