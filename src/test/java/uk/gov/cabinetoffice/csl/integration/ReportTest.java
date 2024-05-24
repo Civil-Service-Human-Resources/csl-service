@@ -11,8 +11,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
+
+import java.util.List;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -85,6 +88,13 @@ public class ReportTest extends CSLServiceWireMockServer {
                     "binDelimiter":"HOUR"
                 }
                 """;
+        Course course1 = new Course();
+        course1.setId("course1");
+        course1.setTitle("Course 1 title");
+        Course course2 = new Course();
+        course2.setId("course2");
+        course2.setTitle("Course 2 title");
+        cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course2"), List.of(course1, course2));
         cslStubService.getReportServiceStubService().getCourseCompletionAggregations(
                 expectedInput, response
         );
@@ -108,8 +118,8 @@ public class ReportTest extends CSLServiceWireMockServer {
                 .jsonPath("$.chart[3].x").isEqualTo("2024-01-01T13:00:00Z[UTC]")
                 .jsonPath("$.chart[3].y").isEqualTo("21")
                 .jsonPath("$.total").isEqualTo("218")
-                .jsonPath("$.courseBreakdown.course1").isEqualTo("85")
-                .jsonPath("$.courseBreakdown.course2").isEqualTo("133");
+                .jsonPath("$.courseBreakdown[\"Course 1 title\"]").isEqualTo("85")
+                .jsonPath("$.courseBreakdown[\"Course 2 title\"]").isEqualTo("133");
     }
 
 }

@@ -2,9 +2,13 @@ package uk.gov.cabinetoffice.csl.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
 import java.time.Duration;
 
@@ -19,6 +23,12 @@ public class RedisCacheConfig {
 
     @Value("${csrs.cache.ttlSeconds}")
     private int userCacheTTlSeconds;
+
+    @Bean
+    public ObjectCache<Course> courseCatalogueCache(CacheManager cacheManager) {
+        Cache cache = cacheManager.getCache("catalogue-course");
+        return new ObjectCache<>(cache, Course.class);
+    }
 
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
