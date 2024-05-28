@@ -20,6 +20,6 @@ public class ReportService {
 
     public CourseCompletionChart getCourseCompletionsChart(GetCourseCompletionsParams params) {
         AggregationResponse<CourseCompletionAggregation> results = reportServiceClient.getCourseCompletionAggregations(params);
-        return chartFactory.buildCourseCompletionsChart(results);
+        return chartFactory.buildCourseCompletionsChart(params, results);
     }
 }

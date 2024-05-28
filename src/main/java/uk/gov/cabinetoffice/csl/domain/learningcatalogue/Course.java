@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
+import uk.gov.cabinetoffice.csl.util.Cacheable;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Course implements Serializable {
+public class Course implements Serializable, Cacheable {
     private String id;
     private String title;
     private Collection<Module> modules = Collections.emptyList();

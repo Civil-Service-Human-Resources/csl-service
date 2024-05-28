@@ -1,10 +1,23 @@
 package uk.gov.cabinetoffice.csl.domain.reportservice.chart;
 
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import java.util.List;
+import java.util.Map;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
+@AllArgsConstructor
 public class CourseCompletionChart extends BasicChart {
 
-    public CourseCompletionChart(List<PlotPoint> chart) {
+    private Map<String, Integer> courseBreakdown;
+    private Integer total;
+
+    public CourseCompletionChart(List<PlotPoint> chart, Map<String, Integer> courseBreakdown, Integer total) {
         super(chart);
+        this.courseBreakdown = courseBreakdown;
+        this.total = total;
     }
 }

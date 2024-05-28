@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.time.ZonedDateTime;
+
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @Data
@@ -13,4 +15,8 @@ public class CourseCompletionAggregation extends Aggregation {
 
     private String courseId;
 
+    public CourseCompletionAggregation(ZonedDateTime dateBin, Integer total, String courseId) {
+        super(dateBin, total);
+        this.courseId = courseId;
+    }
 }

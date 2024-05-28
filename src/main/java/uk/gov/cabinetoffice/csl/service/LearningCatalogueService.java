@@ -2,19 +2,19 @@ package uk.gov.cabinetoffice.csl.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
+
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LearningCatalogueService {
 
-    private final ILearningCatalogueClient client;
+    private final CourseCacheService cache;
 
     public CourseWithModule getCourseWithModule(String courseId, String moduleId) {
         Course course = getCourse(courseId);
@@ -43,7 +43,7 @@ public class LearningCatalogueService {
 
     public Course getCourse(String courseId) {
         try {
-            Course course = client.getCourse(courseId);
+            Course course = cache.getCourse(courseId);
             if (course == null) {
                 throw new LearningCatalogueResourceNotFoundException(String.format("Course '%s'", courseId));
             }
@@ -54,9 +54,13 @@ public class LearningCatalogueService {
         }
     }
 
-    @CacheEvict(value = "catalogue-course", key = "#courseId")
+    public List<Course> getCourses(List<String> courseIds) {
+        return cache.getCourses(courseIds);
+    }
+
     public void removeCourseFromCache(String courseId) {
         log.info("LearningCatalogueService.removeCourseFromCache: Catalogue course is removed from the cache for the" +
                 " key: {}.", courseId);
+        this.cache.removeCourseFromCache(courseId);
     }
 }
