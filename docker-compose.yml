@@ -1,0 +1,13 @@
+services:
+  activemq:
+    image: apache/activemq-artemis:2.31.1
+    ports:
+      - "8161:8161"
+      - "5672:5672"
+      - "61616:61616"
+    volumes:
+      - /docker/activemq/config:/var/lib/artemis-instance/etc-override
+  redis:
+    image: redis
+    ports:
+      - 6379:6379

@@ -15,7 +15,13 @@ public class CourseWithModuleWithEvent extends CourseWithModule {
         this.event = event;
     }
 
+    public CourseWithModuleWithEvent(Course course, Module module, Event event) {
+        super(course, module);
+        this.event = event;
+    }
+
     public String getEventUrl() {
         return String.format("courses/%s/modules/%s/events/%s", getCourse().getId(), getModule().getId(), getEvent().getId());
     }
+
 }

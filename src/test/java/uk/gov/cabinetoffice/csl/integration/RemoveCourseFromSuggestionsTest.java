@@ -10,14 +10,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordInput;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.Preference;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
-
-import java.util.List;
 
 @Slf4j
 @ActiveProfiles({"wiremock", "no-redis"})
@@ -41,10 +37,16 @@ public class RemoveCourseFromSuggestionsTest extends CSLServiceWireMockServer {
         String courseId = testDataService.getCourseId();
         String userId = testDataService.getUserId();
         Course course = testDataService.generateCourse(true, false);
-        CourseRecordInput expectedInput = new CourseRecordInput(courseId, userId,
-                course.getTitle(), null, null, Preference.DISLIKED.name(),
-                List.of());
-        cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedInput, courseRecord);
+        String expectedCourseRecordPOST = """
+                {
+                    "courseId" : "courseId",
+                    "userId" : "userId",
+                    "courseTitle" : "Test Course",
+                    "preference": "DISLIKED",
+                    "state": null
+                }
+                """;
+        cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);
         webTestClient
                 .post()
                 .uri(String.format("/courses/%s/remove_from_suggestions", courseId))

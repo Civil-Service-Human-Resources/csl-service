@@ -7,6 +7,11 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.event.EventModuleRecordAction;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Event;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 
 import java.time.LocalDate;
 
@@ -24,4 +29,12 @@ public class EventResponse {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate eventTimestamp;
+
+    public static EventResponse fromMetaData(EventModuleRecordAction actionType, CourseWithModuleWithEvent courseWithModuleWithEvent) {
+        Course course = courseWithModuleWithEvent.getCourse();
+        Module module = courseWithModuleWithEvent.getModule();
+        Event event = courseWithModuleWithEvent.getEvent();
+        return new EventResponse(String.format("Successfully applied action '%s' to course record", actionType.getDescription()), course.getTitle(),
+                module.getTitle(), course.getId(), module.getId(), event.getId(), event.getStartTime());
+    }
 }

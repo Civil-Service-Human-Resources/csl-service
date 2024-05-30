@@ -40,8 +40,8 @@ public class BookingDtoFactory {
         BookingDto.BookingDtoBuilder bookingBuilder = BookingDto.builder()
                 .event(URI.create(eventUrl))
                 .learner(learnerUid)
-                .learnerEmail(dto.getLearnerEmail())
-                .learnerName(dto.getLearnerName())
+                .learnerEmail(dto.getUserDetailsDto().getLearnerEmail())
+                .learnerName(dto.getUserDetailsDto().getLearnerName())
                 .bookingTime(Instant.now(clock));
 
         if (!dto.getAccessibilityOptions().isEmpty()) {

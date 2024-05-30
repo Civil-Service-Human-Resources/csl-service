@@ -6,8 +6,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Audience;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseFactory;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
+
+import java.util.Collection;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -17,17 +24,34 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     private String courses;
 
     private final IHttpClient httpClient;
+    private final CourseFactory courseFactory;
 
-    public LearningCatalogueClient(@Qualifier("learningCatalogueHttpClient") IHttpClient httpClient) {
+    public LearningCatalogueClient(@Qualifier("learningCatalogueHttpClient") IHttpClient httpClient, CourseFactory courseFactory) {
         this.httpClient = httpClient;
+        this.courseFactory = courseFactory;
     }
 
     @Override
     @Cacheable(value = "catalogue-course", key = "#courseId", unless = "#result == null")
     public Course getCourse(String courseId) {
-        log.info("Getting course with ID '{}'", courseId);
-        String url = String.format("%s/%s", courses, courseId);
-        RequestEntity<Void> request = RequestEntity.get(url).build();
-        return httpClient.executeRequest(request, Course.class);
+        try {
+            log.info("Getting course with ID '{}' from learning catalogue API", courseId);
+            String url = String.format("%s/%s", courses, courseId);
+            RequestEntity<Void> request = RequestEntity.get(url).build();
+            Course course = httpClient.executeRequest(request, Course.class);
+            return buildCourseData(course);
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().value() == 404) {
+                return null;
+            }
+            throw e;
+        }
+    }
+
+    private Course buildCourseData(Course course) {
+        Collection<Audience> audiences = course.getAudiences();
+        Map<String, LearningPeriod> departmentDeadlineMap = courseFactory.buildDepartmentDeadlineMap(audiences);
+        course.setDepartmentDeadlineMap(departmentDeadlineMap);
+        return course;
     }
 }

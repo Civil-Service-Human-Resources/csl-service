@@ -12,7 +12,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.*;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
@@ -23,7 +26,6 @@ import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.math.BigDecimal;
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -60,7 +62,7 @@ public class BookEventTest extends CSLServiceWireMockServer {
         eventId = testDataService.getEventId();
         courseRecord = testDataService.generateCourseRecord(true);
         courseRecords = new CourseRecords(List.of(courseRecord));
-        moduleRecord = courseRecord.getModuleRecord(moduleId);
+        moduleRecord = courseRecord.getModuleRecord(moduleId).get();
         course = testDataService.generateCourse(true, true);
     }
 
@@ -75,19 +77,32 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 .learner(userId)
                 .learnerEmail(userEmail)
                 .learnerName("testName").build();
-        CourseRecordInput expectedCourseRecordInput = CourseRecordInput.from(
-                userId, course, CourseRecordStatus.builder().state("APPROVED").build(),
-                course.getModule(moduleId), ModuleRecordStatus.builder()
-                        .state("APPROVED").uid(null)
-                        .eventId(eventId).eventDate(LocalDate.of(2023, 1, 1)).build());
+        String expectedCourseRecordPOST = """
+                {
+                    "courseId" : "courseId",
+                    "userId" : "userId",
+                    "courseTitle" : "Test Course",
+                    "state" : "APPROVED",
+                    "modules": [
+                        {
+                            "id" : null,
+                            "moduleId" : "moduleId",
+                            "moduleTitle" : "Test Module",
+                            "state": "APPROVED",
+                            "eventId" : "eventId",
+                            "eventDate" : "2023-01-01"
+                        }
+                    ]
+                }
+                """;
         String expectedBookingJsonInput = String.format("""
                         {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
                         "accessibilityOptions": "%s", "status": "%s"}
-                        """, dto.getEvent(), userId, userEmail, "testName", "2023-01-01T10:00:00Z", "access1,access2",
+                        """, dto.getEvent(), userId, userEmail, testDataService.getLearnerFirstName(), "2023-01-01T10:00:00Z", "access1,access2",
                 "Confirmed");
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
-        cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordInput, courseRecord);
-        BookEventDto inputDto = new BookEventDto(List.of("access1", "access2"), "", "userEmail@email.com", "testName");
+        cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);
+        BookEventDto inputDto = new BookEventDto(List.of("access1", "access2"), "", testDataService.generateUserDetailsDto());
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
         webTestClient
                 .post()
@@ -99,7 +114,7 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.message")
-                .isEqualTo("Module was successfully booked");
+                .isEqualTo("Successfully applied action 'Approve a booking' to course record");
     }
 
     @Test
@@ -113,23 +128,31 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 .learner(userId)
                 .learnerEmail(userEmail)
                 .learnerName("testName").build();
-        List<PatchOp> expectedCourseRecordPatches = List.of();
-        List<PatchOp> expectedModuleRecordPatches = List.of(
-                PatchOp.replacePatch("state", "APPROVED"),
-                PatchOp.removePatch("result"),
-                PatchOp.removePatch("score"),
-                PatchOp.removePatch("completionDate"),
-                PatchOp.replacePatch("eventId", eventId),
-                PatchOp.replacePatch("eventDate", "2023-01-01T00:00:00")
-        );
         String expectedBookingJsonInput = String.format("""
                 {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
                 "status": "%s", "accessibilityOptions" : ""}
-                """, dto.getEvent(), userId, userEmail, "testName", "2023-01-01T10:00:00Z", "Confirmed");
+                """, dto.getEvent(), userId, userEmail, testDataService.getLearnerFirstName(), "2023-01-01T10:00:00Z", "Confirmed");
+        String expectedCourseRecordPUT = """
+                {
+                    "courseId" : "courseId",
+                    "userId" : "userId",
+                    "courseTitle" : "Test Course",
+                    "state" : "IN_PROGRESS",
+                    "modules": [
+                        {
+                            "id" : 1,
+                            "moduleId" : "moduleId",
+                            "moduleTitle" : "Test Module",
+                            "state": "APPROVED",
+                            "eventId" : "eventId",
+                            "eventDate" : "2023-01-01"
+                        }
+                    ]
+                }
+                """;
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
-        cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords,
-                1, expectedModuleRecordPatches, moduleRecord, expectedCourseRecordPatches, courseRecord);
-        BookEventDto inputDto = new BookEventDto(List.of(), "", "userEmail@email.com", "testName");
+        cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, courseRecord);
+        BookEventDto inputDto = new BookEventDto(List.of(), "", testDataService.generateUserDetailsDto());
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
         webTestClient
                 .post()
@@ -141,7 +164,7 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.message")
-                .isEqualTo("Module was successfully booked");
+                .isEqualTo("Successfully applied action 'Approve a booking' to course record");
     }
 
     @Test
@@ -156,19 +179,32 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 .poNumber("poNumber123")
                 .learnerEmail(userEmail)
                 .learnerName("testName").build();
-        CourseRecordInput expectedCourseRecordInput = CourseRecordInput.from(
-                userId, course, CourseRecordStatus.builder().state("REGISTERED").build(),
-                course.getModule(moduleId), ModuleRecordStatus.builder()
-                        .state("REGISTERED").uid(null)
-                        .eventId(eventId).eventDate(LocalDate.of(2023, 1, 1)).build());
         String expectedBookingJsonInput = String.format("""
                         {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
                         "accessibilityOptions": "%s", "status": "%s", "poNumber":"%s"}
-                        """, dto.getEvent(), userId, userEmail, "testName", "2023-01-01T10:00:00Z", "access1",
+                        """, dto.getEvent(), userId, userEmail, testDataService.getLearnerFirstName(), "2023-01-01T10:00:00Z", "access1",
                 "Requested", "poNumber123");
+        String expectedCourseRecordPOST = """
+                {
+                    "courseId" : "courseId",
+                    "userId" : "userId",
+                    "courseTitle" : "Test Course",
+                    "state" : "REGISTERED",
+                    "modules": [
+                        {
+                            "id" : null,
+                            "moduleId" : "moduleId",
+                            "moduleTitle" : "Test Module",
+                            "state": "REGISTERED",
+                            "eventId" : "eventId",
+                            "eventDate" : "2023-01-01"
+                        }
+                    ]
+                }
+                """;
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
-        cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordInput, courseRecord);
-        BookEventDto inputDto = new BookEventDto(List.of("access1"), "poNumber123", "userEmail@email.com", "testName");
+        cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);
+        BookEventDto inputDto = new BookEventDto(List.of("access1"), "poNumber123", testDataService.generateUserDetailsDto());
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
         webTestClient
                 .post()
@@ -180,6 +216,6 @@ public class BookEventTest extends CSLServiceWireMockServer {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.message")
-                .isEqualTo("Module was successfully booked");
+                .isEqualTo("Successfully applied action 'Register for an event' to course record");
     }
 }

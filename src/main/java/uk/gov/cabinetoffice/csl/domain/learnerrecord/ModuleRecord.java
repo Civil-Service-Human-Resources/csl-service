@@ -50,8 +50,19 @@ public class ModuleRecord implements Serializable {
     @JsonIgnore
     private CourseRecord courseRecord;
 
-    @JsonIgnore
-    public State getStateSafe() {
+    public ModuleRecord(String moduleId, String moduleTitle, ModuleType moduleType,
+                        Long duration, Boolean optional, BigDecimal cost) {
+        this.moduleId = moduleId;
+        this.moduleTitle = moduleTitle;
+        this.moduleType = moduleType;
+        this.duration = duration;
+        this.optional = optional;
+        this.cost = cost;
+    }
+
+    public State getState() {
         return Objects.requireNonNullElse(this.state, State.NULL);
     }
+
+
 }
