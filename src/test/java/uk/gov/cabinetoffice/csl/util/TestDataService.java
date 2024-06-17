@@ -42,7 +42,7 @@ public class TestDataService {
 
 
     public UserDetailsDto generateUserDetailsDto() {
-        return new UserDetailsDto("", useremail, learnerFirstName, 1, 1, 1, departmentCodes);
+        return new UserDetailsDto("", useremail, learnerFirstName, 1, "orgAbbreviation", 1, "professionName", 1, "gradeCode", departmentCodes);
     }
 
     /**
@@ -112,8 +112,16 @@ public class TestDataService {
     }
 
     public User generateUser() {
-        return new User(userId, useremail, organisationalUnit.getId().intValue(), profession.getId().intValue(),
-                grade.getId().intValue(), departmentCodes);
+        return new User(
+                userId,
+                useremail,
+                organisationalUnit.getId().intValue(),
+                organisationalUnit.getAbbreviation(),
+                profession.getId().intValue(),
+                profession.getName(),
+                grade.getId().intValue(),
+                grade.getCode(),
+                departmentCodes);
     }
 
     public uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course generateCourse(int moduleCount) {
