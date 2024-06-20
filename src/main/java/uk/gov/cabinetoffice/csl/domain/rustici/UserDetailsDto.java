@@ -33,10 +33,9 @@ public class UserDetailsDto {
     @NotNull
     @NotEmpty
     protected String professionName;
+
     // Grade is the only profile setting that can be null, so let's not validate it
     protected Integer gradeId;
-    @NotNull
-    @NotEmpty
     protected String gradeCode;
 
     @NotNull
