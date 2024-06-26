@@ -17,8 +17,11 @@ public final class CourseCompletionMessage implements IMessageMetadata {
     private final String courseId;
     private final String courseTitle;
     private final Integer organisationId;
+    private final String organisationAbbreviation;
     private final Integer professionId;
+    private final String professionName;
     private final Integer gradeId;
+    private final String gradeCode;
 
     @Override
     public String getQueue() {

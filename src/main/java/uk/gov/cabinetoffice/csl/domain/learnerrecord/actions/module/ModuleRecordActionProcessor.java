@@ -52,7 +52,7 @@ public abstract class ModuleRecordActionProcessor extends CourseRecordActionProc
 
     protected CourseCompletionMessage generateCompletionMessage(LocalDateTime completionDate) {
         return new CourseCompletionMessage(completionDate, user.getId(), user.getEmail(), course.getId(), course.getTitle(),
-                user.getOrganisationId(), user.getProfessionId(), user.getGradeId());
+                user.getOrganisationId(), user.getOrganisationAbbreviation(), user.getProfessionId(), user.getProfessionName(), user.getGradeId(), user.getGradeCode());
     }
 
     @Override

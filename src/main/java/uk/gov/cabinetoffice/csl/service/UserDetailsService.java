@@ -18,8 +18,14 @@ public class UserDetailsService {
     public User getUserWithUid(String uid) {
         CivilServant civilServant = csrsClient.getCivilServantProfileWithUid(uid);
         Grade grade = civilServant.getGrade();
-        return new User(uid, civilServant.getEmail(), civilServant.getOrganisationalUnit().getId().intValue(),
-                civilServant.getProfession().getId().intValue(), grade == null ? null : grade.getId().intValue(),
+        return new User(uid,
+                civilServant.getEmail(),
+                civilServant.getOrganisationalUnit().getId().intValue(),
+                civilServant.getOrganisationalUnit().getAbbreviation(),
+                civilServant.getProfession().getId().intValue(),
+                civilServant.getProfession().getName(),
+                grade == null ? null : grade.getId().intValue(),
+                grade == null ? null : grade.getCode(),
                 civilServant.getDepartmentHierarchy());
     }
 }
