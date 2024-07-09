@@ -11,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AggregationResponse<A extends Aggregation> {
-
+    private String timezone;
     private AggregationBinDelimiter delimiter;
     private List<A> results;
-    
+
 }

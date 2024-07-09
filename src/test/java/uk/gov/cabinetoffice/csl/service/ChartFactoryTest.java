@@ -12,8 +12,8 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,9 +51,8 @@ class ChartFactoryTest {
                 add(course4);
             }
         };
-        ZoneId zone = ZoneId.of("UTC");
-        ZonedDateTime date1 = ZonedDateTime.of(2024, 1, 1, 10, 0, 0, 0, zone);
-        ZonedDateTime date2 = ZonedDateTime.of(2024, 2, 1, 10, 0, 0, 0, zone);
+        LocalDateTime date1 = LocalDateTime.of(2024, 1, 1, 10, 0, 0, 0);
+        LocalDateTime date2 = LocalDateTime.of(2024, 2, 1, 10, 0, 0, 0);
         List<CourseCompletionAggregation> aggregations = new ArrayList<>();
         aggregations.add(new CourseCompletionAggregation(date1, 10, "course1"));
         aggregations.add(new CourseCompletionAggregation(date1, 17, "course2"));
@@ -61,17 +60,18 @@ class ChartFactoryTest {
         aggregations.add(new CourseCompletionAggregation(date2, 100, "course1"));
         aggregations.add(new CourseCompletionAggregation(date2, 21, "course2"));
         GetCourseCompletionsParams params = new GetCourseCompletionsParams();
+        params.setTimezone(ZoneId.of("Europe/London"));
         params.setCourseIds(List.of("course1", "course2", "course3", "course4"));
-        AggregationResponse<CourseCompletionAggregation> response = new AggregationResponse<>(AggregationBinDelimiter.MONTH, aggregations);
+        AggregationResponse<CourseCompletionAggregation> response = new AggregationResponse<>("Europe/London", AggregationBinDelimiter.MONTH, aggregations);
 
         when(learningCatalogueService.getCourses(List.of("course1", "course2", "course3", "course4"))).thenReturn(courses);
 
         CourseCompletionChart chart = factory.buildCourseCompletionsChart(params, response);
 
         assertEquals(190, chart.getTotal());
-        assertEquals("2024-01-01T10:00:00Z[UTC]", chart.getChart().get(0).getX());
+        assertEquals("2024-01-01T10:00:00", chart.getChart().get(0).getX());
         assertEquals(69, chart.getChart().get(0).getY());
-        assertEquals("2024-02-01T10:00:00Z[UTC]", chart.getChart().get(1).getX());
+        assertEquals("2024-02-01T10:00:00", chart.getChart().get(1).getX());
         assertEquals(121, chart.getChart().get(1).getY());
         assertEquals(110, chart.getCourseBreakdown().get("Course 1 title"));
         assertEquals(38, chart.getCourseBreakdown().get("Course 2 title"));
