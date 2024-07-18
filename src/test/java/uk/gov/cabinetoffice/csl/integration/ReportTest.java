@@ -34,55 +34,57 @@ public class ReportTest extends CSLServiceWireMockServer {
     public void testGetAggregations() {
         String response = """
                 {
+                  "timezone": "Europe/London",
                   "delimiter": "hour",
                   "results": [
                     {
                       "courseId": "course1",
                       "total": 10,
-                      "dateBin": "2024-01-01T10:00:00Z"
+                      "dateBin": "2024-01-01T10:00:00"
                     },
                     {
                       "courseId": "course2",
                       "total": 14,
-                      "dateBin": "2024-01-01T10:00:00Z"
+                      "dateBin": "2024-01-01T10:00:00"
                     },
                     {
                       "courseId": "course1",
                       "total": 50,
-                      "dateBin": "2024-01-01T11:00:00Z"
+                      "dateBin": "2024-01-01T11:00:00"
                     },
                     {
                       "courseId": "course2",
                       "total": 20,
-                      "dateBin": "2024-01-01T11:00:00Z"
+                      "dateBin": "2024-01-01T11:00:00"
                     },
                     {
                       "courseId": "course1",
                       "total": 13,
-                      "dateBin": "2024-01-01T12:00:00Z"
+                      "dateBin": "2024-01-01T12:00:00"
                     },
                     {
                       "courseId": "course2",
                       "total": 90,
-                      "dateBin": "2024-01-01T12:00:00Z"
+                      "dateBin": "2024-01-01T12:00:00"
                     },
                     {
                       "courseId": "course1",
                       "total": 12,
-                      "dateBin": "2024-01-01T13:00:00Z"
+                      "dateBin": "2024-01-01T13:00:00"
                     },
                     {
                       "courseId": "course2",
                       "total": 9,
-                      "dateBin": "2024-01-01T13:00:00Z"
+                      "dateBin": "2024-01-01T13:00:00"
                     }
                   ]
                 }
                 """;
         String expectedInput = """
                 {
-                    "startDate":"2024-05-08",
-                    "endDate":"2024-05-09",
+                    "startDate":"2024-05-08T00:00:00",
+                    "endDate":"2024-05-09T00:00:00",
+                    "timezone": "Europe/London",
                     "courseIds":["course1", "course2"],
                     "organisationIds":["1","2"],
                     "binDelimiter":"HOUR"
@@ -109,15 +111,16 @@ public class ReportTest extends CSLServiceWireMockServer {
                 .is2xxSuccessful()
                 .expectBody()
                 .consumeWith(System.out::println)
-                .jsonPath("$.chart[0].x").isEqualTo("2024-01-01T10:00:00Z[UTC]")
+                .jsonPath("$.chart[0].x").isEqualTo("2024-01-01T10:00:00")
                 .jsonPath("$.chart[0].y").isEqualTo("24")
-                .jsonPath("$.chart[1].x").isEqualTo("2024-01-01T11:00:00Z[UTC]")
+                .jsonPath("$.chart[1].x").isEqualTo("2024-01-01T11:00:00")
                 .jsonPath("$.chart[1].y").isEqualTo("70")
-                .jsonPath("$.chart[2].x").isEqualTo("2024-01-01T12:00:00Z[UTC]")
+                .jsonPath("$.chart[2].x").isEqualTo("2024-01-01T12:00:00")
                 .jsonPath("$.chart[2].y").isEqualTo("103")
-                .jsonPath("$.chart[3].x").isEqualTo("2024-01-01T13:00:00Z[UTC]")
+                .jsonPath("$.chart[3].x").isEqualTo("2024-01-01T13:00:00")
                 .jsonPath("$.chart[3].y").isEqualTo("21")
                 .jsonPath("$.total").isEqualTo("218")
+                .jsonPath("$.timezone").isEqualTo("Europe/London")
                 .jsonPath("$.courseBreakdown[\"Course 1 title\"]").isEqualTo("85")
                 .jsonPath("$.courseBreakdown[\"Course 2 title\"]").isEqualTo("133");
     }

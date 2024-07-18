@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationBinDelimiter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Data
@@ -16,12 +17,19 @@ import java.util.List;
 @NoArgsConstructor
 public class GetCourseCompletionsParams {
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate startDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime startDate;
 
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate endDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime endDate;
+
+    @NotNull
+    private ZoneId timezone;
+
+    public String getTimezone() {
+        return timezone.toString();
+    }
 
     @Size(min = 1, max = 30)
     @NotNull

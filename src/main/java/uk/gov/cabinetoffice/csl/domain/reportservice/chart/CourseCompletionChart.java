@@ -12,11 +12,13 @@ import java.util.Map;
 @AllArgsConstructor
 public class CourseCompletionChart extends BasicChart {
 
+    private String timezone;
     private Map<String, Integer> courseBreakdown;
     private Integer total;
 
-    public CourseCompletionChart(List<PlotPoint> chart, Map<String, Integer> courseBreakdown, Integer total) {
+    public CourseCompletionChart(List<PlotPoint> chart, Map<String, Integer> courseBreakdown, String timezone, Integer total) {
         super(chart);
+        this.timezone = timezone;
         this.courseBreakdown = courseBreakdown;
         this.total = total;
     }

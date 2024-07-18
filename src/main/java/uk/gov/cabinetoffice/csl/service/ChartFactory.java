@@ -43,7 +43,7 @@ public class ChartFactory {
             }
             courseIdBreakdown.put(courseId, courseTotal);
 
-            String stringedDateTime = result.getDateBin().format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
+            String stringedDateTime = result.getDateBin().format(DateTimeFormatter.ISO_DATE_TIME);
             Integer count = totalResults.get(stringedDateTime);
             if (count == null) {
                 count = result.getTotal();
@@ -62,7 +62,7 @@ public class ChartFactory {
 
         List<PlotPoint> plotPoints = totalResults.entrySet().stream()
                 .map(e -> new PlotPoint(e.getKey(), e.getValue())).toList();
-        return new CourseCompletionChart(plotPoints, courseTitleBreakdown, courseSummaryTotal);
+        return new CourseCompletionChart(plotPoints, courseTitleBreakdown, params.getTimezone(), courseSummaryTotal);
     }
 
 }
