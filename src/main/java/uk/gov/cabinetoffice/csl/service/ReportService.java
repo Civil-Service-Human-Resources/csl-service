@@ -7,11 +7,8 @@ import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
-import uk.gov.cabinetoffice.csl.domain.reportservice.GetCourseCompletionReportRequestsResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
-
-import java.util.List;
 
 @Service
 @Slf4j
@@ -23,9 +20,9 @@ public class ReportService {
 
     public CourseCompletionChart getCourseCompletionsChart(GetCourseCompletionsParams params, String userId) {
         AggregationResponse<CourseCompletionAggregation> results = reportServiceClient.getCourseCompletionAggregations(params);
-        GetCourseCompletionReportRequestsResponse requestResponse = reportServiceClient.getCourseCompletionsExportRequest(userId,
-                List.of("REQUESTED", "PROCESSING"));
-        return chartFactory.buildCourseCompletionsChart(params, results, !requestResponse.getRequests().isEmpty());
+//        GetCourseCompletionReportRequestsResponse requestResponse = reportServiceClient.getCourseCompletionsExportRequest(userId,
+//                List.of("REQUESTED", "PROCESSING"));
+        return chartFactory.buildCourseCompletionsChart(params, results, false);
     }
 
     public CourseCompletionChart requestCourseCompletionsExport(CreateReportRequestParams params) {
