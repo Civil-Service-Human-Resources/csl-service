@@ -66,7 +66,7 @@ class ChartFactoryTest {
 
         when(learningCatalogueService.getCourses(List.of("course1", "course2", "course3", "course4"))).thenReturn(courses);
 
-        CourseCompletionChart chart = factory.buildCourseCompletionsChart(params, response);
+        CourseCompletionChart chart = factory.buildCourseCompletionsChart(params, response, true);
 
         assertEquals(190, chart.getTotal());
         assertEquals("2024-01-01T10:00:00", chart.getChart().get(0).getX());

@@ -86,8 +86,7 @@ public class ReportTest extends CSLServiceWireMockServer {
                     "endDate":"2024-05-09T00:00:00",
                     "timezone": "Europe/London",
                     "courseIds":["course1", "course2"],
-                    "organisationIds":["1","2"],
-                    "binDelimiter":"HOUR"
+                    "organisationIds":["1","2"]
                 }
                 """;
         Course course1 = new Course();
@@ -100,6 +99,13 @@ public class ReportTest extends CSLServiceWireMockServer {
         cslStubService.getReportServiceStubService().getCourseCompletionAggregations(
                 expectedInput, response
         );
+        String reportRequestsResponse = """
+                {
+                    "requests": []
+                }
+                """;
+        cslStubService.getReportServiceStubService().getReportRequests("userId", List.of("REQUESTED", "PROCESSING"),
+                reportRequestsResponse);
         webTestClient
                 .post()
                 .uri("/admin/reporting/course-completions/generate-graph")
@@ -121,6 +127,7 @@ public class ReportTest extends CSLServiceWireMockServer {
                 .jsonPath("$.chart[3].y").isEqualTo("21")
                 .jsonPath("$.total").isEqualTo("218")
                 .jsonPath("$.timezone").isEqualTo("Europe/London")
+                .jsonPath("$.delimiter").isEqualTo("hour")
                 .jsonPath("$.courseBreakdown[\"Course 1 title\"]").isEqualTo("85")
                 .jsonPath("$.courseBreakdown[\"Course 2 title\"]").isEqualTo("133");
     }

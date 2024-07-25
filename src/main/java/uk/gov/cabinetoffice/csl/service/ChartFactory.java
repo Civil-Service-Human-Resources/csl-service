@@ -25,7 +25,8 @@ public class ChartFactory {
     private final LearningCatalogueService learningCatalogueService;
 
     public CourseCompletionChart buildCourseCompletionsChart(GetCourseCompletionsParams params,
-                                                             AggregationResponse<CourseCompletionAggregation> aggregations) {
+                                                             AggregationResponse<CourseCompletionAggregation> aggregations,
+                                                             boolean hasRequests) {
         Map<String, String> courseIdToTitleMap = learningCatalogueService.getCourses(params.getCourseIds())
                 .stream().collect(Collectors.toMap(Course::getId, Course::getTitle));
         Map<String, Integer> totalResults = new LinkedHashMap<>();
@@ -62,7 +63,8 @@ public class ChartFactory {
 
         List<PlotPoint> plotPoints = totalResults.entrySet().stream()
                 .map(e -> new PlotPoint(e.getKey(), e.getValue())).toList();
-        return new CourseCompletionChart(plotPoints, courseTitleBreakdown, params.getTimezone(), courseSummaryTotal);
+        return new CourseCompletionChart(plotPoints, courseTitleBreakdown, params.getTimezone(), courseSummaryTotal,
+                params.getBinDelimiter().getVal(), hasRequests);
     }
 
 }

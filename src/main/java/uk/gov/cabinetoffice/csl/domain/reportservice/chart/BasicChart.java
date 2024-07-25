@@ -11,4 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class BasicChart {
     protected List<PlotPoint> chart;
+    protected String timezone;
+    protected Integer total;
+    protected String delimiter;
 }

@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.controller.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -12,20 +13,22 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetCourseCompletionsParams {
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime startDate;
+    protected LocalDateTime startDate;
 
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime endDate;
+    protected LocalDateTime endDate;
 
     @NotNull
-    private ZoneId timezone;
+    protected ZoneId timezone;
 
     public String getTimezone() {
         return timezone.toString();
@@ -33,16 +36,25 @@ public class GetCourseCompletionsParams {
 
     @Size(min = 1, max = 30)
     @NotNull
-    private List<String> courseIds;
+    protected List<String> courseIds;
 
     @Size(min = 1)
     @NotNull
-    private List<String> organisationIds;
+    protected List<String> organisationIds;
 
-    private List<String> professionIds;
+    protected List<String> professionIds;
 
-    private List<String> gradeIds;
+    protected List<String> gradeIds;
 
-    private AggregationBinDelimiter binDelimiter = AggregationBinDelimiter.DAY;
-
+    @JsonProperty("binDelimiter")
+    public AggregationBinDelimiter getBinDelimiter() {
+        long dayDiff = DAYS.between(startDate, endDate);
+        if (dayDiff <= 1) {
+            return AggregationBinDelimiter.HOUR;
+        } else if (dayDiff <= 31) {
+            return AggregationBinDelimiter.DAY;
+        } else {
+            return AggregationBinDelimiter.MONTH;
+        }
+    }
 }
