@@ -60,6 +60,8 @@ class ChartFactoryTest {
         aggregations.add(new CourseCompletionAggregation(date2, 100, "course1"));
         aggregations.add(new CourseCompletionAggregation(date2, 21, "course2"));
         GetCourseCompletionsParams params = new GetCourseCompletionsParams();
+        params.setStartDate(LocalDateTime.of(2024, 1, 1, 10, 0, 0));
+        params.setEndDate(LocalDateTime.of(2024, 1, 2, 10, 0, 0));
         params.setTimezone(ZoneId.of("Europe/London"));
         params.setCourseIds(List.of("course1", "course2", "course3", "course4"));
         AggregationResponse<CourseCompletionAggregation> response = new AggregationResponse<>("Europe/London", AggregationBinDelimiter.MONTH, aggregations);
