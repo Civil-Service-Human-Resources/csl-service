@@ -11,4 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 public class GetCourseCompletionReportRequestsResponse {
     private List<CourseCompletionReportRequest> requests;
+
+    public boolean hasRequests() {
+        return !this.getRequests().isEmpty();
+    }
 }
