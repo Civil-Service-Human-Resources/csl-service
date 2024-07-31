@@ -128,7 +128,7 @@ public class ReportTest extends CSLServiceWireMockServer {
                 .jsonPath("$.total").isEqualTo("218")
                 .jsonPath("$.timezone").isEqualTo("Europe/London")
                 .jsonPath("$.delimiter").isEqualTo("hour")
-                .jsonPath("$.hasRequests").isEqualTo(false)
+                .jsonPath("$.hasRequest").isEqualTo(false)
                 .jsonPath("$.courseBreakdown[\"Course 1 title\"]").isEqualTo("85")
                 .jsonPath("$.courseBreakdown[\"Course 2 title\"]").isEqualTo("133");
     }
