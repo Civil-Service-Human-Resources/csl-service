@@ -128,8 +128,43 @@ public class ReportTest extends CSLServiceWireMockServer {
                 .jsonPath("$.total").isEqualTo("218")
                 .jsonPath("$.timezone").isEqualTo("Europe/London")
                 .jsonPath("$.delimiter").isEqualTo("hour")
+                .jsonPath("$.hasRequests").isEqualTo(false)
                 .jsonPath("$.courseBreakdown[\"Course 1 title\"]").isEqualTo("85")
                 .jsonPath("$.courseBreakdown[\"Course 2 title\"]").isEqualTo("133");
+    }
+
+    @Test
+    public void testRequestReport() {
+        String reportRequestsResponse = """
+                {
+                    "addedSuccessfully": true,
+                    "details": "addedSuccessfully"
+                }
+                """;
+        String input = """
+                {
+                    "startDate":"2024-05-08T00:00:00",
+                    "endDate":"2024-05-09T00:00:00",
+                    "timezone": "Europe/London",
+                    "courseIds":["course1", "course2"],
+                    "organisationIds":["1","2"],
+                    "userEmail": "email",
+                    "userId": "id"
+                }
+                """;
+        cslStubService.getReportServiceStubService().postReportRequest(input, reportRequestsResponse);
+        webTestClient
+                .post()
+                .uri("/admin/reporting/course-completions/request-source-data")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(input))
+                .header("Authorization", "Bearer fakeToken")
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.addedSuccessfully").isEqualTo(true)
+                .jsonPath("$.details").isEqualTo("addedSuccessfully");
     }
 
 }

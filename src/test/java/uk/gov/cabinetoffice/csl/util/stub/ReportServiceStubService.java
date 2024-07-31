@@ -33,4 +33,15 @@ public class ReportServiceStubService {
         );
     }
 
+    public void postReportRequest(String expectedInput, String response) {
+        stubFor(
+                WireMock.post(urlPathEqualTo("/report-service/course-completions/report-requests"))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer fakeToken"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
 }

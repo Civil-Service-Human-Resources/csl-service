@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.GetCourseCompletionReportRequestsResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
@@ -28,9 +29,7 @@ public class ReportService {
         return chartFactory.buildCourseCompletionsChart(params, results, requestResponse.hasRequests());
     }
 
-    public CourseCompletionChart requestCourseCompletionsExport(CreateReportRequestParams params) {
-        reportServiceClient.postCourseCompletionsExportRequest(params);
-        AggregationResponse<CourseCompletionAggregation> results = reportServiceClient.getCourseCompletionAggregations(params);
-        return chartFactory.buildCourseCompletionsChart(params, results, true);
+    public AddCourseCompletionReportRequestResponse requestCourseCompletionsExport(CreateReportRequestParams params) {
+        return reportServiceClient.postCourseCompletionsExportRequest(params);
     }
 }
