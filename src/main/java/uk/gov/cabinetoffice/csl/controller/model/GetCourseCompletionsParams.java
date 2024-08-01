@@ -73,8 +73,8 @@ public class GetCourseCompletionsParams {
     }
 
     @JsonProperty("binDelimiter")
-    public String getBinDelimiter() {
-        return this.getBinDelimiterVal().getVal();
+    public AggregationBinDelimiter getBinDelimiter() {
+        return this.getBinDelimiterVal();
     }
 
 }

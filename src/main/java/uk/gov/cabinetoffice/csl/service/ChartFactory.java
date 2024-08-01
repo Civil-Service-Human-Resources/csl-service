@@ -84,7 +84,7 @@ public class ChartFactory {
         });
 
         return new CourseCompletionChart(totalResults, courseTitleBreakdown, params.getTimezone(), courseSummaryTotal,
-                params.getBinDelimiter(), hasRequests);
+                params.getBinDelimiter().getVal(), hasRequests);
     }
 
 }
