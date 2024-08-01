@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
 import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
@@ -15,7 +14,7 @@ public class CourseCompletionChart extends BasicChart {
     private Map<String, Integer> courseBreakdown;
     private boolean hasRequest;
 
-    public CourseCompletionChart(List<PlotPoint> chart, Map<String, Integer> courseBreakdown,
+    public CourseCompletionChart(Map<String, Integer> chart, Map<String, Integer> courseBreakdown,
                                  String timezone, Integer total, String delimiter, boolean hasRequest) {
         super(chart, timezone, total, delimiter);
         this.courseBreakdown = courseBreakdown;

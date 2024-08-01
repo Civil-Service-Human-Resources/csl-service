@@ -34,7 +34,7 @@ public class ReportTest extends CSLServiceWireMockServer {
     public void testGetAggregations() {
         String response = """
                 {
-                  "timezone": "Europe/London",
+                  "timezone": "+01:00",
                   "delimiter": "hour",
                   "results": [
                     {
@@ -82,9 +82,9 @@ public class ReportTest extends CSLServiceWireMockServer {
                 """;
         String expectedInput = """
                 {
-                    "startDate":"2024-05-08T00:00:00",
-                    "endDate":"2024-05-09T00:00:00",
-                    "timezone": "Europe/London",
+                    "startDate":"2023-12-31T23:00:00",
+                    "endDate":"2024-01-01T12:00:00",
+                    "timezone": "+01:00",
                     "courseIds":["course1", "course2"],
                     "organisationIds":["1","2"]
                 }
@@ -117,16 +117,22 @@ public class ReportTest extends CSLServiceWireMockServer {
                 .is2xxSuccessful()
                 .expectBody()
                 .consumeWith(System.out::println)
-                .jsonPath("$.chart[0].x").isEqualTo("2024-01-01T10:00:00")
-                .jsonPath("$.chart[0].y").isEqualTo("24")
-                .jsonPath("$.chart[1].x").isEqualTo("2024-01-01T11:00:00")
-                .jsonPath("$.chart[1].y").isEqualTo("70")
-                .jsonPath("$.chart[2].x").isEqualTo("2024-01-01T12:00:00")
-                .jsonPath("$.chart[2].y").isEqualTo("103")
-                .jsonPath("$.chart[3].x").isEqualTo("2024-01-01T13:00:00")
-                .jsonPath("$.chart[3].y").isEqualTo("21")
+                .jsonPath("$.chart[\"2024-01-01T00:00:00\"]").isEqualTo(0)
+                .jsonPath("$.chart[\"2024-01-01T01:00:00\"]").isEqualTo(0)
+                .jsonPath("$.chart[\"2024-01-01T02:00:00\"]").isEqualTo(0)
+                .jsonPath("$.chart[\"2024-01-01T03:00:00\"]").isEqualTo(0)
+                .jsonPath("$.chart[\"2024-01-01T04:00:00\"]").isEqualTo(0)
+                .jsonPath("$.chart[\"2024-01-01T05:00:00\"]").isEqualTo(0)
+                .jsonPath("$.chart[\"2024-01-01T06:00:00\"]").isEqualTo(0)
+                .jsonPath("$.chart[\"2024-01-01T07:00:00\"]").isEqualTo(0)
+                .jsonPath("$.chart[\"2024-01-01T08:00:00\"]").isEqualTo(0)
+                .jsonPath("$.chart[\"2024-01-01T09:00:00\"]").isEqualTo(0)
+                .jsonPath("$.chart[\"2024-01-01T10:00:00\"]").isEqualTo(24)
+                .jsonPath("$.chart[\"2024-01-01T11:00:00\"]").isEqualTo(70)
+                .jsonPath("$.chart[\"2024-01-01T12:00:00\"]").isEqualTo(103)
+                .jsonPath("$.chart[\"2024-01-01T13:00:00\"]").isEqualTo(21)
                 .jsonPath("$.total").isEqualTo("218")
-                .jsonPath("$.timezone").isEqualTo("Europe/London")
+                .jsonPath("$.timezone").isEqualTo("+01:00")
                 .jsonPath("$.delimiter").isEqualTo("hour")
                 .jsonPath("$.hasRequest").isEqualTo(false)
                 .jsonPath("$.courseBreakdown[\"Course 1 title\"]").isEqualTo("85")
