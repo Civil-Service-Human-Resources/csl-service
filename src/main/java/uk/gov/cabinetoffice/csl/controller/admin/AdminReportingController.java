@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.controller.admin;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
@@ -27,6 +28,7 @@ public class AdminReportingController {
         return reportService.getCourseCompletionsChart(params, userId);
     }
 
+    @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")
     @PostMapping(path = "/course-completions/request-source-data", produces = "application/json")
     @ResponseBody
     public AddCourseCompletionReportRequestResponse requestSourceData(@Valid @RequestBody CreateReportRequestParams params) {
