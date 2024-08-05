@@ -3,35 +3,26 @@ package uk.gov.cabinetoffice.csl.integration;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.BodyInserters;
-import uk.gov.cabinetoffice.csl.configuration.TestConfig;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
-import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.util.List;
 
-@Slf4j
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
-@ActiveProfiles({"wiremock", "no-redis"})
-@Import(TestConfig.class)
-public class ReportTest extends CSLServiceWireMockServer {
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-    @Autowired
-    private WebTestClient webTestClient;
+@Slf4j
+public class ReportTest extends IntegrationTestBase {
 
     @Autowired
     private CSLStubService cslStubService;
 
     @Test
-    public void testGetAggregations() {
+    public void testGetAggregations() throws Exception {
         String response = """
                 {
                   "timezone": "+01:00",
@@ -106,41 +97,35 @@ public class ReportTest extends CSLServiceWireMockServer {
                 """;
         cslStubService.getReportServiceStubService().getReportRequests("userId", List.of("REQUESTED", "PROCESSING"),
                 reportRequestsResponse);
-        webTestClient
-                .post()
-                .uri("/admin/reporting/course-completions/generate-graph")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(expectedInput))
-                .header("Authorization", "Bearer fakeToken")
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .consumeWith(System.out::println)
-                .jsonPath("$.chart[\"2024-01-01T00:00:00\"]").isEqualTo(0)
-                .jsonPath("$.chart[\"2024-01-01T01:00:00\"]").isEqualTo(0)
-                .jsonPath("$.chart[\"2024-01-01T02:00:00\"]").isEqualTo(0)
-                .jsonPath("$.chart[\"2024-01-01T03:00:00\"]").isEqualTo(0)
-                .jsonPath("$.chart[\"2024-01-01T04:00:00\"]").isEqualTo(0)
-                .jsonPath("$.chart[\"2024-01-01T05:00:00\"]").isEqualTo(0)
-                .jsonPath("$.chart[\"2024-01-01T06:00:00\"]").isEqualTo(0)
-                .jsonPath("$.chart[\"2024-01-01T07:00:00\"]").isEqualTo(0)
-                .jsonPath("$.chart[\"2024-01-01T08:00:00\"]").isEqualTo(0)
-                .jsonPath("$.chart[\"2024-01-01T09:00:00\"]").isEqualTo(0)
-                .jsonPath("$.chart[\"2024-01-01T10:00:00\"]").isEqualTo(24)
-                .jsonPath("$.chart[\"2024-01-01T11:00:00\"]").isEqualTo(70)
-                .jsonPath("$.chart[\"2024-01-01T12:00:00\"]").isEqualTo(103)
-                .jsonPath("$.chart[\"2024-01-01T13:00:00\"]").isEqualTo(21)
-                .jsonPath("$.total").isEqualTo("218")
-                .jsonPath("$.timezone").isEqualTo("+01:00")
-                .jsonPath("$.delimiter").isEqualTo("hour")
-                .jsonPath("$.hasRequest").isEqualTo(false)
-                .jsonPath("$.courseBreakdown[\"Course 1 title\"]").isEqualTo("85")
-                .jsonPath("$.courseBreakdown[\"Course 2 title\"]").isEqualTo("133");
+        mockMvc.perform(post("/admin/reporting/course-completions/generate-graph")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(expectedInput))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.chart[\"2024-01-01T00:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T00:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T01:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T02:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T03:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T04:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T05:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T06:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T07:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T08:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T09:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T10:00:00\"]").value(24))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T11:00:00\"]").value(70))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T12:00:00\"]").value(103))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T13:00:00\"]").value(21))
+                .andExpect(jsonPath("$.total").value("218"))
+                .andExpect(jsonPath("$.timezone").value("+01:00"))
+                .andExpect(jsonPath("$.delimiter").value("hour"))
+                .andExpect(jsonPath("$.hasRequest").value(false))
+                .andExpect(jsonPath("$.courseBreakdown[\"Course 1 title\"]").value("85"))
+                .andExpect(jsonPath("$.courseBreakdown[\"Course 2 title\"]").value("133"));
     }
 
     @Test
-    public void testRequestReport() {
+    public void testRequestReport() throws Exception {
         String reportRequestsResponse = """
                 {
                     "addedSuccessfully": true,
@@ -159,18 +144,13 @@ public class ReportTest extends CSLServiceWireMockServer {
                 }
                 """;
         cslStubService.getReportServiceStubService().postReportRequest(input, reportRequestsResponse);
-        webTestClient
-                .post()
-                .uri("/admin/reporting/course-completions/request-source-data")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(input))
-                .header("Authorization", "Bearer fakeToken")
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.addedSuccessfully").isEqualTo(true)
-                .jsonPath("$.details").isEqualTo("addedSuccessfully");
+        mockMvc.perform(post("/admin/reporting/course-completions/request-source-data")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("REPORT_EXPORT")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(input))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.addedSuccessfully").value(true))
+                .andExpect(jsonPath("$.details").value("addedSuccessfully"));
     }
 
 }

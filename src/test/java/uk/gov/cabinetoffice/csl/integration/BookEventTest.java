@@ -4,13 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
-import uk.gov.cabinetoffice.csl.configuration.TestConfig;
+import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
@@ -20,7 +14,6 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
-import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
@@ -28,15 +21,12 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 
-@Slf4j
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
-@ActiveProfiles({"wiremock", "no-redis"})
-@Import(TestConfig.class)
-public class BookEventTest extends CSLServiceWireMockServer {
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-    @Autowired
-    private WebTestClient webTestClient;
+@Slf4j
+public class BookEventTest extends IntegrationTestBase {
 
     @Autowired
     private TestDataService testDataService;
@@ -67,7 +57,7 @@ public class BookEventTest extends CSLServiceWireMockServer {
     }
 
     @Test
-    public void testBookFreeEventAndCreateCourseRecord() {
+    public void testBookFreeEventAndCreateCourseRecord() throws Exception {
         course.getModule(moduleId).setCost(BigDecimal.valueOf(0L));
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         BookingDto dto = BookingDto.builder()
@@ -104,21 +94,15 @@ public class BookEventTest extends CSLServiceWireMockServer {
         cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);
         BookEventDto inputDto = new BookEventDto(List.of("access1", "access2"), "", testDataService.generateUserDetailsDto());
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
-        webTestClient
-                .post()
-                .uri(url)
-                .header("Authorization", "Bearer fakeToken")
-                .body(Mono.just(inputDto), BookEventDto.class)
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.message")
-                .isEqualTo("Successfully applied action 'Approve a booking' to course record");
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(utils.toJson(inputDto)))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.message").value("Successfully applied action 'Approve a booking' to course record"));
     }
 
     @Test
-    public void testBookFreeEventAndUpdateCourseRecord() {
+    public void testBookFreeEventAndUpdateCourseRecord() throws Exception {
         course.getModule(moduleId).setCost(BigDecimal.valueOf(0L));
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         courseRecord.setState(State.IN_PROGRESS);
@@ -154,21 +138,15 @@ public class BookEventTest extends CSLServiceWireMockServer {
         cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, courseRecord);
         BookEventDto inputDto = new BookEventDto(List.of(), "", testDataService.generateUserDetailsDto());
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
-        webTestClient
-                .post()
-                .uri(url)
-                .header("Authorization", "Bearer fakeToken")
-                .body(Mono.just(inputDto), BookEventDto.class)
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.message")
-                .isEqualTo("Successfully applied action 'Approve a booking' to course record");
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(utils.toJson(inputDto)))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.message").value("Successfully applied action 'Approve a booking' to course record"));
     }
 
     @Test
-    public void testBookPaidEventAndCreateCourseRecord() {
+    public void testBookPaidEventAndCreateCourseRecord() throws Exception {
         course.getModule(moduleId).setCost(BigDecimal.valueOf(5L));
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         BookingDto dto = BookingDto.builder()
@@ -206,16 +184,10 @@ public class BookEventTest extends CSLServiceWireMockServer {
         cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);
         BookEventDto inputDto = new BookEventDto(List.of("access1"), "poNumber123", testDataService.generateUserDetailsDto());
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
-        webTestClient
-                .post()
-                .uri(url)
-                .header("Authorization", "Bearer fakeToken")
-                .body(Mono.just(inputDto), BookEventDto.class)
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.message")
-                .isEqualTo("Successfully applied action 'Register for an event' to course record");
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(utils.toJson(inputDto)))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.message").value("Successfully applied action 'Register for an event' to course record"));
     }
 }

@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
@@ -29,6 +30,7 @@ public class ReportService {
         return chartFactory.buildCourseCompletionsChart(params, results, requestResponse.hasRequests());
     }
 
+    @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")
     public AddCourseCompletionReportRequestResponse requestCourseCompletionsExport(CreateReportRequestParams params) {
         return reportServiceClient.postCourseCompletionsExportRequest(params);
     }
