@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
 import uk.gov.cabinetoffice.csl.service.ReportService;
@@ -23,8 +24,8 @@ public class AdminReportingController {
     @PostMapping(path = "/course-completions/generate-graph", produces = "application/json")
     @ResponseBody
     public CourseCompletionChart getCourseCompletions(@Valid @RequestBody GetCourseCompletionsParams params) {
-        String userId = userAuthService.getUsername();
-        return reportService.getCourseCompletionsChart(params, userId);
+        IdentityDto user = userAuthService.getIdentity();
+        return reportService.getCourseCompletionsChart(params, user);
     }
 
     @PostMapping(path = "/course-completions/request-source-data", produces = "application/json")

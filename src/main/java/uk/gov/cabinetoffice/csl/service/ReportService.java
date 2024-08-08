@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
-import uk.gov.cabinetoffice.csl.domain.reportservice.GetCourseCompletionReportRequestsResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
 
@@ -23,11 +23,13 @@ public class ReportService {
     private final IReportServiceClient reportServiceClient;
     private final ChartFactory chartFactory;
 
-    public CourseCompletionChart getCourseCompletionsChart(GetCourseCompletionsParams params, String userId) {
+    public CourseCompletionChart getCourseCompletionsChart(GetCourseCompletionsParams params, IdentityDto user) {
         AggregationResponse<CourseCompletionAggregation> results = reportServiceClient.getCourseCompletionAggregations(params);
-        GetCourseCompletionReportRequestsResponse requestResponse = reportServiceClient.getCourseCompletionsExportRequest(userId,
-                List.of("REQUESTED", "PROCESSING"));
-        return chartFactory.buildCourseCompletionsChart(params, results, requestResponse.hasRequests());
+        boolean hasRequests = false;
+        if (user.hasRole("REPORT_EXPORT")) {
+            hasRequests = reportServiceClient.getCourseCompletionsExportRequest(user.getUid(), List.of("REQUESTED", "PROCESSING")).hasRequests();
+        }
+        return chartFactory.buildCourseCompletionsChart(params, results, hasRequests);
     }
 
     @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")

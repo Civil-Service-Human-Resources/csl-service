@@ -90,13 +90,6 @@ public class ReportTest extends IntegrationTestBase {
         cslStubService.getReportServiceStubService().getCourseCompletionAggregations(
                 expectedInput, response
         );
-        String reportRequestsResponse = """
-                {
-                    "requests": []
-                }
-                """;
-        cslStubService.getReportServiceStubService().getReportRequests("userId", List.of("REQUESTED", "PROCESSING"),
-                reportRequestsResponse);
         mockMvc.perform(post("/admin/reporting/course-completions/generate-graph")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(expectedInput))
