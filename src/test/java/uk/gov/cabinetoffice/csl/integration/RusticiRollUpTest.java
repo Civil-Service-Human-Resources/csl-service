@@ -4,33 +4,22 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
-import uk.gov.cabinetoffice.csl.configuration.TestConfig;
+import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
-import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.util.List;
 
-@Slf4j
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
-@ActiveProfiles({"wiremock", "no-redis", "jms"})
-@Import(TestConfig.class)
-public class RusticiRollUpTest extends CSLServiceWireMockServer {
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-    @Autowired
-    private WebTestClient webTestClient;
+@Slf4j
+public class RusticiRollUpTest extends IntegrationTestBase {
 
     @Autowired
     private TestDataService testDataService;
@@ -51,7 +40,7 @@ public class RusticiRollUpTest extends CSLServiceWireMockServer {
 
 
     @Test
-    public void testRollUpCompletedModuleRecord() {
+    public void testRollUpCompletedModuleRecord() throws Exception {
         Course course = testDataService.generateCourse(true, false);
         CivilServant civilServant = testDataService.generateCivilServant();
         cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
@@ -74,18 +63,14 @@ public class RusticiRollUpTest extends CSLServiceWireMockServer {
                 """;
         cslStubService.stubUpdateCourseRecord(testDataService.getCourseId(), course, testDataService.getUserId(),
                 courseRecords, expectedCourseRecordPUT, courseRecord);
-
-        webTestClient
-                .post()
-                .uri("/rustici/rollup")
-                .body(Mono.just(rollupData), RusticiRollupData.class)
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful();
+        mockMvc.perform(post("/rustici/rollup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(utils.toJson(rollupData)))
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
-    public void testRollUpFailedModuleRecord() {
+    public void testRollUpFailedModuleRecord() throws Exception {
         Course course = testDataService.generateCourse(true, false);
         CivilServant civilServant = testDataService.generateCivilServant();
         cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
@@ -111,14 +96,10 @@ public class RusticiRollUpTest extends CSLServiceWireMockServer {
                 """;
         cslStubService.stubUpdateCourseRecord(testDataService.getCourseId(), course, testDataService.getUserId(),
                 courseRecords, expectedCourseRecordPUT, courseRecord);
-
-        webTestClient
-                .post()
-                .uri("/rustici/rollup")
-                .body(Mono.just(failedRollUpData), RusticiRollupData.class)
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful();
+        mockMvc.perform(post("/rustici/rollup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(utils.toJson(failedRollUpData)))
+                .andExpect(status().is2xxSuccessful());
     }
 
 }

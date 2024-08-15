@@ -23,7 +23,7 @@ public class LearnerRecordStubService {
                 WireMock.get(urlPathEqualTo("/learner_record_api/course_records"))
                         .withQueryParam("courseIds", equalTo(courseId))
                         .withQueryParam("userId", equalTo(userId))
-                        .withHeader("Authorization", equalTo("Bearer fakeToken"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
                                 .withBody(utils.toJson(response)))
@@ -33,7 +33,7 @@ public class LearnerRecordStubService {
     public void createCourseRecord(String expectedInput, CourseRecord response) {
         stubFor(
                 WireMock.post(urlPathEqualTo("/learner_record_api/course_records"))
-                        .withHeader("Authorization", equalTo("Bearer fakeToken"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
                         .withRequestBody(equalToJson(expectedInput, true, true))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
@@ -44,7 +44,7 @@ public class LearnerRecordStubService {
     public void updateCourseRecord(String expectedInput, CourseRecord response) {
         stubFor(
                 WireMock.put(urlPathEqualTo("/learner_record_api/course_records"))
-                        .withHeader("Authorization", equalTo("Bearer fakeToken"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
                         .withRequestBody(equalToJson(expectedInput, true, true))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
@@ -55,7 +55,7 @@ public class LearnerRecordStubService {
     public void bookEvent(String eventId, String expectedInput, BookingDto response) {
         stubFor(
                 WireMock.post(urlPathEqualTo(String.format("/learner_record_api/event/%s/booking/", eventId)))
-                        .withHeader("Authorization", equalTo("Bearer fakeToken"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
                         .withRequestBody(equalToJson(
                                 expectedInput
                         ))
@@ -68,7 +68,7 @@ public class LearnerRecordStubService {
     public void cancelBooking(String eventId, String userId, String expectedInput, String response) {
         stubFor(
                 WireMock.patch(urlPathEqualTo(String.format("/learner_record_api/event/%s/learner/%s", eventId, userId)))
-                        .withHeader("Authorization", equalTo("Bearer fakeToken"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
                         .withRequestBody(equalToJson(expectedInput))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
@@ -79,7 +79,7 @@ public class LearnerRecordStubService {
     public void updateBookingWithId(String eventId, Integer bookingId, String expectedInput, String response) {
         stubFor(
                 WireMock.patch(urlPathEqualTo(String.format("/learner_record_api/event/%s/booking/%s", eventId, bookingId)))
-                        .withHeader("Authorization", equalTo("Bearer fakeToken"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
                         .withRequestBody(equalToJson(expectedInput))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")

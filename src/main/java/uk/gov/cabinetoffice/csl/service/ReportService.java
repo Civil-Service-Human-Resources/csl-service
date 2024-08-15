@@ -2,12 +2,18 @@ package uk.gov.cabinetoffice.csl.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
+import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
+import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -17,9 +23,17 @@ public class ReportService {
     private final IReportServiceClient reportServiceClient;
     private final ChartFactory chartFactory;
 
-
-    public CourseCompletionChart getCourseCompletionsChart(GetCourseCompletionsParams params) {
+    public CourseCompletionChart getCourseCompletionsChart(GetCourseCompletionsParams params, IdentityDto user) {
         AggregationResponse<CourseCompletionAggregation> results = reportServiceClient.getCourseCompletionAggregations(params);
-        return chartFactory.buildCourseCompletionsChart(params, results);
+        boolean hasRequests = false;
+        if (user.hasRole("REPORT_EXPORT")) {
+            hasRequests = reportServiceClient.getCourseCompletionsExportRequest(user.getUid(), List.of("REQUESTED", "PROCESSING")).hasRequests();
+        }
+        return chartFactory.buildCourseCompletionsChart(params, results, hasRequests);
+    }
+
+    @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")
+    public AddCourseCompletionReportRequestResponse requestCourseCompletionsExport(CreateReportRequestParams params) {
+        return reportServiceClient.postCourseCompletionsExportRequest(params);
     }
 }

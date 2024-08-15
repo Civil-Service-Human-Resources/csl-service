@@ -26,7 +26,7 @@ public class LearningCatalogueStubService {
         stubFor(
                 WireMock.get(urlPathEqualTo("/learning_catalogue/courses"))
                         .withQueryParam("courseId", equalTo(String.join(",", courseIds)))
-                        .withHeader("Authorization", equalTo("Bearer fakeToken"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
                                 .withBody(utils.toJson(response)))

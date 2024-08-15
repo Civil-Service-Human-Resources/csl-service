@@ -19,7 +19,7 @@ public class CSRSStubService {
     public void getCivilServant(String uid, CivilServant response) {
         stubFor(
                 WireMock.get(urlPathEqualTo("/csrs/civilServants/resource/" + uid + "/profile"))
-                        .withHeader("Authorization", equalTo("Bearer fakeToken"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
                                 .withBody(utils.toJson(response)))
