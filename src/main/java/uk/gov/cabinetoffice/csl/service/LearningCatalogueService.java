@@ -12,7 +12,6 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -80,14 +79,9 @@ public class LearningCatalogueService {
     }
 
     public List<Course> getRequiredLearningForDepartments(Collection<String> departmentCodes) {
-        List<Course> result = new ArrayList<>();
         GetPagedCourseParams params = GetPagedCourseParams.builder()
                 .department(departmentCodes).mandatory(true).build();
-        client.getPagedCourses(params).forEach(c -> {
-            cache.put(c);
-            result.add(c);
-        });
-        return result;
+        return client.getPagedCourses(params);
     }
 
     public void removeCourseFromCache(String courseId) {
