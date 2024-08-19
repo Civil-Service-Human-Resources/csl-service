@@ -10,17 +10,13 @@ import java.util.Collection;
 @Data
 @RequiredArgsConstructor
 @Builder
-public class GetCourseParams {
+public class GetPagedCourseParams {
 
-    private final Collection<String> courseIds;
     private final boolean mandatory;
     private final Collection<String> department;
 
     public String getUrlParams() {
         ArrayList<String> params = new ArrayList<>();
-        if (courseIds != null && !courseIds.isEmpty()) {
-            params.add(String.format("courseId=%s", String.join(",", courseIds)));
-        }
         if (mandatory) {
             params.add("mandatory=true");
         }

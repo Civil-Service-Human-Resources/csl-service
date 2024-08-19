@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.cabinetoffice.csl.client.courseCatalogue.GetCourseParams;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
@@ -62,8 +61,7 @@ public class LearningCatalogueServiceTest {
                 new ArrayList<>(Arrays.asList(course1, course2)));
 
         when(cache.getMultiple(List.of("course1", "course2", "cache-miss-course3"))).thenReturn(cacheResult);
-        GetCourseParams courseParams = new GetCourseParams(List.of("cache-miss-course3"), false, null);
-        when(client.getCoursesWithIds(List.of("cache-miss-course3"))).thenReturn(List.of(course3));
+        when(client.getCourses(List.of("cache-miss-course3"))).thenReturn(List.of(course3));
 
         List<Course> result = learningCatalogueService.getCourses(List.of("course1", "course2", "cache-miss-course3"));
         assertEquals("course1", result.get(0).getId());

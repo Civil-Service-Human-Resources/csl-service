@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.client.courseCatalogue.GetCourseParams;
+import uk.gov.cabinetoffice.csl.client.courseCatalogue.GetPagedCourseParams;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
@@ -67,7 +67,7 @@ public class LearningCatalogueService {
             CacheGetMultipleOp<Course> result = cache.getMultiple(courseIds);
             List<Course> courses = result.getCacheHits();
             if (!result.getCacheMisses().isEmpty()) {
-                client.getCoursesWithIds(result.getCacheMisses()).forEach(course -> {
+                client.getCourses(result.getCacheMisses()).forEach(course -> {
                     courses.add(course);
                     cache.put(course);
                 });
@@ -75,15 +75,15 @@ public class LearningCatalogueService {
             return courses;
         } catch (Cache.ValueRetrievalException ex) {
             log.error("Failed to retrieve courses from cache, falling back to API");
-            return client.getCoursesWithIds(courseIds);
+            return client.getCourses(courseIds);
         }
     }
 
     public List<Course> getRequiredLearningForDepartments(Collection<String> departmentCodes) {
         List<Course> result = new ArrayList<>();
-        GetCourseParams params = GetCourseParams.builder()
+        GetPagedCourseParams params = GetPagedCourseParams.builder()
                 .department(departmentCodes).mandatory(true).build();
-        client.getCourses(params).forEach(c -> {
+        client.getPagedCourses(params).forEach(c -> {
             cache.put(c);
             result.add(c);
         });

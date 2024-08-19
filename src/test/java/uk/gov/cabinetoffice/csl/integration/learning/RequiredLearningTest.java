@@ -31,106 +31,116 @@ public class RequiredLearningTest extends IntegrationTestBase {
     }
 
     String courseSingleModule = """
-            [{
-                "id": "course1",
-                "title": "Course 1",
-                "shortDescription": "Course 1",
-                "description": "Course 1",
-                "modules": [
-                        {
-                                "type": "link",
-                                "url": "https://www.gov.uk/",
-                                "id": "module1",
-                                "title": "module1",
-                                "description": "module1",
-                                "optional": false,
-                                "moduleType": "link"
-                        }
-                ],
-                "audiences": [
-                        {
-                                "id": "aud1",
-                                "name": "aud",
-                                "areasOfWork": [],
-                                "departments": ["CO"],
-                                "grades": [],
-                                "interests": [],
-                                "requiredBy": "2024-01-01T00:00:00Z",
-                                "frequency": "P1Y",
-                                "type": "REQUIRED_LEARNING",
-                                "eventId": null
-                        }
-                ],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-            }]""";
+            {
+                "results": [{
+                  "id": "course1",
+                  "title": "Course 1",
+                  "shortDescription": "Course 1",
+                  "description": "Course 1",
+                  "modules": [
+                          {
+                                  "type": "link",
+                                  "url": "https://www.gov.uk/",
+                                  "id": "module1",
+                                  "title": "module1",
+                                  "description": "module1",
+                                  "optional": false,
+                                  "moduleType": "link"
+                          }
+                  ],
+                  "audiences": [
+                          {
+                                  "id": "aud1",
+                                  "name": "aud",
+                                  "areasOfWork": [],
+                                  "departments": ["CO"],
+                                  "grades": [],
+                                  "interests": [],
+                                  "requiredBy": "2024-01-01T00:00:00Z",
+                                  "frequency": "P1Y",
+                                  "type": "REQUIRED_LEARNING",
+                                  "eventId": null
+                          }
+                  ],
+                  "visibility": "PUBLIC",
+                  "status": "Published",
+                  "cost": 0.0
+              }],
+                  "page": 0,
+                  "totalResults": 1,
+                  "size": 20
+              }""";
 
     private String courseMultipleModules = """
-            [{
-                "id": "course1",
-                "title": "Course 1",
-                "shortDescription": "Course 1",
-                "description": "Course 1",
-                "modules": [
-                        {
-                                "type": "link",
-                                "url": "https://www.gov.uk/",
-                                "id": "module1",
-                                "title": "module1",
-                                "description": "module1",
-                                "optional": false,
-                                "moduleType": "link"
-                        },
-                        {
-                                "type": "elearning",
-                                "url": "https://www.gov.uk/",
-                                "id": "module2",
-                                "title": "module2",
-                                "description": "module2",
-                                "optional": false,
-                                "moduleType": "elearning"
-                        },
-                        {
-                                "type": "link",
-                                "url": "https://www.gov.uk/",
-                                "id": "module3",
-                                "title": "module3",
-                                "description": "module3",
-                                "optional": true,
-                                "moduleType": "link"
-                        }
-                ],
-                "audiences": [
-                        {
-                                "id": "aud1",
-                                "name": "aud",
-                                "areasOfWork": [],
-                                "departments": ["HMRC"],
-                                "grades": [],
-                                "interests": [],
-                                "requiredBy": "2024-06-01T00:00:00Z",
-                                "frequency": "P1Y",
-                                "type": "REQUIRED_LEARNING",
-                                "eventId": null
-                        },
-                        {
-                                "id": "aud1",
-                                "name": "aud",
-                                "areasOfWork": [],
-                                "departments": ["DWP"],
-                                "grades": [],
-                                "interests": [],
-                                "requiredBy": "2024-07-01T00:00:00Z",
-                                "frequency": "P1Y",
-                                "type": "REQUIRED_LEARNING",
-                                "eventId": null
-                        }
-                ],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-            }]""";
+              {
+                  "results": [{
+                  "id": "course1",
+                  "title": "Course 1",
+                  "shortDescription": "Course 1",
+                  "description": "Course 1",
+                  "modules": [
+                          {
+                                  "type": "link",
+                                  "url": "https://www.gov.uk/",
+                                  "id": "module1",
+                                  "title": "module1",
+                                  "description": "module1",
+                                  "optional": false,
+                                  "moduleType": "link"
+                          },
+                          {
+                                  "type": "elearning",
+                                  "url": "https://www.gov.uk/",
+                                  "id": "module2",
+                                  "title": "module2",
+                                  "description": "module2",
+                                  "optional": false,
+                                  "moduleType": "elearning"
+                          },
+                          {
+                                  "type": "link",
+                                  "url": "https://www.gov.uk/",
+                                  "id": "module3",
+                                  "title": "module3",
+                                  "description": "module3",
+                                  "optional": true,
+                                  "moduleType": "link"
+                          }
+                  ],
+                  "audiences": [
+                          {
+                                  "id": "aud1",
+                                  "name": "aud",
+                                  "areasOfWork": [],
+                                  "departments": ["HMRC"],
+                                  "grades": [],
+                                  "interests": [],
+                                  "requiredBy": "2024-06-01T00:00:00Z",
+                                  "frequency": "P1Y",
+                                  "type": "REQUIRED_LEARNING",
+                                  "eventId": null
+                          },
+                          {
+                                  "id": "aud1",
+                                  "name": "aud",
+                                  "areasOfWork": [],
+                                  "departments": ["DWP"],
+                                  "grades": [],
+                                  "interests": [],
+                                  "requiredBy": "2024-07-01T00:00:00Z",
+                                  "frequency": "P1Y",
+                                  "type": "REQUIRED_LEARNING",
+                                  "eventId": null
+                          }
+                  ],
+                  "visibility": "PUBLIC",
+                  "status": "Published",
+                  "cost": 0.0
+              }],
+                "page": 0,
+                "totalResults": 1,
+                "size": 20
+            }""";
 
     @Test
     public void testGetRequiredLearningForUserNotStarted() throws Exception {

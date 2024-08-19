@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface ILearningCatalogueClient {
 
-    List<Course> getCourses(GetCourseParams params);
+    List<Course> getCourses(List<String> courseIds);
 
-    List<Course> getCoursesWithIds(List<String> courseIds);
+    List<Course> getPagedCourses(GetPagedCourseParams params);
 
     Course getCourse(String courseId);
 
