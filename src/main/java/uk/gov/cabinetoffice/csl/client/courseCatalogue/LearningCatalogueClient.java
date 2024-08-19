@@ -7,12 +7,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Audience;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseFactory;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,15 +24,16 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     private final IHttpClient httpClient;
     private final CourseFactory courseFactory;
 
-    public LearningCatalogueClient(@Qualifier("learningCatalogueHttpClient") IHttpClient httpClient, CourseFactory courseFactory) {
+    public LearningCatalogueClient(@Qualifier("learningCatalogueHttpClient") IHttpClient httpClient,
+                                   CourseFactory courseFactory) {
         this.httpClient = httpClient;
         this.courseFactory = courseFactory;
     }
 
     @Override
-    public List<Course> getCourses(List<String> courseIds) {
-        log.info("Getting courses with IDs '{}' from learning catalogue API", courseIds);
-        String url = String.format("%s?courseId=%s", courses, String.join(",", courseIds));
+    public List<Course> getCourses(GetCourseParams params) {
+        log.info("Getting courses with params '{}' from learning catalogue API", params);
+        String url = String.format("%s%s", courses, params.getUrlParams());
         RequestEntity<Void> request = RequestEntity.get(url).build();
         List<Course> course = httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
         });
@@ -43,14 +41,22 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
+    public List<Course> getCoursesWithIds(List<String> courseIds) {
+        GetCourseParams params = GetCourseParams.builder().courseIds(courseIds).build();
+        return this.getCourses(params);
+    }
+
+    @Override
     public Course getCourse(String courseId) {
-        return this.getCourses(List.of(courseId)).stream().findFirst().orElse(null);
+        return this.getCoursesWithIds(List.of(courseId)).stream().findFirst().orElse(null);
     }
 
     private Course buildCourseData(Course course) {
-        Collection<Audience> audiences = course.getAudiences();
-        Map<String, LearningPeriod> departmentDeadlineMap = courseFactory.buildDepartmentDeadlineMap(audiences);
-        course.setDepartmentDeadlineMap(departmentDeadlineMap);
+        Map<String, Integer> departmentCodeToRequiredAudienceMap = courseFactory.buildRequiredLearningDepartmentMap(course.getAudiences());
+        course.setDepartmentCodeToRequiredAudienceMap(departmentCodeToRequiredAudienceMap);
+
+        List<String> moduleIdsRequiredForCompletion = courseFactory.getRequiredModulesForCompletion(course.getModules());
+        course.setRequiredModuleIdsForCompletion(moduleIdsRequiredForCompletion);
         return course;
     }
 }

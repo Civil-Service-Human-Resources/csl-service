@@ -23,13 +23,29 @@ public class LearningCatalogueStubService {
     }
 
     public void getCourses(List<String> courseIds, List<Course> response) {
+        getCourses(courseIds, utils.toJson(response));
+    }
+
+    public void getMandatoryLearning(List<String> departments, String response) {
+        stubFor(
+                WireMock.get(urlPathEqualTo("/learning_catalogue/courses"))
+                        .withQueryParam("department", equalTo(String.join(",", departments)))
+                        .withQueryParam("mandatory", equalTo("true"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
+    public void getCourses(List<String> courseIds, String response) {
         stubFor(
                 WireMock.get(urlPathEqualTo("/learning_catalogue/courses"))
                         .withQueryParam("courseId", equalTo(String.join(",", courseIds)))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
-                                .withBody(utils.toJson(response)))
+                                .withBody(response))
         );
     }
 

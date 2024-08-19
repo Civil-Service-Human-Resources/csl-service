@@ -32,14 +32,26 @@ public class Audience implements Serializable {
     private String frequency;
     private Type type;
     private LocalDate requiredBy;
+    private LearningPeriod learningPeriod;
 
     public Type getType() {
         return Optional.ofNullable(this.type).orElse(Type.NULL);
     }
 
     @JsonIgnore
+    public boolean isRequiredForDepartments() {
+        return this.isRequired() && !getDepartments().isEmpty();
+    }
+
+    @JsonIgnore
     public boolean isRequired() {
         return (getType().equals(Audience.Type.REQUIRED_LEARNING) && getRequiredBy() != null);
+    }
+
+    @JsonIgnore
+    public String getFrequencyAsString() {
+        return getFrequencyAsPeriod().map(f -> String.format("%s years, %s months", f.getYears(), f.getMonths()))
+                .orElse("None");
     }
 
     @JsonIgnore

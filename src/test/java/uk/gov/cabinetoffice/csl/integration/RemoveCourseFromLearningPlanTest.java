@@ -61,7 +61,7 @@ public class RemoveCourseFromLearningPlanTest extends IntegrationTestBase {
         String courseId = testDataService.getCourseId();
         String userId = testDataService.getUserId();
         cslStubService.getLearningCatalogue().getCourse(courseId, this.testDataService.generateCourse(false, false));
-        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, null);
+        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, new CourseRecords());
         String url = String.format("/courses/%s/remove_from_learning_plan", courseId);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON))

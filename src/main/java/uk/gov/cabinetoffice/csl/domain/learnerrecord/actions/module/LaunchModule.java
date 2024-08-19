@@ -24,7 +24,7 @@ public class LaunchModule extends ModuleRecordActionProcessor {
                     if (mr.getState().equals(State.COMPLETED)) {
                         course.getLearningPeriodForDepartmentHierarchy(user.getDepartmentCodes())
                                 .ifPresent(lp -> {
-                                    if (mr.getCompletionDate().isBefore(lp.getStartDate())) {
+                                    if (mr.getCompletionDate().isBefore(lp.getStartDateAsDateTime())) {
                                         mr.setState(State.IN_PROGRESS);
                                     }
                                 });

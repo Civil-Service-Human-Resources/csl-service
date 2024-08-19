@@ -4,16 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CourseRecords {
-    public List<CourseRecord> courseRecords;
+    public List<CourseRecord> courseRecords = new ArrayList<>();
 
-    public CourseRecord getCourseRecord(String courseId){
-        if (courseRecords != null ) {
+    public CourseRecord getCourseRecord(String courseId) {
+        if (courseRecords != null) {
             return this.courseRecords
                     .stream()
                     .filter(c -> c.getCourseId().equals(courseId))
