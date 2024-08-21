@@ -1,10 +1,13 @@
 package uk.gov.cabinetoffice.csl.util;
 
+import lombok.Data;
 import org.springframework.cache.Cache;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+@Data
 public class ObjectCache<T extends Cacheable> {
 
     private final Cache cache;
@@ -19,7 +22,7 @@ public class ObjectCache<T extends Cacheable> {
         return cache.get(id, clazz);
     }
 
-    public CacheGetMultipleOp<T> getMultiple(List<String> ids) {
+    public CacheGetMultipleOp<T> getMultiple(Collection<String> ids) {
         List<String> missingIds = new ArrayList<>();
         ArrayList<T> hits = new ArrayList<>();
         ids.forEach(id -> {

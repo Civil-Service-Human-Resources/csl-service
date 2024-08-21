@@ -26,11 +26,9 @@ public class LearningCatalogueStubService {
         getCourses(courseIds, utils.toJson(response));
     }
 
-    public void getMandatoryLearning(List<String> departments, String response) {
+    public void getMandatoryLearningMap(String response) {
         stubFor(
-                WireMock.get(urlPathEqualTo("/learning_catalogue/courses"))
-                        .withQueryParam("department", equalTo(String.join(",", departments)))
-                        .withQueryParam("mandatory", equalTo("true"))
+                WireMock.get(urlPathEqualTo("/learning_catalogue/v2/courses/required-learning-map"))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")

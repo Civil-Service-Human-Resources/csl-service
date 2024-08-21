@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.service.learningCatalogue.RequiredLearningMapCache;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
 import java.time.Duration;
@@ -24,6 +25,12 @@ public class RedisCacheConfig {
 
     @Value("${csrs.cache.ttlSeconds}")
     private int userCacheTTlSeconds;
+
+    @Bean
+    public RequiredLearningMapCache requiredLearningMapCache(CacheManager cacheManager) {
+        Cache cache = cacheManager.getCache("catalogue-course");
+        return new RequiredLearningMapCache(cache);
+    }
 
     @Bean
     public ObjectCache<Course> courseCatalogueCache(CacheManager cacheManager) {

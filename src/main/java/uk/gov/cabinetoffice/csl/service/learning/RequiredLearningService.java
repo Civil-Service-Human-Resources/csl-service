@@ -8,8 +8,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learning.Learning;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
-import uk.gov.cabinetoffice.csl.service.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.UserDetailsService;
+import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
 import java.util.List;
 

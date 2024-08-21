@@ -1,10 +1,9 @@
-package uk.gov.cabinetoffice.csl.service;
+package uk.gov.cabinetoffice.csl.service.learningCatalogue;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.client.courseCatalogue.GetPagedCourseParams;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
@@ -14,6 +13,7 @@ import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -21,6 +21,7 @@ import java.util.List;
 public class LearningCatalogueService {
 
     private final ObjectCache<Course> cache;
+    private final RequiredLearningMapCache requiredLearningMapCache;
     private final ILearningCatalogueClient client;
 
     public CourseWithModule getCourseWithModule(String courseId, String moduleId) {
@@ -61,7 +62,7 @@ public class LearningCatalogueService {
         }
     }
 
-    public List<Course> getCourses(List<String> courseIds) {
+    public List<Course> getCourses(Collection<String> courseIds) {
         try {
             CacheGetMultipleOp<Course> result = cache.getMultiple(courseIds);
             List<Course> courses = result.getCacheHits();
@@ -79,14 +80,24 @@ public class LearningCatalogueService {
     }
 
     public List<Course> getRequiredLearningForDepartments(Collection<String> departmentCodes) {
-        GetPagedCourseParams params = GetPagedCourseParams.builder()
-                .department(departmentCodes).mandatory(true).build();
-        return client.getPagedCourses(params);
+        RequiredLearningMap map = requiredLearningMapCache.get();
+        if (map == null) {
+            map = client.getRequiredLearningIdMap();
+            requiredLearningMapCache.put(map);
+        }
+        Set<String> uniqueCourseIds = map.getRequiredLearningWithDepartmentCodes(departmentCodes);
+        return this.getCourses(uniqueCourseIds);
     }
 
     public void removeCourseFromCache(String courseId) {
         log.info("LearningCatalogueService.removeCourseFromCache: Catalogue course is removed from the cache for the" +
                 " key: {}.", courseId);
         this.cache.evict(courseId);
+        RequiredLearningMap map = requiredLearningMapCache.get();
+        if (map != null) {
+            if (map.doesCourseExistInMap(courseId)) {
+                requiredLearningMapCache.evict();
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@ import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordUpdateProcessor;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
 @Service
 @Slf4j

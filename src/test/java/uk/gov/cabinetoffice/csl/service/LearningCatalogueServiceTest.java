@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
