@@ -43,7 +43,8 @@ public class RequiredLearningDisplayCourseFactory implements IDisplayCourseFacto
             if (moduleIdsRequiredForCompletion.contains(displayModule.getId())) {
                 if (displayModule.getStatus().equals(State.COMPLETED)) {
                     LocalDateTime completionDate = Objects.requireNonNullElse(displayModule.getCompletionDate(), LocalDateTime.MIN);
-                    if (completionDate.isAfter(Objects.requireNonNullElse(courseCompletionDate, LocalDateTime.MIN))) {
+                    if (completionDate.isAfter(Objects.requireNonNullElse(courseCompletionDate, LocalDateTime.MIN))
+                            && courseRecord.getState().equals(State.COMPLETED)) {
                         courseCompletionDate = completionDate;
                     }
                     requiredCompletedCount++;
