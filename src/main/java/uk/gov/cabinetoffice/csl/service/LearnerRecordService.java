@@ -47,8 +47,10 @@ public class LearnerRecordService {
         return getCourseRecords(learnerId, List.of(courseId)).stream().findFirst().orElse(null);
     }
 
-    public CourseRecord updateCourseRecord(CourseRecord input) {
-        CourseRecord courseRecord = client.updateCourseRecord(input);
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
+        CourseRecord result = client.updateCourseRecord(courseRecord);
+        log.debug(String.format("Updating with course record %s", result));
+        courseRecord.update(result);
         cache.put(courseRecord);
         return courseRecord;
     }
