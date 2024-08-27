@@ -24,6 +24,10 @@ public class LearnerRecordService {
         cache.evict(id);
     }
 
+    public void updateCourseRecordCache(CourseRecord courseRecord) {
+        cache.put(courseRecord);
+    }
+
     public List<CourseRecord> getCourseRecords(String learnerId, List<String> courseIds) {
         try {
             List<String> ids = courseIds.stream().map(c -> String.format("%s,%s", learnerId, c)).toList();
@@ -47,12 +51,9 @@ public class LearnerRecordService {
         return getCourseRecords(learnerId, List.of(courseId)).stream().findFirst().orElse(null);
     }
 
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
-        CourseRecord result = client.updateCourseRecord(courseRecord);
-        log.debug(String.format("Updating with course record %s", result));
-        courseRecord.update(result);
-        cache.put(courseRecord);
-        return courseRecord;
+    public CourseRecord updateCourseRecord(CourseRecord recordUpdates) {
+        log.debug(String.format("Updating with course record %s", recordUpdates));
+        return client.updateCourseRecord(recordUpdates);
     }
 
     public CourseRecord createCourseRecord(CourseRecord input) {

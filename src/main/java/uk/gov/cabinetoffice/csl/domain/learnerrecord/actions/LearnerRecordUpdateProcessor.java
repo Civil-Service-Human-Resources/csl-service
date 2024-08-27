@@ -52,11 +52,13 @@ public class LearnerRecordUpdateProcessor {
             if (courseRecord == null) {
                 courseRecord = learnerRecordService.createCourseRecord(action.generateNewCourseRecord());
             } else {
-                CourseRecord updatedRecord = action.applyUpdatesToCourseRecord(courseRecord);
-                courseRecord = learnerRecordService.updateCourseRecord(updatedRecord);
+                CourseRecord recordUpdates = action.applyUpdatesToCourseRecord(courseRecord);
+                recordUpdates = learnerRecordService.updateCourseRecord(recordUpdates);
+                courseRecord.update(recordUpdates);
             }
             log.debug(String.format("Updated course record %s ", courseRecord));
             messagingClient.sendMessages(action.getMessages());
+            learnerRecordService.updateCourseRecordCache(courseRecord);
             return courseRecord;
         } catch (Exception e) {
             learnerRecordService.bustCourseRecordCache(action.getUserId(), action.getCourseId());
