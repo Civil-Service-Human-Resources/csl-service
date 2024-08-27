@@ -29,7 +29,7 @@ public class RequiredLearningDisplayCourseFactory implements IDisplayCourseFacto
     private final DisplayAudienceFactory displayAudienceFactory;
 
     public DisplayCourse generateDetailedDisplayCourse(Course course, User user, CourseRecord courseRecord) {
-        LocalDateTime courseCompletionDate = null;
+        LocalDateTime latestCompletionDate = null;
         DisplayAudience displayAudience = displayAudienceFactory.generateDisplayAudience(course, user);
         LearningPeriod learningPeriod = displayAudience == null ? null : displayAudience.getLearningPeriod();
         Map<String, ModuleRecord> moduleRecordMap = courseRecord.getModuleRecordsAsMap();
@@ -41,15 +41,12 @@ public class RequiredLearningDisplayCourseFactory implements IDisplayCourseFacto
             ModuleRecord moduleRecord = moduleRecordMap.get(m.getId());
             DisplayModule displayModule = moduleRecord == null ? displayModuleFactory.generateDisplayModule(m) : displayModuleFactory.generateDisplayModule(m, moduleRecord, learningPeriod);
             if (moduleIdsRequiredForCompletion.contains(displayModule.getId())) {
-                LocalDateTime completionDate = displayModule.getCompletionDate();
-                if (completionDate != null) {
-                    if (completionDate.isAfter(Objects.requireNonNullElse(courseCompletionDate, LocalDateTime.MIN))
-                            && courseRecord.getState().equals(State.COMPLETED)) {
-                        courseCompletionDate = completionDate;
+                if (displayModule.getStatus().equals(State.COMPLETED)) {
+                    LocalDateTime completionDate = Objects.requireNonNullElse(displayModule.getCompletionDate(), LocalDateTime.MIN);
+                    if (completionDate.isAfter(Objects.requireNonNullElse(latestCompletionDate, LocalDateTime.MIN))) {
+                        latestCompletionDate = completionDate;
                     }
-                    if (displayModule.getStatus().equals(State.COMPLETED)) {
-                        requiredCompletedCount++;
-                    }
+                    requiredCompletedCount++;
                 } else if (displayModule.getStatus().equals(State.IN_PROGRESS)) {
                     inProgressCount++;
                 }
@@ -69,7 +66,8 @@ public class RequiredLearningDisplayCourseFactory implements IDisplayCourseFacto
         }
 
         return new DisplayCourse(course.getId(), course.getTitle(), course.getShortDescription(), courseRecord.getLastUpdated(),
-                courseCompletionDate, courseRecordState, displayAudience, displayModules, course.getModulesRequiredForCompletion().size(), requiredCompletedCount);
+                courseRecordState == State.COMPLETED ? latestCompletionDate : null, courseRecordState, displayAudience,
+                displayModules, course.getModulesRequiredForCompletion().size(), requiredCompletedCount);
     }
 
     public DisplayCourse generateDetailedDisplayCourse(Course course, User user) {
