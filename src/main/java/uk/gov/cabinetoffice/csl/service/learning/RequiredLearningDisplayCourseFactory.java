@@ -41,13 +41,15 @@ public class RequiredLearningDisplayCourseFactory implements IDisplayCourseFacto
             ModuleRecord moduleRecord = moduleRecordMap.get(m.getId());
             DisplayModule displayModule = moduleRecord == null ? displayModuleFactory.generateDisplayModule(m) : displayModuleFactory.generateDisplayModule(m, moduleRecord, learningPeriod);
             if (moduleIdsRequiredForCompletion.contains(displayModule.getId())) {
-                if (displayModule.getStatus().equals(State.COMPLETED)) {
-                    LocalDateTime completionDate = Objects.requireNonNullElse(displayModule.getCompletionDate(), LocalDateTime.MIN);
+                LocalDateTime completionDate = displayModule.getCompletionDate();
+                if (completionDate != null) {
                     if (completionDate.isAfter(Objects.requireNonNullElse(courseCompletionDate, LocalDateTime.MIN))
-                            || courseRecord.getState().equals(State.COMPLETED)) {
+                            && courseRecord.getState().equals(State.COMPLETED)) {
                         courseCompletionDate = completionDate;
                     }
-                    requiredCompletedCount++;
+                    if (displayModule.getStatus().equals(State.COMPLETED)) {
+                        requiredCompletedCount++;
+                    }
                 } else if (displayModule.getStatus().equals(State.IN_PROGRESS)) {
                     inProgressCount++;
                 }
