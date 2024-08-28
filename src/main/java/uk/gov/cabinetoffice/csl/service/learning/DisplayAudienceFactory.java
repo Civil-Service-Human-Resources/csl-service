@@ -8,17 +8,18 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Audience;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 public class DisplayAudienceFactory {
 
     public DisplayAudience generateDisplayAudience(Course course, User user) {
-        for (String code : user.getDepartmentCodes()) {
-            Audience audience = course.getRequiredAudienceWithDepCode(code);
-            if (audience != null) {
-                LearningPeriod learningPeriod = audience.getLearningPeriod();
-                return new DisplayAudience(code, audience.getFrequencyAsString(), learningPeriod);
-            }
+        Optional<Audience> optionalAudience = course.getAudienceForDepartmentHierarchy(user.getDepartmentCodes());
+        if (optionalAudience.isPresent()) {
+            Audience audience = optionalAudience.get();
+            LearningPeriod learningPeriod = audience.getLearningPeriod();
+            return new DisplayAudience(audience.getName(), audience.getFrequencyAsString(), learningPeriod);
         }
         return null;
     }

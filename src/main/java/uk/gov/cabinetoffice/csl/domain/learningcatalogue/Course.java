@@ -28,7 +28,6 @@ public class Course implements Serializable, Cacheable {
     private List<Audience> audiences = Collections.emptyList();
 
     private Map<String, Integer> departmentCodeToRequiredAudienceMap = new HashMap<>();
-    private List<String> requiredModuleIdsForCompletion = new ArrayList<>();
 
     @JsonIgnore
     public Audience getRequiredAudienceWithDepCode(String departmentCode) {
@@ -56,40 +55,33 @@ public class Course implements Serializable, Cacheable {
     }
 
     @JsonIgnore
-    public Collection<Module> getModulesRequiredForCompletion() {
-        Collection<Module> optionalModules = new ArrayList<>();
-        Collection<Module> requiredModules = new ArrayList<>();
-        getModules().forEach(m -> {
-            if (m.isOptional()) {
-                optionalModules.add(m);
-            } else {
-                requiredModules.add(m);
-            }
-        });
-        if (requiredModules.isEmpty()) {
-            return optionalModules;
-        } else {
-            return requiredModules;
-        }
-    }
-
-    @JsonIgnore
-    public Optional<LearningPeriod> getLearningPeriodForDepartmentHierarchy(Collection<String> departmentCodeHierarchy) {
+    public Optional<Audience> getAudienceForDepartmentHierarchy(Collection<String> departmentCodeHierarchy) {
         String[] departmentCodeHierarchyArray = departmentCodeHierarchy.toArray(new String[]{});
         for (int i = (departmentCodeHierarchyArray.length - 1); i >= 0; i--) {
             String code = departmentCodeHierarchyArray[i];
             Audience audience = getRequiredAudienceWithDepCode(code);
             if (audience != null) {
-                LearningPeriod learningPeriod = audience.getLearningPeriod();
-                if (learningPeriod != null) {
-                    return Optional.of(learningPeriod);
-                }
+                return Optional.of(audience);
             }
         }
         return Optional.empty();
     }
 
-    public Collection<Module> getRemainingModulesForCompletion(CourseRecord courseRecord, User user) {
+    @JsonIgnore
+    public Optional<LearningPeriod> getLearningPeriodForDepartmentHierarchy(Collection<String> departmentCodeHierarchy) {
+        Optional<Audience> optionalAudience = getAudienceForDepartmentHierarchy(departmentCodeHierarchy);
+        return optionalAudience.map(Audience::getLearningPeriod);
+    }
+
+    @JsonIgnore
+    public List<Module> getRequiredModulesForCompletion() {
+        return this.modules.stream()
+                .filter(Module::isRequiredForCompletion)
+                .collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public Collection<String> getRemainingModuleIdsForCompletion(CourseRecord courseRecord, User user) {
         log.debug(String.format("Getting learning period for course %s and department codes %s", this.getId(), user.getDepartmentCodes()));
         LearningPeriod learningPeriod = getLearningPeriodForDepartmentHierarchy(user.getDepartmentCodes()).orElse(null);
         log.debug(String.format("Selected learning period: %s", learningPeriod));
@@ -98,10 +90,10 @@ public class Course implements Serializable, Cacheable {
             State moduleRecordState = mr.getStateForLearningPeriod(learningPeriod);
             realModuleStates.put(mr.getModuleId(), moduleRecordState);
         });
-        return getModulesRequiredForCompletion().stream().filter(m -> {
-            State moduleState = realModuleStates.getOrDefault(m.getId(), State.NULL);
+        return getRequiredModulesForCompletion().stream().filter(mod -> {
+            State moduleState = realModuleStates.getOrDefault(mod.getId(), State.NULL);
             return !moduleState.equals(State.COMPLETED);
-        }).collect(Collectors.toSet());
+        }).map(Module::getId).collect(Collectors.toSet());
     }
 
 }

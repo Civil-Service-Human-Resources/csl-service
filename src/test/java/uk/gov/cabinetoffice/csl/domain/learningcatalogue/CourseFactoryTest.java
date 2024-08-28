@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.domain.learningcatalogue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.AssertionErrors;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,9 +23,48 @@ class CourseFactoryTest {
     LearningPeriodFactory learningPeriodFactory = mock(LearningPeriodFactory.class);
     CourseFactory courseFactory = new CourseFactory(learningPeriodFactory);
 
+    private Module generateModule(String moduleId, boolean optional) {
+        Module module = new Module();
+        module.setId(moduleId);
+        module.setOptional(optional);
+        return module;
+    }
+
     @BeforeEach
     public void before() {
         when(learningPeriodFactory.buildLearningPeriod(any())).thenReturn(genericLearningPeriod);
+    }
+
+    @Test
+    public void testGetRequiredModules() {
+        Module mod1 = generateModule("mod1", false);
+        Module mod2 = generateModule("mod2", false);
+        Module mod3 = generateModule("mod3", true);
+        List<String> requiredModules = courseFactory.getRequiredModulesForCompletion(List.of(mod1, mod2, mod3));
+        AssertionErrors.assertEquals("Expected mod1 to be in the required modules", "mod1", requiredModules.get(0));
+        AssertionErrors.assertEquals("Expected mod2 to be in the required modules", "mod2", requiredModules.get(1));
+    }
+
+    @Test
+    public void testGetRequiredModulesAllRequired() {
+        Module mod1 = generateModule("mod1", false);
+        Module mod2 = generateModule("mod2", false);
+        Module mod3 = generateModule("mod3", false);
+        List<String> requiredModules = courseFactory.getRequiredModulesForCompletion(List.of(mod1, mod2, mod3));
+        AssertionErrors.assertEquals("Expected mod1 to be in the required modules", "mod1", requiredModules.get(0));
+        AssertionErrors.assertEquals("Expected mod2 to be in the required modules", "mod2", requiredModules.get(1));
+        AssertionErrors.assertEquals("Expected mod2 to be in the required modules", "mod3", requiredModules.get(2));
+    }
+
+    @Test
+    public void testGetRequiredModulesAllOptional() {
+        Module mod1 = generateModule("mod1", true);
+        Module mod2 = generateModule("mod2", true);
+        Module mod3 = generateModule("mod3", true);
+        List<String> requiredModules = courseFactory.getRequiredModulesForCompletion(List.of(mod1, mod2, mod3));
+        AssertionErrors.assertEquals("Expected mod1 to be in the required modules", "mod1", requiredModules.get(0));
+        AssertionErrors.assertEquals("Expected mod2 to be in the required modules", "mod2", requiredModules.get(1));
+        AssertionErrors.assertEquals("Expected mod2 to be in the required modules", "mod3", requiredModules.get(2));
     }
 
     @Test

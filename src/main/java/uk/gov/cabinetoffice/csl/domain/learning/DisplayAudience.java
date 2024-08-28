@@ -8,7 +8,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 @RequiredArgsConstructor
 public class DisplayAudience {
 
-    private final String organisation;
+    private final String name;
     private final String frequency;
     private final LearningPeriod learningPeriod;
 

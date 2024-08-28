@@ -26,6 +26,7 @@ public class Audience implements Serializable {
         NULL
     }
 
+    private String name;
     private List<String> areasOfWork;
     private List<String> departments;
     private List<String> grades;

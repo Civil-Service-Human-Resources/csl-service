@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.service.learning;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
@@ -12,13 +13,10 @@ import uk.gov.cabinetoffice.csl.domain.learning.DisplayCourse;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -28,53 +26,29 @@ public class RequiredLearningDisplayCourseFactory implements IDisplayCourseFacto
     private final DisplayModuleFactory displayModuleFactory;
     private final DisplayAudienceFactory displayAudienceFactory;
 
-    public DisplayCourse generateDetailedDisplayCourse(Course course, User user, CourseRecord courseRecord) {
-        LocalDateTime latestCompletionDate = null;
-        DisplayAudience displayAudience = displayAudienceFactory.generateDisplayAudience(course, user);
-        LearningPeriod learningPeriod = displayAudience == null ? null : displayAudience.getLearningPeriod();
-        Map<String, ModuleRecord> moduleRecordMap = courseRecord.getModuleRecordsAsMap();
-        List<String> moduleIdsRequiredForCompletion = course.getRequiredModuleIdsForCompletion();
-        List<DisplayModule> displayModules = new ArrayList<>();
-        int inProgressCount = 0;
-        Integer requiredCompletedCount = 0;
-        for (Module m : course.getModules()) {
-            ModuleRecord moduleRecord = moduleRecordMap.get(m.getId());
-            DisplayModule displayModule = moduleRecord == null ? displayModuleFactory.generateDisplayModule(m) : displayModuleFactory.generateDisplayModule(m, moduleRecord, learningPeriod);
-            if (moduleIdsRequiredForCompletion.contains(displayModule.getId())) {
-                if (displayModule.getStatus().equals(State.COMPLETED)) {
-                    LocalDateTime completionDate = Objects.requireNonNullElse(displayModule.getCompletionDate(), LocalDateTime.MIN);
-                    if (completionDate.isAfter(Objects.requireNonNullElse(latestCompletionDate, LocalDateTime.MIN))) {
-                        latestCompletionDate = completionDate;
-                    }
-                    requiredCompletedCount++;
-                } else if (displayModule.getStatus().equals(State.IN_PROGRESS)) {
-                    inProgressCount++;
-                }
-            } else {
-                if (!displayModule.getStatus().equals(State.NULL)) {
-                    inProgressCount++;
-                }
+    public DisplayCourse generateDetailedDisplayCourse(Course course, User user, @Nullable CourseRecord courseRecord) {
+        if (courseRecord != null) {
+            Map<String, ModuleRecord> moduleRecordMap = courseRecord.getModuleRecordsAsMap();
+            if (moduleRecordMap.isEmpty()) {
+                return generateDetailedDisplayCourse(course, user);
             }
-            displayModules.add(displayModule);
+            DisplayAudience displayAudience = displayAudienceFactory.generateDisplayAudience(course, user);
+            LearningPeriod learningPeriod = displayAudience == null ? null : displayAudience.getLearningPeriod();
+            Collection<DisplayModule> modules = course.getModules().stream().map(m -> {
+                ModuleRecord moduleRecord = moduleRecordMap.get(m.getId());
+                return displayModuleFactory.generateDisplayModule(m, moduleRecord, learningPeriod);
+            }).toList();
+            DisplayModuleSummary moduleSummary = displayModuleFactory.generateDisplayModuleSummary(modules);
+            return DisplayCourse.build(course, modules, moduleSummary, displayAudience, courseRecord.getLastUpdated());
         }
-
-        State courseRecordState = State.NULL;
-        if (requiredCompletedCount.equals(moduleIdsRequiredForCompletion.size())) {
-            courseRecordState = State.COMPLETED;
-        } else if (inProgressCount > 0 || requiredCompletedCount > 0) {
-            courseRecordState = State.IN_PROGRESS;
-        }
-
-        return new DisplayCourse(course.getId(), course.getTitle(), course.getShortDescription(), courseRecord.getLastUpdated(),
-                courseRecordState == State.COMPLETED ? latestCompletionDate : null, courseRecordState, displayAudience,
-                displayModules, course.getModulesRequiredForCompletion().size(), requiredCompletedCount);
+        return generateDetailedDisplayCourse(course, user);
     }
 
     public DisplayCourse generateDetailedDisplayCourse(Course course, User user) {
         List<DisplayModule> modules = course.getModules().stream().map(displayModuleFactory::generateDisplayModule).toList();
         DisplayAudience displayAudience = displayAudienceFactory.generateDisplayAudience(course, user);
         return new DisplayCourse(course.getId(), course.getTitle(), course.getShortDescription(), null, null,
-                State.NULL, displayAudience, modules, course.getModulesRequiredForCompletion().size(), 0);
+                State.NULL, displayAudience, modules, course.getRequiredModulesForCompletion().size(), 0);
     }
 
 }

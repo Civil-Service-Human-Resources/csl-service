@@ -15,6 +15,7 @@ public class DisplayModule {
     private final String description;
     private final String type;
     private final boolean required;
+    private final boolean isRequiredForCompletion;
     private final LocalDateTime lastUpdated;
     private final LocalDateTime completionDate;
     private final State status;

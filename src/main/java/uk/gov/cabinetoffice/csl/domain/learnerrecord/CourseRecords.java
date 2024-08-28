@@ -12,15 +12,4 @@ import java.util.List;
 @NoArgsConstructor
 public class CourseRecords {
     public List<CourseRecord> courseRecords = new ArrayList<>();
-
-    public CourseRecord getCourseRecord(String courseId) {
-        if (courseRecords != null) {
-            return this.courseRecords
-                    .stream()
-                    .filter(c -> c.getCourseId().equals(courseId))
-                    .findFirst()
-                    .orElse(null);
-        }
-        return null;
-    }
 }

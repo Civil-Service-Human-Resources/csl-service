@@ -27,6 +27,8 @@ public class Module implements Serializable {
     private boolean optional;
     private String url;
 
+    private boolean requiredForCompletion;
+
     @JsonIgnore
     public Event getEvent(String eventId) {
         List<Event> events = this.events.stream().filter(e -> e.getId().equals(eventId)).toList();

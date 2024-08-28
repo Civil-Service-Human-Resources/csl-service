@@ -9,7 +9,6 @@ import uk.gov.cabinetoffice.csl.domain.learning.DisplayCourse;
 import uk.gov.cabinetoffice.csl.domain.learning.Learning;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,15 +23,10 @@ public class LearningFactory<F extends IDisplayCourseFactory> {
     public Learning buildDetailedLearning(List<Course> courses, List<CourseRecord> courseRecords,
                                           User user) {
         Map<String, CourseRecord> courseRecordMap = courseRecords.stream().collect(Collectors.toMap(CourseRecord::getCourseId, courseRecord -> courseRecord));
-        List<DisplayCourse> displayCourses = new ArrayList<>();
-        for (Course course : courses) {
-            CourseRecord courseRecord = courseRecordMap.get(course.getId());
-            if (courseRecord != null) {
-                displayCourses.add(displayCourseFactory.generateDetailedDisplayCourse(course, user, courseRecord));
-            } else {
-                displayCourses.add(displayCourseFactory.generateDetailedDisplayCourse(course, user));
-            }
-        }
+        List<DisplayCourse> displayCourses = courses.stream().map(c -> {
+            CourseRecord courseRecord = courseRecordMap.get(c.getId());
+            return displayCourseFactory.generateDetailedDisplayCourse(c, user, courseRecord);
+        }).toList();
         return new Learning(displayCourses);
     }
 

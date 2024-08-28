@@ -18,8 +18,6 @@ public class LearnerRecordClient implements ILearnerRecordClient {
 
     @Value("${learnerRecord.courseRecordsForLearnerUrl}")
     private String courseRecords;
-    @Value("${learnerRecord.moduleRecordsForLearnerUrl}")
-    private String moduleRecords;
     @Value("${learnerRecord.eventsUrl}")
     private String event;
     @Value("${learnerRecord.bookingsUrl}")

@@ -60,7 +60,11 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         course.setDepartmentCodeToRequiredAudienceMap(departmentCodeToRequiredAudienceMap);
 
         List<String> moduleIdsRequiredForCompletion = courseFactory.getRequiredModulesForCompletion(course.getModules());
-        course.setRequiredModuleIdsForCompletion(moduleIdsRequiredForCompletion);
+        course.getModules().forEach(m -> {
+            if (moduleIdsRequiredForCompletion.contains(m.getId())) {
+                m.setRequiredForCompletion(true);
+            }
+        });
         return course;
     }
 }
