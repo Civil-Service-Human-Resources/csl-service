@@ -5,7 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -19,12 +22,4 @@ public class RequiredLearningMap implements Serializable {
         return depCodes.stream().flatMap(code -> departmentCodeMap.getOrDefault(code, new ArrayList<>()).stream()).collect(Collectors.toSet());
     }
 
-    public boolean doesCourseExistInMap(String courseId) {
-        for (List<String> courseIds : departmentCodeMap.values()) {
-            if (courseIds.contains(courseId)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

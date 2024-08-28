@@ -93,12 +93,6 @@ public class LearningCatalogueService {
         log.info("LearningCatalogueService.removeCourseFromCache: Catalogue course is removed from the cache for the" +
                 " key: {}.", courseId);
         this.cache.evict(courseId);
-        RequiredLearningMap map = requiredLearningMapCache.get();
-        if (map != null) {
-            if (map.doesCourseExistInMap(courseId)) {
-                log.info(String.format("Course %s is a required learning course, evicting the required learning map.", courseId));
-                requiredLearningMapCache.evict();
-            }
-        }
+        requiredLearningMapCache.evict();
     }
 }
