@@ -96,6 +96,7 @@ public class LearningCatalogueService {
         RequiredLearningMap map = requiredLearningMapCache.get();
         if (map != null) {
             if (map.doesCourseExistInMap(courseId)) {
+                log.info(String.format("Course %s is a required learning course, evicting the required learning map.", courseId));
                 requiredLearningMapCache.evict();
             }
         }
