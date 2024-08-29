@@ -5,13 +5,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientResponseException;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -20,8 +18,6 @@ public class LearnerRecordClient implements ILearnerRecordClient {
 
     @Value("${learnerRecord.courseRecordsForLearnerUrl}")
     private String courseRecords;
-    @Value("${learnerRecord.moduleRecordsForLearnerUrl}")
-    private String moduleRecords;
     @Value("${learnerRecord.eventsUrl}")
     private String event;
     @Value("${learnerRecord.bookingsUrl}")
@@ -34,25 +30,24 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     }
 
     @Override
-    public CourseRecords getCourseRecord(String userId, String courseId) {
-        try {
-            return getCourseRecords(userId, Collections.singletonList(courseId));
-        } catch (RestClientResponseException e) {
-            if (e.getStatusCode().value() == 404) {
-                log.warn("Course record with userID '{}' and courseId '{}' was not found.", userId, courseId);
-                return null;
-            }
-            throw e;
+    public CourseRecord getCourseRecord(String userId, String courseId) {
+        List<CourseRecord> courseRecords = getCourseRecords(userId, List.of(courseId));
+        if (courseRecords.size() == 0) {
+            log.warn("Course record with userID '{}' and courseId '{}' was not found.", userId, courseId);
+            return null;
+        } else {
+            return courseRecords.get(0);
         }
     }
 
     @Override
-    public CourseRecords getCourseRecords(String userId, List<String> courseIds) {
+    public List<CourseRecord> getCourseRecords(String userId, List<String> courseIds) {
         log.debug("Getting course records with ids '{}' for user '{}'", courseIds, userId);
         String courseIdList = String.join(",", courseIds);
         String url = String.format("%s?userId=%s&courseIds=%s", courseRecords, userId, courseIdList);
         RequestEntity<Void> request = RequestEntity.get(url).build();
-        return httpClient.executeRequest(request, CourseRecords.class);
+        CourseRecords courseRecords = httpClient.executeRequest(request, CourseRecords.class);
+        return courseRecords.getCourseRecords();
     }
 
     @Override

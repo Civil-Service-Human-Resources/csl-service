@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
@@ -18,16 +19,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CourseCacheServiceTest {
-
-    @Mock
-    private ILearningCatalogueClient client;
+public class LearningCatalogueServiceTest {
 
     @Mock
     private ObjectCache<Course> cache;
+    @Mock
+    private ILearningCatalogueClient client;
 
     @InjectMocks
-    private CourseCacheService cacheService;
+    private LearningCatalogueService learningCatalogueService;
 
     @Test
     void getCoursesWithFullCacheHit() {
@@ -43,7 +43,7 @@ class CourseCacheServiceTest {
 
         when(cache.getMultiple(List.of("course1", "course2", "course3"))).thenReturn(cacheResult);
 
-        List<Course> result = cacheService.getCourses(List.of("course1", "course2", "course3"));
+        List<Course> result = learningCatalogueService.getCourses(List.of("course1", "course2", "course3"));
         assertEquals("course1", result.get(0).getId());
         assertEquals("course2", result.get(1).getId());
         assertEquals("course3", result.get(2).getId());
@@ -58,13 +58,13 @@ class CourseCacheServiceTest {
         Course course3 = new Course();
         course3.setId("cache-miss-course3");
 
-        CacheGetMultipleOp<Course> cacheResult = new CacheGetMultipleOp<>(List.of("course3"),
+        CacheGetMultipleOp<Course> cacheResult = new CacheGetMultipleOp<>(List.of("cache-miss-course3"),
                 new ArrayList<>(Arrays.asList(course1, course2)));
 
-        when(cache.getMultiple(List.of("course1", "course2", "course3"))).thenReturn(cacheResult);
-        when(client.getCourses(List.of("course3"))).thenReturn(List.of(course3));
+        when(cache.getMultiple(List.of("course1", "course2", "cache-miss-course3"))).thenReturn(cacheResult);
+        when(client.getCourses(List.of("cache-miss-course3"))).thenReturn(List.of(course3));
 
-        List<Course> result = cacheService.getCourses(List.of("course1", "course2", "course3"));
+        List<Course> result = learningCatalogueService.getCourses(List.of("course1", "course2", "cache-miss-course3"));
         assertEquals("course1", result.get(0).getId());
         assertEquals("course2", result.get(1).getId());
         assertEquals("cache-miss-course3", result.get(2).getId());

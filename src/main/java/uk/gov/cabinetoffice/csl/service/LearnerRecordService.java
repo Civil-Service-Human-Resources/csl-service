@@ -2,47 +2,64 @@ package uk.gov.cabinetoffice.csl.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.learnerRecord.ILearnerRecordClient;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
+import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
+import uk.gov.cabinetoffice.csl.util.ObjectCache;
+
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LearnerRecordService {
 
+    private final ObjectCache<CourseRecord> cache;
     private final ILearnerRecordClient client;
 
-    @CacheEvict(value = "course-record", key = "{#learnerId, #courseId}")
     public void bustCourseRecordCache(String learnerId, String courseId) {
-
+        String id = String.format("%s,%s", learnerId, courseId);
+        cache.evict(id);
     }
 
-    @CachePut(value = "course-record", key = "{ #courseRecord.getUserId(), #courseRecord.getCourseId() }")
-    public CourseRecord updateCourseRecordCache(CourseRecord courseRecord) {
-        log.debug(String.format("Saving course record to cache: %s", courseRecord.toString()));
-        return courseRecord;
+    public void updateCourseRecordCache(CourseRecord courseRecord) {
+        cache.put(courseRecord);
     }
 
-    @Cacheable(value = "course-record", key = "{#learnerId, #courseId}", unless = "#result == null")
-    public CourseRecord getCourseRecord(String learnerId, String courseId) {
-        CourseRecords courseRecords = client.getCourseRecord(learnerId, courseId);
-        if (courseRecords == null) {
-            return null;
+    public List<CourseRecord> getCourseRecords(String learnerId, List<String> courseIds) {
+        try {
+            List<String> ids = courseIds.stream().map(c -> String.format("%s,%s", learnerId, c)).toList();
+            CacheGetMultipleOp<CourseRecord> result = cache.getMultiple(ids);
+            List<CourseRecord> courseRecords = result.getCacheHits();
+            if (!result.getCacheMisses().isEmpty()) {
+                List<String> missCourseIds = result.getCacheMisses().stream().map(id -> id.split(",")[1]).toList();
+                client.getCourseRecords(learnerId, missCourseIds).forEach(courseRecord -> {
+                    courseRecords.add(courseRecord);
+                    cache.put(courseRecord);
+                });
+            }
+            return courseRecords;
+        } catch (Cache.ValueRetrievalException ex) {
+            log.error("Failed to retrieve courses from cache, falling back to API");
+            return client.getCourseRecords(learnerId, courseIds);
         }
-        return courseRecords.getCourseRecord(courseId);
     }
 
-    public CourseRecord updateCourseRecord(CourseRecord input) {
-        return client.updateCourseRecord(input);
+    public CourseRecord getCourseRecord(String learnerId, String courseId) {
+        return getCourseRecords(learnerId, List.of(courseId)).stream().findFirst().orElse(null);
+    }
+
+    public CourseRecord updateCourseRecord(CourseRecord recordUpdates) {
+        log.debug(String.format("Updating with course record %s", recordUpdates));
+        return client.updateCourseRecord(recordUpdates);
     }
 
     public CourseRecord createCourseRecord(CourseRecord input) {
-        return client.createCourseRecord(input);
+        CourseRecord courseRecord = client.createCourseRecord(input);
+        cache.put(courseRecord);
+        return courseRecord;
     }
 
 }

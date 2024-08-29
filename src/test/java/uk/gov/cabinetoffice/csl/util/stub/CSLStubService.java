@@ -26,7 +26,7 @@ public class CSLStubService {
     public void stubCreateCourseRecord(String courseId, Course course, String userId,
                                        String expectedUpdateInput, CourseRecord courseRecordResponse) {
         learningCatalogue.getCourse(courseId, course);
-        learnerRecord.getCourseRecord(courseId, userId, null);
+        learnerRecord.getCourseRecord(courseId, userId, new CourseRecords());
         learnerRecord.createCourseRecord(expectedUpdateInput, courseRecordResponse);
     }
 

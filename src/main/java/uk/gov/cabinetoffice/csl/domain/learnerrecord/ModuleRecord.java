@@ -8,7 +8,9 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 
 import java.io.Serializable;
@@ -64,5 +66,21 @@ public class ModuleRecord implements Serializable {
         return Objects.requireNonNullElse(this.state, State.NULL);
     }
 
+    @JsonIgnore
+    public State getStateForLearningPeriod(@Nullable LearningPeriod learningPeriod) {
+        State state = getState();
+        if (learningPeriod != null) {
+            state = State.NULL;
+            LocalDateTime learningPeriodStartDateTime = learningPeriod.getStartDateAsDateTime();
+            LocalDateTime completionDate = Objects.requireNonNullElse(getCompletionDate(), LocalDateTime.MIN);
+            LocalDateTime updatedAt = Objects.requireNonNullElse(getUpdatedAt(), LocalDateTime.MIN);
+            if (learningPeriodStartDateTime.isBefore(completionDate)) {
+                state = State.COMPLETED;
+            } else if (learningPeriodStartDateTime.isBefore(updatedAt)) {
+                state = State.IN_PROGRESS;
+            }
+        }
+        return state;
+    }
 
 }

@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordUpdate
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.event.EventModuleRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
+import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
 @Service
 @Slf4j

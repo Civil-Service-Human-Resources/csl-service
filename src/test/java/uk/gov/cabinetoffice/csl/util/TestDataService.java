@@ -107,6 +107,7 @@ public class TestDataService {
         module.setCost(BigDecimal.valueOf(10));
         module.setTitle(moduleTitle);
         module.setOptional(false);
+        module.setRequiredForCompletion(true);
         module.setId(moduleId);
         return module;
     }

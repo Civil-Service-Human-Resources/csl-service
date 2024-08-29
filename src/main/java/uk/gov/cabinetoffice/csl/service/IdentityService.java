@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.client.identity.IIdentityClient;
 import uk.gov.cabinetoffice.csl.client.identity.IdentityClient;
 import uk.gov.cabinetoffice.csl.domain.identity.OAuthToken;
 
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Service
 public class IdentityService {
 
-    private final IdentityClient identityClient;
+    private final IIdentityClient identityClient;
 
     public IdentityService(IdentityClient identityClient) {
         this.identityClient = identityClient;

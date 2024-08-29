@@ -7,10 +7,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Audience;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseFactory;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.RequiredLearningMap;
 
 import java.util.Collection;
 import java.util.List;
@@ -23,18 +22,20 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
 
     @Value("${learningCatalogue.courseUrl}")
     private String courses;
-
+    @Value("${learningCatalogue.courseV2Url}")
+    private String v2Courses;
     private final IHttpClient httpClient;
     private final CourseFactory courseFactory;
 
-    public LearningCatalogueClient(@Qualifier("learningCatalogueHttpClient") IHttpClient httpClient, CourseFactory courseFactory) {
+    public LearningCatalogueClient(@Qualifier("learningCatalogueHttpClient") IHttpClient httpClient,
+                                   CourseFactory courseFactory) {
         this.httpClient = httpClient;
         this.courseFactory = courseFactory;
     }
 
     @Override
-    public List<Course> getCourses(List<String> courseIds) {
-        log.info("Getting courses with IDs '{}' from learning catalogue API", courseIds);
+    public List<Course> getCourses(Collection<String> courseIds) {
+        log.info("Getting courses with ids '{}' from learning catalogue API", courseIds);
         String url = String.format("%s?courseId=%s", courses, String.join(",", courseIds));
         RequestEntity<Void> request = RequestEntity.get(url).build();
         List<Course> course = httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
@@ -47,10 +48,23 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         return this.getCourses(List.of(courseId)).stream().findFirst().orElse(null);
     }
 
+    @Override
+    public RequiredLearningMap getRequiredLearningIdMap() {
+        String url = String.format("%s/required-learning-map", v2Courses);
+        RequestEntity<Void> request = RequestEntity.get(url).build();
+        return httpClient.executeRequest(request, RequiredLearningMap.class);
+    }
+
     private Course buildCourseData(Course course) {
-        Collection<Audience> audiences = course.getAudiences();
-        Map<String, LearningPeriod> departmentDeadlineMap = courseFactory.buildDepartmentDeadlineMap(audiences);
-        course.setDepartmentDeadlineMap(departmentDeadlineMap);
+        Map<String, Integer> departmentCodeToRequiredAudienceMap = courseFactory.buildRequiredLearningDepartmentMap(course.getAudiences());
+        course.setDepartmentCodeToRequiredAudienceMap(departmentCodeToRequiredAudienceMap);
+
+        List<String> moduleIdsRequiredForCompletion = courseFactory.getRequiredModulesForCompletion(course.getModules());
+        course.getModules().forEach(m -> {
+            if (moduleIdsRequiredForCompletion.contains(m.getId())) {
+                m.setRequiredForCompletion(true);
+            }
+        });
         return course;
     }
 }

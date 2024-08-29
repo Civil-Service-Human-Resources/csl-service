@@ -10,8 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.cabinetoffice.csl.domain.error.RecordNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
+import uk.gov.cabinetoffice.csl.util.Cacheable;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
@@ -21,7 +21,11 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CourseRecord implements Serializable {
+public class CourseRecord implements Cacheable {
+
+    public String getId() {
+        return String.format("%s,%s", userId, courseId);
+    }
 
     private String courseId;
 
@@ -59,6 +63,11 @@ public class CourseRecord implements Serializable {
         this.courseId = courseId;
         this.userId = userId;
         this.courseTitle = courseTitle;
+    }
+
+    @JsonIgnore
+    public Map<String, ModuleRecord> getModuleRecordsAsMap() {
+        return getModuleRecords().stream().collect(Collectors.toMap(ModuleRecord::getModuleId, moduleRecord -> moduleRecord));
     }
 
     @JsonIgnore

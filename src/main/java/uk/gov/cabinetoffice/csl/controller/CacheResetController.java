@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
-import uk.gov.cabinetoffice.csl.service.LearningCatalogueService;
+import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
 @Slf4j
 @RestController

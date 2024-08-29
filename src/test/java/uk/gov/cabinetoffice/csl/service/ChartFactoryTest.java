@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationBinDelimiter;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
+import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
