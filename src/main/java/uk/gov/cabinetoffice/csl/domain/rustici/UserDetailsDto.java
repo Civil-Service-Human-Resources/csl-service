@@ -23,9 +23,7 @@ public class UserDetailsDto {
     @NotNull
     @Min(1)
     protected Integer organisationId;
-
-    @NotNull
-    @NotEmpty
+    
     protected String organisationAbbreviation;
     @NotNull
     @Min(1)
