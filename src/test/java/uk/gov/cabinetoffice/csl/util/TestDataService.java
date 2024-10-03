@@ -3,10 +3,7 @@ package uk.gov.cabinetoffice.csl.util;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
-import uk.gov.cabinetoffice.csl.domain.csrs.Grade;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
-import uk.gov.cabinetoffice.csl.domain.csrs.Profession;
+import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
@@ -35,14 +32,20 @@ public class TestDataService {
     private final String useremail = "userEmail@email.com";
     private final String learnerFirstName = "Learner";
     private final String courseTitle = "Test Course";
-    private final List<String> departmentCodes = List.of("CO", "DWP", "HMRC");
+    private final OrganisationalUnit grandparentOrganisationalUnit = new OrganisationalUnit(4L, "HMRC", "HMRC", "HMRC", null);
+    private final OrganisationalUnit parentOrganisationalUnit = new OrganisationalUnit(3L, "Department for Work and Pensions", "DWP", "DWP", grandparentOrganisationalUnit);
+    private final OrganisationalUnit organisationalUnit = new OrganisationalUnit(2L, "Cabinet Office", "CO", "CO", parentOrganisationalUnit);
+    private final ArrayList<BasicOrganisationalUnit> depHierarchy = new ArrayList<>(List.of(
+            new BasicOrganisationalUnit(2, "CO", "Cabinet Office"),
+            new BasicOrganisationalUnit(3, "DWP", "Department for Work and Pensions"),
+            new BasicOrganisationalUnit(4, "HMRC", "HMRC")
+    ));
     private final Grade grade = new Grade(1L, "SEO", "Senior Executive Officer");
-    private final OrganisationalUnit organisationalUnit = new OrganisationalUnit(2L, "Cabinet Office", "CO", "CO");
     private final Profession profession = new Profession(3L, "DDaT");
 
 
     public UserDetailsDto generateUserDetailsDto() {
-        return new UserDetailsDto("", useremail, learnerFirstName, 1, "orgAbbreviation", 1, "professionName", 1, "gradeCode", departmentCodes);
+        return new UserDetailsDto("", useremail, learnerFirstName, 1, "professionName", 1, "gradeCode", depHierarchy);
     }
 
     /**
@@ -116,13 +119,11 @@ public class TestDataService {
         return new User(
                 userId,
                 useremail,
-                organisationalUnit.getId().intValue(),
-                organisationalUnit.getAbbreviation(),
                 profession.getId().intValue(),
                 profession.getName(),
                 grade.getId().intValue(),
                 grade.getCode(),
-                departmentCodes);
+                depHierarchy);
     }
 
     public uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course generateCourse(int moduleCount) {
@@ -176,6 +177,6 @@ public class TestDataService {
     }
 
     public CivilServant generateCivilServant() {
-        return new CivilServant(getLearnerFirstName(), useremail, userId, grade, organisationalUnit, profession, departmentCodes);
+        return new CivilServant(getLearnerFirstName(), useremail, userId, grade, organisationalUnit, profession);
     }
 }
