@@ -6,6 +6,7 @@ import uk.gov.cabinetoffice.csl.domain.learning.DisplayAudience;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Audience;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
+import uk.gov.cabinetoffice.csl.util.TestDataService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,8 @@ class DisplayAudienceFactoryTest {
 
     DisplayAudienceFactory displayAudienceFactory = new DisplayAudienceFactory();
 
+    TestDataService testDataService = new TestDataService();
+
     @Test
     public void testGenerateDisplayAudience() {
         Course course = new Course();
@@ -26,10 +29,9 @@ class DisplayAudienceFactoryTest {
         audience.setLearningPeriod(new LearningPeriod(LocalDate.MIN, LocalDate.MAX));
 
         course.setAudiences(List.of(audience));
-        course.setDepartmentCodeToRequiredAudienceMap(Map.of("CODE2", 0));
+        course.setDepartmentCodeToRequiredAudienceMap(Map.of("DWP", 0));
 
-        User user = new User("UserId");
-        user.setDepartmentCodes(List.of("CODE1", "CODE2", "CODE3"));
+        User user = testDataService.generateUser();
 
         DisplayAudience result = displayAudienceFactory.generateDisplayAudience(course, user);
         assertEquals("AudienceName", result.getName());
