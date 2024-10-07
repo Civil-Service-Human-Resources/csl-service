@@ -36,12 +36,4 @@ public class UserDetailsDto {
     @Size(min = 1, message = "At least one department is required in the hierarchy")
     protected ArrayList<BasicOrganisationalUnit> departmentHierarchy;
 
-    public Integer getOrganisationId() {
-        return departmentHierarchy.stream().findFirst().map(BasicOrganisationalUnit::getId).orElse(0);
-    }
-
-    public String getOrganisationName() {
-        return departmentHierarchy.stream().findFirst().map(BasicOrganisationalUnit::getName).orElse("");
-    }
-
 }
