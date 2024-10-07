@@ -28,7 +28,7 @@ public class UserDetailsService {
                 civilServant.getProfession().getId().intValue(),
                 civilServant.getProfession().getName(),
                 grade == null ? null : grade.getId().intValue(),
-                grade == null ? null : grade.getCode(),
+                grade == null ? null : grade.getName(),
                 orgs);
     }
 }
