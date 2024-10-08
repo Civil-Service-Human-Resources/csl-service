@@ -23,7 +23,7 @@ public class NotificationServiceClient implements INotificationServiceClient {
     @Override
     public void sendEmail(String emailName, MessageDto body) {
         log.info(String.format("Sending email '%s'", emailName));
-        String url = String.format("%s/%s", emails, emailName);
+        String url = String.format("%s/%s/send", emails, emailName);
         RequestEntity<MessageDto> request = RequestEntity.post(url).body(body);
         httpClient.executeRequest(request, Void.class);
     }

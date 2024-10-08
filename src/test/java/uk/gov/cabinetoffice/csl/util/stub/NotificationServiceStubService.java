@@ -10,7 +10,7 @@ public class NotificationServiceStubService {
 
     public void sendEmail(String emailName, String expBody) {
         stubFor(
-                WireMock.post(urlPathEqualTo("/notification_service/notifications/emails/" + emailName))
+                WireMock.post(urlPathEqualTo("/notification_service/notifications/emails/" + emailName + "/send"))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .withRequestBody(equalToJson(expBody, true, true))
                         .willReturn(aResponse()
