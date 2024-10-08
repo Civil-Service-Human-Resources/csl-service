@@ -20,13 +20,11 @@ import java.util.stream.Collectors;
 public abstract class ModuleRecordActionProcessor extends CourseRecordActionProcessor {
 
     protected final Module module;
-    protected final ICourseRecordActionType actionType;
 
     protected ModuleRecordActionProcessor(UtilService utilService, CourseWithModule courseWithModule, User user,
                                           ICourseRecordActionType actionType) {
         super(utilService, courseWithModule.getCourse(), user, actionType);
         this.module = courseWithModule.getModule();
-        this.actionType = actionType;
     }
 
     @Override

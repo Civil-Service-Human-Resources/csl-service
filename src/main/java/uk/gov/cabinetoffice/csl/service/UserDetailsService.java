@@ -25,10 +25,13 @@ public class UserDetailsService {
         ArrayList<BasicOrganisationalUnit> orgs = civilServant.getDepartmentHierarchy().stream().map(o -> new BasicOrganisationalUnit(o.getId().intValue(), o.getCode(), o.getName())).collect(Collectors.toCollection(ArrayList::new));
         return new User(uid,
                 civilServant.getEmail(),
+                civilServant.getFullName(),
                 civilServant.getProfession().getId().intValue(),
                 civilServant.getProfession().getName(),
                 grade == null ? null : grade.getId().intValue(),
                 grade == null ? null : grade.getName(),
+                civilServant.getLineManagerName(),
+                civilServant.getLineManagerEmail(),
                 orgs);
     }
 }

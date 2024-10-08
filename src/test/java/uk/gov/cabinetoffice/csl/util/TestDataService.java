@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +30,10 @@ public class TestDataService {
     private final String moduleUid = "uid";
     private final long moduleRecordId = 1;
     private final String userId = "userId";
-    private final String useremail = "userEmail@email.com";
+    private final String userEmail = "userEmail@email.com";
     private final String learnerFirstName = "Learner";
+    private final String lineManagerName = "Manager";
+    private final String lineManagerEmail = "lineManager@email.com";
     private final String courseTitle = "Test Course";
     private final OrganisationalUnit grandparentOrganisationalUnit = new OrganisationalUnit(4L, "HMRC", "HMRC", "HMRC", null);
     private final OrganisationalUnit parentOrganisationalUnit = new OrganisationalUnit(3L, "Department for Work and Pensions", "DWP", "DWP", grandparentOrganisationalUnit);
@@ -45,7 +48,7 @@ public class TestDataService {
 
 
     public UserDetailsDto generateUserDetailsDto() {
-        return new UserDetailsDto("", useremail, learnerFirstName, 1, "professionName", 1, "gradeCode", depHierarchy);
+        return new UserDetailsDto("", userEmail, learnerFirstName, 1, "professionName", lineManagerName, lineManagerEmail, 1, "gradeCode", depHierarchy);
     }
 
     /**
@@ -118,11 +121,14 @@ public class TestDataService {
     public User generateUser() {
         return new User(
                 userId,
-                useremail,
+                userEmail,
+                learnerFirstName,
                 profession.getId().intValue(),
                 profession.getName(),
                 grade.getId().intValue(),
-                grade.getCode(),
+                grade.getName(),
+                lineManagerName,
+                lineManagerEmail,
                 depHierarchy);
     }
 
@@ -156,6 +162,11 @@ public class TestDataService {
         return course;
     }
 
+    public Audience generateRequiredAudience(String departmentCode) {
+        return new Audience("audience", List.of(), List.of(departmentCode), List.of(), "P1M", Audience.Type.REQUIRED_LEARNING,
+                LocalDate.now().plus(1L, ChronoUnit.DAYS), null);
+    }
+
     public RusticiRollupData generateRusticiRollupData() {
         RusticiRollupData rollupData = new RusticiRollupData();
         Course course = new Course();
@@ -177,6 +188,6 @@ public class TestDataService {
     }
 
     public CivilServant generateCivilServant() {
-        return new CivilServant(getLearnerFirstName(), useremail, userId, grade, organisationalUnit, profession);
+        return new CivilServant(getLearnerFirstName(), userEmail, userId, grade, organisationalUnit, profession, lineManagerEmail, lineManagerName);
     }
 }

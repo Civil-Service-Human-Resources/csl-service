@@ -6,6 +6,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
+import uk.gov.cabinetoffice.csl.service.notification.messages.NotifyLineManagerCompletedLearning;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,11 @@ public class CompleteModule extends ModuleRecordActionProcessor {
         if (willModuleCompletionCompleteCourse(courseRecord)) {
             log.debug(String.format("Completing module %s will complete this course. Setting course record to completed and sending completion message", getModuleId()));
             courseRecord.setState(State.COMPLETED);
-            messages.add(generateCompletionMessage(completionDate));
+            addMessage(generateCompletionMessage(completionDate));
+            if (course.isMandatoryLearningForUser(user)) {
+                addEmail(new NotifyLineManagerCompletedLearning(user.getLineManagerEmail(), user.getLineManagerName(),
+                        user.getName(), user.getEmail(), course.getTitle()));
+            }
         } else if (courseRecord.getState().equals(State.NULL) ||
                 courseRecord.getState().equals(State.ARCHIVED)) {
             courseRecord.setState(State.IN_PROGRESS);
