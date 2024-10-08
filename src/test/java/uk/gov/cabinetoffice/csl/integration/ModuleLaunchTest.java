@@ -152,9 +152,9 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 {
                     "recipient": "lineManager@email.com",
                     "personalisation": {
-                        "lineManagerName": "Manager",
-                        "learnerName": "Learner",
-                        "learnerEmail": "userEmail@email.com",
+                        "manager": "Manager",
+                        "learner": "Learner",
+                        "learnerEmailAddress": "userEmail@email.com",
                         "courseTitle": "Test Course"
                     }
                 }
