@@ -28,7 +28,8 @@ public class UserDetailsDto {
     @NotEmpty
     protected String professionName;
 
-    // Grade is the only profile setting that can be null, so let's not validate it
+    protected String lineManagerName;
+    protected String lineManagerEmail;
     protected Integer gradeId;
     protected String gradeName;
 

@@ -18,6 +18,8 @@ public class CivilServant {
     private Grade grade;
     private OrganisationalUnit organisationalUnit;
     private Profession profession;
+    private String lineManagerEmail;
+    private String lineManagerName;
 
     public List<OrganisationalUnit> getDepartmentHierarchy() {
         ArrayList<OrganisationalUnit> orgs = new ArrayList<>(Collections.singletonList(organisationalUnit));

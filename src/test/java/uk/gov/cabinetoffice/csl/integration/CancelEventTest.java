@@ -41,7 +41,7 @@ public class CancelEventTest extends IntegrationTestBase {
     public void populateTestData() {
         courseId = testDataService.getCourseId();
         userId = testDataService.getUserId();
-        userEmail = testDataService.getUseremail();
+        userEmail = testDataService.getUserEmail();
         moduleId = testDataService.getModuleId();
         eventId = testDataService.getEventId();
         courseRecord = testDataService.generateCourseRecord(true);

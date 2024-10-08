@@ -13,6 +13,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
+import uk.gov.cabinetoffice.csl.service.notification.INotificationService;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class LearnerRecordUpdateProcessor {
     private final LearnerRecordService learnerRecordService;
     private final CourseRecordActionFactory courseRecordActionFactory;
     private final IMessagingClient messagingClient;
+    private final INotificationService notificationService;
 
     public CourseRecord processCourseRecordAction(Course course, User user, CourseRecordAction actionType) {
         ICourseRecordAction action = courseRecordActionFactory.getCourseRecordAction(course, user, actionType);
@@ -58,6 +60,7 @@ public class LearnerRecordUpdateProcessor {
             }
             log.debug(String.format("Updated course record %s ", courseRecord));
             messagingClient.sendMessages(action.getMessages());
+            notificationService.sendEmails(action.getEmails());
             learnerRecordService.updateCourseRecordCache(courseRecord);
             return courseRecord;
         } catch (Exception e) {

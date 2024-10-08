@@ -6,6 +6,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ICourseRecordAction
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ICourseRecordActionType;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.messaging.model.IMessageMetadata;
+import uk.gov.cabinetoffice.csl.service.notification.messages.IEmail;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
 import java.util.ArrayList;
@@ -16,8 +17,9 @@ public abstract class CourseRecordActionProcessor implements ICourseRecordAction
     protected final UtilService utilService;
     protected final Course course;
     protected final User user;
-    protected final Collection<IMessageMetadata> messages = new ArrayList<>();
     protected final ICourseRecordActionType actionType;
+    private final Collection<IMessageMetadata> messages;
+    private final Collection<IEmail> emails;
 
     protected CourseRecordActionProcessor(UtilService utilService, Course course, User user,
                                           ICourseRecordActionType actionType) {
@@ -25,6 +27,8 @@ public abstract class CourseRecordActionProcessor implements ICourseRecordAction
         this.course = course;
         this.user = user;
         this.actionType = actionType;
+        this.messages = new ArrayList<>();
+        this.emails = new ArrayList<>();
     }
 
     @Override
@@ -40,6 +44,19 @@ public abstract class CourseRecordActionProcessor implements ICourseRecordAction
     @Override
     public Collection<IMessageMetadata> getMessages() {
         return this.messages;
+    }
+
+    protected void addMessage(IMessageMetadata message) {
+        this.messages.add(message);
+    }
+
+    @Override
+    public Collection<IEmail> getEmails() {
+        return this.emails;
+    }
+
+    protected void addEmail(IEmail message) {
+        this.emails.add(message);
     }
 
     @Override

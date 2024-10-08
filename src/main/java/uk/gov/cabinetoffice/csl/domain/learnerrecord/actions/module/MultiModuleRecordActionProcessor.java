@@ -26,7 +26,8 @@ public class MultiModuleRecordActionProcessor extends ModuleRecordActionProcesso
     protected CourseRecord updateCourseRecord(CourseRecord courseRecord) {
         for (ICourseRecordAction action : actionTypes.getActions()) {
             courseRecord = action.applyUpdatesToCourseRecord(courseRecord);
-            messages.addAll(action.getMessages());
+            action.getMessages().forEach(this::addMessage);
+            action.getEmails().forEach(this::addEmail);
         }
         return courseRecord;
     }

@@ -30,7 +30,7 @@ public class CompleteBookingTest extends BaseEventModuleRecordActionTest<Complet
         assertTrue(actionUnderTest.getMessages().stream().findFirst().isPresent());
         CourseCompletionMessage courseCompletionMessage = (CourseCompletionMessage) actionUnderTest.getMessages().stream().findFirst().get();
         assertEquals(getUserId(), courseCompletionMessage.getUserId());
-        assertEquals(getUseremail(), courseCompletionMessage.getUserEmail());
+        assertEquals(getUserEmail(), courseCompletionMessage.getUserEmail());
         assertEquals(getCourseTitle(), courseCompletionMessage.getCourseTitle());
         assertEquals(getCourseId(), courseCompletionMessage.getCourseId());
         assertEquals(getOrganisationalUnit().getId().intValue(), courseCompletionMessage.getOrganisationId());
