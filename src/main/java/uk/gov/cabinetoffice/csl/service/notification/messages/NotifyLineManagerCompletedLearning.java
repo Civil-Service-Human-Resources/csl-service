@@ -24,9 +24,9 @@ public class NotifyLineManagerCompletedLearning implements IEmail {
 
     @Override
     public Map<String, String> getPersonalisation() {
-        return Map.of("lineManagerName", lineManagerName,
-                "learnerName", learnerName,
-                "learnerEmail", learnerEmail,
+        return Map.of("manager", lineManagerName,
+                "learner", learnerName,
+                "learnerEmailAddress", learnerEmail,
                 "courseTitle", courseTitle);
     }
 
