@@ -36,6 +36,7 @@ public class IntegrationTestBase extends CSLServiceWireMockServer {
     @Autowired
     protected WebApplicationContext context;
 
+
     @BeforeEach
     public void setup() {
         Jwt jwt = new Jwt("token", Instant.now(), Instant.MAX, Map.of("alg", "none"),

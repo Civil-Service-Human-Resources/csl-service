@@ -18,15 +18,19 @@ import java.util.stream.IntStream;
 public class User implements Serializable {
     private final String id;
     private String email;
+    private String name;
     private Integer professionId;
     private String professionName;
     private Integer gradeId;
     private String gradeName;
+    private String lineManagerName;
+    private String lineManagerEmail;
     private ArrayList<BasicOrganisationalUnit> departmentHierarchy = new ArrayList<>();
 
     public static User fromUserDetails(String uid, UserDetailsDto userDetailsDto) {
-        return new User(uid, userDetailsDto.getLearnerEmail(), userDetailsDto.getProfessionId(),
+        return new User(uid, userDetailsDto.getLearnerEmail(), userDetailsDto.getLearnerName(), userDetailsDto.getProfessionId(),
                 userDetailsDto.getProfessionName(), userDetailsDto.getGradeId(), userDetailsDto.getGradeName(),
+                userDetailsDto.getLineManagerName(), userDetailsDto.getLineManagerEmail(),
                 userDetailsDto.getDepartmentHierarchy());
     }
 

@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
+import uk.gov.cabinetoffice.csl.service.notification.INotificationService;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +27,9 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
 
     @Mock
     private IMessagingClient iMessagingClient;
+
+    @Mock
+    private INotificationService notificationService;
 
     @InjectMocks
     private LearnerRecordUpdateProcessor learnerRecordUpdateProcessor;

@@ -18,6 +18,7 @@ public class CSLStubService {
     private final RusticiStubService rustici;
     private final ReportServiceStubService reportServiceStubService;
     private final CSRSStubService csrsStubService;
+    private final NotificationServiceStubService notificationServiceStubService;
 
     public void stubGetUserDetails(String uid, CivilServant civilServant) {
         getCsrsStubService().getCivilServant(uid, civilServant);
