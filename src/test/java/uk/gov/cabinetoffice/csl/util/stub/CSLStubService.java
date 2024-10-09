@@ -16,6 +16,7 @@ public class CSLStubService {
     private final LearnerRecordStubService learnerRecord;
     private final LearningCatalogueStubService learningCatalogue;
     private final RusticiStubService rustici;
+    private final ReportServiceStubService reportServiceStubService;
     private final CSRSStubService csrsStubService;
 
     public void stubGetUserDetails(String uid, CivilServant civilServant) {
@@ -25,7 +26,7 @@ public class CSLStubService {
     public void stubCreateCourseRecord(String courseId, Course course, String userId,
                                        String expectedUpdateInput, CourseRecord courseRecordResponse) {
         learningCatalogue.getCourse(courseId, course);
-        learnerRecord.getCourseRecord(courseId, userId, null);
+        learnerRecord.getCourseRecord(courseId, userId, new CourseRecords());
         learnerRecord.createCourseRecord(expectedUpdateInput, courseRecordResponse);
     }
 

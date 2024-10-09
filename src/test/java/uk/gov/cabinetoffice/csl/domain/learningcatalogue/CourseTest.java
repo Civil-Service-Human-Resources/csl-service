@@ -8,6 +8,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -49,38 +50,6 @@ public class CourseTest extends TestDataService {
         ));
     }
 
-    @Test
-    public void testGetRequiredModules() {
-        course.getModule("mod1").setOptional(false);
-        course.getModule("mod2").setOptional(false);
-        course.getModule("mod3").setOptional(true);
-        Module[] requiredModules = course.getModulesRequiredForCompletion().toArray(new Module[]{});
-        assertEquals("Expected mod1 to be in the required modules", "mod1", requiredModules[0].getId());
-        assertEquals("Expected mod2 to be in the required modules", "mod2", requiredModules[1].getId());
-    }
-
-    @Test
-    public void testGetRequiredModulesAllRequired() {
-        course.getModule("mod1").setOptional(false);
-        course.getModule("mod2").setOptional(false);
-        course.getModule("mod3").setOptional(false);
-        Module[] requiredModules = course.getModulesRequiredForCompletion().toArray(new Module[]{});
-        assertEquals("Expected mod1 to be in the required modules", "mod1", requiredModules[0].getId());
-        assertEquals("Expected mod2 to be in the required modules", "mod2", requiredModules[1].getId());
-        assertEquals("Expected mod2 to be in the required modules", "mod3", requiredModules[2].getId());
-    }
-
-    @Test
-    public void testGetRequiredModulesAllOptional() {
-        course.getModule("mod1").setOptional(true);
-        course.getModule("mod2").setOptional(true);
-        course.getModule("mod3").setOptional(true);
-        Module[] requiredModules = course.getModulesRequiredForCompletion().toArray(new Module[]{});
-        assertEquals("Expected mod1 to be in the required modules", "mod1", requiredModules[0].getId());
-        assertEquals("Expected mod2 to be in the required modules", "mod2", requiredModules[1].getId());
-        assertEquals("Expected mod2 to be in the required modules", "mod3", requiredModules[2].getId());
-    }
-
     // Completion tests
 
     @Test
@@ -94,7 +63,7 @@ public class CourseTest extends TestDataService {
         courseRecord.getModuleRecord("mod2").get().setCompletionDate(LocalDateTime.now());
         courseRecord.getModuleRecord("mod3").get().setState(State.COMPLETED);
         courseRecord.getModuleRecord("mod3").get().setCompletionDate(LocalDateTime.now());
-        Integer result = course.getRemainingModulesForCompletion(courseRecord, user).size();
+        Integer result = course.getRemainingModuleIdsForCompletion(courseRecord, user).size();
         assertEquals("Expected course to be completed (0 modules remaining)", 0, result);
     }
 
@@ -107,31 +76,34 @@ public class CourseTest extends TestDataService {
         courseRecord.getModuleRecord("mod2").get().setCompletionDate(LocalDateTime.now());
         courseRecord.getModuleRecord("mod3").get().setState(State.COMPLETED);
         courseRecord.getModuleRecord("mod3").get().setCompletionDate(LocalDateTime.now());
-        Integer result = course.getRemainingModulesForCompletion(courseRecord, user).size();
+        Integer result = course.getRemainingModuleIdsForCompletion(courseRecord, user).size();
         assertEquals("Expected course to be completed", 0, result);
     }
 
     @Test
     public void testCourseNotCompletedWithOptionalModules() {
-        course.getModule("mod1").setOptional(true);
-        course.getModule("mod2").setOptional(true);
-        course.getModule("mod3").setOptional(false);
+        course.getModule("mod1").setRequiredForCompletion(false);
+        course.getModule("mod2").setRequiredForCompletion(false);
+        course.getModule("mod3").setRequiredForCompletion(true);
         courseRecord.getModuleRecord("mod1").get().setState(State.COMPLETED);
         courseRecord.getModuleRecord("mod1").get().setCompletionDate(LocalDateTime.now());
         courseRecord.getModuleRecord("mod2").get().setState(State.COMPLETED);
         courseRecord.getModuleRecord("mod2").get().setCompletionDate(LocalDateTime.now());
         courseRecord.getModuleRecord("mod3").get().setState(State.IN_PROGRESS);
-        Integer result = course.getRemainingModulesForCompletion(courseRecord, user).size();
+        Integer result = course.getRemainingModuleIdsForCompletion(courseRecord, user).size();
         assertEquals("Expected course to not be completed (expected 1 module remaining)", 1, result);
     }
 
     @Test
     public void testCourseCompletedInLearningPeriod() {
         LearningPeriod learningPeriod = new LearningPeriod(
-                LocalDateTime.of(2023, 1, 1, 10, 0, 0),
-                LocalDateTime.of(2024, 1, 1, 10, 0, 0)
+                LocalDate.of(2023, 1, 1),
+                LocalDate.of(2024, 1, 1)
         );
-        course.setDepartmentDeadlineMap(Map.of("HMRC", learningPeriod));
+        Audience audience = new Audience();
+        audience.setLearningPeriod(learningPeriod);
+        course.setAudiences(List.of(audience));
+        course.setDepartmentCodeToRequiredAudienceMap(Map.of("HMRC", 0));
         course.getModule("mod1").setOptional(false);
         course.getModule("mod2").setOptional(false);
         course.getModule("mod3").setOptional(false);
@@ -141,57 +113,70 @@ public class CourseTest extends TestDataService {
         courseRecord.getModuleRecord("mod2").get().setCompletionDate(LocalDateTime.of(2023, 4, 30, 10, 0, 0));
         courseRecord.getModuleRecord("mod3").get().setState(State.COMPLETED);
         courseRecord.getModuleRecord("mod3").get().setCompletionDate(LocalDateTime.of(2023, 12, 1, 10, 0, 0));
-        Integer result = course.getRemainingModulesForCompletion(courseRecord, user).size();
+        Integer result = course.getRemainingModuleIdsForCompletion(courseRecord, user).size();
         assertEquals("Expected course to be completed (expected 0 modules remaining)", 0, result);
     }
 
     @Test
     public void testCourseHalfCompletedInLearningPeriod() {
         LearningPeriod learningPeriod = new LearningPeriod(
-                LocalDateTime.of(2023, 1, 1, 10, 0, 0),
-                LocalDateTime.of(2024, 1, 1, 10, 0, 0)
+                LocalDate.of(2023, 1, 1),
+                LocalDate.of(2024, 1, 1)
         );
-        course.setDepartmentDeadlineMap(Map.of("HMRC", learningPeriod));
-        course.getModule("mod1").setOptional(false);
-        course.getModule("mod2").setOptional(false);
-        course.getModule("mod3").setOptional(false);
+        Audience audience = new Audience();
+        audience.setLearningPeriod(learningPeriod);
+        course.setAudiences(List.of(audience));
+        course.setDepartmentCodeToRequiredAudienceMap(Map.of("HMRC", 0));
+        course.getModule("mod1").setRequiredForCompletion(true);
+        course.getModule("mod2").setRequiredForCompletion(true);
+        course.getModule("mod3").setRequiredForCompletion(true);
         courseRecord.getModuleRecord("mod1").get().setState(State.COMPLETED);
         courseRecord.getModuleRecord("mod1").get().setCompletionDate(LocalDateTime.of(2022, 2, 1, 10, 0, 0));
         courseRecord.getModuleRecord("mod2").get().setState(State.COMPLETED);
         courseRecord.getModuleRecord("mod2").get().setCompletionDate(LocalDateTime.of(2023, 4, 30, 10, 0, 0));
         courseRecord.getModuleRecord("mod3").get().setState(State.COMPLETED);
         courseRecord.getModuleRecord("mod3").get().setCompletionDate(LocalDateTime.of(2023, 12, 1, 10, 0, 0));
-        Collection<Module> result = course.getRemainingModulesForCompletion(courseRecord, user);
+        Collection<String> result = course.getRemainingModuleIdsForCompletion(courseRecord, user);
         assertEquals("Expected course not to be completed (expected 1 module remaining)", 1, result.size());
-        assertEquals("Expected mod1 to not be completed in this learning period", "mod1", result.stream().findFirst().get().getId());
+        assertEquals("Expected mod1 to not be completed in this learning period", "mod1", result.stream().findFirst().get());
     }
 
     // Required learning
 
     @Test
     public void testGetRequiredLearningFromCourse() {
-        LearningPeriod learningPeriod = new LearningPeriod(
-                LocalDateTime.of(2023, 1, 1, 10, 0, 0),
-                LocalDateTime.of(2024, 1, 1, 10, 0, 0)
-        );
-        course.setDepartmentDeadlineMap(Map.of("HMRC", learningPeriod));
-        assertTrue("Expected course to be mandatory for user", course.isMandatoryLearningForUser(user));
+        Course requiredLearningCourse = new Course();
+        Audience audience = new Audience();
+        audience.setLearningPeriod(new LearningPeriod(
+                LocalDate.of(2023, 1, 1),
+                LocalDate.of(2024, 1, 1)
+        ));
+        requiredLearningCourse.setAudiences(List.of(audience));
+        requiredLearningCourse.setDepartmentCodeToRequiredAudienceMap(Map.of("HMRC", 0));
+        assertTrue("Expected course to be mandatory for user", requiredLearningCourse.isMandatoryLearningForUser(user));
     }
 
     @Test
     public void testGetRequiredLearningFromCourseMultipleDepartments() {
-        course.setDepartmentDeadlineMap(Map.of(
-                "CO", new LearningPeriod(
-                        LocalDateTime.of(2023, 1, 1, 10, 0, 0),
-                        LocalDateTime.of(2024, 1, 1, 10, 0, 0)
-                ), "HMRC", new LearningPeriod(
-                        LocalDateTime.of(2024, 1, 1, 10, 0, 0),
-                        LocalDateTime.of(2025, 1, 1, 10, 0, 0)
-                )));
+        Course requiredLearningCourse = new Course();
+        Audience audience = new Audience();
+        audience.setLearningPeriod(new LearningPeriod(
+                LocalDate.of(2024, 1, 1),
+                LocalDate.of(2025, 1, 1)
+        ));
+
+        Audience audience2 = new Audience();
+        audience2.setLearningPeriod(new LearningPeriod(
+                LocalDate.of(2023, 1, 1),
+                LocalDate.of(2024, 1, 1)
+        ));
+
+        requiredLearningCourse.setAudiences(List.of(audience, audience2));
+        requiredLearningCourse.setDepartmentCodeToRequiredAudienceMap(Map.of("CO", 0, "HMRC", 1));
         // HMRC is higher up in the hierarchy for this list, so the HMRC learning period should be selected
-        LearningPeriod learningPeriod = course.getLearningPeriodForDepartmentHierarchy(List.of("CO", "HMRC")).get();
-        assertEquals("Expected start date to equal 2024-01-01 10:00:00", LocalDateTime.of(2024, 1, 1, 10, 0, 0), learningPeriod.getStartDate());
-        assertEquals("Expected start date to equal 2025-01-01 10:00:00", LocalDateTime.of(2025, 1, 1, 10, 0, 0), learningPeriod.getEndDate());
+        LearningPeriod learningPeriodResult = requiredLearningCourse.getLearningPeriodForDepartmentHierarchy(List.of("CO", "HMRC")).get();
+        assertEquals("Expected start date to equal 2023-01-01", LocalDate.of(2023, 1, 1), learningPeriodResult.getStartDate());
+        assertEquals("Expected start date to equal 2024-01-01", LocalDate.of(2024, 1, 1), learningPeriodResult.getEndDate());
     }
 
 

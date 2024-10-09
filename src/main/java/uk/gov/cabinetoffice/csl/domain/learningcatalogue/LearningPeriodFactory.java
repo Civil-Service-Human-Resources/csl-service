@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -30,10 +29,10 @@ public class LearningPeriodFactory {
             }
             LocalDateTime startDate = endDate.minus(frequency);
             log.debug(String.format("Start date is %s, end date is %s", startDate, endDate));
-            return new LearningPeriod(startDate, endDate);
+            return new LearningPeriod(startDate.toLocalDate(), endDate.toLocalDate());
         }).orElseGet(() -> {
             log.debug("No frequency data found, setting start date as EPOCH");
-            return new LearningPeriod(LocalDate.EPOCH.atStartOfDay(), requiredByAsDateTime);
+            return new LearningPeriod(null, requiredByAsDateTime.toLocalDate());
         });
     }
 }

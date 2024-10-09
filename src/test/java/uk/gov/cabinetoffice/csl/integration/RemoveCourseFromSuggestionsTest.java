@@ -3,27 +3,18 @@ package uk.gov.cabinetoffice.csl.integration;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import uk.gov.cabinetoffice.csl.configuration.TestConfig;
+import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
-import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
-@Slf4j
-@ActiveProfiles({"wiremock", "no-redis"})
-@Import(TestConfig.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
-public class RemoveCourseFromSuggestionsTest extends CSLServiceWireMockServer {
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-    @Autowired
-    private WebTestClient webTestClient;
+@Slf4j
+public class RemoveCourseFromSuggestionsTest extends IntegrationTestBase {
 
     @Autowired
     private TestDataService testDataService;
@@ -32,7 +23,7 @@ public class RemoveCourseFromSuggestionsTest extends CSLServiceWireMockServer {
     private CSLStubService cslStubService;
 
     @Test
-    public void TestRemoveCourseFromSuggestions() {
+    public void TestRemoveCourseFromSuggestions() throws Exception {
         CourseRecord courseRecord = testDataService.generateCourseRecord(false);
         String courseId = testDataService.getCourseId();
         String userId = testDataService.getUserId();
@@ -47,17 +38,13 @@ public class RemoveCourseFromSuggestionsTest extends CSLServiceWireMockServer {
                 }
                 """;
         cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);
-        webTestClient
-                .post()
-                .uri(String.format("/courses/%s/remove_from_suggestions", courseId))
-                .header("Authorization", "Bearer fakeToken")
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.courseId").isEqualTo(courseId)
-                .jsonPath("$.courseTitle").isEqualTo(testDataService.getCourseTitle())
-                .jsonPath("$.message").isEqualTo("Successfully applied action 'Remove from suggestions' to course record");
+        String url = String.format("/courses/%s/remove_from_suggestions", courseId);
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.courseId").value(courseId))
+                .andExpect(jsonPath("$.courseTitle").value(testDataService.getCourseTitle()))
+                .andExpect(jsonPath("$.message").value("Successfully applied action 'Remove from suggestions' to course record"));
 
     }
 

@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -34,6 +35,11 @@ public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(IncorrectStateException.class)
     public ProblemDetail handleIncorrectStateException(IncorrectStateException ex) {
         return createProblemDetail(400, ex, "Record is in the incorrect state");
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ProblemDetail handleAccessDeniedException(AccessDeniedException ex) {
+        return createProblemDetail(403, ex, "Access is denied");
     }
 
     @ExceptionHandler(NotFoundException.class)

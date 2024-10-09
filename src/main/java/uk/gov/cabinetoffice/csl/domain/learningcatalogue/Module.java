@@ -20,11 +20,14 @@ public class Module implements Serializable {
     private String id;
     private String title;
     private ModuleType moduleType;
+    private String description;
     private Long duration;
     private BigDecimal cost;
     private Collection<Event> events = Collections.emptyList();
     private boolean optional;
     private String url;
+
+    private boolean requiredForCompletion;
 
     @JsonIgnore
     public Event getEvent(String eventId) {

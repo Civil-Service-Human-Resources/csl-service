@@ -19,6 +19,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationInput;
 import uk.gov.cabinetoffice.csl.domain.rustici.UserDetailsDto;
+import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

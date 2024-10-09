@@ -23,11 +23,18 @@ public class UserDetailsDto {
     @NotNull
     @Min(1)
     protected Integer organisationId;
+    
+    protected String organisationAbbreviation;
     @NotNull
     @Min(1)
     protected Integer professionId;
+    @NotNull
+    @NotEmpty
+    protected String professionName;
+
     // Grade is the only profile setting that can be null, so let's not validate it
     protected Integer gradeId;
+    protected String gradeCode;
 
     @NotNull
     @Size(min = 1, message = "At least one department is required in the hierarchy")
