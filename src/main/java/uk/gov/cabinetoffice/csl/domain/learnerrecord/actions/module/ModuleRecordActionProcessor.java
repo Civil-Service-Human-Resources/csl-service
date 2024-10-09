@@ -11,8 +11,6 @@ import uk.gov.cabinetoffice.csl.service.messaging.model.CourseCompletionMessage;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -39,13 +37,6 @@ public abstract class ModuleRecordActionProcessor extends CourseRecordActionProc
 
     protected String getModuleId() {
         return module.getId();
-    }
-
-    protected boolean willModuleCompletionCompleteCourse(CourseRecord courseRecord) {
-        log.debug(String.format("Checking if %s completion will complete course", module.getId()));
-        List<String> remainingModules = new ArrayList<>(course.getRemainingModuleIdsForCompletion(courseRecord, user));
-        log.debug(String.format("Remaining modules left for completion: %s", remainingModules));
-        return (remainingModules.size() == 1 && Objects.equals(remainingModules.get(0), getModuleId()));
     }
 
     protected CourseCompletionMessage generateCompletionMessage(LocalDateTime completionDate) {

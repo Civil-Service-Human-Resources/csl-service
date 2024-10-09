@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.Preference;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
@@ -14,7 +15,8 @@ public class AddToLearningPlan extends CourseRecordActionProcessor {
 
     @Override
     public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord) {
-        courseRecord.setState(null);
+        State state = courseRecord.getModuleRecords().size() > 0 ? State.IN_PROGRESS : null;
+        courseRecord.setState(state);
         courseRecord.setPreference(Preference.LIKED);
         return courseRecord;
     }
