@@ -16,4 +16,6 @@ public class CreateReportRequestParams extends GetCourseCompletionsParams {
     @NotNull
     private String userEmail;
 
+    private String fullName;
+
 }
