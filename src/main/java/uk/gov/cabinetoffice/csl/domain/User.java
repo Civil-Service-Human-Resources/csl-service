@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Data
 @RequiredArgsConstructor
@@ -55,7 +55,7 @@ public class User implements Serializable {
     }
 
     public boolean hasLineManager() {
-        return !isBlank(lineManagerEmail) && !isBlank(lineManagerName);
+        return isNotBlank(lineManagerEmail) && isNotBlank(lineManagerName);
     }
 
 }
