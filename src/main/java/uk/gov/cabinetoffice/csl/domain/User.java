@@ -55,7 +55,7 @@ public class User implements Serializable {
     }
 
     public boolean hasLineManager() {
-        return isBlank(lineManagerEmail) && isBlank(lineManagerName);
+        return !isBlank(lineManagerEmail) && !isBlank(lineManagerName);
     }
 
 }
