@@ -52,4 +52,8 @@ public class User implements Serializable {
         return departmentHierarchy.stream().findFirst().map(BasicOrganisationalUnit::getName).orElse("");
     }
 
+    public boolean hasLineManager() {
+        return lineManagerEmail != null && lineManagerName != null;
+    }
+
 }
