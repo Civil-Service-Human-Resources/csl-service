@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.module;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
@@ -77,5 +78,25 @@ public class CompleteModuleTest extends BaseModuleRecordActionTest<CompleteModul
         assertEquals(getLineManagerEmail(), email.getRecipient());
         assertEquals(getLineManagerName(), email.getLineManagerName());
         assertEquals(getCourseTitle(), email.getCourseTitle());
+    }
+
+    @Test
+    public void testCompleteRequiredLearningModuleForRequiredLearningNoLineManager() {
+        Course requiredCourse = generateCourse(true, false);
+        User noLMUser = generateUser();
+        noLMUser.setLineManagerEmail(null);
+        noLMUser.setLineManagerName(null);
+        Audience requiredAudience = generateRequiredAudience(noLMUser.getDepartmentCodes().get(0));
+        requiredAudience.setLearningPeriod(new LearningPeriod(LocalDate.MIN, LocalDate.MAX));
+        requiredCourse.setAudiences(List.of(requiredAudience));
+        requiredCourse.setDepartmentCodeToRequiredAudienceMap(Map.of(noLMUser.getDepartmentCodes().get(0), 0));
+        Module requiredModule = requiredCourse.getModule(getModuleId());
+        CourseWithModule requiredCourseWithModule = new CourseWithModule(requiredCourse, requiredModule);
+        CompleteModule action = new CompleteModule(this.utilService, requiredCourseWithModule, noLMUser);
+        CourseRecord cr = generateCourseRecord(true);
+        cr = action.applyUpdatesToCourseRecord(cr);
+        assertEquals(State.COMPLETED, cr.getState());
+        assertEquals(State.COMPLETED, cr.getModuleRecord(getModuleId()).get().getState());
+        assertTrue(action.getEmails().isEmpty());
     }
 }

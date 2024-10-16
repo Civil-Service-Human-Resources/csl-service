@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -50,6 +52,10 @@ public class User implements Serializable {
 
     public String getOrganisationName() {
         return departmentHierarchy.stream().findFirst().map(BasicOrganisationalUnit::getName).orElse("");
+    }
+
+    public boolean hasLineManager() {
+        return isNotBlank(lineManagerEmail) && isNotBlank(lineManagerName);
     }
 
 }

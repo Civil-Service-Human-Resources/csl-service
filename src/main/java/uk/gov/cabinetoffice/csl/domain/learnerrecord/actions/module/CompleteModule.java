@@ -30,7 +30,7 @@ public class CompleteModule extends ModuleRecordActionProcessor {
             log.debug(String.format("Completing module %s will complete this course. Setting course record to completed and sending completion message", getModuleId()));
             courseRecord.setState(State.COMPLETED);
             addMessage(generateCompletionMessage(completionDate));
-            if (course.isMandatoryLearningForUser(user)) {
+            if (user.hasLineManager() && course.isMandatoryLearningForUser(user)) {
                 addEmail(new NotifyLineManagerCompletedLearning(user.getLineManagerEmail(), user.getLineManagerName(),
                         user.getName(), user.getEmail(), course.getTitle()));
             }
