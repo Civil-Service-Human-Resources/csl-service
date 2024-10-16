@@ -3,9 +3,11 @@ package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.module;
 import org.junit.jupiter.api.Test;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.Preference;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class LaunchModuleTest extends BaseModuleRecordActionTest<LaunchModule> {
 
@@ -20,6 +22,16 @@ public class LaunchModuleTest extends BaseModuleRecordActionTest<LaunchModule> {
         cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
         assertEquals(State.IN_PROGRESS, cr.getState());
         assertEquals(State.IN_PROGRESS, cr.getModuleRecords().stream().findFirst().get().getState());
+    }
+
+    @Test
+    public void testLaunchModuleDisliked() {
+        CourseRecord cr = new CourseRecord();
+        cr.setPreference(Preference.DISLIKED);
+        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        assertEquals(State.IN_PROGRESS, cr.getState());
+        assertEquals(State.IN_PROGRESS, cr.getModuleRecords().stream().findFirst().get().getState());
+        assertNull(cr.getPreference());
     }
 
     /**
