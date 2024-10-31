@@ -17,6 +17,9 @@ import java.time.Duration;
 @Configuration
 public class RedisCacheConfig {
 
+    @Value("${spring.cache.redis.key-prefix}")
+    private String keyPrefix;
+
     @Value("${learnerRecord.cache.ttlSeconds}")
     private int learnerRecordCacheTTlSeconds;
 
@@ -48,10 +51,13 @@ public class RedisCacheConfig {
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
         return (builder) -> builder
                 .withCacheConfiguration("course-record",
-                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(learnerRecordCacheTTlSeconds)))
+                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(learnerRecordCacheTTlSeconds))
+                                .prefixCacheNameWith(keyPrefix))
                 .withCacheConfiguration("catalogue-course",
-                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(learningCatalogueCacheTTlSeconds)))
+                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(learningCatalogueCacheTTlSeconds))
+                                .prefixCacheNameWith(keyPrefix))
                 .withCacheConfiguration("user",
-                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(userCacheTTlSeconds)));
+                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(userCacheTTlSeconds))
+                                .prefixCacheNameWith(keyPrefix));
     }
 }
