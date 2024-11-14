@@ -11,8 +11,6 @@ import uk.gov.cabinetoffice.csl.service.messaging.model.CourseCompletionMessage;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -20,18 +18,17 @@ import java.util.stream.Collectors;
 public abstract class ModuleRecordActionProcessor extends CourseRecordActionProcessor {
 
     protected final Module module;
-    protected final ICourseRecordActionType actionType;
 
     protected ModuleRecordActionProcessor(UtilService utilService, CourseWithModule courseWithModule, User user,
                                           ICourseRecordActionType actionType) {
         super(utilService, courseWithModule.getCourse(), user, actionType);
         this.module = courseWithModule.getModule();
-        this.actionType = actionType;
     }
 
     @Override
     public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord) {
         CourseRecord updatedRecord = new CourseRecord(courseRecord.getCourseId(), courseRecord.getUserId(), courseRecord.getCourseTitle());
+        courseRecord.setPreference(null);
         updatedRecord.update(this.updateCourseRecord(courseRecord));
         updatedRecord.setModuleRecords(courseRecord.getModuleRecords().stream().filter(mr -> Objects.equals(mr.getModuleId(), getModuleId())).collect(Collectors.toSet()));
         return updatedRecord;
@@ -43,16 +40,9 @@ public abstract class ModuleRecordActionProcessor extends CourseRecordActionProc
         return module.getId();
     }
 
-    protected boolean willModuleCompletionCompleteCourse(CourseRecord courseRecord) {
-        log.debug(String.format("Checking if %s completion will complete course", module.getId()));
-        List<String> remainingModules = new ArrayList<>(course.getRemainingModuleIdsForCompletion(courseRecord, user));
-        log.debug(String.format("Remaining modules left for completion: %s", remainingModules));
-        return (remainingModules.size() == 1 && Objects.equals(remainingModules.get(0), getModuleId()));
-    }
-
     protected CourseCompletionMessage generateCompletionMessage(LocalDateTime completionDate) {
         return new CourseCompletionMessage(completionDate, user.getId(), user.getEmail(), course.getId(), course.getTitle(),
-                user.getOrganisationId(), user.getOrganisationAbbreviation(), user.getProfessionId(), user.getProfessionName(), user.getGradeId(), user.getGradeCode());
+                user.getOrganisationId(), user.getFormattedOrganisationName(), user.getProfessionId(), user.getProfessionName(), user.getGradeId(), user.getGradeName());
     }
 
     @Override

@@ -3,10 +3,7 @@ package uk.gov.cabinetoffice.csl.util;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
-import uk.gov.cabinetoffice.csl.domain.csrs.Grade;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
-import uk.gov.cabinetoffice.csl.domain.csrs.Profession;
+import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
@@ -18,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,17 +30,25 @@ public class TestDataService {
     private final String moduleUid = "uid";
     private final long moduleRecordId = 1;
     private final String userId = "userId";
-    private final String useremail = "userEmail@email.com";
+    private final String userEmail = "userEmail@email.com";
     private final String learnerFirstName = "Learner";
+    private final String lineManagerName = "Manager";
+    private final String lineManagerEmail = "lineManager@email.com";
     private final String courseTitle = "Test Course";
-    private final List<String> departmentCodes = List.of("CO", "DWP", "HMRC");
+    private final OrganisationalUnit grandparentOrganisationalUnit = new OrganisationalUnit(4L, "HMRC", "HMRC", "HMRC", null);
+    private final OrganisationalUnit parentOrganisationalUnit = new OrganisationalUnit(3L, "Department for Work and Pensions", "DWP", "DWP", grandparentOrganisationalUnit);
+    private final OrganisationalUnit organisationalUnit = new OrganisationalUnit(2L, "Cabinet Office", "CO", "CO", parentOrganisationalUnit);
+    private final ArrayList<BasicOrganisationalUnit> depHierarchy = new ArrayList<>(List.of(
+            new BasicOrganisationalUnit(2, "CO", "Cabinet Office"),
+            new BasicOrganisationalUnit(3, "DWP", "Department for Work and Pensions"),
+            new BasicOrganisationalUnit(4, "HMRC", "HMRC")
+    ));
     private final Grade grade = new Grade(1L, "SEO", "Senior Executive Officer");
-    private final OrganisationalUnit organisationalUnit = new OrganisationalUnit(2L, "Cabinet Office", "CO", "CO");
     private final Profession profession = new Profession(3L, "DDaT");
 
 
     public UserDetailsDto generateUserDetailsDto() {
-        return new UserDetailsDto("", useremail, learnerFirstName, 1, "orgAbbreviation", 1, "professionName", 1, "gradeCode", departmentCodes);
+        return new UserDetailsDto("", userEmail, learnerFirstName, 1, "professionName", lineManagerName, lineManagerEmail, 1, "gradeCode", depHierarchy);
     }
 
     /**
@@ -115,14 +121,15 @@ public class TestDataService {
     public User generateUser() {
         return new User(
                 userId,
-                useremail,
-                organisationalUnit.getId().intValue(),
-                organisationalUnit.getAbbreviation(),
+                userEmail,
+                learnerFirstName,
                 profession.getId().intValue(),
                 profession.getName(),
                 grade.getId().intValue(),
-                grade.getCode(),
-                departmentCodes);
+                grade.getName(),
+                lineManagerName,
+                lineManagerEmail,
+                depHierarchy);
     }
 
     public uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course generateCourse(int moduleCount) {
@@ -155,6 +162,11 @@ public class TestDataService {
         return course;
     }
 
+    public Audience generateRequiredAudience(String departmentCode) {
+        return new Audience("audience", List.of(), List.of(departmentCode), List.of(), "P1M", Audience.Type.REQUIRED_LEARNING,
+                LocalDate.now().plus(1L, ChronoUnit.DAYS), null);
+    }
+
     public RusticiRollupData generateRusticiRollupData() {
         RusticiRollupData rollupData = new RusticiRollupData();
         Course course = new Course();
@@ -176,6 +188,6 @@ public class TestDataService {
     }
 
     public CivilServant generateCivilServant() {
-        return new CivilServant(getLearnerFirstName(), useremail, userId, grade, organisationalUnit, profession, departmentCodes);
+        return new CivilServant(getLearnerFirstName(), userEmail, userId, grade, organisationalUnit, profession, lineManagerEmail, lineManagerName);
     }
 }

@@ -122,6 +122,53 @@ public class ModuleLaunchTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testCompleteRequiredCourse() throws Exception {
+        Course requiredCourse = testDataService.generateCourse(true, false);
+        requiredCourse.setAudiences(List.of(
+                testDataService.generateRequiredAudience(input.getDepartmentHierarchy().get(0).getCode())
+        ));
+        requiredCourse.getModule(moduleId).setModuleType(ModuleType.file);
+        requiredCourse.getModule(moduleId).setUrl("http://launch.link");
+        cslStubService.getLearningCatalogue().getCourse(courseId, requiredCourse);
+        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, new CourseRecords());
+        String expectedCourseRecordPOST = """
+                {
+                    "courseId" : "courseId",
+                    "userId" : "userId",
+                    "courseTitle" : "Test Course",
+                    "state" : "COMPLETED",
+                    "modules": [
+                        {
+                            "id" : null,
+                            "moduleId" : "moduleId",
+                            "moduleTitle" : "Test Module",
+                            "state": "COMPLETED"
+                        }
+                    ]
+                }
+                """;
+        cslStubService.getLearnerRecord().createCourseRecord(expectedCourseRecordPOST, courseRecord);
+        String expectedMessageDto = """
+                {
+                    "recipient": "lineManager@email.com",
+                    "personalisation": {
+                        "manager": "Manager",
+                        "learner": "Learner",
+                        "learnerEmailAddress": "userEmail@email.com",
+                        "courseTitle": "Test Course"
+                    }
+                }
+                """;
+        cslStubService.getNotificationServiceStubService().sendEmail("NOTIFY_LINE_MANAGER_COMPLETED_LEARNING", expectedMessageDto);
+        String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(utils.toJson(input)))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
+    }
+
+    @Test
     public void testLaunchNewCourse() throws Exception {
         course.getModule(moduleId).setModuleType(ModuleType.file);
         course.getModule(moduleId).setUrl("http://launch.link");

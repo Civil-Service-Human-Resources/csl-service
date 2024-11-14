@@ -4,8 +4,9 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.cabinetoffice.csl.domain.csrs.BasicOrganisationalUnit;
 
-import java.util.Collection;
+import java.util.ArrayList;
 
 @Data
 @NoArgsConstructor
@@ -22,22 +23,18 @@ public class UserDetailsDto {
     protected String learnerName;
     @NotNull
     @Min(1)
-    protected Integer organisationId;
-    
-    protected String organisationAbbreviation;
-    @NotNull
-    @Min(1)
     protected Integer professionId;
     @NotNull
     @NotEmpty
     protected String professionName;
 
-    // Grade is the only profile setting that can be null, so let's not validate it
+    protected String lineManagerName;
+    protected String lineManagerEmail;
     protected Integer gradeId;
-    protected String gradeCode;
+    protected String gradeName;
 
     @NotNull
     @Size(min = 1, message = "At least one department is required in the hierarchy")
-    protected Collection<String> userDepartmentHierarchy;
+    protected ArrayList<BasicOrganisationalUnit> departmentHierarchy;
 
 }
