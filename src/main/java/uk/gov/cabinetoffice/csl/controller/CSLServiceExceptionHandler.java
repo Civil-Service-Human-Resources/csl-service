@@ -65,7 +65,7 @@ public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         BindingResult result = ex.getBindingResult();
-        return ResponseEntity.ok(errorDtoFactory.createWithErrorFields(HttpStatus.BAD_REQUEST, result.getFieldErrors()));
+        return errorDtoFactory.createWithErrorFields(HttpStatus.BAD_REQUEST, result.getFieldErrors()).getAsResponseEntity();
     }
 
 }
