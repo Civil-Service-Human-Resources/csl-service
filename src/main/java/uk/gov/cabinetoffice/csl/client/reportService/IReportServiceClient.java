@@ -1,5 +1,7 @@
 package uk.gov.cabinetoffice.csl.client.reportService;
 
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ResponseEntity;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
@@ -16,4 +18,6 @@ public interface IReportServiceClient {
     AddCourseCompletionReportRequestResponse postCourseCompletionsExportRequest(CreateReportRequestParams params);
 
     GetCourseCompletionReportRequestsResponse getCourseCompletionsExportRequest(String userId, List<String> statuses);
+
+    ResponseEntity<ByteArrayResource> downloadCourseCompletionsReport(String slug);
 }

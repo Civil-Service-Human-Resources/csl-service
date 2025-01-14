@@ -11,10 +11,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.webjars.NotFoundException;
 import uk.gov.cabinetoffice.csl.controller.model.ErrorDtoFactory;
-import uk.gov.cabinetoffice.csl.domain.error.ClientAuthenticationErrorException;
-import uk.gov.cabinetoffice.csl.domain.error.GenericServerException;
-import uk.gov.cabinetoffice.csl.domain.error.IncorrectStateException;
-import uk.gov.cabinetoffice.csl.domain.error.RecordNotFoundException;
+import uk.gov.cabinetoffice.csl.domain.error.*;
 
 import java.time.Instant;
 
@@ -55,6 +52,11 @@ public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ClientAuthenticationErrorException.class)
     public ProblemDetail handleAuthException(ClientAuthenticationErrorException ex) {
         return createProblemDetail(400, ex, "Client authentication exception");
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ProblemDetail handleForbiddenException(ForbiddenException ex) {
+        return createProblemDetail(403, ex, "Forbidden exception");
     }
 
     @ExceptionHandler(GenericServerException.class)

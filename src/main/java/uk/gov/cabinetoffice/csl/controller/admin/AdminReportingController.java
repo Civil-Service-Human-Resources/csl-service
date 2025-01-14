@@ -3,6 +3,8 @@ package uk.gov.cabinetoffice.csl.controller.admin;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
@@ -33,4 +35,11 @@ public class AdminReportingController {
     public AddCourseCompletionReportRequestResponse requestSourceData(@Valid @RequestBody CreateReportRequestParams params) {
         return reportService.requestCourseCompletionsExport(params);
     }
+
+    @GetMapping(path = "/course-completions/download-report/{urlSlug}", produces = "application/octet-stream")
+    @ResponseBody
+    public ResponseEntity<ByteArrayResource> requestSourceData(@PathVariable String urlSlug) {
+        return reportService.downloadCourseCompletionsReport(urlSlug);
+    }
+
 }
