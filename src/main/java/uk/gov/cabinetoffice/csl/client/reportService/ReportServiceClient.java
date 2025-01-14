@@ -4,11 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
+import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
@@ -58,10 +57,9 @@ public class ReportServiceClient implements IReportServiceClient {
     }
 
     @Override
-    public ResponseEntity<ByteArrayResource> downloadCourseCompletionsReport(String slug) {
+    public DownloadableFile downloadCourseCompletionsReport(String slug) {
         String url = String.format("%s/downloads/%s", requestCourseCompletionReport, slug);
         RequestEntity<Void> request = RequestEntity.get(url).build();
-        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
-        });
+        return httpClient.executeFileDownloadRequest(request);
     }
 }

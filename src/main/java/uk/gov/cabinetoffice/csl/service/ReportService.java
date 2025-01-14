@@ -2,12 +2,11 @@ package uk.gov.cabinetoffice.csl.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
+import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
@@ -43,7 +42,7 @@ public class ReportService {
     }
 
     @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")
-    public ResponseEntity<ByteArrayResource> downloadCourseCompletionsReport(String slug) {
+    public DownloadableFile downloadCourseCompletionsReport(String slug) {
         try {
             return reportServiceClient.downloadCourseCompletionsReport(slug);
         } catch (RestClientResponseException e) {

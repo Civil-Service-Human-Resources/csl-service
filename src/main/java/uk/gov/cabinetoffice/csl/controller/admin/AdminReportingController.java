@@ -4,8 +4,11 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
@@ -39,7 +42,12 @@ public class AdminReportingController {
     @GetMapping(path = "/course-completions/download-report/{urlSlug}", produces = "application/octet-stream")
     @ResponseBody
     public ResponseEntity<ByteArrayResource> requestSourceData(@PathVariable String urlSlug) {
-        return reportService.downloadCourseCompletionsReport(urlSlug);
+        DownloadableFile file = reportService.downloadCourseCompletionsReport(urlSlug);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFileName() + "\"");
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .headers(headers)
+                .body(file.getData());
     }
 
 }
