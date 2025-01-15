@@ -39,6 +39,13 @@ public class ReportServiceStubService {
                         ));
     }
 
+    public void downloadCourseCompletionReportNotFound(String slug) {
+        stubFor(
+                WireMock.get(String.format("/report-service/course-completions/report-requests/downloads/%s", slug))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(status(404)));
+    }
+
     public void getReportRequests(String expectedUserId, List<String> expectedStatuses, String response) {
         stubFor(
                 WireMock.get(urlPathEqualTo("/report-service/course-completions/report-requests"))

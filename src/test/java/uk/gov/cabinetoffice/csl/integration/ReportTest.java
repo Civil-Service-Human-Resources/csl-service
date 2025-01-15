@@ -162,4 +162,13 @@ public class ReportTest extends IntegrationTestBase {
                 .andExpect(content().bytes(testContent.getBytes()));
     }
 
+    @Test
+    public void testDownloadReportNotFound() throws Exception {
+        String testSlug = "testSlug";
+        cslStubService.getReportServiceStubService().downloadCourseCompletionReportNotFound(testSlug);
+        mockMvc.perform(get(String.format("/admin/reporting/course-completions/download-report/%s", testSlug))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("REPORT_EXPORT"))))
+                .andExpect(status().isNotFound());
+    }
+
 }
