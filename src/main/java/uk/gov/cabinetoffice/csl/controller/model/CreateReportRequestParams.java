@@ -18,7 +18,7 @@ public class CreateReportRequestParams extends GetCourseCompletionsParams {
     private String userEmail;
 
     @NotNull
-    @URL(protocol = "https", regexp = ".*learn\\.civilservice\\.gov\\.uk")
+    @URL(protocol = "https", regexp = "^https:\\/\\/(?:\\w+\\.)?learn\\.civilservice\\.gov\\.uk(?:\\/\\w+)+$")
     private String downloadBaseUrl;
 
     private String fullName;
