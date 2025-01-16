@@ -135,7 +135,7 @@ public class ReportTest extends IntegrationTestBase {
                     "organisationIds":["1","2"],
                     "userEmail": "email",
                     "userId": "id",
-                    "downloadBaseUrl": "https://domain.management.learn.civilservice.gov.uk/reporting/course-completions/download-report"
+                    "downloadBaseUrl": "http://localhost:3005/download"
                 }
                 """;
         cslStubService.getReportServiceStubService().postReportRequest(input, reportRequestsResponse);

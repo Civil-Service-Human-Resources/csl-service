@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.URL;
+import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 
 @Data
 @AllArgsConstructor
@@ -18,7 +18,7 @@ public class CreateReportRequestParams extends GetCourseCompletionsParams {
     private String userEmail;
 
     @NotNull
-    @URL(protocol = "https", regexp = "^https:\\/\\/(?:\\w+\\.){0,2}learn\\.civilservice\\.gov\\.uk(?:\\/.+)+$")
+    @ValidFrontendUrl
     private String downloadBaseUrl;
 
     private String fullName;
