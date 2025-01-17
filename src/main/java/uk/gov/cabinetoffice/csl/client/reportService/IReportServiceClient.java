@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.client.reportService;
 
+import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
@@ -16,4 +17,6 @@ public interface IReportServiceClient {
     AddCourseCompletionReportRequestResponse postCourseCompletionsExportRequest(CreateReportRequestParams params);
 
     GetCourseCompletionReportRequestsResponse getCourseCompletionsExportRequest(String userId, List<String> statuses);
+
+    DownloadableFile downloadCourseCompletionsReport(String slug);
 }

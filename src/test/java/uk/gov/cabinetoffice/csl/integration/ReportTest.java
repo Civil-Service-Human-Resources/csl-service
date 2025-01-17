@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.integration;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
@@ -11,9 +12,9 @@ import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 import java.util.List;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
 public class ReportTest extends IntegrationTestBase {
@@ -133,7 +134,8 @@ public class ReportTest extends IntegrationTestBase {
                     "courseIds":["course1", "course2"],
                     "organisationIds":["1","2"],
                     "userEmail": "email",
-                    "userId": "id"
+                    "userId": "id",
+                    "downloadBaseUrl": "http://localhost:3005/download"
                 }
                 """;
         cslStubService.getReportServiceStubService().postReportRequest(input, reportRequestsResponse);
@@ -144,6 +146,29 @@ public class ReportTest extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.addedSuccessfully").value(true))
                 .andExpect(jsonPath("$.details").value("addedSuccessfully"));
+    }
+
+    @Test
+    public void testDownloadReport() throws Exception {
+        String testContent = "content";
+        String testSlug = "testSlug";
+        String filename = "file.txt";
+        cslStubService.getReportServiceStubService().downloadCourseCompletionReport(testSlug, filename, testContent);
+        mockMvc.perform(get(String.format("/admin/reporting/course-completions/download-report/%s", testSlug))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("REPORT_EXPORT"))))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", filename)))
+                .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(content().bytes(testContent.getBytes()));
+    }
+
+    @Test
+    public void testDownloadReportNotFound() throws Exception {
+        String testSlug = "testSlug";
+        cslStubService.getReportServiceStubService().downloadCourseCompletionReportNotFound(testSlug);
+        mockMvc.perform(get(String.format("/admin/reporting/course-completions/download-report/%s", testSlug))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("REPORT_EXPORT"))))
+                .andExpect(status().isNotFound());
     }
 
 }
