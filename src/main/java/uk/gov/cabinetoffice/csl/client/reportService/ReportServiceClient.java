@@ -13,6 +13,7 @@ import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.GetCourseCompletionReportRequestsResponse;
+import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.Aggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 
 import java.util.List;
@@ -21,8 +22,11 @@ import java.util.List;
 @Component
 public class ReportServiceClient implements IReportServiceClient {
 
-    @Value("${reportService.courseCompletionsAggregationsUrl}")
+    @Value("${reportService.courseCompletionsAggregationsByCourseUrl}")
     private String courseCompletionAggregationsByCourse;
+
+    @Value("${reportService.courseCompletionsAggregationsUrl}")
+    private String courseCompletionAggregations;
 
     @Value("${reportService.requestCourseCompletionReportUrl}")
     private String requestCourseCompletionReport;
@@ -33,10 +37,16 @@ public class ReportServiceClient implements IReportServiceClient {
         this.httpClient = httpClient;
     }
 
+    public AggregationResponse<Aggregation> getCourseCompletionAggregations(GetCourseCompletionsParams body) {
+        log.debug("Getting course completion aggregation report with body '{}'", body);
+        RequestEntity<GetCourseCompletionsParams> request = RequestEntity.post(courseCompletionAggregations).body(body);
+        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
+        });
+    }
 
     @Override
-    public AggregationResponse<CourseCompletionAggregation> getCourseCompletionAggregations(GetCourseCompletionsParams body) {
-        log.debug("Getting course completion aggregation report with body '{}'", body);
+    public AggregationResponse<CourseCompletionAggregation> getCourseCompletionAggregationsByCourse(GetCourseCompletionsParams body) {
+        log.debug("Getting course completion aggregation report by course with body '{}'", body);
         RequestEntity<GetCourseCompletionsParams> request = RequestEntity.post(courseCompletionAggregationsByCourse).body(body);
         return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
         });

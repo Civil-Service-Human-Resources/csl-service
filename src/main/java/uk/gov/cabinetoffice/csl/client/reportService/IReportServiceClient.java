@@ -6,13 +6,16 @@ import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.GetCourseCompletionReportRequestsResponse;
+import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.Aggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 
 import java.util.List;
 
 public interface IReportServiceClient {
 
-    AggregationResponse<CourseCompletionAggregation> getCourseCompletionAggregations(GetCourseCompletionsParams params);
+    AggregationResponse<Aggregation> getCourseCompletionAggregations(GetCourseCompletionsParams params);
+
+    AggregationResponse<CourseCompletionAggregation> getCourseCompletionAggregationsByCourse(GetCourseCompletionsParams params);
 
     AddCourseCompletionReportRequestResponse postCourseCompletionsExportRequest(CreateReportRequestParams params);
 

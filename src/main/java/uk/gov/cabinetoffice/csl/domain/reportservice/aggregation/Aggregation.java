@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Aggregation {
+public class Aggregation implements IAggregation {
     protected LocalDateTime dateBin;
     protected Integer total;
 }

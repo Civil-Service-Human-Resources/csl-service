@@ -13,7 +13,9 @@ import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -60,6 +62,10 @@ public class LearningCatalogueService {
             removeCourseFromCache(courseId);
             throw e;
         }
+    }
+
+    public Map<String, String> getCourseIdToTitleMap(Collection<String> courseIds) {
+        return getCourses(courseIds).stream().collect(Collectors.toMap(Course::getId, Course::getTitle));
     }
 
     public List<Course> getCourses(Collection<String> courseIds) {

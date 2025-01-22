@@ -3,6 +3,8 @@ package uk.gov.cabinetoffice.csl.domain.reportservice.chart;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.service.chart.AggregationChart;
 
 import java.util.Map;
 
@@ -13,10 +15,10 @@ public class CourseCompletionChart extends BasicChart {
 
     private Map<String, Integer> courseBreakdown;
     private boolean hasRequest;
-
-    public CourseCompletionChart(Map<String, Integer> chart, Map<String, Integer> courseBreakdown,
-                                 String timezone, Integer total, String delimiter, boolean hasRequest) {
-        super(chart, timezone, total, delimiter);
+    
+    public CourseCompletionChart(AggregationChart chart, AggregationChart courseBreakdown,
+                                 GetCourseCompletionsParams params, boolean hasRequest) {
+        super(chart, params.getTimezone(), chart.getTotal(), params.getBinDelimiter().getVal());
         this.courseBreakdown = courseBreakdown;
         this.hasRequest = hasRequest;
     }

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
-public class CourseCompletionAggregation extends Aggregation {
+public class CourseCompletionAggregation extends Aggregation implements IAggregation {
 
     private String courseId;
 

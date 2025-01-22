@@ -17,6 +17,17 @@ public class ReportServiceStubService {
 
     public void getCourseCompletionAggregations(String expectedInput, String response) {
         stubFor(
+                WireMock.post(urlPathEqualTo("/report-service/course-completions/aggregations"))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
+    public void getCourseCompletionAggregationsByCourse(String expectedInput, String response) {
+        stubFor(
                 WireMock.post(urlPathEqualTo("/report-service/course-completions/aggregations/by-course"))
                         .withRequestBody(equalToJson(expectedInput, true, true))
                         .withHeader("Authorization", equalTo("Bearer token"))

@@ -36,7 +36,7 @@ public class GetCourseCompletionsParams {
         return timezone.toString();
     }
 
-    @Size(min = 1, max = 30)
+    @Size(max = 30)
     @NotNull
     protected List<String> courseIds;
 
