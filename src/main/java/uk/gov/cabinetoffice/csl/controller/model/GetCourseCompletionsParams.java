@@ -37,7 +37,6 @@ public class GetCourseCompletionsParams {
     }
 
     @Size(max = 30)
-    @NotNull
     protected List<String> courseIds;
 
     @Size(min = 1)

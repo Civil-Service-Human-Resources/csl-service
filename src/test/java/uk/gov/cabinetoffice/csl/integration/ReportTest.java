@@ -53,7 +53,6 @@ public class ReportTest extends IntegrationTestBase {
                     "startDate":"2023-12-31T23:00:00",
                     "endDate":"2024-01-01T12:00:00",
                     "timezone": "+01:00",
-                    "courseIds": [],
                     "organisationIds":["1","2"]
                 }
                 """;

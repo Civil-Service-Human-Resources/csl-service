@@ -20,6 +20,8 @@ import uk.gov.cabinetoffice.csl.service.chart.ChartFactoryService;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartFactoryBase;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
 
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class ReportService {
     private final ChartFactoryService chartFactoryService;
 
     public CourseCompletionChart getCourseCompletionsChart(GetCourseCompletionsParams params, IdentityDto user) {
-        CourseCompletionChartType type = params.getCourseIds().isEmpty() ? CourseCompletionChartType.BASIC : CourseCompletionChartType.BY_COURSE;
+        CourseCompletionChartType type = isEmpty(params.getCourseIds()) ? CourseCompletionChartType.BASIC : CourseCompletionChartType.BY_COURSE;
         CourseCompletionChartFactoryBase factory = chartFactoryService.getFactory(type);
         return factory.buildCourseCompletionsChart(params, user);
     }
