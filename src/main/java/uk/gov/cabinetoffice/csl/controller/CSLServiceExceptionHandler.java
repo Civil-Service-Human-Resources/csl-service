@@ -9,12 +9,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import org.webjars.NotFoundException;
 import uk.gov.cabinetoffice.csl.controller.model.ErrorDtoFactory;
-import uk.gov.cabinetoffice.csl.domain.error.ClientAuthenticationErrorException;
-import uk.gov.cabinetoffice.csl.domain.error.GenericServerException;
-import uk.gov.cabinetoffice.csl.domain.error.IncorrectStateException;
-import uk.gov.cabinetoffice.csl.domain.error.RecordNotFoundException;
+import uk.gov.cabinetoffice.csl.domain.error.*;
 
 import java.time.Instant;
 
@@ -57,6 +53,11 @@ public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
         return createProblemDetail(400, ex, "Client authentication exception");
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    public ProblemDetail handleForbiddenException(ForbiddenException ex) {
+        return createProblemDetail(403, ex, "Forbidden exception");
+    }
+
     @ExceptionHandler(GenericServerException.class)
     public ProblemDetail handleServerException(GenericServerException ex) {
         return createProblemDetail(500, ex, "Server exception");
@@ -65,7 +66,7 @@ public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         BindingResult result = ex.getBindingResult();
-        return ResponseEntity.ok(errorDtoFactory.createWithErrorFields(HttpStatus.BAD_REQUEST, result.getFieldErrors()));
+        return errorDtoFactory.createWithErrorFields(HttpStatus.BAD_REQUEST, result.getFieldErrors()).getAsResponseEntity();
     }
 
 }

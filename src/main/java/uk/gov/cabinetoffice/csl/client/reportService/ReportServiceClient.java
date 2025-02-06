@@ -7,6 +7,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
+import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
@@ -53,5 +54,12 @@ public class ReportServiceClient implements IReportServiceClient {
         String url = String.format("%s?userId=%s&status=%s", requestCourseCompletionReport, userId, String.join(",", statuses));
         RequestEntity<Void> request = RequestEntity.get(url).build();
         return httpClient.executeRequest(request, GetCourseCompletionReportRequestsResponse.class);
+    }
+
+    @Override
+    public DownloadableFile downloadCourseCompletionsReport(String slug) {
+        String url = String.format("%s/downloads/%s", requestCourseCompletionReport, slug);
+        RequestEntity<Void> request = RequestEntity.get(url).build();
+        return httpClient.executeFileDownloadRequest(request);
     }
 }
