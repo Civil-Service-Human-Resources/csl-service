@@ -15,11 +15,12 @@ import uk.gov.cabinetoffice.csl.domain.error.ForbiddenException;
 import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
 import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
-import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
-import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
+import uk.gov.cabinetoffice.csl.service.chart.ChartFactoryService;
+import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartFactoryBase;
+import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
 
-import java.util.List;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 @Slf4j
@@ -27,15 +28,12 @@ import java.util.List;
 public class ReportService {
 
     private final IReportServiceClient reportServiceClient;
-    private final ChartFactory chartFactory;
+    private final ChartFactoryService chartFactoryService;
 
     public CourseCompletionChart getCourseCompletionsChart(GetCourseCompletionsParams params, IdentityDto user) {
-        AggregationResponse<CourseCompletionAggregation> results = reportServiceClient.getCourseCompletionAggregations(params);
-        boolean hasRequests = false;
-        if (user.hasRole("REPORT_EXPORT")) {
-            hasRequests = reportServiceClient.getCourseCompletionsExportRequest(user.getUid(), List.of("REQUESTED", "PROCESSING")).hasRequests();
-        }
-        return chartFactory.buildCourseCompletionsChart(params, results, hasRequests);
+        CourseCompletionChartType type = isEmpty(params.getCourseIds()) ? CourseCompletionChartType.BASIC : CourseCompletionChartType.BY_COURSE;
+        CourseCompletionChartFactoryBase factory = chartFactoryService.getFactory(type);
+        return factory.buildCourseCompletionsChart(params, user);
     }
 
     @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")

@@ -30,6 +30,68 @@ public class ReportTest extends IntegrationTestBase {
                   "delimiter": "hour",
                   "results": [
                     {
+                      "total": 10,
+                      "dateBin": "2024-01-01T10:00:00"
+                    },
+                    {
+                      "total": 14,
+                      "dateBin": "2024-01-01T11:00:00"
+                    },
+                    {
+                      "total": 13,
+                      "dateBin": "2024-01-01T12:00:00"
+                    },
+                    {
+                      "total": 12,
+                      "dateBin": "2024-01-01T13:00:00"
+                    }
+                  ]
+                }
+                """;
+        String expectedInput = """
+                {
+                    "startDate":"2023-12-31T23:00:00",
+                    "endDate":"2024-01-01T12:00:00",
+                    "timezone": "+01:00",
+                    "organisationIds":["1","2"]
+                }
+                """;
+        cslStubService.getReportServiceStubService().getCourseCompletionAggregations(
+                expectedInput, response
+        );
+        mockMvc.perform(post("/admin/reporting/course-completions/generate-graph")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(expectedInput))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.chart[\"2024-01-01T00:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T00:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T01:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T02:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T03:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T04:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T05:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T06:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T07:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T08:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T09:00:00\"]").value(0))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T10:00:00\"]").value(10))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T11:00:00\"]").value(14))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T12:00:00\"]").value(13))
+                .andExpect(jsonPath("$.chart[\"2024-01-01T13:00:00\"]").value(12))
+                .andExpect(jsonPath("$.total").value("49"))
+                .andExpect(jsonPath("$.timezone").value("+01:00"))
+                .andExpect(jsonPath("$.delimiter").value("hour"))
+                .andExpect(jsonPath("$.hasRequest").value(false));
+    }
+
+    @Test
+    public void testGetAggregationsByCourse() throws Exception {
+        String response = """
+                {
+                  "timezone": "+01:00",
+                  "delimiter": "hour",
+                  "results": [
+                    {
                       "courseId": "course1",
                       "total": 10,
                       "dateBin": "2024-01-01T10:00:00"
@@ -88,7 +150,7 @@ public class ReportTest extends IntegrationTestBase {
         course2.setId("course2");
         course2.setTitle("Course 2 title");
         cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course2"), List.of(course1, course2));
-        cslStubService.getReportServiceStubService().getCourseCompletionAggregations(
+        cslStubService.getReportServiceStubService().getCourseCompletionAggregationsByCourse(
                 expectedInput, response
         );
         mockMvc.perform(post("/admin/reporting/course-completions/generate-graph")
