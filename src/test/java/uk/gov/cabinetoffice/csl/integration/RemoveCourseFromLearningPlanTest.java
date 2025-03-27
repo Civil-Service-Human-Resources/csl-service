@@ -37,12 +37,12 @@ public class RemoveCourseFromLearningPlanTest extends IntegrationTestBase {
         CourseRecord archivedCourseRecord = testDataService.generateCourseRecord(false);
         archivedCourseRecord.setState(State.ARCHIVED);
         String expectedCourseRecordPUT = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
                     "state" : "ARCHIVED"
-                }
+                }]
                 """;
         cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, archivedCourseRecord);
         String url = String.format("/courses/%s/remove_from_learning_plan", courseId);

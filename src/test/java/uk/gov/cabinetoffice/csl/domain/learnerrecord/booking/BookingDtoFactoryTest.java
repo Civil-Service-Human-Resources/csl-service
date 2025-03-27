@@ -6,8 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.rustici.UserDetailsDto;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 

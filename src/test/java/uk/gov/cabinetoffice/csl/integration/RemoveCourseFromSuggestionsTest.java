@@ -29,13 +29,13 @@ public class RemoveCourseFromSuggestionsTest extends IntegrationTestBase {
         String userId = testDataService.getUserId();
         Course course = testDataService.generateCourse(true, false);
         String expectedCourseRecordPOST = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
                     "preference": "DISLIKED",
                     "state": null
-                }
+                }]
                 """;
         cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);
         String url = String.format("/courses/%s/remove_from_suggestions", courseId);

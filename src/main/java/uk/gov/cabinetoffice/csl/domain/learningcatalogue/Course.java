@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.util.Cacheable;
 
 import java.io.Serializable;
@@ -28,6 +29,12 @@ public class Course implements Serializable, Cacheable {
     private List<Audience> audiences = Collections.emptyList();
 
     private Map<String, Integer> departmentCodeToRequiredAudienceMap = new HashMap<>();
+
+    @JsonIgnore
+    public void updateEvent(String moduleId, Event event) {
+        Optional.ofNullable(getModule(moduleId))
+                .ifPresent(module -> module.updateEvent(event));
+    }
 
     @JsonIgnore
     public Audience getRequiredAudienceWithDepCode(String departmentCode) {

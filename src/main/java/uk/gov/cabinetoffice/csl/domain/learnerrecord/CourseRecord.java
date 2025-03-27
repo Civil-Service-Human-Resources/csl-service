@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CourseRecord implements Cacheable {
 
+    @JsonIgnore
     public String getId() {
         return String.format("%s,%s", userId, courseId);
     }

@@ -68,7 +68,7 @@ public class BookEventTest extends IntegrationTestBase {
                 .learnerEmail(userEmail)
                 .learnerName("testName").build();
         String expectedCourseRecordPOST = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
@@ -83,7 +83,7 @@ public class BookEventTest extends IntegrationTestBase {
                             "eventDate" : "2023-01-01"
                         }
                     ]
-                }
+                }]
                 """;
         String expectedBookingJsonInput = String.format("""
                         {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
@@ -117,7 +117,7 @@ public class BookEventTest extends IntegrationTestBase {
                 "status": "%s", "accessibilityOptions" : ""}
                 """, dto.getEvent(), userId, userEmail, testDataService.getLearnerFirstName(), "2023-01-01T10:00:00Z", "Confirmed");
         String expectedCourseRecordPUT = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
@@ -132,7 +132,7 @@ public class BookEventTest extends IntegrationTestBase {
                             "eventDate" : "2023-01-01"
                         }
                     ]
-                }
+                }]
                 """;
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
         cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, courseRecord);
@@ -163,7 +163,7 @@ public class BookEventTest extends IntegrationTestBase {
                         """, dto.getEvent(), userId, userEmail, testDataService.getLearnerFirstName(), "2023-01-01T10:00:00Z", "access1",
                 "Requested", "poNumber123");
         String expectedCourseRecordPOST = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
@@ -178,7 +178,7 @@ public class BookEventTest extends IntegrationTestBase {
                             "eventDate" : "2023-01-01"
                         }
                     ]
-                }
+                }]
                 """;
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
         cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);

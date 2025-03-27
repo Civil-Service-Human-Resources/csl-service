@@ -68,7 +68,7 @@ public class AdminCancelBookingTest extends IntegrationTestBase {
                 "learnerEmail": "%s", "learnerName":"testName", "cancellationReason": "the booking has not been paid"}
                 """, event, userId, userEmail);
         String expectedCourseRecordPUT = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
@@ -82,7 +82,7 @@ public class AdminCancelBookingTest extends IntegrationTestBase {
                             "bookingStatus": "Cancelled"
                         }
                     ]
-                }
+                }]
                 """;
         cslStubService.getLearnerRecord().updateBookingWithId(eventId, bookingId, expectedCancellationJsonInput, bookingDtoJsonResponse);
         cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, courseRecord);

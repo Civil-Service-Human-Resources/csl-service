@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.AddToLearningPlan;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.RemoveFromLearningPlan;
@@ -14,6 +15,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,16 @@ public class CourseRecordActionFactory {
             case PASS_MODULE -> new PassModule(utilService, courseWithModule, user);
             case ROLLUP_COMPLETE_MODULE -> new RollupCompleteModule(utilService, courseWithModule, user);
         };
+    }
+
+    public CourseRecordActionCollection getEventModuleRecordActions(CourseWithModuleWithEvent courseWithModuleWithEvent, List<UserToAction<EventModuleRecordAction>> users) {
+        List<CourseRecordId> courseRecordIds = new ArrayList<>();
+        List<ICourseRecordAction> actions = new ArrayList<>();
+        users.forEach(user -> {
+            courseRecordIds.add(new CourseRecordId(user.getUser().getId(), courseWithModuleWithEvent.getCourse().getId()));
+            actions.add(getEventModuleRecordAction(courseWithModuleWithEvent, user.getUser(), user.getAction()));
+        });
+        return new CourseRecordActionCollection(actions, courseRecordIds);
     }
 
     public ICourseRecordAction getEventModuleRecordAction(CourseWithModuleWithEvent courseWithModuleWithEvent, User user, EventModuleRecordAction action) {

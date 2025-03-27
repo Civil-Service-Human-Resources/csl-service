@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.*;
 
@@ -30,6 +32,7 @@ public class TestDataService {
     private final String moduleUid = "uid";
     private final long moduleRecordId = 1;
     private final String userId = "userId";
+    private final CourseRecordId courseRecordId = new CourseRecordId(userId, courseId);
     private final String userEmail = "userEmail@email.com";
     private final String learnerFirstName = "Learner";
     private final String lineManagerName = "Manager";
