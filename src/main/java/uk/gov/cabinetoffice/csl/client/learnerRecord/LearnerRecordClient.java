@@ -36,7 +36,7 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     @Override
     public List<CourseRecord> getCourseRecords(List<CourseRecordId> courseRecordIds) {
         log.debug("Getting course records with ids '{}'", courseRecordIds);
-        String url = String.format("%s?userId=%s&courseIds=%s", courseRecords,
+        String url = String.format("%s?userIds=%s&courseIds=%s", courseRecords,
                 String.join(",", courseRecordIds.stream().map(CourseRecordId::learnerId).toList()),
                 String.join(",", courseRecordIds.stream().map(CourseRecordId::courseId).toList()));
         RequestEntity<Void> request = RequestEntity.get(url).build();
