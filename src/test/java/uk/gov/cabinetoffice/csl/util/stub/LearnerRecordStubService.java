@@ -34,8 +34,10 @@ public class LearnerRecordStubService {
     }
 
     public void getCourseRecords(List<CourseRecordId> courseRecordIds, String response) {
-        String courseIdsFmt = courseRecordIds.stream().map(CourseRecordId::courseId).collect(Collectors.joining(","));
-        String userIdsFmt = courseRecordIds.stream().map(CourseRecordId::learnerId).collect(Collectors.joining(","));
+        String courseIdsFmt = String.join(",", courseRecordIds.stream().map(CourseRecordId::courseId)
+                .collect(Collectors.toSet()));
+        String userIdsFmt = String.join(",", courseRecordIds.stream().map(CourseRecordId::learnerId)
+                .collect(Collectors.toSet()));
         stubFor(
                 WireMock.get(urlPathEqualTo("/learner_record_api/course_records"))
                         .withQueryParam("courseIds", equalTo(courseIdsFmt))
