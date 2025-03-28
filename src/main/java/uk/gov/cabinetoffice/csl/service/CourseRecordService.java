@@ -1,8 +1,8 @@
 package uk.gov.cabinetoffice.csl.service;
 
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.controller.model.FetchCourseRecordParams;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 
 import java.util.List;
 
@@ -16,11 +16,14 @@ public class CourseRecordService {
         this.learnerRecordService = learnerRecordService;
     }
 
-    public List<CourseRecord> getCourseRecords(FetchCourseRecordParams params) {
-        if (params.getCourseIds().isEmpty()) {
-            return learnerRecordService.getAllCourseRecords(params.getUserId());
+    public List<CourseRecord> getCourseRecords(String userId, List<String> courseIds) {
+        if (courseIds.isEmpty()) {
+            return learnerRecordService.getAllCourseRecords(userId);
         } else {
-            return learnerRecordService.getCourseRecords(params.getAsCourseRecordIds());
+            List<CourseRecordId> courseRecordIds = courseIds.stream().map(
+                    courseId -> new CourseRecordId(userId, courseId)
+            ).toList();
+            return learnerRecordService.getCourseRecords(courseRecordIds);
         }
     }
 }

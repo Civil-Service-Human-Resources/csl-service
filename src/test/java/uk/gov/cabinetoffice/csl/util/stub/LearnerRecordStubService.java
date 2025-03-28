@@ -49,6 +49,21 @@ public class LearnerRecordStubService {
         );
     }
 
+    public void getCourseRecordsForUser(String userId, CourseRecords response) {
+        getCourseRecordsForUser(userId, utils.toJson(response));
+    }
+
+    public void getCourseRecordsForUser(String userId, String response) {
+        stubFor(
+                WireMock.get(urlPathEqualTo("/learner_record_api/course_records"))
+                        .withQueryParam("userIds", equalTo(userId))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
     public void createCourseRecord(String expectedInput, CourseRecords response) {
         stubFor(
                 WireMock.post(urlPathEqualTo("/learner_record_api/course_records/bulk"))
