@@ -15,6 +15,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventStatusDto;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -34,11 +35,20 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     }
 
     @Override
+    public List<CourseRecord> getCourseRecordsForUser(String userId) {
+        log.debug("Getting course records for user '{}'", userId);
+        String url = String.format("%s?userIds=%s", courseRecords, userId);
+        RequestEntity<Void> request = RequestEntity.get(url).build();
+        CourseRecords courseRecords = httpClient.executeRequest(request, CourseRecords.class);
+        return courseRecords.getCourseRecords();
+    }
+
+    @Override
     public List<CourseRecord> getCourseRecords(List<CourseRecordId> courseRecordIds) {
         log.debug("Getting course records with ids '{}'", courseRecordIds);
         String url = String.format("%s?userIds=%s&courseIds=%s", courseRecords,
-                String.join(",", courseRecordIds.stream().map(CourseRecordId::learnerId).toList()),
-                String.join(",", courseRecordIds.stream().map(CourseRecordId::courseId).toList()));
+                String.join(",", courseRecordIds.stream().map(CourseRecordId::learnerId).collect(Collectors.toSet())),
+                String.join(",", courseRecordIds.stream().map(CourseRecordId::courseId).collect(Collectors.toSet())));
         RequestEntity<Void> request = RequestEntity.get(url).build();
         CourseRecords courseRecords = httpClient.executeRequest(request, CourseRecords.class);
         return courseRecords.getCourseRecords();

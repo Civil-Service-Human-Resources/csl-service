@@ -30,6 +30,12 @@ public class LearnerRecordService {
         courseRecordIds.forEach(this::bustCourseRecordCache);
     }
 
+    public List<CourseRecord> getAllCourseRecords(String userId) {
+        List<CourseRecord> courseRecords = client.getCourseRecordsForUser(userId);
+        courseRecords.forEach(cache::put);
+        return courseRecords;
+    }
+
     public List<CourseRecord> getCourseRecords(List<CourseRecordId> courseRecordIds) {
         try {
             List<String> ids = courseRecordIds.stream().map(CourseRecordId::getAsString).toList();

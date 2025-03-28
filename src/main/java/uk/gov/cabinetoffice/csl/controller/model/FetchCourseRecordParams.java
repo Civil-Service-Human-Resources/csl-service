@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -15,13 +15,11 @@ import java.util.List;
 @NoArgsConstructor
 public class FetchCourseRecordParams {
     @NotNull
-    List<String> userIds;
-    List<String> courseIds;
+    String userId;
+    List<String> courseIds = Collections.emptyList();
 
     @JsonIgnore
     public List<CourseRecordId> getAsCourseRecordIds() {
-        List<CourseRecordId> recordIds = new ArrayList<>();
-        userIds.forEach(userId -> courseIds.forEach(courseId -> recordIds.add(new CourseRecordId(userId, courseId))));
-        return recordIds;
+        return courseIds.stream().map(courseId -> new CourseRecordId(userId, courseId)).toList();
     }
 }

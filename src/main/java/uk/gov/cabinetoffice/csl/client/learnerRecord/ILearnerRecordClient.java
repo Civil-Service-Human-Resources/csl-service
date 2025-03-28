@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface ILearnerRecordClient {
 
+    List<CourseRecord> getCourseRecordsForUser(String userId);
+
     List<CourseRecord> getCourseRecords(List<CourseRecordId> courseRecordIds);
 
     List<CourseRecord> createCourseRecords(List<CourseRecord> body);

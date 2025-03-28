@@ -6,23 +6,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.FetchCourseRecordParams;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
-import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
+import uk.gov.cabinetoffice.csl.service.CourseRecordService;
 
 @Slf4j
 @RestController
 @RequestMapping("course_records")
 public class CourseRecordController {
 
-    private final LearnerRecordService learnerRecordService;
+    private final CourseRecordService courseRecordService;
 
-    public CourseRecordController(LearnerRecordService learnerRecordService) {
-        this.learnerRecordService = learnerRecordService;
+    public CourseRecordController(CourseRecordService courseRecordService) {
+        this.courseRecordService = courseRecordService;
     }
 
     @GetMapping
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public CourseRecords getCourseRecords(@Valid FetchCourseRecordParams params) {
-        return new CourseRecords(this.learnerRecordService.getCourseRecords(params.getAsCourseRecordIds()));
+        return new CourseRecords(this.courseRecordService.getCourseRecords(params));
     }
 }
