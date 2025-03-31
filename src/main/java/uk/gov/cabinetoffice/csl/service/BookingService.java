@@ -9,6 +9,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDtoFactory;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 
+import java.util.List;
+
 
 @Service
 @Slf4j
@@ -43,4 +45,7 @@ public class BookingService {
         return learnerRecordClient.updateBookingWithId(eventId, bookingId, cancellationDto);
     }
 
+    public List<BookingDto> getBookings(String eventId) {
+        return learnerRecordClient.getBookings(eventId);
+    }
 }

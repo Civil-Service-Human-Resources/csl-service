@@ -45,7 +45,7 @@ public class RusticiRollUpTest extends IntegrationTestBase {
         CivilServant civilServant = testDataService.generateCivilServant();
         cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
         String expectedCourseRecordPUT = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
@@ -59,7 +59,7 @@ public class RusticiRollUpTest extends IntegrationTestBase {
                             "completionDate": "2023-01-01T10:00:00"
                         }
                     ]
-                }
+                }]
                 """;
         cslStubService.stubUpdateCourseRecord(testDataService.getCourseId(), course, testDataService.getUserId(),
                 courseRecords, expectedCourseRecordPUT, courseRecord);
@@ -78,7 +78,7 @@ public class RusticiRollUpTest extends IntegrationTestBase {
         failedRollUpData.setRegistrationSuccess("FAILED");
         failedRollUpData.setCompletedDate(null);
         String expectedCourseRecordPUT = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
@@ -92,7 +92,7 @@ public class RusticiRollUpTest extends IntegrationTestBase {
                             "result": "FAILED"
                         }
                     ]
-                }
+                }]
                 """;
         cslStubService.stubUpdateCourseRecord(testDataService.getCourseId(), course, testDataService.getUserId(),
                 courseRecords, expectedCourseRecordPUT, courseRecord);

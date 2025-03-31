@@ -10,6 +10,7 @@ import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseFactory;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.RequiredLearningMap;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 
 import java.util.Collection;
 import java.util.List;
@@ -53,6 +54,13 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         String url = String.format("%s/required-learning-map", v2Courses);
         RequestEntity<Void> request = RequestEntity.get(url).build();
         return httpClient.executeRequest(request, RequiredLearningMap.class);
+    }
+
+    @Override
+    public Event updateEvent(String courseId, String moduleId, Event event) {
+        String url = String.format("%s/%s/modules/%s/events/%s", courses, courseId, moduleId, event.getId());
+        RequestEntity<Event> request = RequestEntity.put(url).body(event);
+        return httpClient.executeRequest(request, Event.class);
     }
 
     private Course buildCourseData(Course course) {

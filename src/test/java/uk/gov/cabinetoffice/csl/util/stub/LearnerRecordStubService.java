@@ -2,12 +2,13 @@ package uk.gov.cabinetoffice.csl.util.stub;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
@@ -21,19 +22,24 @@ public class LearnerRecordStubService {
     }
 
     public void getCourseRecord(String courseId, String userId, CourseRecords response) {
-        getCourseRecords(List.of(courseId), userId, utils.toJson(response));
+        getCourseRecords(List.of(new CourseRecordId(userId, courseId)), utils.toJson(response));
     }
 
     public void getCourseRecord(String courseId, String userId, String response) {
-        getCourseRecords(List.of(courseId), userId, response);
+        getCourseRecords(List.of(new CourseRecordId(userId, courseId)), response);
     }
 
-    public void getCourseRecords(List<String> courseIds, String userId, String response) {
-        String courseIdsFmt = String.join(",", courseIds);
+    public void getCourseRecords(List<CourseRecordId> courseRecordIds, CourseRecords response) {
+        getCourseRecords(courseRecordIds, utils.toJson(response));
+    }
+
+    public void getCourseRecords(List<CourseRecordId> courseRecordIds, String response) {
+        String courseIdsFmt = courseRecordIds.stream().map(CourseRecordId::courseId).collect(Collectors.joining(","));
+        String userIdsFmt = courseRecordIds.stream().map(CourseRecordId::learnerId).collect(Collectors.joining(","));
         stubFor(
                 WireMock.get(urlPathEqualTo("/learner_record_api/course_records"))
                         .withQueryParam("courseIds", equalTo(courseIdsFmt))
-                        .withQueryParam("userId", equalTo(userId))
+                        .withQueryParam("userIds", equalTo(userIdsFmt))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
@@ -41,9 +47,9 @@ public class LearnerRecordStubService {
         );
     }
 
-    public void createCourseRecord(String expectedInput, CourseRecord response) {
+    public void createCourseRecord(String expectedInput, CourseRecords response) {
         stubFor(
-                WireMock.post(urlPathEqualTo("/learner_record_api/course_records"))
+                WireMock.post(urlPathEqualTo("/learner_record_api/course_records/bulk"))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .withRequestBody(equalToJson(expectedInput, true, true))
                         .willReturn(aResponse()
@@ -52,9 +58,9 @@ public class LearnerRecordStubService {
         );
     }
 
-    public void updateCourseRecord(String expectedInput, CourseRecord response) {
+    public void updateCourseRecords(String expectedInput, CourseRecords response) {
         stubFor(
-                WireMock.put(urlPathEqualTo("/learner_record_api/course_records"))
+                WireMock.put(urlPathEqualTo("/learner_record_api/course_records/bulk"))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .withRequestBody(equalToJson(expectedInput, true, true))
                         .willReturn(aResponse()
@@ -92,6 +98,26 @@ public class LearnerRecordStubService {
                 WireMock.patch(urlPathEqualTo(String.format("/learner_record_api/event/%s/booking/%s", eventId, bookingId)))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .withRequestBody(equalToJson(expectedInput))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
+    public void cancelEvent(String eventId, String expectedInput) {
+        stubFor(
+                WireMock.patch(urlPathEqualTo(String.format("/learner_record_api/event/%s", eventId)))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .withRequestBody(equalToJson(expectedInput))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json"))
+        );
+    }
+
+    public void getBookings(String eventId, String response) {
+        stubFor(
+                WireMock.get(urlPathEqualTo(String.format("/learner_record_api/event/%s/booking", eventId)))
+                        .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
                                 .withBody(response))

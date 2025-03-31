@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.domain.learningcatalogue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

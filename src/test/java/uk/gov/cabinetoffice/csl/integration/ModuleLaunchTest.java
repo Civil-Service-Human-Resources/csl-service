@@ -61,7 +61,7 @@ public class ModuleLaunchTest extends IntegrationTestBase {
     @Test
     public void testGetELearningLaunchLinkUidExists() throws Exception {
         String expectedCourseRecordPUT = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
@@ -74,7 +74,7 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                             "state": "IN_PROGRESS"
                         }
                     ]
-                }
+                }]
                 """;
         moduleRecord.setState(State.IN_PROGRESS);
         cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, courseRecord);
@@ -97,7 +97,7 @@ public class ModuleLaunchTest extends IntegrationTestBase {
         cslStubService.getLearningCatalogue().getCourse(courseId, course);
         cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
         String expectedCourseRecordPOST = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
@@ -110,9 +110,9 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                             "state": "COMPLETED"
                         }
                     ]
-                }
+                }]
                 """;
-        cslStubService.getLearnerRecord().updateCourseRecord(expectedCourseRecordPOST, courseRecord);
+        cslStubService.getLearnerRecord().updateCourseRecords(expectedCourseRecordPOST, new CourseRecords(courseRecord));
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -132,7 +132,7 @@ public class ModuleLaunchTest extends IntegrationTestBase {
         cslStubService.getLearningCatalogue().getCourse(courseId, requiredCourse);
         cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, new CourseRecords());
         String expectedCourseRecordPOST = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
@@ -142,12 +142,13 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                             "id" : null,
                             "moduleId" : "moduleId",
                             "moduleTitle" : "Test Module",
-                            "state": "COMPLETED"
+                            "state": "COMPLETED",
+                            "completionDate" : "2023-01-01T10:00:00"
                         }
                     ]
-                }
+                }]
                 """;
-        cslStubService.getLearnerRecord().createCourseRecord(expectedCourseRecordPOST, courseRecord);
+        cslStubService.getLearnerRecord().createCourseRecord(expectedCourseRecordPOST, new CourseRecords(courseRecord));
         String expectedMessageDto = """
                 {
                     "recipient": "lineManager@email.com",
@@ -173,7 +174,7 @@ public class ModuleLaunchTest extends IntegrationTestBase {
         course.getModule(moduleId).setModuleType(ModuleType.file);
         course.getModule(moduleId).setUrl("http://launch.link");
         String expectedCourseRecordPOST = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
@@ -186,7 +187,7 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                             "state": "COMPLETED"
                         }
                     ]
-                }
+                }]
                 """;
         cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);
 

@@ -14,6 +14,9 @@ import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.notification.INotificationService;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.Mockito.*;
@@ -45,43 +48,45 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
     @Test
     public void shouldCreateCourseRecord() {
         CourseRecord courseRecord = generateCourseRecord(false);
-        when(learnerRecordService.getCourseRecord(getUserId(), getCourseId()))
-                .thenReturn(null);
+        Map<String, CourseRecord> map = Map.of(courseRecord.getId(), courseRecord);
+        when(action.getCourseRecordId()).thenReturn(getCourseRecordId());
+        when(learnerRecordService.getCourseRecords(List.of(getCourseRecordId())))
+                .thenReturn(List.of());
         when(action.generateNewCourseRecord())
                 .thenReturn(courseRecord);
         when(action.getCourseId()).thenReturn(courseRecord.getCourseId());
         when(action.getUserId()).thenReturn(courseRecord.getUserId());
-        when(learnerRecordService.createCourseRecord(courseRecord))
-                .thenReturn(courseRecord);
+        when(learnerRecordService.createCourseRecords(List.of(courseRecord)))
+                .thenReturn(List.of(courseRecord));
         CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(action);
-        verify(learnerRecordService, never()).updateCourseRecord(courseRecord);
+        verify(learnerRecordService, never()).updateCourseRecords(map);
         assertEquals(courseRecord, resp);
     }
 
     @Test
     public void shouldUpdateCourseRecord() {
         CourseRecord courseRecord = generateCourseRecord(false);
-        when(learnerRecordService.getCourseRecord(getUserId(), getCourseId()))
-                .thenReturn(courseRecord);
+        Map<String, CourseRecord> map = Map.of(courseRecord.getId(), courseRecord);
+        when(action.getCourseRecordId()).thenReturn(getCourseRecordId());
+        when(learnerRecordService.getCourseRecords(List.of(getCourseRecordId())))
+                .thenReturn(List.of(courseRecord));
         when(action.getCourseId()).thenReturn(courseRecord.getCourseId());
         when(action.getUserId()).thenReturn(courseRecord.getUserId());
         when(action.applyUpdatesToCourseRecord(courseRecord))
                 .thenReturn(courseRecord);
-        when(learnerRecordService.updateCourseRecord(courseRecord))
-                .thenReturn(courseRecord);
+        when(learnerRecordService.updateCourseRecords(map))
+                .thenReturn(map);
         CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(action);
-        verify(learnerRecordService, never()).createCourseRecord(courseRecord);
+        verify(learnerRecordService, never()).createCourseRecords(List.of(courseRecord));
         assertEquals(courseRecord, resp);
     }
 
     @Test
     public void shouldBustLearnerRecordCacheOnError() {
-        when(learnerRecordService.getCourseRecord(getUserId(), getCourseId())).thenThrow(new RuntimeException("Error"));
-        when(action.getCourseId()).thenReturn(getCourseId());
+        when(learnerRecordService.getCourseRecords(List.of(getCourseRecordId()))).thenThrow(new RuntimeException("Error"));
+        when(action.getCourseRecordId()).thenReturn(getCourseRecordId());
         when(action.getUserId()).thenReturn(getUserId());
-        assertThrowsExactly(RuntimeException.class, () -> {
-            learnerRecordUpdateProcessor.processCourseRecordAction(action);
-        });
-        verify(learnerRecordService, atMostOnce()).bustCourseRecordCache(getUserId(), getCourseId());
+        assertThrowsExactly(RuntimeException.class, () -> learnerRecordUpdateProcessor.processCourseRecordAction(action));
+        verify(learnerRecordService, atMostOnce()).bustCourseRecordCache(getCourseRecordId());
     }
 }

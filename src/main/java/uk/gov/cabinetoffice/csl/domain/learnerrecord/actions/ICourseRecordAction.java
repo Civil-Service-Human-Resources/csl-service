@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions;
 
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 import uk.gov.cabinetoffice.csl.service.messaging.model.IMessageMetadata;
 import uk.gov.cabinetoffice.csl.service.notification.messages.IEmail;
 
@@ -15,6 +16,8 @@ public interface ICourseRecordAction {
     String getCourseId();
 
     String getUserId();
+
+    CourseRecordId getCourseRecordId();
 
     Collection<IMessageMetadata> getMessages();
 

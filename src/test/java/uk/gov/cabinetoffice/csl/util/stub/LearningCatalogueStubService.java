@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.util.stub;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
 import java.util.List;
@@ -47,4 +48,14 @@ public class LearningCatalogueStubService {
         );
     }
 
+    public void updateEvent(String courseId, String moduleId, String eventId, Event expectedInput) {
+        stubFor(
+                WireMock.put(urlPathEqualTo(String.format("/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .withRequestBody(equalToJson(utils.toJson(expectedInput), true, true))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(utils.toJson(expectedInput)))
+        );
+    }
 }

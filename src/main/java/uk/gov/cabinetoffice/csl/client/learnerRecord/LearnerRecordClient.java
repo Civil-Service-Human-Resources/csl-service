@@ -3,12 +3,16 @@ package uk.gov.cabinetoffice.csl.client.learnerRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventDto;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventStatusDto;
 
 import java.util.List;
 
@@ -30,38 +34,28 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     }
 
     @Override
-    public CourseRecord getCourseRecord(String userId, String courseId) {
-        List<CourseRecord> courseRecords = getCourseRecords(userId, List.of(courseId));
-        if (courseRecords.size() == 0) {
-            log.warn("Course record with userID '{}' and courseId '{}' was not found.", userId, courseId);
-            return null;
-        } else {
-            return courseRecords.get(0);
-        }
-    }
-
-    @Override
-    public List<CourseRecord> getCourseRecords(String userId, List<String> courseIds) {
-        log.debug("Getting course records with ids '{}' for user '{}'", courseIds, userId);
-        String courseIdList = String.join(",", courseIds);
-        String url = String.format("%s?userId=%s&courseIds=%s", courseRecords, userId, courseIdList);
+    public List<CourseRecord> getCourseRecords(List<CourseRecordId> courseRecordIds) {
+        log.debug("Getting course records with ids '{}'", courseRecordIds);
+        String url = String.format("%s?userIds=%s&courseIds=%s", courseRecords,
+                String.join(",", courseRecordIds.stream().map(CourseRecordId::learnerId).toList()),
+                String.join(",", courseRecordIds.stream().map(CourseRecordId::courseId).toList()));
         RequestEntity<Void> request = RequestEntity.get(url).build();
         CourseRecords courseRecords = httpClient.executeRequest(request, CourseRecords.class);
         return courseRecords.getCourseRecords();
     }
 
     @Override
-    public CourseRecord createCourseRecord(CourseRecord body) {
-        log.debug("Creating course record '{}'", body);
-        RequestEntity<CourseRecord> request = RequestEntity.post(courseRecords).body(body);
-        return httpClient.executeRequest(request, CourseRecord.class);
+    public List<CourseRecord> createCourseRecords(List<CourseRecord> body) {
+        log.debug("Creating course records '{}'", body);
+        RequestEntity<List<CourseRecord>> request = RequestEntity.post(String.format("%s/bulk", courseRecords)).body(body);
+        return httpClient.executeRequest(request, CourseRecords.class).getCourseRecords();
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord body) {
-        log.debug("Updating course record '{}'", body);
-        RequestEntity<CourseRecord> request = RequestEntity.put(courseRecords).body(body);
-        return httpClient.executeRequest(request, CourseRecord.class);
+    public List<CourseRecord> updateCourseRecords(List<CourseRecord> input) {
+        log.debug("Updating course records '{}'", input);
+        RequestEntity<List<CourseRecord>> request = RequestEntity.put(String.format("%s/bulk", courseRecords)).body(input);
+        return httpClient.executeRequest(request, CourseRecords.class).getCourseRecords();
     }
 
     @Override
@@ -88,5 +82,22 @@ public class LearnerRecordClient implements ILearnerRecordClient {
         String url = String.format("%s/%s%s/%s", event, eventId, booking, bookingId);
         RequestEntity<BookingDto> request = RequestEntity.patch(url).body(bookingDto);
         return httpClient.executeRequest(request, BookingDto.class);
+    }
+
+    @Override
+    public EventDto updateEvent(String eventId, EventStatusDto dto) {
+        log.debug("Updating event {} with data {}", eventId, dto);
+        String url = String.format("%s/%s", event, eventId);
+        RequestEntity<EventStatusDto> request = RequestEntity.patch(url).body(dto);
+        return httpClient.executeRequest(request, EventDto.class);
+    }
+
+    @Override
+    public List<BookingDto> getBookings(String eventId) {
+        log.debug("Fetching bookings for event {}", eventId);
+        String url = String.format("%s/%s/booking", event, eventId);
+        RequestEntity<Void> request = RequestEntity.get(url).build();
+        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
+        });
     }
 }

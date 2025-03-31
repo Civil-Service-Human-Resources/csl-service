@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.event.EventModuleRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.module.ModuleRecordAction;
@@ -16,6 +17,8 @@ import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.notification.INotificationService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -46,27 +49,40 @@ public class LearnerRecordUpdateProcessor {
         return processCourseRecordAction(action);
     }
 
-    public CourseRecord processCourseRecordAction(ICourseRecordAction action) {
+    public Map<String, CourseRecord> processMultipleEventModuleRecordActions(CourseWithModuleWithEvent courseWithModuleWithEvent, List<UserToAction<EventModuleRecordAction>> users) {
+        CourseRecordActionCollection actions = courseRecordActionFactory.getEventModuleRecordActions(courseWithModuleWithEvent, users);
+        return processCourseRecordActions(actions);
+    }
+
+    public Map<String, CourseRecord> processCourseRecordActions(CourseRecordActionCollection actions) {
+        List<CourseRecordId> courseRecordIds = actions.getCourseRecordIds();
         try {
-            log.info(String.format("Applying update %s", action.toString()));
-            CourseRecord courseRecord = learnerRecordService.getCourseRecord(action.getUserId(), action.getCourseId());
-            log.debug(String.format("Fetched course record: %s", courseRecord));
-            if (courseRecord == null) {
-                courseRecord = learnerRecordService.createCourseRecord(action.generateNewCourseRecord());
-            } else {
-                CourseRecord recordUpdates = action.applyUpdatesToCourseRecord(courseRecord);
-                recordUpdates = learnerRecordService.updateCourseRecord(recordUpdates);
-                courseRecord.update(recordUpdates);
+            Map<String, CourseRecord> courseRecordMap = learnerRecordService.getCourseRecords(courseRecordIds)
+                    .stream().collect(Collectors.toMap(CourseRecord::getId, cr -> cr));
+            CourseRecordActionCollectionResult result = actions.process(courseRecordMap);
+            if (!result.getNewRecords().isEmpty()) {
+                learnerRecordService.createCourseRecords(result.getNewRecords()).forEach(cr -> courseRecordMap.put(cr.getId(), cr));
             }
-            log.debug(String.format("Updated course record %s ", courseRecord));
-            messagingClient.sendMessages(action.getMessages());
-            notificationService.sendEmails(action.getEmails());
-            learnerRecordService.updateCourseRecordCache(courseRecord);
-            return courseRecord;
+            if (!result.getUpdatedRecords().isEmpty()) {
+                courseRecordMap.putAll(learnerRecordService.updateCourseRecords(result.getUpdatedRecords()));
+            }
+            if (!result.getMessages().isEmpty()) {
+                messagingClient.sendMessages(result.getMessages());
+            }
+            if (!result.getEmails().isEmpty()) {
+                notificationService.sendEmails(result.getEmails());
+            }
+            return courseRecordMap;
         } catch (Exception e) {
-            learnerRecordService.bustCourseRecordCache(action.getUserId(), action.getCourseId());
+            learnerRecordService.bustCourseRecordCache(courseRecordIds);
             throw e;
         }
+    }
+
+    public CourseRecord processCourseRecordAction(ICourseRecordAction action) {
+        CourseRecordId courseRecordId = action.getCourseRecordId();
+        CourseRecordActionCollection courseRecordActionCollection = CourseRecordActionCollection.createWithSingleAction(action);
+        return processCourseRecordActions(courseRecordActionCollection).get(courseRecordId.getAsString());
     }
 
 }

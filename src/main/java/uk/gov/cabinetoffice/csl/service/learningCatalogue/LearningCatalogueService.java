@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
+import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
@@ -100,5 +103,16 @@ public class LearningCatalogueService {
                 " key: {}.", courseId);
         this.cache.evict(courseId);
         requiredLearningMapCache.evict();
+    }
+
+    public void cancelEvent(CourseWithModuleWithEvent data, CancelEventDto cancelEventDto) {
+        Course course = data.getCourse();
+        Module module = data.getModule();
+        Event event = data.getEvent();
+        event.setCancellationReason(cancelEventDto.getReason());
+        event.setStatus(EventStatus.CANCELLED);
+        event = client.updateEvent(course.getId(), module.getId(), event);
+        course.updateEvent(module.getId(), event);
+        cache.put(course);
     }
 }

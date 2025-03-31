@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course;
 
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ICourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ICourseRecordActionType;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
@@ -39,6 +40,11 @@ public abstract class CourseRecordActionProcessor implements ICourseRecordAction
     @Override
     public String getUserId() {
         return user.getId();
+    }
+
+    @Override
+    public CourseRecordId getCourseRecordId() {
+        return new CourseRecordId(getUserId(), getCourseId());
     }
 
     @Override
