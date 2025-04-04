@@ -1,0 +1,106 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="csl-service[mvn-boot-run]" type="MavenRunConfiguration" factoryName="Maven">
+    <MavenSettings>
+      <option name="myGeneralSettings" />
+      <option name="myRunnerSettings">
+        <MavenRunnerSettings>
+          <option name="delegateBuildToMaven" value="false" />
+          <option name="environmentProperties">
+            <map>
+              <entry key="ACTIVEMQ_PASSWORD" value="artemis" />
+              <entry key="ACTIVEMQ_URL" value="localhost:61616" />
+              <entry key="ACTIVEMQ_USERNAME" value="artemis" />
+              <entry key="ACTUATOR_MANAGEMENT_ENDPOINTS_ENABLED" value="true" />
+              <entry key="ACTUATOR_MANAGEMENT_ENDPOINTS_WEB_BASE_PATH" value="/manage" />
+              <entry key="ACTUATOR_MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDED" value="health,info" />
+              <entry key="ACTUATOR_MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS" value="never" />
+              <entry key="ACTUATOR_MANAGEMENT_INFO_ENV_ENABLED" value="false" />
+              <entry key="ACTUATOR_MANAGEMENT_INFO_JAVA_ENABLED" value="false" />
+              <entry key="ACTUATOR_MANAGEMENT_REDIS_HEALTH_ENABLED" value="false" />
+              <entry key="APP_CONTEXT_PATH" value="/api" />
+              <entry key="APP_DESCRIPTION" value="csl-service-description" />
+              <entry key="APP_NAME" value="csl-service" />
+              <entry key="CLIENT_ID" value="ChangeMe" />
+              <entry key="CLIENT_SECRET" value="ChangeMe" />
+              <entry key="COURSE_CACHE_TTL_SECONDS" value="10000" />
+              <entry key="CSL_SERVICE_SECURITY_PASSWORD" value="ChangeMe" />
+              <entry key="CSL_SERVICE_SECURITY_USERNAME" value="ChangeMe" />
+              <entry key="CSRS_SERVICE_URL" value="http://localhost:9002" />
+              <entry key="JMS_USE_SERVICEBUS" value="false" />
+              <entry key="JWT_KEY" value="ChangeMe" />
+              <entry key="LEARNER_RECORD_CACHE_TTL_SECONDS" value="1" />
+              <entry key="LEARNER_RECORD_SERVICE_URL" value="http://localhost:9000" />
+              <entry key="LEARNING_CATALOGUE_SERVICE_URL" value="http://localhost:9001" />
+              <entry key="MANAGEMENT_UI_BASE_URL" value="http://localhost:3005" />
+              <entry key="MVN_WRAPPER_VERSION" value="ApacheMaven3.8.6" />
+              <entry key="NOTIFICATION_SERVICE_URL" value="http://localhost:9006" />
+              <entry key="OAUTH_SERVICE_URL" value="http://localhost:8080" />
+              <entry key="OAUTH_TOKEN_ENDPOINT" value="/oauth2/token" />
+              <entry key="ORG_SPRINGFRAMEWORK_SECURITY_LOGGING_LEVEL" value="INFO" />
+              <entry key="REDIS_CACHE_DEFAULT_TTL" value="3600000" />
+              <entry key="REDIS_CACHE_NULL_VALUES" value="false" />
+              <entry key="REDIS_HOST" value="localhost" />
+              <entry key="REDIS_KEY_PREFIX" value="csl_service_" />
+              <entry key="REDIS_PASSWORD" value="ChangeMe" />
+              <entry key="REDIS_PORT" value="6379" />
+              <entry key="REDIS_USE_KEY_PREFIX" value="true" />
+              <entry key="REFRESH_SERVICETOKENCACHE_BEFORE_SECONDS_TOEXPIRE" value="0" />
+              <entry key="REPORT_SERVICE_URL" value="http://localhost:9004" />
+              <entry key="ROOT_LOGGING_LEVEL" value="INFO" />
+              <entry key="RUSTICI_DISABLED_BOOKMARKING_MODULE_IDS" value="sUmxgUeHSCS6Z7G3cwI1Iw, WLt5cZ_dSUCBbqEvOJEV2g" />
+              <entry key="RUSTICI_ENGINE_TENANT_NAME" value="ChangeMe" />
+              <entry key="RUSTICI_LAUNCH_LINK_EXPIRY_SECONDS" value="0" />
+              <entry key="RUSTICI_PASSWORD" value="ChangeMe" />
+              <entry key="RUSTICI_REDIRECT_ON_EXIT_SERVICE_URL" value="http://localhost:3001/learning-record" />
+              <entry key="RUSTICI_SERVICE_URL" value="ChangeMe" />
+              <entry key="RUSTICI_USERNAME" value="ChangeMe" />
+              <entry key="SERVICEBUS_CONNECTION_STRING" value="ChangeMe" />
+              <entry key="SESSION_TIMEOUT" value="3600" />
+              <entry key="SPRING_BOOT_VERSION" value="SpringBoot3.0" />
+              <entry key="UK_GOV_CABINETOFFICE_LOGGING_LEVEL" value="DEBUG" />
+              <entry key="USER_CACHE_TTL_SECONDS" value="86400" />
+              <entry key="WEBSITES_PORT" value="9003" />
+            </map>
+          </option>
+          <option name="jreName" value="#USE_PROJECT_JDK" />
+          <option name="mavenProperties">
+            <map />
+          </option>
+          <option name="passParentEnv" value="true" />
+          <option name="runMavenInBackground" value="true" />
+          <option name="skipTests" value="false" />
+          <option name="vmOptions" value="" />
+        </MavenRunnerSettings>
+      </option>
+      <option name="myRunnerParameters">
+        <MavenRunnerParameters>
+          <option name="profiles">
+            <set />
+          </option>
+          <option name="goals">
+            <list>
+              <option value="spring-boot:run" />
+            </list>
+          </option>
+          <option name="pomFileName" />
+          <option name="profilesMap">
+            <map />
+          </option>
+          <option name="resolveToWorkspace" value="false" />
+          <option name="workingDirPath" value="$PROJECT_DIR$" />
+        </MavenRunnerParameters>
+      </option>
+    </MavenSettings>
+    <extension name="net.ashald.envfile">
+      <option name="IS_ENABLED" value="false" />
+      <option name="IS_SUBST" value="false" />
+      <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+      <option name="IS_IGNORE_MISSING_FILES" value="false" />
+      <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+      <ENTRIES>
+        <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+      </ENTRIES>
+    </extension>
+    <method v="2" />
+  </configuration>
+</component>
