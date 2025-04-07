@@ -23,7 +23,7 @@ public class CompleteBooking extends EventModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
         ModuleRecord moduleRecord = courseRecord.getModuleRecord(getModuleId())
                 .orElseThrow(() -> new IncorrectStateException("Can't create a new module record when completing an event."));
         if (!moduleRecord.getState().equals(State.APPROVED) ||

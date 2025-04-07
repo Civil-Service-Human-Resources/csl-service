@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -20,14 +21,14 @@ public class CourseRecordActionCollection {
     }
 
 
-    public CourseRecordActionCollectionResult process(Map<String, CourseRecord> courseRecordMap) {
+    public CourseRecordActionCollectionResult process(Map<String, CourseRecord> courseRecordMap, LocalDateTime completedDate) {
         CourseRecordActionCollectionResult result = new CourseRecordActionCollectionResult();
         actions.forEach(action -> {
             CourseRecord courseRecord = courseRecordMap.get(action.getCourseRecordId().getAsString());
             if (courseRecord == null) {
                 result.getNewRecords().add(action.generateNewCourseRecord());
             } else {
-                result.getUpdatedRecords().put(courseRecord.getId(), action.applyUpdatesToCourseRecord(courseRecord));
+                result.getUpdatedRecords().put(courseRecord.getId(), action.applyUpdatesToCourseRecord(courseRecord, completedDate));
             }
             result.getMessages().addAll(action.getMessages());
             result.getEmails().addAll(action.getEmails());

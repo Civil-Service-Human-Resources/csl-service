@@ -8,6 +8,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.Result;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.time.LocalDateTime;
+
 public class FailModule extends ModuleRecordActionProcessor {
 
     public FailModule(UtilService utilService, CourseWithModule courseWithModule, User user) {
@@ -15,7 +17,7 @@ public class FailModule extends ModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
         ModuleRecord moduleRecord = courseRecord.getModuleRecord(getModuleId())
                 .orElseThrow(() -> new IncorrectStateException("Can't create a new module record when failing a module."));
         moduleRecord.setResult(Result.FAILED);

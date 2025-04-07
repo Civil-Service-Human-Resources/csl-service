@@ -8,6 +8,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.time.LocalDateTime;
+
 public class SkipBooking extends EventModuleRecordActionProcessor {
 
     public SkipBooking(UtilService utilService, CourseWithModuleWithEvent courseWithModuleWithEvent, User user) {
@@ -15,7 +17,7 @@ public class SkipBooking extends EventModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
         ModuleRecord moduleRecord = courseRecord.getModuleRecord(getModuleId())
                 .orElseThrow(() -> new IncorrectStateException("Can't create a new module record when skipping an event."));
         if (!moduleRecord.getState().equals(State.APPROVED)) {

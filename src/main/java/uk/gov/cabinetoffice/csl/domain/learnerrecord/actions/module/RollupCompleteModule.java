@@ -6,6 +6,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.time.LocalDateTime;
+
 public class RollupCompleteModule extends CompleteModule {
 
     public RollupCompleteModule(UtilService utilService, CourseWithModule courseWithModule, User user) {
@@ -13,10 +15,10 @@ public class RollupCompleteModule extends CompleteModule {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
         courseRecord.getModuleRecord(getModuleId())
                 .orElseThrow(() -> new RecordNotFoundException("Can't complete a module via rollup if the module record does not exist"));
-        return super.updateCourseRecord(courseRecord);
+        return super.updateCourseRecord(courseRecord, completedDate);
     }
 
     @Override

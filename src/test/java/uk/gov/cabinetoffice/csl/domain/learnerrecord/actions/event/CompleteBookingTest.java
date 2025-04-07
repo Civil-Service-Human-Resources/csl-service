@@ -22,7 +22,7 @@ public class CompleteBookingTest extends BaseEventModuleRecordActionTest<Complet
         cr.setState(State.APPROVED);
         ModuleRecord mr = cr.getModuleRecord(getModuleId()).get();
         mr.setState(State.APPROVED);
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToCourseRecord(cr, null);
         assertEquals(State.COMPLETED, cr.getState());
         ModuleRecord moduleRecord = cr.getModuleRecord(getModuleId()).get();
         assertEquals(State.COMPLETED, moduleRecord.getState());
@@ -42,7 +42,7 @@ public class CompleteBookingTest extends BaseEventModuleRecordActionTest<Complet
     public void testCompleteBookingNoModuleRecord() {
         CourseRecord cr = generateCourseRecord(false);
         assertThrows(IncorrectStateException.class, () -> {
-            actionUnderTest.updateCourseRecord(cr);
+            actionUnderTest.updateCourseRecord(cr, null);
         });
     }
 
@@ -60,7 +60,7 @@ public class CompleteBookingTest extends BaseEventModuleRecordActionTest<Complet
         ModuleRecord mr = cr.getModuleRecord(getModuleId()).get();
         mr.setState(State.REGISTERED);
         assertThrows(IncorrectStateException.class, () -> {
-            actionUnderTest.updateCourseRecord(cr);
+            actionUnderTest.updateCourseRecord(cr, null);
         });
     }
 }

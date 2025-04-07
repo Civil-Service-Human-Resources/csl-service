@@ -26,7 +26,7 @@ public class CompleteModuleTest extends BaseModuleRecordActionTest<CompleteModul
     @Test
     public void testCompleteModule() {
         CourseRecord cr = generateCourseRecord(true);
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToCourseRecord(cr, null);
         assertEquals(State.COMPLETED, cr.getState());
         assertEquals(State.COMPLETED, cr.getModuleRecord(getModuleId()).get().getState());
         assertTrue(actionUnderTest.getMessages().stream().findFirst().isPresent());
@@ -43,7 +43,7 @@ public class CompleteModuleTest extends BaseModuleRecordActionTest<CompleteModul
     @Test
     public void testCompleteRequiredLearningModule() {
         CourseRecord cr = generateCourseRecord(true);
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToCourseRecord(cr, null);
         assertEquals(State.COMPLETED, cr.getState());
         assertEquals(State.COMPLETED, cr.getModuleRecord(getModuleId()).get().getState());
         assertTrue(actionUnderTest.getMessages().stream().findFirst().isPresent());
@@ -68,7 +68,7 @@ public class CompleteModuleTest extends BaseModuleRecordActionTest<CompleteModul
         CourseWithModule requiredCourseWithModule = new CourseWithModule(requiredCourse, requiredModule);
         CompleteModule action = new CompleteModule(this.utilService, requiredCourseWithModule, user);
         CourseRecord cr = generateCourseRecord(true);
-        cr = action.applyUpdatesToCourseRecord(cr);
+        cr = action.applyUpdatesToCourseRecord(cr, null);
         assertEquals(State.COMPLETED, cr.getState());
         assertEquals(State.COMPLETED, cr.getModuleRecord(getModuleId()).get().getState());
         assertTrue(action.getEmails().stream().findFirst().isPresent());
@@ -94,7 +94,7 @@ public class CompleteModuleTest extends BaseModuleRecordActionTest<CompleteModul
         CourseWithModule requiredCourseWithModule = new CourseWithModule(requiredCourse, requiredModule);
         CompleteModule action = new CompleteModule(this.utilService, requiredCourseWithModule, noLMUser);
         CourseRecord cr = generateCourseRecord(true);
-        cr = action.applyUpdatesToCourseRecord(cr);
+        cr = action.applyUpdatesToCourseRecord(cr, null);
         assertEquals(State.COMPLETED, cr.getState());
         assertEquals(State.COMPLETED, cr.getModuleRecord(getModuleId()).get().getState());
         assertTrue(action.getEmails().isEmpty());

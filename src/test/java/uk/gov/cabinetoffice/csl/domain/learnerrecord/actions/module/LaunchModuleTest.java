@@ -19,7 +19,7 @@ public class LaunchModuleTest extends BaseModuleRecordActionTest<LaunchModule> {
     @Test
     public void testLaunchModule() {
         CourseRecord cr = new CourseRecord();
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToCourseRecord(cr, null);
         assertEquals(State.IN_PROGRESS, cr.getState());
         assertEquals(State.IN_PROGRESS, cr.getModuleRecords().stream().findFirst().get().getState());
     }
@@ -28,7 +28,7 @@ public class LaunchModuleTest extends BaseModuleRecordActionTest<LaunchModule> {
     public void testLaunchModuleDisliked() {
         CourseRecord cr = new CourseRecord();
         cr.setPreference(Preference.DISLIKED);
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToCourseRecord(cr, null);
         assertEquals(State.IN_PROGRESS, cr.getState());
         assertEquals(State.IN_PROGRESS, cr.getModuleRecords().stream().findFirst().get().getState());
         assertNull(cr.getPreference());
@@ -47,7 +47,7 @@ public class LaunchModuleTest extends BaseModuleRecordActionTest<LaunchModule> {
         extraMr.setState(State.IN_PROGRESS);
         cr.updateModuleRecord(extraMr);
 
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToCourseRecord(cr, null);
         assertEquals(State.IN_PROGRESS, cr.getState());
         assertEquals(1, cr.getModuleRecords().size());
         assertEquals(State.IN_PROGRESS, cr.getModuleRecordAndThrowIfNotFound(getModuleId()).getState());

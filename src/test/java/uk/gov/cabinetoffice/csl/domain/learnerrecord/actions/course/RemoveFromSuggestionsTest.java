@@ -24,7 +24,7 @@ public class RemoveFromSuggestionsTest extends BaseCourseRecordActionTest<Remove
     @Test
     public void testRemoveFromSuggestionsExistingRecord() {
         assertThrows(IncorrectStateException.class, () -> {
-            actionUnderTest.applyUpdatesToCourseRecord(new CourseRecord());
+            actionUnderTest.applyUpdatesToCourseRecord(new CourseRecord(), null);
         });
     }
 }

@@ -7,6 +7,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.time.LocalDateTime;
+
 public class RemoveFromLearningPlan extends CourseRecordActionProcessor {
 
     public RemoveFromLearningPlan(UtilService utilService, Course course, User user) {
@@ -14,7 +16,7 @@ public class RemoveFromLearningPlan extends CourseRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord) {
+    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
         if (!courseRecord.getState().equals(State.ARCHIVED)) {
             courseRecord.setState(State.ARCHIVED);
         }

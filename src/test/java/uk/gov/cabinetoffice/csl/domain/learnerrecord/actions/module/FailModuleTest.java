@@ -19,7 +19,7 @@ public class FailModuleTest extends BaseModuleRecordActionTest<FailModule> {
     public void testPassModule() {
         CourseRecord cr = generateCourseRecord(true);
         cr.setState(State.IN_PROGRESS);
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToCourseRecord(cr, null);
         ModuleRecord moduleRecord = cr.getModuleRecord(getModuleId()).get();
         assertEquals(Result.FAILED, moduleRecord.getResult());
     }

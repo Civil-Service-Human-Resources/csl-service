@@ -72,7 +72,7 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
                 .thenReturn(List.of(courseRecord));
         when(action.getCourseId()).thenReturn(courseRecord.getCourseId());
         when(action.getUserId()).thenReturn(courseRecord.getUserId());
-        when(action.applyUpdatesToCourseRecord(courseRecord))
+        when(action.applyUpdatesToCourseRecord(courseRecord, null))
                 .thenReturn(courseRecord);
         when(learnerRecordService.updateCourseRecords(map))
                 .thenReturn(map);

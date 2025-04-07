@@ -7,6 +7,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.time.LocalDateTime;
+
 public class LaunchModule extends ModuleRecordActionProcessor {
 
     public LaunchModule(UtilService utilService, CourseWithModule courseWithModule, User user) {
@@ -14,7 +16,7 @@ public class LaunchModule extends ModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
         if (courseRecord.getState().equals(State.NULL) || courseRecord.getState().equals(State.ARCHIVED)) {
             courseRecord.setState(State.IN_PROGRESS);
         }
@@ -39,6 +41,6 @@ public class LaunchModule extends ModuleRecordActionProcessor {
 
     @Override
     public CourseRecord generateNewCourseRecord() {
-        return applyUpdatesToCourseRecord(createCourseRecord());
+        return applyUpdatesToCourseRecord(createCourseRecord(), null);
     }
 }

@@ -60,7 +60,7 @@ public class LearnerRecordUpdateProcessor {
         try {
             Map<String, CourseRecord> courseRecordMap = learnerRecordService.getCourseRecords(courseRecordIds)
                     .stream().collect(Collectors.toMap(CourseRecord::getId, cr -> cr));
-            CourseRecordActionCollectionResult result = actions.process(courseRecordMap);
+            CourseRecordActionCollectionResult result = actions.process(courseRecordMap, completedDate);
             if (!result.getNewRecords().isEmpty()) {
                 learnerRecordService.createCourseRecords(result.getNewRecords()).forEach(cr -> courseRecordMap.put(cr.getId(), cr));
             }

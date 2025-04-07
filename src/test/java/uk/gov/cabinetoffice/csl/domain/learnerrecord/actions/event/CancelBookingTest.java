@@ -27,7 +27,7 @@ public class CancelBookingTest extends BaseEventModuleRecordActionTest<CancelBoo
         mr.setResult(Result.PASSED);
         mr.setCompletionDate(LocalDateTime.now());
         mr.setBookingStatus(BookingStatus.CONFIRMED);
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToCourseRecord(cr, null);
         assertEquals(State.UNREGISTERED, cr.getState());
 
         ModuleRecord moduleRecord = cr.getModuleRecord(getModuleId()).get();
@@ -41,7 +41,7 @@ public class CancelBookingTest extends BaseEventModuleRecordActionTest<CancelBoo
     public void testCancelBookingNoModuleRecord() {
         CourseRecord cr = generateCourseRecord(false);
         assertThrows(IncorrectStateException.class, () -> {
-            actionUnderTest.updateCourseRecord(cr);
+            actionUnderTest.updateCourseRecord(cr, null);
         });
     }
 

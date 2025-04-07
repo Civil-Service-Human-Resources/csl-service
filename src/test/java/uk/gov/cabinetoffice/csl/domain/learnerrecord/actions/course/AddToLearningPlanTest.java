@@ -18,7 +18,7 @@ public class AddToLearningPlanTest extends BaseCourseRecordActionTest<AddToLearn
     public void testAddToLearningPlan() {
         CourseRecord cr = new CourseRecord();
         cr.setState(State.ARCHIVED);
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToCourseRecord(cr, null);
         assertEquals(Preference.LIKED, cr.getPreference());
         assertEquals(State.NULL, cr.getState());
     }
@@ -27,7 +27,7 @@ public class AddToLearningPlanTest extends BaseCourseRecordActionTest<AddToLearn
     public void testAddToLearningPlanInProgress() {
         CourseRecord cr = this.generateCourseRecord(true);
         cr.setState(State.ARCHIVED);
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToCourseRecord(cr, null);
         assertEquals(Preference.LIKED, cr.getPreference());
         assertEquals(State.IN_PROGRESS, cr.getState());
     }

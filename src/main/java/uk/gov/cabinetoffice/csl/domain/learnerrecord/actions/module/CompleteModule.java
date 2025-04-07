@@ -22,7 +22,7 @@ public class CompleteModule extends ModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
         ModuleRecord moduleRecord = courseRecord.getOrCreateModuleRecord(module);
         LocalDateTime completionDate = utilService.getNowDateTime();
         List<String> remainingModules = new ArrayList<>(course.getRemainingModuleIdsForCompletion(courseRecord, user));
@@ -48,6 +48,6 @@ public class CompleteModule extends ModuleRecordActionProcessor {
 
     @Override
     public CourseRecord generateNewCourseRecord() {
-        return applyUpdatesToCourseRecord(createCourseRecord());
+        return applyUpdatesToCourseRecord(createCourseRecord(), null);
     }
 }

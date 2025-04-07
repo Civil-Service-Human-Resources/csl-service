@@ -7,6 +7,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.MultiCourseRecordAc
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.time.LocalDateTime;
+
 public class MultiModuleRecordActionProcessor extends ModuleRecordActionProcessor {
 
     private final MultiCourseRecordAction actionTypes;
@@ -19,13 +21,13 @@ public class MultiModuleRecordActionProcessor extends ModuleRecordActionProcesso
 
     @Override
     public CourseRecord generateNewCourseRecord() {
-        return this.applyUpdatesToCourseRecord(createCourseRecord());
+        return this.applyUpdatesToCourseRecord(createCourseRecord(), null);
     }
 
     @Override
-    protected CourseRecord updateCourseRecord(CourseRecord courseRecord) {
+    protected CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
         for (ICourseRecordAction action : actionTypes.getActions()) {
-            courseRecord = action.applyUpdatesToCourseRecord(courseRecord);
+            courseRecord = action.applyUpdatesToCourseRecord(courseRecord, completedDate);
             action.getMessages().forEach(this::addMessage);
             action.getEmails().forEach(this::addEmail);
         }

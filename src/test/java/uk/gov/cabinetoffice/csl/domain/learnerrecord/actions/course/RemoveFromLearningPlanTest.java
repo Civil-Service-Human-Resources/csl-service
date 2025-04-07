@@ -15,7 +15,7 @@ public class RemoveFromLearningPlanTest extends BaseCourseRecordActionTest<Remov
 
     @Test
     public void testRemoveFromLearningPlan() {
-        CourseRecord cr = actionUnderTest.applyUpdatesToCourseRecord(generateCourseRecord(false));
+        CourseRecord cr = actionUnderTest.applyUpdatesToCourseRecord(generateCourseRecord(false), null);
         assertEquals(State.ARCHIVED, cr.getState());
     }
 }

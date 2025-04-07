@@ -9,6 +9,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.time.LocalDateTime;
+
 public class CancelBooking extends EventModuleRecordActionProcessor {
 
     public CancelBooking(UtilService utilService, CourseWithModuleWithEvent courseWithModuleWithEvent, User user) {
@@ -16,7 +18,7 @@ public class CancelBooking extends EventModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
         ModuleRecord moduleRecord = courseRecord.getModuleRecord(getModuleId())
                 .orElseThrow(() -> new IncorrectStateException("Can't create a new module record when cancelling an event."));
         if (courseRecord.getState().equals(State.NULL) ||

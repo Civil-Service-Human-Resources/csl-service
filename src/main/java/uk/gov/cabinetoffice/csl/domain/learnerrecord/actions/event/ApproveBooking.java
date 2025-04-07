@@ -7,6 +7,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.time.LocalDateTime;
+
 public class ApproveBooking extends EventModuleRecordActionProcessor {
 
     public ApproveBooking(UtilService utilService, CourseWithModuleWithEvent courseWithModuleWithEvent, User user) {
@@ -14,7 +16,7 @@ public class ApproveBooking extends EventModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
         if (courseRecord.getState().equals(State.NULL) ||
                 !courseRecord.getState().equals(State.IN_PROGRESS)) {
             courseRecord.setState(State.APPROVED);
@@ -30,7 +32,7 @@ public class ApproveBooking extends EventModuleRecordActionProcessor {
 
     @Override
     public CourseRecord generateNewCourseRecord() {
-        return applyUpdatesToCourseRecord(createCourseRecord());
+        return applyUpdatesToCourseRecord(createCourseRecord(), null);
     }
 
 }

@@ -7,6 +7,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.Preference;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.time.LocalDateTime;
+
 public class RemoveFromSuggestions extends CourseRecordActionProcessor {
 
     public RemoveFromSuggestions(UtilService utilService, Course course, User user) {
@@ -14,7 +16,7 @@ public class RemoveFromSuggestions extends CourseRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord) {
+    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
         throw new IncorrectStateException("Can't remove a course from suggestions when there is a course record present");
     }
 

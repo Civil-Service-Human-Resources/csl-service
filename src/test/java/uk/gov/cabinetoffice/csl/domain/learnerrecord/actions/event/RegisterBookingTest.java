@@ -27,7 +27,7 @@ public class RegisterBookingTest extends BaseEventModuleRecordActionTest<Registe
         mr.setResult(Result.PASSED);
         mr.setCompletionDate(LocalDateTime.now());
         mr.setBookingStatus(BookingStatus.CONFIRMED);
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToCourseRecord(cr, null);
         assertEquals(State.REGISTERED, cr.getState());
 
         ModuleRecord moduleRecord = cr.getModuleRecord(getModuleId()).get();
