@@ -23,14 +23,16 @@ public class CompleteBooking extends EventModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completionDate) {
         ModuleRecord moduleRecord = courseRecord.getModuleRecord(getModuleId())
                 .orElseThrow(() -> new IncorrectStateException("Can't create a new module record when completing an event."));
         if (!moduleRecord.getState().equals(State.APPROVED) ||
                 !courseRecord.getState().equals(State.APPROVED)) {
             throw new IncorrectStateException("Can't complete a booking that hasn't been approved");
         }
-        LocalDateTime completionDate = utilService.getNowDateTime();
+        if (completionDate == null) {
+            completionDate = utilService.getNowDateTime();
+        }
         List<String> remainingModules = new ArrayList<>(course.getRemainingModuleIdsForCompletion(courseRecord, user));
         if (remainingModules.size() == 1 && Objects.equals(remainingModules.get(0), getModuleId())) {
             log.debug(String.format("Completing module %s will complete this course. Setting course record to completed and sending completion message", getModuleId()));
