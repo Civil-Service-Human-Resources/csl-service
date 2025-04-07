@@ -25,9 +25,9 @@ public class MultiModuleRecordActionProcessor extends ModuleRecordActionProcesso
     }
 
     @Override
-    protected CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
+    protected CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completionDate) {
         for (ICourseRecordAction action : actionTypes.getActions()) {
-            courseRecord = action.applyUpdatesToCourseRecord(courseRecord, completedDate);
+            courseRecord = action.applyUpdatesToCourseRecord(courseRecord, completionDate);
             action.getMessages().forEach(this::addMessage);
             action.getEmails().forEach(this::addEmail);
         }

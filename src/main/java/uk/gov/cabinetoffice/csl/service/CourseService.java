@@ -31,9 +31,9 @@ public class CourseService {
         return processCourseRecordActionWithResponse(user, courseId, CourseRecordAction.REMOVE_FROM_SUGGESTIONS, null);
     }
 
-    private CourseResponse processCourseRecordActionWithResponse(User user, String courseId, CourseRecordAction actionType, LocalDateTime completedDate) {
+    private CourseResponse processCourseRecordActionWithResponse(User user, String courseId, CourseRecordAction actionType, LocalDateTime completionDate) {
         Course course = learningCatalogueService.getCourse(courseId);
-        learnerRecordUpdateProcessor.processCourseRecordAction(course, user, actionType, completedDate);
+        learnerRecordUpdateProcessor.processCourseRecordAction(course, user, actionType, completionDate);
         return CourseResponse.fromMetaData(actionType, course);
     }
 

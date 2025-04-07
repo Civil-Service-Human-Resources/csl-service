@@ -26,15 +26,15 @@ public abstract class ModuleRecordActionProcessor extends CourseRecordActionProc
     }
 
     @Override
-    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
+    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord, LocalDateTime completionDate) {
         CourseRecord updatedRecord = new CourseRecord(courseRecord.getCourseId(), courseRecord.getUserId(), courseRecord.getCourseTitle());
         courseRecord.setPreference(null);
-        updatedRecord.update(this.updateCourseRecord(courseRecord, completedDate));
+        updatedRecord.update(this.updateCourseRecord(courseRecord, completionDate));
         updatedRecord.setModuleRecords(courseRecord.getModuleRecords().stream().filter(mr -> Objects.equals(mr.getModuleId(), getModuleId())).collect(Collectors.toSet()));
         return updatedRecord;
     }
 
-    protected abstract CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate);
+    protected abstract CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completionDate);
 
     protected String getModuleId() {
         return module.getId();

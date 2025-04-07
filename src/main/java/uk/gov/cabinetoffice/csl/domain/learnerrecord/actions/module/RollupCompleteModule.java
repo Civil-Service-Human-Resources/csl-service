@@ -15,10 +15,10 @@ public class RollupCompleteModule extends CompleteModule {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completionDate) {
         courseRecord.getModuleRecord(getModuleId())
                 .orElseThrow(() -> new RecordNotFoundException("Can't complete a module via rollup if the module record does not exist"));
-        return super.updateCourseRecord(courseRecord, completedDate);
+        return super.updateCourseRecord(courseRecord, completionDate);
     }
 
     @Override

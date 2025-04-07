@@ -17,7 +17,7 @@ public class FailModule extends ModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completionDate) {
         ModuleRecord moduleRecord = courseRecord.getModuleRecord(getModuleId())
                 .orElseThrow(() -> new IncorrectStateException("Can't create a new module record when failing a module."));
         moduleRecord.setResult(Result.FAILED);

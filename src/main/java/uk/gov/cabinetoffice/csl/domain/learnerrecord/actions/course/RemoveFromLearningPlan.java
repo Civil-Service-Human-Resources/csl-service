@@ -16,7 +16,7 @@ public class RemoveFromLearningPlan extends CourseRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
+    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord, LocalDateTime completionDate) {
         if (!courseRecord.getState().equals(State.ARCHIVED)) {
             courseRecord.setState(State.ARCHIVED);
         }

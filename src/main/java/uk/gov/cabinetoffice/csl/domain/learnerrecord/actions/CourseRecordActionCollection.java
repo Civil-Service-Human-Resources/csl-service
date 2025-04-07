@@ -21,14 +21,14 @@ public class CourseRecordActionCollection {
     }
 
 
-    public CourseRecordActionCollectionResult process(Map<String, CourseRecord> courseRecordMap, LocalDateTime completedDate) {
+    public CourseRecordActionCollectionResult process(Map<String, CourseRecord> courseRecordMap, LocalDateTime completionDate) {
         CourseRecordActionCollectionResult result = new CourseRecordActionCollectionResult();
         actions.forEach(action -> {
             CourseRecord courseRecord = courseRecordMap.get(action.getCourseRecordId().getAsString());
             if (courseRecord == null) {
                 result.getNewRecords().add(action.generateNewCourseRecord());
             } else {
-                result.getUpdatedRecords().put(courseRecord.getId(), action.applyUpdatesToCourseRecord(courseRecord, completedDate));
+                result.getUpdatedRecords().put(courseRecord.getId(), action.applyUpdatesToCourseRecord(courseRecord, completionDate));
             }
             result.getMessages().addAll(action.getMessages());
             result.getEmails().addAll(action.getEmails());

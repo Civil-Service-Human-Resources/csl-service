@@ -42,9 +42,9 @@ public class ModuleService {
         }
     }
 
-    public ModuleResponse completeModule(User user, String courseId, String moduleId, LocalDateTime completedDate) {
+    public ModuleResponse completeModule(User user, String courseId, String moduleId, LocalDateTime completionDate) {
         CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
-        learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, ModuleRecordAction.COMPLETE_MODULE, completedDate);
+        learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, ModuleRecordAction.COMPLETE_MODULE, completionDate);
         return ModuleResponse.fromMetada(ModuleRecordAction.COMPLETE_MODULE, courseWithModule);
     }
 
@@ -52,10 +52,9 @@ public class ModuleService {
         log.info("rusticiRollupData: {}", rusticiRollupData);
         CSLRusticiProps properties = rusticiService.getCSLDataFromRollUpData(rusticiRollupData);
         if (!properties.getModuleRecordActions().isEmpty()) {
-            LocalDateTime completedDate = rusticiRollupData.getCompletedDate();
             CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(properties.getCourseId(), properties.getModuleId());
             User user = userDetailsService.getUserWithUid(properties.getLearnerId());
-            learnerRecordUpdateProcessor.processModuleRecordActions(courseWithModule, user, properties.getModuleRecordActions(), completedDate);
+            learnerRecordUpdateProcessor.processModuleRecordActions(courseWithModule, user, properties.getModuleRecordActions(), rusticiRollupData.getCompletedDate());
         }
     }
 

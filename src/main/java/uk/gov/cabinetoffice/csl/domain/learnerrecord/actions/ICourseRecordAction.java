@@ -10,7 +10,7 @@ import java.util.Collection;
 
 public interface ICourseRecordAction {
 
-    CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate);
+    CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord, LocalDateTime completionDate);
 
     CourseRecord generateNewCourseRecord();
 

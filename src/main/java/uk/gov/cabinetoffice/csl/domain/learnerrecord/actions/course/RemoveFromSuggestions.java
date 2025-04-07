@@ -16,7 +16,7 @@ public class RemoveFromSuggestions extends CourseRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
+    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord, LocalDateTime completionDate) {
         throw new IncorrectStateException("Can't remove a course from suggestions when there is a course record present");
     }
 

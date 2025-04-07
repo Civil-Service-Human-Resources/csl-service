@@ -18,7 +18,7 @@ public class CancelBooking extends EventModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completionDate) {
         ModuleRecord moduleRecord = courseRecord.getModuleRecord(getModuleId())
                 .orElseThrow(() -> new IncorrectStateException("Can't create a new module record when cancelling an event."));
         if (courseRecord.getState().equals(State.NULL) ||

@@ -16,7 +16,7 @@ public class AddToLearningPlan extends CourseRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
+    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord, LocalDateTime completionDate) {
         State state = courseRecord.getModuleRecords().size() > 0 ? State.IN_PROGRESS : null;
         courseRecord.setState(state);
         courseRecord.setPreference(Preference.LIKED);

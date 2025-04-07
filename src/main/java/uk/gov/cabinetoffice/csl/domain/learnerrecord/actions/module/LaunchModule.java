@@ -16,7 +16,7 @@ public class LaunchModule extends ModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completedDate) {
+    public CourseRecord updateCourseRecord(CourseRecord courseRecord, LocalDateTime completionDate) {
         if (courseRecord.getState().equals(State.NULL) || courseRecord.getState().equals(State.ARCHIVED)) {
             courseRecord.setState(State.IN_PROGRESS);
         }

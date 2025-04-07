@@ -31,36 +31,36 @@ public class LearnerRecordUpdateProcessor {
     private final IMessagingClient messagingClient;
     private final INotificationService notificationService;
 
-    public CourseRecord processCourseRecordAction(Course course, User user, CourseRecordAction actionType, LocalDateTime completedDate) {
+    public CourseRecord processCourseRecordAction(Course course, User user, CourseRecordAction actionType, LocalDateTime completionDate) {
         ICourseRecordAction action = courseRecordActionFactory.getCourseRecordAction(course, user, actionType);
-        return processCourseRecordAction(action, completedDate);
+        return processCourseRecordAction(action, completionDate);
     }
 
-    public CourseRecord processModuleRecordAction(CourseWithModule courseWithModule, User user, ModuleRecordAction actionType, LocalDateTime completedDate) {
-        return processModuleRecordActions(courseWithModule, user, List.of(actionType), completedDate);
+    public CourseRecord processModuleRecordAction(CourseWithModule courseWithModule, User user, ModuleRecordAction actionType, LocalDateTime completionDate) {
+        return processModuleRecordActions(courseWithModule, user, List.of(actionType), completionDate);
     }
 
-    public CourseRecord processModuleRecordActions(CourseWithModule courseWithModule, User user, List<ModuleRecordAction> actionTypes, LocalDateTime completedDate) {
+    public CourseRecord processModuleRecordActions(CourseWithModule courseWithModule, User user, List<ModuleRecordAction> actionTypes, LocalDateTime completionDate) {
         ICourseRecordAction action = courseRecordActionFactory.getMultipleModuleRecordActions(courseWithModule, user, actionTypes);
-        return processCourseRecordAction(action, completedDate);
+        return processCourseRecordAction(action, completionDate);
     }
 
-    public CourseRecord processEventModuleRecordAction(CourseWithModuleWithEvent courseWithModuleWithEvent, User user, EventModuleRecordAction actionType, LocalDateTime completedDate) {
+    public CourseRecord processEventModuleRecordAction(CourseWithModuleWithEvent courseWithModuleWithEvent, User user, EventModuleRecordAction actionType, LocalDateTime completionDate) {
         ICourseRecordAction action = courseRecordActionFactory.getEventModuleRecordAction(courseWithModuleWithEvent, user, actionType);
-        return processCourseRecordAction(action, completedDate);
+        return processCourseRecordAction(action, completionDate);
     }
 
-    public Map<String, CourseRecord> processMultipleEventModuleRecordActions(CourseWithModuleWithEvent courseWithModuleWithEvent, List<UserToAction<EventModuleRecordAction>> users, LocalDateTime completedDate) {
+    public Map<String, CourseRecord> processMultipleEventModuleRecordActions(CourseWithModuleWithEvent courseWithModuleWithEvent, List<UserToAction<EventModuleRecordAction>> users, LocalDateTime completionDate) {
         CourseRecordActionCollection actions = courseRecordActionFactory.getEventModuleRecordActions(courseWithModuleWithEvent, users);
-        return processCourseRecordActions(actions, completedDate);
+        return processCourseRecordActions(actions, completionDate);
     }
 
-    public Map<String, CourseRecord> processCourseRecordActions(CourseRecordActionCollection actions, LocalDateTime completedDate) {
+    public Map<String, CourseRecord> processCourseRecordActions(CourseRecordActionCollection actions, LocalDateTime completionDate) {
         List<CourseRecordId> courseRecordIds = actions.getCourseRecordIds();
         try {
             Map<String, CourseRecord> courseRecordMap = learnerRecordService.getCourseRecords(courseRecordIds)
                     .stream().collect(Collectors.toMap(CourseRecord::getId, cr -> cr));
-            CourseRecordActionCollectionResult result = actions.process(courseRecordMap, completedDate);
+            CourseRecordActionCollectionResult result = actions.process(courseRecordMap, completionDate);
             if (!result.getNewRecords().isEmpty()) {
                 learnerRecordService.createCourseRecords(result.getNewRecords()).forEach(cr -> courseRecordMap.put(cr.getId(), cr));
             }
@@ -80,10 +80,10 @@ public class LearnerRecordUpdateProcessor {
         }
     }
 
-    public CourseRecord processCourseRecordAction(ICourseRecordAction action,LocalDateTime completedDate) {
+    public CourseRecord processCourseRecordAction(ICourseRecordAction action, LocalDateTime completionDate) {
         CourseRecordId courseRecordId = action.getCourseRecordId();
         CourseRecordActionCollection courseRecordActionCollection = CourseRecordActionCollection.createWithSingleAction(action);
-        return processCourseRecordActions(courseRecordActionCollection, completedDate).get(courseRecordId.getAsString());
+        return processCourseRecordActions(courseRecordActionCollection, completionDate).get(courseRecordId.getAsString());
     }
 
 }
