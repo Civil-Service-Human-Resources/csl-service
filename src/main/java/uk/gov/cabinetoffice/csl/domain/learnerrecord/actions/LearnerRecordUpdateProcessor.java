@@ -52,7 +52,7 @@ public class LearnerRecordUpdateProcessor {
 
     public Map<String, CourseRecord> processMultipleEventModuleRecordActions(CourseWithModuleWithEvent courseWithModuleWithEvent, List<UserToAction<EventModuleRecordAction>> users, LocalDateTime completedDate) {
         CourseRecordActionCollection actions = courseRecordActionFactory.getEventModuleRecordActions(courseWithModuleWithEvent, users);
-        return processCourseRecordActions(actions, null);
+        return processCourseRecordActions(actions, completedDate);
     }
 
     public Map<String, CourseRecord> processCourseRecordActions(CourseRecordActionCollection actions, LocalDateTime completedDate) {
