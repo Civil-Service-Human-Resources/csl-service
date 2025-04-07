@@ -67,7 +67,7 @@ public class EventService {
     }
 
     private EventResponse processCourseRecordActionWithResponse(User user, CourseWithModuleWithEvent courseWithModuleWithEvent, EventModuleRecordAction actionType) {
-        learnerRecordUpdateProcessor.processEventModuleRecordAction(courseWithModuleWithEvent, user, actionType);
+        learnerRecordUpdateProcessor.processEventModuleRecordAction(courseWithModuleWithEvent, user, actionType, null);
         return EventResponse.fromMetaData(actionType, courseWithModuleWithEvent);
     }
 
@@ -83,7 +83,7 @@ public class EventService {
     private void cancelBookings(List<BookingDto> bookingDtos, CourseWithModuleWithEvent courseWithModuleWithEvent) {
         List<UserToAction<EventModuleRecordAction>> actions = bookingDtos.stream()
                 .map(b -> new UserToAction<>(new User(b.getLearner()), EventModuleRecordAction.CANCEL_BOOKING)).toList();
-        learnerRecordUpdateProcessor.processMultipleEventModuleRecordActions(courseWithModuleWithEvent, actions);
+        learnerRecordUpdateProcessor.processMultipleEventModuleRecordActions(courseWithModuleWithEvent, actions, null);
     }
 
     public void cancelEvent(String courseId, String moduleId, String eventId, CancelEventDto cancelEventDto) {

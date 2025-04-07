@@ -10,6 +10,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecord
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
+import java.time.LocalDateTime;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -18,20 +20,20 @@ public class CourseService {
     private final LearnerRecordUpdateProcessor learnerRecordUpdateProcessor;
 
     public CourseResponse addToLearningPlan(User user, String courseId) {
-        return processCourseRecordActionWithResponse(user, courseId, CourseRecordAction.ADD_TO_LEARNING_PLAN);
+        return processCourseRecordActionWithResponse(user, courseId, CourseRecordAction.ADD_TO_LEARNING_PLAN, null);
     }
 
     public CourseResponse removeFromLearningPlan(User user, String courseId) {
-        return processCourseRecordActionWithResponse(user, courseId, CourseRecordAction.REMOVE_FROM_LEARNING_PLAN);
+        return processCourseRecordActionWithResponse(user, courseId, CourseRecordAction.REMOVE_FROM_LEARNING_PLAN, null);
     }
 
     public CourseResponse removeFromSuggestions(User user, String courseId) {
-        return processCourseRecordActionWithResponse(user, courseId, CourseRecordAction.REMOVE_FROM_SUGGESTIONS);
+        return processCourseRecordActionWithResponse(user, courseId, CourseRecordAction.REMOVE_FROM_SUGGESTIONS, null);
     }
 
-    private CourseResponse processCourseRecordActionWithResponse(User user, String courseId, CourseRecordAction actionType) {
+    private CourseResponse processCourseRecordActionWithResponse(User user, String courseId, CourseRecordAction actionType, LocalDateTime completedDate) {
         Course course = learningCatalogueService.getCourse(courseId);
-        learnerRecordUpdateProcessor.processCourseRecordAction(course, user, actionType);
+        learnerRecordUpdateProcessor.processCourseRecordAction(course, user, actionType, completedDate);
         return CourseResponse.fromMetaData(actionType, course);
     }
 

@@ -42,7 +42,7 @@ public class CourseServiceTest extends TestDataService {
     @Test
     public void shouldAddToLearningPlan() {
         when(learningCatalogueService.getCourse(getCourseId())).thenReturn(course);
-        verify(learnerRecordUpdateProcessor, atMostOnce()).processCourseRecordAction(course, user, CourseRecordAction.ADD_TO_LEARNING_PLAN);
+        verify(learnerRecordUpdateProcessor, atMostOnce()).processCourseRecordAction(course, user, CourseRecordAction.ADD_TO_LEARNING_PLAN, null);
         CourseResponse result = courseService.addToLearningPlan(user, getCourseId());
         assertEquals("Successfully applied action 'Add to learning plan' to course record", result.getMessage());
         assertEquals(getCourseId(), result.getCourseId());
@@ -52,7 +52,7 @@ public class CourseServiceTest extends TestDataService {
     @Test
     public void shouldRemoveFromLearningPlan() {
         when(learningCatalogueService.getCourse(getCourseId())).thenReturn(course);
-        verify(learnerRecordUpdateProcessor, atMostOnce()).processCourseRecordAction(course, user, CourseRecordAction.REMOVE_FROM_LEARNING_PLAN);
+        verify(learnerRecordUpdateProcessor, atMostOnce()).processCourseRecordAction(course, user, CourseRecordAction.REMOVE_FROM_LEARNING_PLAN, null);
         CourseResponse result = courseService.removeFromLearningPlan(user, getCourseId());
         assertEquals("Successfully applied action 'Remove from learning plan' to course record", result.getMessage());
         assertEquals(getCourseId(), result.getCourseId());
@@ -62,7 +62,7 @@ public class CourseServiceTest extends TestDataService {
     @Test
     public void shouldRemoveFromSuggestions() {
         when(learningCatalogueService.getCourse(getCourseId())).thenReturn(course);
-        verify(learnerRecordUpdateProcessor, atMostOnce()).processCourseRecordAction(course, user, CourseRecordAction.REMOVE_FROM_SUGGESTIONS);
+        verify(learnerRecordUpdateProcessor, atMostOnce()).processCourseRecordAction(course, user, CourseRecordAction.REMOVE_FROM_SUGGESTIONS, null);
         CourseResponse result = courseService.removeFromSuggestions(user, getCourseId());
         assertEquals("Successfully applied action 'Remove from suggestions' to course record", result.getMessage());
         assertEquals(getCourseId(), result.getCourseId());

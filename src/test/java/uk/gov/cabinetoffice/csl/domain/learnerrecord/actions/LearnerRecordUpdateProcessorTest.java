@@ -58,7 +58,7 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
         when(action.getUserId()).thenReturn(courseRecord.getUserId());
         when(learnerRecordService.createCourseRecords(List.of(courseRecord)))
                 .thenReturn(List.of(courseRecord));
-        CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(action);
+        CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(action, null);
         verify(learnerRecordService, never()).updateCourseRecords(map);
         assertEquals(courseRecord, resp);
     }
@@ -76,7 +76,7 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
                 .thenReturn(courseRecord);
         when(learnerRecordService.updateCourseRecords(map))
                 .thenReturn(map);
-        CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(action);
+        CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(action, null);
         verify(learnerRecordService, never()).createCourseRecords(List.of(courseRecord));
         assertEquals(courseRecord, resp);
     }
@@ -86,7 +86,7 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
         when(learnerRecordService.getCourseRecords(List.of(getCourseRecordId()))).thenThrow(new RuntimeException("Error"));
         when(action.getCourseRecordId()).thenReturn(getCourseRecordId());
         when(action.getUserId()).thenReturn(getUserId());
-        assertThrowsExactly(RuntimeException.class, () -> learnerRecordUpdateProcessor.processCourseRecordAction(action));
+        assertThrowsExactly(RuntimeException.class, () -> learnerRecordUpdateProcessor.processCourseRecordAction(action, null));
         verify(learnerRecordService, atMostOnce()).bustCourseRecordCache(getCourseRecordId());
     }
 }

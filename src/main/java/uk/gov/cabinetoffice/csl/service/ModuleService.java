@@ -15,6 +15,8 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.domain.rustici.*;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
+import java.time.LocalDateTime;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class ModuleService {
         CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
         Module module = courseWithModule.getModule();
         ModuleRecordAction actionType = module.isType(ModuleType.link) || module.isType(ModuleType.file) ? ModuleRecordAction.COMPLETE_MODULE : ModuleRecordAction.LAUNCH_MODULE;
-        CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, actionType);
+        CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, actionType, null);
         if (module.isType(ModuleType.elearning)) {
             ModuleRecord moduleRecord = courseRecord.getModuleRecordAndThrowIfNotFound(moduleId);
             return rusticiService.createLaunchLink(RegistrationInput.from(
@@ -40,9 +42,9 @@ public class ModuleService {
         }
     }
 
-    public ModuleResponse completeModule(User user, String courseId, String moduleId) {
+    public ModuleResponse completeModule(User user, String courseId, String moduleId, LocalDateTime completedDate) {
         CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
-        learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, ModuleRecordAction.COMPLETE_MODULE);
+        learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, ModuleRecordAction.COMPLETE_MODULE, completedDate);
         return ModuleResponse.fromMetada(ModuleRecordAction.COMPLETE_MODULE, courseWithModule);
     }
 
@@ -50,9 +52,10 @@ public class ModuleService {
         log.info("rusticiRollupData: {}", rusticiRollupData);
         CSLRusticiProps properties = rusticiService.getCSLDataFromRollUpData(rusticiRollupData);
         if (!properties.getModuleRecordActions().isEmpty()) {
+            LocalDateTime completedDate = rusticiRollupData.getCompletedDate();
             CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(properties.getCourseId(), properties.getModuleId());
             User user = userDetailsService.getUserWithUid(properties.getLearnerId());
-            learnerRecordUpdateProcessor.processModuleRecordActions(courseWithModule, user, properties.getModuleRecordActions());
+            learnerRecordUpdateProcessor.processModuleRecordActions(courseWithModule, user, properties.getModuleRecordActions(), completedDate);
         }
     }
 
