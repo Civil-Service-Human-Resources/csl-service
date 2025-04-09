@@ -16,6 +16,7 @@ import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.notification.INotificationService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,12 +36,12 @@ public class LearnerRecordUpdateProcessor {
         return processCourseRecordAction(action);
     }
 
-    public CourseRecord processModuleRecordAction(CourseWithModule courseWithModule, User user, ModuleRecordAction actionType) {
-        return processModuleRecordActions(courseWithModule, user, List.of(actionType));
+    public CourseRecord processModuleRecordAction(CourseWithModule courseWithModule, User user, ModuleRecordAction actionType, LocalDateTime completionDate) {
+        return processModuleRecordActions(courseWithModule, user, List.of(actionType), completionDate);
     }
 
-    public CourseRecord processModuleRecordActions(CourseWithModule courseWithModule, User user, List<ModuleRecordAction> actionTypes) {
-        ICourseRecordAction action = courseRecordActionFactory.getMultipleModuleRecordActions(courseWithModule, user, actionTypes);
+    public CourseRecord processModuleRecordActions(CourseWithModule courseWithModule, User user, List<ModuleRecordAction> actionTypes, LocalDateTime completionDate) {
+        ICourseRecordAction action = courseRecordActionFactory.getMultipleModuleRecordActions(courseWithModule, user, actionTypes, completionDate);
         return processCourseRecordAction(action);
     }
 

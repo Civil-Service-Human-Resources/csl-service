@@ -20,7 +20,7 @@ public class CompleteModuleTest extends BaseModuleRecordActionTest<CompleteModul
 
     @Override
     protected CompleteModule buildProcessor() {
-        return new CompleteModule(utilService, courseWithModule, user);
+        return new CompleteModule(utilService, courseWithModule, user, this.utilService.getNowDateTime());
     }
 
     @Test
@@ -66,7 +66,7 @@ public class CompleteModuleTest extends BaseModuleRecordActionTest<CompleteModul
         requiredCourse.setDepartmentCodeToRequiredAudienceMap(Map.of(user.getDepartmentCodes().get(0), 0));
         Module requiredModule = requiredCourse.getModule(getModuleId());
         CourseWithModule requiredCourseWithModule = new CourseWithModule(requiredCourse, requiredModule);
-        CompleteModule action = new CompleteModule(this.utilService, requiredCourseWithModule, user);
+        CompleteModule action = new CompleteModule(this.utilService, requiredCourseWithModule, user, this.utilService.getNowDateTime());
         CourseRecord cr = generateCourseRecord(true);
         cr = action.applyUpdatesToCourseRecord(cr);
         assertEquals(State.COMPLETED, cr.getState());
@@ -92,7 +92,7 @@ public class CompleteModuleTest extends BaseModuleRecordActionTest<CompleteModul
         requiredCourse.setDepartmentCodeToRequiredAudienceMap(Map.of(noLMUser.getDepartmentCodes().get(0), 0));
         Module requiredModule = requiredCourse.getModule(getModuleId());
         CourseWithModule requiredCourseWithModule = new CourseWithModule(requiredCourse, requiredModule);
-        CompleteModule action = new CompleteModule(this.utilService, requiredCourseWithModule, noLMUser);
+        CompleteModule action = new CompleteModule(this.utilService, requiredCourseWithModule, noLMUser, this.utilService.getNowDateTime());
         CourseRecord cr = generateCourseRecord(true);
         cr = action.applyUpdatesToCourseRecord(cr);
         assertEquals(State.COMPLETED, cr.getState());
