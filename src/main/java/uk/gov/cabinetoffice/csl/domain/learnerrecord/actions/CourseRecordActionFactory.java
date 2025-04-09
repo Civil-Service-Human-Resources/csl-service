@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
@@ -20,13 +21,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CourseRecordActionFactory {
 
     private final UtilService utilService;
-
-    public CourseRecordActionFactory(UtilService utilService) {
-        this.utilService = utilService;
-    }
 
     public ICourseRecordAction getCourseRecordAction(Course course, User user, CourseRecordAction action) {
         return switch (action) {
