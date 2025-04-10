@@ -6,10 +6,12 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.time.LocalDateTime;
+
 public class RollupCompleteModule extends CompleteModule {
 
-    public RollupCompleteModule(UtilService utilService, CourseWithModule courseWithModule, User user) {
-        super(utilService, courseWithModule, user);
+    public RollupCompleteModule(UtilService utilService, CourseWithModule courseWithModule, User user, LocalDateTime completionDate) {
+        super(utilService, courseWithModule, user, completionDate);
     }
 
     @Override

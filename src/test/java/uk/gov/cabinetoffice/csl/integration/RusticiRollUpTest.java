@@ -56,7 +56,7 @@ public class RusticiRollUpTest extends IntegrationTestBase {
                             "moduleId" : "moduleId",
                             "moduleTitle" : "Test Module",
                             "state": "COMPLETED",
-                            "completionDate": "2023-01-01T10:00:00"
+                            "completionDate": "2023-02-02T10:00:00"
                         }
                     ]
                 }]

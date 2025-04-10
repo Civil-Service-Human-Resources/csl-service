@@ -15,6 +15,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,13 +34,13 @@ public class CourseRecordActionFactory {
         };
     }
 
-    public ICourseRecordAction getModuleRecordAction(CourseWithModule courseWithModule, User user, ModuleRecordAction action) {
+    public ICourseRecordAction getModuleRecordAction(CourseWithModule courseWithModule, User user, ModuleRecordAction action, LocalDateTime completionDate) {
         return switch (action) {
             case LAUNCH_MODULE -> new LaunchModule(utilService, courseWithModule, user);
-            case COMPLETE_MODULE -> new CompleteModule(utilService, courseWithModule, user);
+            case COMPLETE_MODULE -> new CompleteModule(utilService, courseWithModule, user, completionDate);
             case FAIL_MODULE -> new FailModule(utilService, courseWithModule, user);
             case PASS_MODULE -> new PassModule(utilService, courseWithModule, user);
-            case ROLLUP_COMPLETE_MODULE -> new RollupCompleteModule(utilService, courseWithModule, user);
+            case ROLLUP_COMPLETE_MODULE -> new RollupCompleteModule(utilService, courseWithModule, user, completionDate);
         };
     }
 
@@ -63,8 +64,8 @@ public class CourseRecordActionFactory {
         };
     }
 
-    public ICourseRecordAction getMultipleModuleRecordActions(CourseWithModule courseWithModule, User user, List<ModuleRecordAction> actions) {
-        MultiCourseRecordAction multiCourseRecordAction = new MultiCourseRecordAction(actions.stream().map(a -> getModuleRecordAction(courseWithModule, user, a)).collect(Collectors.toList()));
+    public ICourseRecordAction getMultipleModuleRecordActions(CourseWithModule courseWithModule, User user, List<ModuleRecordAction> actions, LocalDateTime completionDate) {
+        MultiCourseRecordAction multiCourseRecordAction = new MultiCourseRecordAction(actions.stream().map(a -> getModuleRecordAction(courseWithModule, user, a, completionDate)).collect(Collectors.toList()));
         return new MultiModuleRecordActionProcessor(utilService, courseWithModule, user, multiCourseRecordAction);
     }
 

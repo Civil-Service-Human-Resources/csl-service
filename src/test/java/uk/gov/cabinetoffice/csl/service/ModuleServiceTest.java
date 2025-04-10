@@ -58,7 +58,7 @@ public class ModuleServiceTest extends TestDataService {
         CourseWithModule courseWithModule = mockCatalogueCall(course, module);
         UserDetailsDto userDetailsDto = new UserDetailsDto();
         LaunchLink result = moduleService.launchModule(user, getCourseId(), getModuleId(), userDetailsDto);
-        verify(learnerRecordUpdateProcessor, atMostOnce()).processModuleRecordAction(courseWithModule, user, ModuleRecordAction.LAUNCH_MODULE);
+        verify(learnerRecordUpdateProcessor, atMostOnce()).processModuleRecordAction(courseWithModule, user, ModuleRecordAction.LAUNCH_MODULE, null);
         assertEquals("https://test.com", result.getLaunchLink());
     }
 
@@ -69,7 +69,7 @@ public class ModuleServiceTest extends TestDataService {
         CourseRecord courseRecord = generateCourseRecord(true);
         courseRecord.getModuleRecord(getModuleId()).get().setUid("uid");
         CourseWithModule courseWithModule = mockCatalogueCall(course, module);
-        when(learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, ModuleRecordAction.LAUNCH_MODULE))
+        when(learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, ModuleRecordAction.LAUNCH_MODULE, null))
                 .thenReturn(courseRecord);
         LaunchLink launchLink = createLaunchLink();
         UserDetailsDto userDetailsDto = generateUserDetailsDto();
@@ -84,9 +84,9 @@ public class ModuleServiceTest extends TestDataService {
         Module module = course.getModule(getModuleId());
         CourseRecord courseRecord = generateCourseRecord(true);
         CourseWithModule courseWithModule = mockCatalogueCall(course, module);
-        when(learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, ModuleRecordAction.COMPLETE_MODULE))
+        when(learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, ModuleRecordAction.COMPLETE_MODULE, null))
                 .thenReturn(courseRecord);
-        ModuleResponse result = moduleService.completeModule(user, getCourseId(), getModuleId());
+        ModuleResponse result = moduleService.completeModule(user, getCourseId(), getModuleId(), null);
         assertEquals("Successfully applied action 'Complete a module' to course record", result.getMessage());
         assertEquals(getModuleId(), result.getModuleId());
         assertEquals("Test Module", result.getModuleTitle());

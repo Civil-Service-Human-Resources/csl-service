@@ -17,14 +17,21 @@ import java.util.Objects;
 @Slf4j
 public class CompleteModule extends ModuleRecordActionProcessor {
 
-    public CompleteModule(UtilService utilService, CourseWithModule courseWithModule, User user) {
+    private LocalDateTime completionDate;
+
+    public CompleteModule(UtilService utilService, CourseWithModule courseWithModule, User user, LocalDateTime completionDate) {
         super(utilService, courseWithModule, user, ModuleRecordAction.COMPLETE_MODULE);
+        this.completionDate = completionDate;
     }
 
     @Override
     public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
         ModuleRecord moduleRecord = courseRecord.getOrCreateModuleRecord(module);
-        LocalDateTime completionDate = utilService.getNowDateTime();
+
+        if(completionDate == null) {
+            completionDate = utilService.getNowDateTime();
+        }
+
         List<String> remainingModules = new ArrayList<>(course.getRemainingModuleIdsForCompletion(courseRecord, user));
         if (remainingModules.size() == 1 && Objects.equals(remainingModules.get(0), getModuleId())) {
             log.debug(String.format("Completing module %s will complete this course. Setting course record to completed and sending completion message", getModuleId()));
