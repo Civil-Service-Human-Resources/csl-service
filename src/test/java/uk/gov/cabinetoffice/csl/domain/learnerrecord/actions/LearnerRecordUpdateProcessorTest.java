@@ -59,7 +59,7 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
         when(learnerRecordService.createCourseRecords(List.of(courseRecord)))
                 .thenReturn(List.of(courseRecord));
         CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(action);
-        verify(learnerRecordService, never()).updateCourseRecords(map);
+        verify(learnerRecordService, never()).updateCourseRecords(any(), any());
         assertEquals(courseRecord, resp);
     }
 
@@ -74,7 +74,7 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
         when(action.getUserId()).thenReturn(courseRecord.getUserId());
         when(action.applyUpdatesToCourseRecord(courseRecord))
                 .thenReturn(courseRecord);
-        when(learnerRecordService.updateCourseRecords(map))
+        when(learnerRecordService.updateCourseRecords(Map.of(courseRecord.getId(), courseRecord), map))
                 .thenReturn(map);
         CourseRecord resp = learnerRecordUpdateProcessor.processCourseRecordAction(action);
         verify(learnerRecordService, never()).createCourseRecords(List.of(courseRecord));

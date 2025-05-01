@@ -65,7 +65,7 @@ public class LearnerRecordUpdateProcessor {
                 learnerRecordService.createCourseRecords(result.getNewRecords()).forEach(cr -> courseRecordMap.put(cr.getId(), cr));
             }
             if (!result.getUpdatedRecords().isEmpty()) {
-                courseRecordMap.putAll(learnerRecordService.updateCourseRecords(result.getUpdatedRecords()));
+                courseRecordMap.putAll(learnerRecordService.updateCourseRecords(courseRecordMap, result.getUpdatedRecords()));
             }
             if (!result.getMessages().isEmpty()) {
                 messagingClient.sendMessages(result.getMessages());
