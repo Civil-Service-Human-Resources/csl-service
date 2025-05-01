@@ -65,14 +65,15 @@ public class LearnerRecordService {
         return newRecords;
     }
 
-    public Map<String, CourseRecord> updateCourseRecords(Map<String, CourseRecord> updatedRecords) {
+    public Map<String, CourseRecord> updateCourseRecords(Map<String, CourseRecord> existingRecords, Map<String, CourseRecord> updatedRecords) {
         client.updateCourseRecords(updatedRecords.values().stream().toList())
                 .forEach(cr -> {
-                    CourseRecord existing = updatedRecords.get(cr.getId());
+                    CourseRecord existing = existingRecords.get(cr.getId());
                     existing.update(cr);
+                    existingRecords.put(cr.getId(), cr);
                     log.debug(String.format("Updated course record %s ", existing));
                     cache.put(existing);
                 });
-        return updatedRecords;
+        return existingRecords;
     }
 }
