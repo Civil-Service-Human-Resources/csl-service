@@ -185,7 +185,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 {
                     "courseRecords": [
                             {
-                                "courseId": "course1",
+                                "resourceId": "course1",
                                 "userId": "userId",
                                 "courseTitle": "Course 1",
                                 "state": "IN_PROGRESS",
@@ -259,7 +259,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 {
                     "courseRecords": [
                             {
-                                "courseId": "course1",
+                                "resourceId": "course1",
                                 "userId": "userId",
                                 "courseTitle": "Course 1",
                                 "state": "IN_PROGRESS",
@@ -333,7 +333,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 {
                     "courseRecords": [
                             {
-                                "courseId": "course1",
+                                "resourceId": "course1",
                                 "userId": "userId",
                                 "courseTitle": "Course 1",
                                 "state": "IN_PROGRESS",

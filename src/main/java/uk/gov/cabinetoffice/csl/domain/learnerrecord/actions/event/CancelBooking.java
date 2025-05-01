@@ -2,7 +2,6 @@ package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.event;
 
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.error.IncorrectStateException;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
@@ -16,22 +15,16 @@ public class CancelBooking extends EventModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
-        ModuleRecord moduleRecord = courseRecord.getModuleRecord(getModuleId())
-                .orElseThrow(() -> new IncorrectStateException("Can't create a new module record when cancelling an event."));
-        if (courseRecord.getState().equals(State.NULL) ||
-                !courseRecord.getState().equals(State.IN_PROGRESS)) {
-            courseRecord.setState(State.UNREGISTERED);
-        }
+    public ModuleRecord applyUpdatesToModuleRecord(ModuleRecord moduleRecord) {
         moduleRecord.setState(State.UNREGISTERED);
         moduleRecord.setBookingStatus(BookingStatus.CANCELLED);
         moduleRecord.setResult(null);
         moduleRecord.setCompletionDate(null);
-        return courseRecord;
+        return moduleRecord;
     }
 
     @Override
-    public CourseRecord generateNewCourseRecord() {
-        throw new IncorrectStateException("Can't create a new course record when cancelling an event.");
+    public ModuleRecord generateNewModuleRecord() {
+        throw new IncorrectStateException("Can't create a new module record when cancelling an event.");
     }
 }

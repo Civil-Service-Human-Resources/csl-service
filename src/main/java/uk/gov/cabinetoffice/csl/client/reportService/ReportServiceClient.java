@@ -3,7 +3,6 @@ package uk.gov.cabinetoffice.csl.client.reportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
@@ -40,16 +39,14 @@ public class ReportServiceClient implements IReportServiceClient {
     public AggregationResponse<Aggregation> getCourseCompletionAggregations(GetCourseCompletionsParams body) {
         log.debug("Getting course completion aggregation report with body '{}'", body);
         RequestEntity<GetCourseCompletionsParams> request = RequestEntity.post(courseCompletionAggregations).body(body);
-        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
-        });
+        return httpClient.executeTypeReferenceRequest(request);
     }
 
     @Override
     public AggregationResponse<CourseCompletionAggregation> getCourseCompletionAggregationsByCourse(GetCourseCompletionsParams body) {
         log.debug("Getting course completion aggregation report by course with body '{}'", body);
         RequestEntity<GetCourseCompletionsParams> request = RequestEntity.post(courseCompletionAggregationsByCourse).body(body);
-        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
-        });
+        return httpClient.executeTypeReferenceRequest(request);
     }
 
     @Override

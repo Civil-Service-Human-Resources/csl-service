@@ -25,7 +25,7 @@ public class ApproveBookingTest extends BaseEventModuleRecordActionTest<ApproveB
         ModuleRecord mr = cr.getModuleRecord(getModuleId()).get();
         mr.setResult(Result.PASSED);
         mr.setCompletionDate(LocalDateTime.now());
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToModuleRecord(cr);
         assertEquals(State.APPROVED, cr.getState());
 
         ModuleRecord moduleRecord = cr.getModuleRecord(getModuleId()).get();

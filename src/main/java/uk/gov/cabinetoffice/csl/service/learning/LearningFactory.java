@@ -22,7 +22,7 @@ public class LearningFactory<F extends IDisplayCourseFactory> {
     public Learning buildDetailedLearning(List<Course> courses, Map<String, CourseRecord> courseRecords,
                                           User user) {
         List<DisplayCourse> displayCourses = courses.stream().map(c -> {
-            CourseRecord courseRecord = courseRecords.get(c.getId());
+            CourseRecord courseRecord = courseRecords.get(c.getCacheableId());
             return displayCourseFactory.generateDetailedDisplayCourse(c, user, courseRecord);
         }).toList();
         return new Learning(displayCourses);

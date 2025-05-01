@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 @Data
 public class MultiCourseRecordAction implements ICourseRecordActionType {
 
-    private final Collection<ICourseRecordAction> actions;
+    private final Collection<IModuleRecordAction> actions;
 
     @Override
     public String getDescription() {
-        return actions.stream().map(ICourseRecordAction::getAction).collect(Collectors.joining(", "));
+        return actions.stream().map(IModuleRecordAction::getAction).collect(Collectors.joining(", "));
     }
 }

@@ -35,6 +35,6 @@ public class EventResponse {
         Module module = courseWithModuleWithEvent.getModule();
         Event event = courseWithModuleWithEvent.getEvent();
         return new EventResponse(String.format("Successfully applied action '%s' to course record", actionType.getDescription()), course.getTitle(),
-                module.getTitle(), course.getId(), module.getId(), event.getId(), event.getStartTime());
+                module.getTitle(), course.getCacheableId(), module.getId(), event.getId(), event.getStartTime());
     }
 }

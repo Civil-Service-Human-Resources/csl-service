@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
@@ -87,7 +87,7 @@ public class CancelEventTest extends IntegrationTestBase {
                 {"cancellationReason": "VENUE", "status":"CANCELLED"}
                 """);
         cslStubService.stubUpdateCourseRecords(
-                List.of(new CourseRecordId(userId, courseId), new CourseRecordId(userId2, courseId)),
+                List.of(new LearnerRecordResourceId(userId, courseId), new LearnerRecordResourceId(userId2, courseId)),
                 List.of(course), courseRecords, """
                         [{
                             "courseId" : "courseId",

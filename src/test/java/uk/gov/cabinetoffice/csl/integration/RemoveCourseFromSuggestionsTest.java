@@ -30,7 +30,7 @@ public class RemoveCourseFromSuggestionsTest extends IntegrationTestBase {
         Course course = testDataService.generateCourse(true, false);
         String expectedCourseRecordPOST = """
                 [{
-                    "courseId" : "courseId",
+                    "resourceId" : "resourceId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
                     "preference": "DISLIKED",

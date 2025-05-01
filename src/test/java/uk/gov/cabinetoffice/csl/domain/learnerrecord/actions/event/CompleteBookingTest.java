@@ -7,7 +7,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.service.messaging.model.CourseCompletionMessage;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CompleteBookingTest extends BaseEventModuleRecordActionTest<CompleteBooking> {
 
@@ -22,7 +23,7 @@ public class CompleteBookingTest extends BaseEventModuleRecordActionTest<Complet
         cr.setState(State.APPROVED);
         ModuleRecord mr = cr.getModuleRecord(getModuleId()).get();
         mr.setState(State.APPROVED);
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToModuleRecord(cr);
         assertEquals(State.COMPLETED, cr.getState());
         ModuleRecord moduleRecord = cr.getModuleRecord(getModuleId()).get();
         assertEquals(State.COMPLETED, moduleRecord.getState());
@@ -49,7 +50,7 @@ public class CompleteBookingTest extends BaseEventModuleRecordActionTest<Complet
     @Test
     public void testCompleteBookingNoCourseRecord() {
         assertThrows(IncorrectStateException.class, () -> {
-            actionUnderTest.generateNewCourseRecord();
+            actionUnderTest.generateNewModuleRecord();
         });
     }
 

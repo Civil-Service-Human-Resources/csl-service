@@ -1,20 +1,26 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course;
 
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ICourseRecordActionType;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@Getter
+@RequiredArgsConstructor
 public enum CourseRecordAction implements ICourseRecordActionType {
-    ADD_TO_LEARNING_PLAN("Add to learning plan"),
-    REMOVE_FROM_LEARNING_PLAN("Remove from learning plan"),
-    REMOVE_FROM_SUGGESTIONS("Remove from suggestions");
+    ADD_TO_LEARNING_PLAN("ADD_TO_LEARNING_PLAN", "Add to learning plan", true, false),
+    REMOVE_FROM_LEARNING_PLAN("REMOVE_FROM_LEARNING_PLAN", "Remove from learning plan", false, false),
+    REMOVE_FROM_SUGGESTIONS("REMOVE_FROM_SUGGESTIONS", "Remove from suggestions", true, false),
+    COMPLETE_COURSE("COMPLETE_COURSE", "Complete a course", true, true);
 
+    private final String name;
     private final String description;
-
-    CourseRecordAction(String description) {
-        this.description = description;
+    private final boolean canCreateRecord;
+    private final boolean canRepeat;
+    
+    public boolean canCreateRecord() {
+        return canCreateRecord;
     }
 
-    @Override
-    public String getDescription() {
-        return description;
+    public boolean canRepeat() {
+        return canRepeat;
     }
 }

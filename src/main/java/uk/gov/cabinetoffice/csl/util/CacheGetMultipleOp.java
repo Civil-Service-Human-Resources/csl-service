@@ -14,6 +14,6 @@ public class CacheGetMultipleOp<T extends Cacheable> {
     private final List<T> cacheHits;
 
     public Map<String, T> getCacheHitsAsMap() {
-        return this.cacheHits.stream().collect(Collectors.toMap(Cacheable::getId, o -> o));
+        return this.cacheHits.stream().collect(Collectors.toMap(Cacheable::getCacheableId, o -> o));
     }
 }

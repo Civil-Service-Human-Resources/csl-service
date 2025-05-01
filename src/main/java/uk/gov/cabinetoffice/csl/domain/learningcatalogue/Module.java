@@ -5,9 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.cabinetoffice.csl.domain.IChildLearningResource;
+import uk.gov.cabinetoffice.csl.domain.IParentLearningResource;
+import uk.gov.cabinetoffice.csl.domain.LearningResourceType;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
+import uk.gov.cabinetoffice.csl.util.Cacheable;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,8 +21,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Module implements Serializable {
+public class Module implements IChildLearningResource, IParentLearningResource<Event>, Cacheable {
     private String id;
+    private String courseId;
     private String title;
     private ModuleType moduleType;
     private String description;
@@ -54,5 +58,35 @@ public class Module implements Serializable {
     @JsonIgnore
     public boolean isType(ModuleType type) {
         return this.getModuleType().equals(type);
+    }
+
+    @Override
+    public String getParentId() {
+        return courseId;
+    }
+
+    @Override
+    public String getResourceId() {
+        return id;
+    }
+
+    @Override
+    public String getName() {
+        return title;
+    }
+
+    @Override
+    public LearningResourceType getType() {
+        return LearningResourceType.MODULE;
+    }
+
+    @Override
+    public Collection<Event> getChildren() {
+        return this.events;
+    }
+
+    @Override
+    public String getCacheableId() {
+        return id;
     }
 }

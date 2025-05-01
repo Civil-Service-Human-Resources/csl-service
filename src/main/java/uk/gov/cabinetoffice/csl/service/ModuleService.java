@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.model.ModuleResponse;
 import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordUpdateProcessor;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.module.ModuleRecordAction;
@@ -30,16 +29,17 @@ public class ModuleService {
     public LaunchLink launchModule(User user, String courseId, String moduleId, UserDetailsDto userDetailsDto) {
         CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
         Module module = courseWithModule.getModule();
-        ModuleRecordAction actionType = module.isType(ModuleType.link) || module.isType(ModuleType.file) ? ModuleRecordAction.COMPLETE_MODULE : ModuleRecordAction.LAUNCH_MODULE;
-        CourseRecord courseRecord = learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, actionType, null);
-        if (module.isType(ModuleType.elearning)) {
-            ModuleRecord moduleRecord = courseRecord.getModuleRecordAndThrowIfNotFound(moduleId);
-            return rusticiService.createLaunchLink(RegistrationInput.from(
-                    user.getId(), moduleId, moduleRecord.getUid(), courseId, userDetailsDto
-            ));
+        if (module.isType(ModuleType.link) || module.isType(ModuleType.file)) {
+            learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, ModuleRecordAction.COMPLETE_MODULE);
         } else {
-            return new LaunchLink(courseWithModule.getModule().getUrl());
+            ModuleRecord moduleRecord = learnerRecordUpdateProcessor.processModuleRecordAction(courseWithModule, user, ModuleRecordAction.LAUNCH_MODULE);
+            if (module.isType(ModuleType.elearning)) {
+                return rusticiService.createLaunchLink(RegistrationInput.from(
+                        user.getId(), moduleId, moduleRecord.getUid(), courseId, userDetailsDto
+                ));
+            }
         }
+        return new LaunchLink(courseWithModule.getModule().getUrl());
     }
 
     public ModuleResponse completeModule(User user, String courseId, String moduleId, LocalDateTime completionDate) {

@@ -2,8 +2,8 @@ package uk.gov.cabinetoffice.csl.util.stub;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
@@ -22,21 +22,21 @@ public class LearnerRecordStubService {
     }
 
     public void getCourseRecord(String courseId, String userId, CourseRecords response) {
-        getCourseRecords(List.of(new CourseRecordId(userId, courseId)), utils.toJson(response));
+        getCourseRecords(List.of(new LearnerRecordResourceId(userId, courseId)), utils.toJson(response));
     }
 
     public void getCourseRecord(String courseId, String userId, String response) {
-        getCourseRecords(List.of(new CourseRecordId(userId, courseId)), response);
+        getCourseRecords(List.of(new LearnerRecordResourceId(userId, courseId)), response);
     }
 
-    public void getCourseRecords(List<CourseRecordId> courseRecordIds, CourseRecords response) {
+    public void getCourseRecords(List<LearnerRecordResourceId> courseRecordIds, CourseRecords response) {
         getCourseRecords(courseRecordIds, utils.toJson(response));
     }
 
-    public void getCourseRecords(List<CourseRecordId> courseRecordIds, String response) {
-        String courseIdsFmt = String.join(",", courseRecordIds.stream().map(CourseRecordId::courseId)
+    public void getCourseRecords(List<LearnerRecordResourceId> courseRecordIds, String response) {
+        String courseIdsFmt = String.join(",", courseRecordIds.stream().map(LearnerRecordResourceId::resourceId)
                 .collect(Collectors.toSet()));
-        String userIdsFmt = String.join(",", courseRecordIds.stream().map(CourseRecordId::learnerId)
+        String userIdsFmt = String.join(",", courseRecordIds.stream().map(LearnerRecordResourceId::learnerId)
                 .collect(Collectors.toSet()));
         stubFor(
                 WireMock.get(urlPathEqualTo("/learner_record_api/course_records"))

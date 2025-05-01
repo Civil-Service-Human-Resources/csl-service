@@ -47,7 +47,7 @@ public class RequiredLearningDisplayCourseFactory implements IDisplayCourseFacto
     public DisplayCourse generateDetailedDisplayCourse(Course course, User user) {
         List<DisplayModule> modules = course.getModules().stream().map(displayModuleFactory::generateDisplayModule).toList();
         DisplayAudience displayAudience = displayAudienceFactory.generateDisplayAudience(course, user);
-        return new DisplayCourse(course.getId(), course.getTitle(), course.getShortDescription(), null, null,
+        return new DisplayCourse(course.getCacheableId(), course.getTitle(), course.getShortDescription(), null, null,
                 State.NULL, displayAudience, modules, course.getRequiredModulesForCompletion().size(), 0);
     }
 

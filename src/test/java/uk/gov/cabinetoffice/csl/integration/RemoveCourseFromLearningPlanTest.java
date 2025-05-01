@@ -38,7 +38,7 @@ public class RemoveCourseFromLearningPlanTest extends IntegrationTestBase {
         archivedCourseRecord.setState(State.ARCHIVED);
         String expectedCourseRecordPUT = """
                 [{
-                    "courseId" : "courseId",
+                    "resourceId" : "resourceId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
                     "state" : "ARCHIVED"
@@ -49,7 +49,7 @@ public class RemoveCourseFromLearningPlanTest extends IntegrationTestBase {
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.courseId").value("courseId"))
+                .andExpect(jsonPath("$.courseId").value("resourceId"))
                 .andExpect(jsonPath("$.courseTitle").value(testDataService.getCourseTitle()))
                 .andExpect(jsonPath("$.message").value("Successfully applied action 'Remove from learning plan' to course record"));
         ;
@@ -68,7 +68,7 @@ public class RemoveCourseFromLearningPlanTest extends IntegrationTestBase {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.title").value("Record is in the incorrect state"))
                 .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.instance").value("/courses/courseId/remove_from_learning_plan"));
+                .andExpect(jsonPath("$.instance").value("/courses/resourceId/remove_from_learning_plan"));
         ;
     }
 }

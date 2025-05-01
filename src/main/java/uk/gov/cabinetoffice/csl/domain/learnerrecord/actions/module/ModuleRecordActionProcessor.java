@@ -2,51 +2,63 @@ package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.module;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ICourseRecordActionType;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordActionProcessor;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.IModuleRecordAction;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
-import uk.gov.cabinetoffice.csl.service.messaging.model.CourseCompletionMessage;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 @Slf4j
-public abstract class ModuleRecordActionProcessor extends CourseRecordActionProcessor {
+public abstract class ModuleRecordActionProcessor implements IModuleRecordAction {
 
+    protected final UtilService utilService;
+    protected final Course course;
     protected final Module module;
+    protected final User user;
+    protected final ICourseRecordActionType actionType;
 
     protected ModuleRecordActionProcessor(UtilService utilService, CourseWithModule courseWithModule, User user,
                                           ICourseRecordActionType actionType) {
-        super(utilService, courseWithModule.getCourse(), user, actionType);
+        this.utilService = utilService;
+        this.course = courseWithModule.getCourse();
         this.module = courseWithModule.getModule();
+        this.user = user;
+        this.actionType = actionType;
     }
 
     @Override
-    public CourseRecord applyUpdatesToCourseRecord(CourseRecord courseRecord) {
-        CourseRecord updatedRecord = new CourseRecord(courseRecord.getCourseId(), courseRecord.getUserId(), courseRecord.getCourseTitle());
-        courseRecord.setPreference(null);
-        updatedRecord.update(this.updateCourseRecord(courseRecord));
-        updatedRecord.setModuleRecords(courseRecord.getModuleRecords().stream().filter(mr -> Objects.equals(mr.getModuleId(), getModuleId())).collect(Collectors.toSet()));
-        return updatedRecord;
+    public String getCourseId() {
+        return course.getId();
     }
 
-    protected abstract CourseRecord updateCourseRecord(CourseRecord courseRecord);
+    @Override
+    public String getUserId() {
+        return user.getId();
+    }
 
-    protected String getModuleId() {
+    public String getModuleId() {
         return module.getId();
     }
 
-    protected CourseCompletionMessage generateCompletionMessage(LocalDateTime completionDate) {
-        return new CourseCompletionMessage(completionDate, user.getId(), user.getEmail(), course.getId(), course.getTitle(),
-                user.getOrganisationId(), user.getFormattedOrganisationName(), user.getProfessionId(), user.getProfessionName(), user.getGradeId(), user.getGradeName());
+    @Override
+    public String getAction() {
+        return actionType.getDescription();
     }
 
     @Override
     public String toString() {
-        return String.format("%s | Module ID: %s", super.toString(), module.getId());
+        return String.format("Action: '%s' | Learner ID: %s | Course ID: %s | Module ID: %s", getAction(), user.getId(), course.getId(), module.getId());
+    }
+
+    @Override
+    public ModuleRecord generateNewModuleRecord() {
+        return applyUpdatesToModuleRecord(createModuleRecord());
+    }
+
+    protected ModuleRecord createModuleRecord() {
+        return new ModuleRecord(getCourseId(), getUserId(), module.getId(), module.getTitle(), module.getModuleType(),
+                module.getDuration(), module.isOptional(), module.getCost(), true);
     }
 }

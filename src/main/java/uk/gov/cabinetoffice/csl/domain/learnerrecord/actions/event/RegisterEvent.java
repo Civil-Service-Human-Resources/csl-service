@@ -1,7 +1,6 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.event;
 
 import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
@@ -14,22 +13,13 @@ public class RegisterEvent extends EventModuleRecordActionProcessor {
     }
 
     @Override
-    public CourseRecord updateCourseRecord(CourseRecord courseRecord) {
-        if (courseRecord.getState().equals(State.NULL) ||
-                !courseRecord.getState().equals(State.IN_PROGRESS)) {
-            courseRecord.setState(State.REGISTERED);
-        }
-        ModuleRecord moduleRecord = courseRecord.getOrCreateModuleRecord(module);
+    public ModuleRecord applyUpdatesToModuleRecord(ModuleRecord moduleRecord) {
         moduleRecord.setState(State.REGISTERED);
         moduleRecord.setEventId(event.getId());
         moduleRecord.setEventDate(event.getStartTime());
         moduleRecord.setResult(null);
         moduleRecord.setCompletionDate(null);
-        return courseRecord;
+        return moduleRecord;
     }
 
-    @Override
-    public CourseRecord generateNewCourseRecord() {
-        return applyUpdatesToCourseRecord(createCourseRecord());
-    }
 }

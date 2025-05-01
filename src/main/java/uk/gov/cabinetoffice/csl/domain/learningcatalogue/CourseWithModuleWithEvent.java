@@ -22,7 +22,7 @@ public class CourseWithModuleWithEvent extends CourseWithModule {
     }
 
     public String getEventUrl() {
-        return String.format("courses/%s/modules/%s/events/%s", getCourse().getId(), getModule().getId(), getEvent().getId());
+        return String.format("courses/%s/modules/%s/events/%s", getCourse().getCacheableId(), getModule().getId(), getEvent().getId());
     }
 
 }

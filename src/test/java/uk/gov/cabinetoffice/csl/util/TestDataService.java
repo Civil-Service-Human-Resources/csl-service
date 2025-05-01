@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
@@ -25,14 +25,14 @@ import java.util.List;
 @Getter
 public class TestDataService {
 
-    private final String courseId = "courseId";
+    private final String courseId = "resourceId";
     private final String moduleId = "moduleId";
     private final String eventId = "eventId";
     private final String moduleTitle = "Test Module";
     private final String moduleUid = "uid";
     private final long moduleRecordId = 1;
     private final String userId = "userId";
-    private final CourseRecordId courseRecordId = new CourseRecordId(userId, courseId);
+    private final LearnerRecordResourceId courseRecordId = new LearnerRecordResourceId(userId, courseId);
     private final String userEmail = "userEmail@email.com";
     private final String learnerFirstName = "Learner";
     private final String lineManagerName = "Manager";

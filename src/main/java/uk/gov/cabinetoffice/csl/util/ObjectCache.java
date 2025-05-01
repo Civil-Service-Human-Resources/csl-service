@@ -37,7 +37,7 @@ public class ObjectCache<T extends Cacheable> {
     }
 
     public void put(T object) {
-        cache.put(object.getId(), object);
+        cache.put(object.getCacheableId(), object);
     }
 
     public void evict(String id) {

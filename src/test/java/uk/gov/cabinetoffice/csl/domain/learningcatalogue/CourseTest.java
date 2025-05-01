@@ -26,7 +26,7 @@ public class CourseTest extends TestDataService {
     @BeforeEach
     public void before() {
         course = new Course();
-        course.setId("courseId");
+        course.setId("resourceId");
         Module module1 = new Module();
         module1.setId("mod1");
         Module module2 = new Module();
@@ -38,7 +38,7 @@ public class CourseTest extends TestDataService {
         ));
 
         courseRecord = new CourseRecord();
-        courseRecord.setCourseId(course.getId());
+        courseRecord.setCourseId(course.getCacheableId());
         ModuleRecord moduleRecord1 = new ModuleRecord();
         moduleRecord1.setModuleId(module1.getId());
         ModuleRecord moduleRecord2 = new ModuleRecord();

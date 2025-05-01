@@ -29,7 +29,7 @@ public class CourseServiceTest extends TestDataService {
     private LearningCatalogueService learningCatalogueService;
 
     @InjectMocks
-    private CourseService courseService;
+    private CourseActionService courseService;
 
     private final Course course = generateCourse(false, false);
     private final User user = generateUser();

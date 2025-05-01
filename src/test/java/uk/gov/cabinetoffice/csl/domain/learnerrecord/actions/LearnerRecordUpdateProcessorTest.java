@@ -38,7 +38,7 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
     private LearnerRecordUpdateProcessor learnerRecordUpdateProcessor;
     private final Course course = generateCourse(true, false);
 
-    private final ICourseRecordAction action = mock(ICourseRecordAction.class);
+    private final IModuleRecordAction action = mock(IModuleRecordAction.class);
 
     @BeforeEach
     public void before() {
@@ -48,11 +48,11 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
     @Test
     public void shouldCreateCourseRecord() {
         CourseRecord courseRecord = generateCourseRecord(false);
-        Map<String, CourseRecord> map = Map.of(courseRecord.getId(), courseRecord);
-        when(action.getCourseRecordId()).thenReturn(getCourseRecordId());
+        Map<String, CourseRecord> map = Map.of(courseRecord.getCacheableId(), courseRecord);
+        when(action.getModuleRecordId()).thenReturn(getCourseRecordId());
         when(learnerRecordService.getCourseRecords(List.of(getCourseRecordId())))
                 .thenReturn(List.of());
-        when(action.generateNewCourseRecord())
+        when(action.generateNewModuleRecord())
                 .thenReturn(courseRecord);
         when(action.getCourseId()).thenReturn(courseRecord.getCourseId());
         when(action.getUserId()).thenReturn(courseRecord.getUserId());
@@ -66,13 +66,13 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
     @Test
     public void shouldUpdateCourseRecord() {
         CourseRecord courseRecord = generateCourseRecord(false);
-        Map<String, CourseRecord> map = Map.of(courseRecord.getId(), courseRecord);
-        when(action.getCourseRecordId()).thenReturn(getCourseRecordId());
+        Map<String, CourseRecord> map = Map.of(courseRecord.getCacheableId(), courseRecord);
+        when(action.getModuleRecordId()).thenReturn(getCourseRecordId());
         when(learnerRecordService.getCourseRecords(List.of(getCourseRecordId())))
                 .thenReturn(List.of(courseRecord));
         when(action.getCourseId()).thenReturn(courseRecord.getCourseId());
         when(action.getUserId()).thenReturn(courseRecord.getUserId());
-        when(action.applyUpdatesToCourseRecord(courseRecord))
+        when(action.applyUpdatesToModuleRecord(courseRecord))
                 .thenReturn(courseRecord);
         when(learnerRecordService.updateCourseRecords(map))
                 .thenReturn(map);
@@ -84,7 +84,7 @@ public class LearnerRecordUpdateProcessorTest extends TestDataService {
     @Test
     public void shouldBustLearnerRecordCacheOnError() {
         when(learnerRecordService.getCourseRecords(List.of(getCourseRecordId()))).thenThrow(new RuntimeException("Error"));
-        when(action.getCourseRecordId()).thenReturn(getCourseRecordId());
+        when(action.getModuleRecordId()).thenReturn(getCourseRecordId());
         when(action.getUserId()).thenReturn(getUserId());
         assertThrowsExactly(RuntimeException.class, () -> learnerRecordUpdateProcessor.processCourseRecordAction(action));
         verify(learnerRecordService, atMostOnce()).bustCourseRecordCache(getCourseRecordId());

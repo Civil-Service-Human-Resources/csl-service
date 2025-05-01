@@ -26,7 +26,7 @@ public class SkipBookingTest extends BaseEventModuleRecordActionTest<SkipBooking
         mr.setState(State.APPROVED);
         mr.setResult(Result.PASSED);
         mr.setCompletionDate(LocalDateTime.now());
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
+        cr = actionUnderTest.applyUpdatesToModuleRecord(cr);
         assertEquals(State.SKIPPED, cr.getState());
         ModuleRecord moduleRecord = cr.getModuleRecord(getModuleId()).get();
         assertEquals(State.SKIPPED, moduleRecord.getState());
@@ -45,7 +45,7 @@ public class SkipBookingTest extends BaseEventModuleRecordActionTest<SkipBooking
     @Test
     public void testCancelBookingNoCourseRecord() {
         assertThrows(IncorrectStateException.class, () -> {
-            actionUnderTest.generateNewCourseRecord();
+            actionUnderTest.generateNewModuleRecord();
         });
     }
 

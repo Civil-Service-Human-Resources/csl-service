@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @deprecated We should move away from using course records as it is a legacy data item.
+ * <p>
+ * Use The ILearnerRecord.java interface for calculating course state
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
