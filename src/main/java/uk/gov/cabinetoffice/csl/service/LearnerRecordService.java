@@ -68,7 +68,7 @@ public class LearnerRecordService {
     public Map<String, CourseRecord> updateCourseRecords(Map<String, CourseRecord> updatedRecords) {
         client.updateCourseRecords(updatedRecords.values().stream().toList())
                 .forEach(cr -> {
-                    CourseRecord existing = cache.get(cr.getId());
+                    CourseRecord existing = updatedRecords.get(cr.getId());
                     existing.update(cr);
                     log.debug(String.format("Updated course record %s ", existing));
                     cache.put(existing);
