@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - master
+      - main
       - idt-develop
       - idt-feature-LC-*
       - idt-release-v*
