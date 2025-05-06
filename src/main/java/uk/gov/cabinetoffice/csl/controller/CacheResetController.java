@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
@@ -43,7 +44,7 @@ public class CacheResetController {
     @GetMapping(path = "/learner/{learnerId}/course_record/{courseId}")
     public ResponseEntity<?> removeCourseRecordFromCache(@PathVariable String learnerId,
                                                          @PathVariable String courseId) {
-        learnerRecordService.bustCourseRecordCache(learnerId, courseId);
+        learnerRecordService.bustCourseRecordCache(new CourseRecordId(learnerId, courseId));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

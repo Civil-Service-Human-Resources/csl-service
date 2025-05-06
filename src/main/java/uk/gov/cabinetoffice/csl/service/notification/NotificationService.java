@@ -1,24 +1,24 @@
 package uk.gov.cabinetoffice.csl.service.notification;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.notificationService.INotificationServiceClient;
+import uk.gov.cabinetoffice.csl.config.notifications.EmailTemplates;
 import uk.gov.cabinetoffice.csl.domain.notificationservice.MessageDto;
-import uk.gov.cabinetoffice.csl.service.notification.messages.EmailNotification;
 import uk.gov.cabinetoffice.csl.service.notification.messages.IEmail;
 import uk.gov.cabinetoffice.csl.util.UtilService;
 
 import java.util.Collection;
-import java.util.Map;
 
 @Component
+@Slf4j
 public class NotificationService implements INotificationService {
 
-
     private final INotificationServiceClient notificationServiceClient;
-    private final Map<EmailNotification, String> emailNameMap;
+    private final EmailTemplates emailNameMap;
     private final UtilService utilService;
 
-    public NotificationService(INotificationServiceClient notificationServiceClient, Map<EmailNotification, String> emailNameMap, UtilService utilService) {
+    public NotificationService(INotificationServiceClient notificationServiceClient, EmailTemplates emailNameMap, UtilService utilService) {
         this.notificationServiceClient = notificationServiceClient;
         this.emailNameMap = emailNameMap;
         this.utilService = utilService;
@@ -27,7 +27,7 @@ public class NotificationService implements INotificationService {
     public void sendEmails(Collection<IEmail> emails) {
         emails.forEach(email -> {
             String uid = utilService.generateUUID();
-            String name = emailNameMap.get(email.getEmailNotification());
+            String name = emailNameMap.getTemplate(email.getEmailNotification());
             MessageDto messageDto = new MessageDto(uid, email.getRecipient(), email.getPersonalisation());
             notificationServiceClient.sendEmail(name, messageDto);
         });

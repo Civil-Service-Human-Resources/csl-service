@@ -5,12 +5,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -28,6 +30,11 @@ public class Module implements Serializable {
     private String url;
 
     private boolean requiredForCompletion;
+
+    @JsonIgnore
+    public void updateEvent(Event event) {
+        events.stream().collect(Collectors.toMap(Event::getId, e -> e)).put(event.getId(), event);
+    }
 
     @JsonIgnore
     public Event getEvent(String eventId) {

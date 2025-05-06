@@ -65,7 +65,7 @@ public class CompleteEventTest extends IntegrationTestBase {
         cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
         UserDetailsDto dto = testDataService.generateUserDetailsDto();
         String expectedCourseRecordPUT = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
@@ -79,9 +79,9 @@ public class CompleteEventTest extends IntegrationTestBase {
                             "completionDate": "2023-01-01T10:00:00"
                         }
                     ]
-                }
+                }]
                 """;
-        cslStubService.getLearnerRecord().updateCourseRecord(expectedCourseRecordPUT, courseRecord);
+        cslStubService.getLearnerRecord().updateCourseRecords(expectedCourseRecordPUT, new CourseRecords(courseRecord));
         String url = String.format("/courses/%s/modules/%s/events/%s/complete_booking", courseId, moduleId, eventId);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)

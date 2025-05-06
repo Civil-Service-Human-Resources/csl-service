@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.CancelBookingDto;
+import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
 import uk.gov.cabinetoffice.csl.controller.model.EventResponse;
 import uk.gov.cabinetoffice.csl.service.EventService;
 
@@ -15,6 +16,15 @@ public class AdminEventController {
 
     private final EventService eventService;
 
+    @PostMapping(path = "/admin/courses/{courseId}/modules/{moduleId}/events/{eventId}/cancel", produces = "application/json")
+    @ResponseBody
+    public void cancelEvent(@PathVariable("courseId") String courseId,
+                            @PathVariable("moduleId") String moduleId,
+                            @PathVariable("eventId") String eventId,
+                            @Valid @RequestBody CancelEventDto cancelEventDto) {
+        eventService.cancelEvent(courseId, moduleId, eventId, cancelEventDto);
+    }
+
     @PostMapping(path = "/admin/courses/{courseId}/modules/{moduleId}/events/{eventId}/bookings/{bookingId}/cancel_booking", produces = "application/json")
     @ResponseBody
     public EventResponse bookEvent(@PathVariable("courseId") String courseId,
@@ -22,7 +32,6 @@ public class AdminEventController {
                                    @PathVariable("eventId") String eventId,
                                    @PathVariable("bookingId") String bookingId,
                                    @Valid @RequestBody CancelBookingDto cancelBookingDto) {
-        log.debug("courseId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
         return eventService.cancelBookingWithBookingId(courseId, moduleId, eventId, bookingId, cancelBookingDto);
     }
 
@@ -32,7 +41,6 @@ public class AdminEventController {
                                       @PathVariable("moduleId") String moduleId,
                                       @PathVariable("eventId") String eventId,
                                       @PathVariable("bookingId") String bookingId) {
-        log.debug("courseId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
         return eventService.approveBookingWithBookingId(courseId, moduleId, eventId, bookingId);
     }
 }

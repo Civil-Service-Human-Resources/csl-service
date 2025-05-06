@@ -11,7 +11,6 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,11 +19,10 @@ public class LearningFactory<F extends IDisplayCourseFactory> {
 
     private final F displayCourseFactory;
 
-    public Learning buildDetailedLearning(List<Course> courses, List<CourseRecord> courseRecords,
+    public Learning buildDetailedLearning(List<Course> courses, Map<String, CourseRecord> courseRecords,
                                           User user) {
-        Map<String, CourseRecord> courseRecordMap = courseRecords.stream().collect(Collectors.toMap(CourseRecord::getCourseId, courseRecord -> courseRecord));
         List<DisplayCourse> displayCourses = courses.stream().map(c -> {
-            CourseRecord courseRecord = courseRecordMap.get(c.getId());
+            CourseRecord courseRecord = courseRecords.get(c.getId());
             return displayCourseFactory.generateDetailedDisplayCourse(c, user, courseRecord);
         }).toList();
         return new Learning(displayCourses);

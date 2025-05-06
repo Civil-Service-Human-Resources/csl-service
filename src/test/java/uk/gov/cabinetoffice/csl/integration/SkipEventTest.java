@@ -54,7 +54,7 @@ public class SkipEventTest extends IntegrationTestBase {
         moduleRecord.setState(State.APPROVED);
         courseRecord.setState(State.APPROVED);
         String expectedCourseRecordPUT = """
-                {
+                [{
                     "courseId" : "courseId",
                     "userId" : "userId",
                     "courseTitle" : "Test Course",
@@ -67,7 +67,7 @@ public class SkipEventTest extends IntegrationTestBase {
                             "state" : "SKIPPED"
                         }
                     ]
-                }
+                }]
                 """;
         cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, courseRecord);
         String url = String.format("/courses/%s/modules/%s/events/%s/skip_booking", courseId, moduleId, eventId);
