@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import uk.gov.cabinetoffice.csl.domain.LearningResourceType;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.LearnerRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ITypedLearnerRecordResourceID;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.TypedLearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ILearnerRecordActionType;
 
 import java.time.LocalDateTime;
@@ -15,9 +16,12 @@ import java.time.LocalDateTime;
 public class LearnerRecordEventDto {
     private String resourceId;
     private String learnerId;
+    @JsonIgnore
     private ILearnerRecordActionType actionType;
     private String eventSource;
     private LocalDateTime eventTimestamp;
+
+    @JsonIgnore
     private boolean newEvent;
 
     @JsonProperty("eventType")
@@ -31,7 +35,7 @@ public class LearnerRecordEventDto {
     }
 
     @JsonIgnore
-    public LearnerRecordResourceId getResourceId() {
-        return new LearnerRecordResourceId(getResourceType(), learnerId, resourceId);
+    public ITypedLearnerRecordResourceID getLearnerRecordResourceId() {
+        return new TypedLearnerRecordResourceId(learnerId, resourceId, getResourceType());
     }
 }

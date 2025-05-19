@@ -14,11 +14,11 @@ public class ResourceActionResponse {
     private boolean performedUpdate;
 
     private String getIdWithTitle() {
-        return String.format("%s (%s)", resourceId, resourceTitle);
+        return String.format("%s %s (%s)", recordType, resourceId, resourceTitle);
     }
 
     public String getMessage() {
-        String message = performedUpdate ? "Successfully applied action '%s' to %s %s" : "Did not apply action '%s' to %s";
-        return String.format(message, actionDescription, recordType, getIdWithTitle());
+        String message = performedUpdate ? "Successfully applied action '%s' to %s" : "Did not apply action '%s' to %s";
+        return String.format(message, actionDescription, getIdWithTitle());
     }
 }

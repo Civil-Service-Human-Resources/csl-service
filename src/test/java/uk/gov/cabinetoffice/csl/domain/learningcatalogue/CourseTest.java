@@ -3,7 +3,6 @@ package uk.gov.cabinetoffice.csl.domain.learningcatalogue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
@@ -20,8 +19,8 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
 public class CourseTest extends TestDataService {
 
     private Course course;
-    private CourseRecord courseRecord;
     private final User user = generateUser();
+    private Map<String, ModuleRecord> moduleRecordMap;
 
     @BeforeEach
     public void before() {
@@ -37,17 +36,13 @@ public class CourseTest extends TestDataService {
                 module1, module2, module3
         ));
 
-        courseRecord = new CourseRecord();
-        courseRecord.setCourseId(course.getCacheableId());
         ModuleRecord moduleRecord1 = new ModuleRecord();
         moduleRecord1.setModuleId(module1.getId());
         ModuleRecord moduleRecord2 = new ModuleRecord();
         moduleRecord2.setModuleId(module2.getId());
         ModuleRecord moduleRecord3 = new ModuleRecord();
         moduleRecord3.setModuleId(module3.getId());
-        courseRecord.setModuleRecords(List.of(
-                moduleRecord1, moduleRecord2, moduleRecord3
-        ));
+        moduleRecordMap = Map.of("mod1", moduleRecord1, "mod2", moduleRecord2, "mod3", moduleRecord3);
     }
 
     // Completion tests
@@ -57,26 +52,26 @@ public class CourseTest extends TestDataService {
         course.getModule("mod1").setOptional(false);
         course.getModule("mod2").setOptional(false);
         course.getModule("mod3").setOptional(true);
-        courseRecord.getModuleRecord("mod1").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod1").get().setCompletionDate(LocalDateTime.now());
-        courseRecord.getModuleRecord("mod2").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod2").get().setCompletionDate(LocalDateTime.now());
-        courseRecord.getModuleRecord("mod3").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod3").get().setCompletionDate(LocalDateTime.now());
-        Integer result = course.getRemainingModuleIdsForCompletion(courseRecord, user).size();
+        moduleRecordMap.get("mod1").setState(State.COMPLETED);
+        moduleRecordMap.get("mod1").setCompletionDate(LocalDateTime.now());
+        moduleRecordMap.get("mod2").setState(State.COMPLETED);
+        moduleRecordMap.get("mod2").setCompletionDate(LocalDateTime.now());
+        moduleRecordMap.get("mod3").setState(State.COMPLETED);
+        moduleRecordMap.get("mod3").setCompletionDate(LocalDateTime.now());
+        Integer result = course.getRemainingModuleIdsForCompletion(moduleRecordMap, user).size();
         assertEquals("Expected course to be completed (0 modules remaining)", 0, result);
     }
 
     @Test
     public void testCourseCompletedWithOptionalModules() {
         course.getModules().forEach(m -> m.setOptional(true));
-        courseRecord.getModuleRecord("mod1").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod1").get().setCompletionDate(LocalDateTime.now());
-        courseRecord.getModuleRecord("mod2").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod2").get().setCompletionDate(LocalDateTime.now());
-        courseRecord.getModuleRecord("mod3").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod3").get().setCompletionDate(LocalDateTime.now());
-        Integer result = course.getRemainingModuleIdsForCompletion(courseRecord, user).size();
+        moduleRecordMap.get("mod1").setState(State.COMPLETED);
+        moduleRecordMap.get("mod1").setCompletionDate(LocalDateTime.now());
+        moduleRecordMap.get("mod2").setState(State.COMPLETED);
+        moduleRecordMap.get("mod2").setCompletionDate(LocalDateTime.now());
+        moduleRecordMap.get("mod3").setState(State.COMPLETED);
+        moduleRecordMap.get("mod3").setCompletionDate(LocalDateTime.now());
+        Integer result = course.getRemainingModuleIdsForCompletion(moduleRecordMap, user).size();
         assertEquals("Expected course to be completed", 0, result);
     }
 
@@ -85,12 +80,12 @@ public class CourseTest extends TestDataService {
         course.getModule("mod1").setRequiredForCompletion(false);
         course.getModule("mod2").setRequiredForCompletion(false);
         course.getModule("mod3").setRequiredForCompletion(true);
-        courseRecord.getModuleRecord("mod1").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod1").get().setCompletionDate(LocalDateTime.now());
-        courseRecord.getModuleRecord("mod2").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod2").get().setCompletionDate(LocalDateTime.now());
-        courseRecord.getModuleRecord("mod3").get().setState(State.IN_PROGRESS);
-        Integer result = course.getRemainingModuleIdsForCompletion(courseRecord, user).size();
+        moduleRecordMap.get("mod1").setState(State.COMPLETED);
+        moduleRecordMap.get("mod1").setCompletionDate(LocalDateTime.now());
+        moduleRecordMap.get("mod2").setState(State.COMPLETED);
+        moduleRecordMap.get("mod2").setCompletionDate(LocalDateTime.now());
+        moduleRecordMap.get("mod3").setState(State.IN_PROGRESS);
+        Integer result = course.getRemainingModuleIdsForCompletion(moduleRecordMap, user).size();
         assertEquals("Expected course to not be completed (expected 1 module remaining)", 1, result);
     }
 
@@ -107,13 +102,13 @@ public class CourseTest extends TestDataService {
         course.getModule("mod1").setOptional(false);
         course.getModule("mod2").setOptional(false);
         course.getModule("mod3").setOptional(false);
-        courseRecord.getModuleRecord("mod1").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod1").get().setCompletionDate(LocalDateTime.of(2023, 2, 1, 10, 0, 0));
-        courseRecord.getModuleRecord("mod2").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod2").get().setCompletionDate(LocalDateTime.of(2023, 4, 30, 10, 0, 0));
-        courseRecord.getModuleRecord("mod3").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod3").get().setCompletionDate(LocalDateTime.of(2023, 12, 1, 10, 0, 0));
-        Integer result = course.getRemainingModuleIdsForCompletion(courseRecord, user).size();
+        moduleRecordMap.get("mod1").setState(State.COMPLETED);
+        moduleRecordMap.get("mod1").setCompletionDate(LocalDateTime.of(2023, 2, 1, 10, 0, 0));
+        moduleRecordMap.get("mod2").setState(State.COMPLETED);
+        moduleRecordMap.get("mod2").setCompletionDate(LocalDateTime.of(2023, 4, 30, 10, 0, 0));
+        moduleRecordMap.get("mod3").setState(State.COMPLETED);
+        moduleRecordMap.get("mod3").setCompletionDate(LocalDateTime.of(2023, 12, 1, 10, 0, 0));
+        Integer result = course.getRemainingModuleIdsForCompletion(moduleRecordMap, user).size();
         assertEquals("Expected course to be completed (expected 0 modules remaining)", 0, result);
     }
 
@@ -130,13 +125,13 @@ public class CourseTest extends TestDataService {
         course.getModule("mod1").setRequiredForCompletion(true);
         course.getModule("mod2").setRequiredForCompletion(true);
         course.getModule("mod3").setRequiredForCompletion(true);
-        courseRecord.getModuleRecord("mod1").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod1").get().setCompletionDate(LocalDateTime.of(2022, 2, 1, 10, 0, 0));
-        courseRecord.getModuleRecord("mod2").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod2").get().setCompletionDate(LocalDateTime.of(2023, 4, 30, 10, 0, 0));
-        courseRecord.getModuleRecord("mod3").get().setState(State.COMPLETED);
-        courseRecord.getModuleRecord("mod3").get().setCompletionDate(LocalDateTime.of(2023, 12, 1, 10, 0, 0));
-        Collection<String> result = course.getRemainingModuleIdsForCompletion(courseRecord, user);
+        moduleRecordMap.get("mod1").setState(State.COMPLETED);
+        moduleRecordMap.get("mod1").setCompletionDate(LocalDateTime.of(2022, 2, 1, 10, 0, 0));
+        moduleRecordMap.get("mod2").setState(State.COMPLETED);
+        moduleRecordMap.get("mod2").setCompletionDate(LocalDateTime.of(2023, 4, 30, 10, 0, 0));
+        moduleRecordMap.get("mod3").setState(State.COMPLETED);
+        moduleRecordMap.get("mod3").setCompletionDate(LocalDateTime.of(2023, 12, 1, 10, 0, 0));
+        Collection<String> result = course.getRemainingModuleIdsForCompletion(moduleRecordMap, user);
         assertEquals("Expected course not to be completed (expected 1 module remaining)", 1, result.size());
         assertEquals("Expected mod1 to not be completed in this learning period", "mod1", result.stream().findFirst().get());
     }

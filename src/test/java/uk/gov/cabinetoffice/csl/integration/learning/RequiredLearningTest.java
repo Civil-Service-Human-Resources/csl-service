@@ -153,13 +153,20 @@ public class RequiredLearningTest extends IntegrationTestBase {
     public void testGetRequiredLearningForUserNotStarted() throws Exception {
         String courseRecord = """
                 {
-                    "courseRecords": []
+                    "content": [],
+                    "totalPages": 1
+                }
+                """;
+        String moduleRecords = """
+                {
+                    "moduleRecords": []
                 }
                 """;
         cslStubService.getLearningCatalogue().getMandatoryLearningMap(depToCourseRequiredLearningCourseSingleModule);
         cslStubService.getLearningCatalogue().getCourses(List.of("course1"), courseSingleModule);
         cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
-        cslStubService.getLearnerRecord().getCourseRecord("course1", "userId", courseRecord);
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1"), moduleRecords);
+        cslStubService.getLearnerRecord().getLearnerRecords("userId", "course1", 0, courseRecord);
         mockMvc.perform(get("/learning/required/detailed/userId")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
@@ -183,48 +190,53 @@ public class RequiredLearningTest extends IntegrationTestBase {
     public void testGetRequiredLearningForUserInProgress() throws Exception {
         String courseRecord = """
                 {
-                    "courseRecords": [
-                            {
-                                "resourceId": "course1",
-                                "userId": "userId",
-                                "courseTitle": "Course 1",
-                                "state": "IN_PROGRESS",
-                                "lastUpdated": "2024-07-02T10:00:00",
-                                "required": false,
-                                "modules": [
-                                    {
-                                        "id": 1,
-                                        "uid": "module1",
-                                        "moduleId": "module1",
-                                        "moduleTitle": "module1",
-                                        "moduleType": "link",
-                                        "duration": 3600,
-                                        "state": "COMPLETED",
-                                        "completionDate": "2024-07-02T10:00:00",
-                                        "createdAt": "2024-07-02T10:00:00",
-                                        "updatedAt": "2024-07-02T10:00:00"
-                                    },
-                                    {
-                                        "id": 2,
-                                        "uid": "module2",
-                                        "moduleId": "module2",
-                                        "moduleTitle": "module2",
-                                        "moduleType": "elearning",
-                                        "duration": 3600,
-                                        "state": "IN_PROGRESS",
-                                        "completionDate": null,
-                                        "createdAt": "2023-07-02T10:00:00",
-                                        "updatedAt": "2023-07-02T10:00:00"
-                                    }
-                                ]
+                    "content": [
+                        {
+                            "resourceId": "course1",
+                            "learnerId": "userId",
+                            "recordType": {
+                                "type": "COURSE"
                             }
+                        }
+                    ],
+                    "totalPages": 1
+                }
+                """;
+        String moduleRecords = """
+                {
+                    "moduleRecords": [
+                        {
+                            "id": 1,
+                            "uid": "module1",
+                            "moduleId": "module1",
+                            "moduleTitle": "module1",
+                            "moduleType": "link",
+                            "duration": 3600,
+                            "state": "COMPLETED",
+                            "completionDate": "2024-07-02T10:00:00",
+                            "createdAt": "2024-07-02T10:00:00",
+                            "updatedAt": "2024-07-02T10:00:00"
+                        },
+                        {
+                            "id": 2,
+                            "uid": "module2",
+                            "moduleId": "module2",
+                            "moduleTitle": "module2",
+                            "moduleType": "elearning",
+                            "duration": 3600,
+                            "state": "IN_PROGRESS",
+                            "completionDate": null,
+                            "createdAt": "2023-07-02T10:00:00",
+                            "updatedAt": "2023-07-02T10:00:00"
+                        }
                     ]
                 }
                 """;
         cslStubService.getLearningCatalogue().getMandatoryLearningMap(depToCourseRequiredLearningCourseMingleModules);
         cslStubService.getLearningCatalogue().getCourses(List.of("course1"), courseMultipleModules);
         cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
-        cslStubService.getLearnerRecord().getCourseRecord("course1", "userId", courseRecord);
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2", "module3"), moduleRecords);
+        cslStubService.getLearnerRecord().getLearnerRecords("userId", "course1", 0, courseRecord);
         mockMvc.perform(get("/learning/required/detailed/userId")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
@@ -257,48 +269,53 @@ public class RequiredLearningTest extends IntegrationTestBase {
     public void testGetRequiredLearningForUserSingleModuleInProgress() throws Exception {
         String courseRecord = """
                 {
-                    "courseRecords": [
-                            {
-                                "resourceId": "course1",
-                                "userId": "userId",
-                                "courseTitle": "Course 1",
-                                "state": "IN_PROGRESS",
-                                "lastUpdated": "2024-07-02T10:00:00",
-                                "required": false,
-                                "modules": [
-                                    {
-                                        "id": 1,
-                                        "uid": "module1",
-                                        "moduleId": "module1",
-                                        "moduleTitle": "module1",
-                                        "moduleType": "link",
-                                        "duration": 3600,
-                                        "state": "NULL",
-                                        "completionDate": null,
-                                        "createdAt": null,
-                                        "updatedAt": null
-                                    },
-                                    {
-                                        "id": 2,
-                                        "uid": "module2",
-                                        "moduleId": "module2",
-                                        "moduleTitle": "module2",
-                                        "moduleType": "elearning",
-                                        "duration": 3600,
-                                        "state": "IN_PROGRESS",
-                                        "completionDate": null,
-                                        "createdAt": "2023-07-02T10:00:00",
-                                        "updatedAt": "2023-07-02T10:00:00"
-                                    }
-                                ]
+                    "content": [
+                        {
+                            "resourceId": "course1",
+                            "learnerId": "userId",
+                            "recordType": {
+                                "type": "COURSE"
                             }
+                        }
+                    ],
+                    "totalPages": 1
+                }
+                """;
+        String moduleRecords = """
+                {
+                    "moduleRecords": [
+                        {
+                            "id": 1,
+                            "uid": "module1",
+                            "moduleId": "module1",
+                            "moduleTitle": "module1",
+                            "moduleType": "link",
+                            "duration": 3600,
+                            "state": "NULL",
+                            "completionDate": null,
+                            "createdAt": null,
+                            "updatedAt": null
+                        },
+                        {
+                            "id": 2,
+                            "uid": "module2",
+                            "moduleId": "module2",
+                            "moduleTitle": "module2",
+                            "moduleType": "elearning",
+                            "duration": 3600,
+                            "state": "IN_PROGRESS",
+                            "completionDate": null,
+                            "createdAt": "2023-07-02T10:00:00",
+                            "updatedAt": "2023-07-02T10:00:00"
+                        }
                     ]
                 }
                 """;
         cslStubService.getLearningCatalogue().getMandatoryLearningMap(depToCourseRequiredLearningCourseMingleModules);
         cslStubService.getLearningCatalogue().getCourses(List.of("course1"), courseMultipleModules);
         cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
-        cslStubService.getLearnerRecord().getCourseRecord("course1", "userId", courseRecord);
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2", "module3"), moduleRecords);
+        cslStubService.getLearnerRecord().getLearnerRecords("userId", "course1", 0, courseRecord);
         mockMvc.perform(get("/learning/required/detailed/userId")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
@@ -331,48 +348,53 @@ public class RequiredLearningTest extends IntegrationTestBase {
     public void testGetRequiredLearningForUserCompletedLastLearningPeriod() throws Exception {
         String courseRecord = """
                 {
-                    "courseRecords": [
-                            {
-                                "resourceId": "course1",
-                                "userId": "userId",
-                                "courseTitle": "Course 1",
-                                "state": "IN_PROGRESS",
-                                "lastUpdated": "2023-06-01T10:00:00",
-                                "required": false,
-                                "modules": [
-                                    {
-                                        "id": 1,
-                                        "uid": "module1",
-                                        "moduleId": "module1",
-                                        "moduleTitle": "module1",
-                                        "moduleType": "link",
-                                        "duration": 3600,
-                                        "state": "COMPLETED",
-                                        "completionDate": "2023-06-01T10:00:00",
-                                        "createdAt": "2023-06-01T10:00:00",
-                                        "updatedAt": "2023-06-01T10:00:00"
-                                    },
-                                    {
-                                        "id": 2,
-                                        "uid": "module2",
-                                        "moduleId": "module2",
-                                        "moduleTitle": "module2",
-                                        "moduleType": "elearning",
-                                        "duration": 3600,
-                                        "state": "COMPLETED",
-                                        "completionDate": "2023-06-01T10:00:00",
-                                        "createdAt": "2023-06-01T10:00:00",
-                                        "updatedAt": "2023-06-01T10:00:00"
-                                    }
-                                ]
+                    "content": [
+                        {
+                            "resourceId": "course1",
+                            "learnerId": "userId",
+                            "recordType": {
+                                "type": "COURSE"
                             }
+                        }
+                    ],
+                    "totalPages": 1
+                }
+                """;
+        String moduleRecords = """
+                {
+                    "moduleRecords": [
+                        {
+                            "id": 1,
+                            "uid": "module1",
+                            "moduleId": "module1",
+                            "moduleTitle": "module1",
+                            "moduleType": "link",
+                            "duration": 3600,
+                            "state": "COMPLETED",
+                            "completionDate": "2023-06-01T10:00:00",
+                            "createdAt": "2023-06-01T10:00:00",
+                            "updatedAt": "2023-06-01T10:00:00"
+                        },
+                        {
+                            "id": 2,
+                            "uid": "module2",
+                            "moduleId": "module2",
+                            "moduleTitle": "module2",
+                            "moduleType": "elearning",
+                            "duration": 3600,
+                            "state": "COMPLETED",
+                            "completionDate": "2023-06-01T10:00:00",
+                            "createdAt": "2023-06-01T10:00:00",
+                            "updatedAt": "2023-06-01T10:00:00"
+                        }
                     ]
                 }
                 """;
         cslStubService.getLearningCatalogue().getMandatoryLearningMap(depToCourseRequiredLearningCourseMingleModules);
         cslStubService.getLearningCatalogue().getCourses(List.of("course1"), courseMultipleModules);
         cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
-        cslStubService.getLearnerRecord().getCourseRecord("course1", "userId", courseRecord);
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2", "module3"), moduleRecords);
+        cslStubService.getLearnerRecord().getLearnerRecords("userId", "course1", 0, courseRecord);
         mockMvc.perform(get("/learning/required/detailed/userId")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())

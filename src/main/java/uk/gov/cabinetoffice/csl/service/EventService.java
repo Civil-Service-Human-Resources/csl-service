@@ -9,13 +9,14 @@ import uk.gov.cabinetoffice.csl.controller.model.CancelBookingDto;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
 import uk.gov.cabinetoffice.csl.controller.model.EventResponse;
 import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.LearnerRecordUpdateProcessor;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.UserToAction;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.event.EventModuleRecordAction;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.IModuleAction;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ModuleRecordActionFactory;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.UserToModuleAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventStatusDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.notification.INotificationService;
@@ -29,7 +30,8 @@ import java.util.List;
 @AllArgsConstructor
 public class EventService {
 
-    private final LearnerRecordUpdateProcessor learnerRecordUpdateProcessor;
+    private final ModuleRecordActionFactory moduleRecordActionFactory;
+    private final ModuleActionService moduleActionService;
     private final NotificationFactory notificationFactory;
     private final INotificationService notificationService;
     private final ILearnerRecordClient learnerRecordClient;
@@ -39,51 +41,57 @@ public class EventService {
     public EventResponse bookEvent(User user, String courseId, String moduleId, String eventId, BookEventDto dto) {
         CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
         bookingService.createBooking(user.getId(), courseWithModuleWithEvent, dto);
-        EventModuleRecordAction actionType = courseWithModuleWithEvent.getModule().isFree() ? EventModuleRecordAction.APPROVE_BOOKING : EventModuleRecordAction.REGISTER_BOOKING;
-        return processCourseRecordActionWithResponse(user, courseWithModuleWithEvent, actionType);
+        Event event = courseWithModuleWithEvent.getEvent();
+        IModuleAction actionType = courseWithModuleWithEvent.getModule().isFree() ? moduleRecordActionFactory.getApproveBookingAction(event) : moduleRecordActionFactory.getRegisterEventAction(event);
+        return processCourseRecordActionWithResponse(courseWithModuleWithEvent, new UserToModuleAction(user.getId(), actionType));
     }
 
     public EventResponse cancelBooking(User user, String courseId, String moduleId, String eventId, CancelBookingDto dto) {
         bookingService.cancelBooking(user.getId(), eventId, dto.getReason());
-        return cancelBooking(user, courseId, moduleId, eventId);
+        return cancelBooking(user.getId(), courseId, moduleId, eventId);
     }
 
     public EventResponse completeBooking(User user, String courseId, String moduleId, String eventId) {
-        return processCourseRecordActionWithResponse(user, courseId, moduleId, eventId, EventModuleRecordAction.COMPLETE_BOOKING);
+        UserToModuleAction action = new UserToModuleAction(user.getId(), moduleRecordActionFactory.getCompleteBookingAction());
+        return processCourseRecordActionWithResponse(courseId, moduleId, eventId, action);
     }
 
     public EventResponse skipBooking(User user, String courseId, String moduleId, String eventId) {
-        return processCourseRecordActionWithResponse(user, courseId, moduleId, eventId, EventModuleRecordAction.SKIP_BOOKING);
+        UserToModuleAction action = new UserToModuleAction(user.getId(), moduleRecordActionFactory.getSkipBookingAction());
+        return processCourseRecordActionWithResponse(courseId, moduleId, eventId, action);
     }
 
     public EventResponse cancelBookingWithBookingId(String courseId, String moduleId, String eventId, String bookingId, CancelBookingDto cancelBookingDto) {
         BookingDto dto = bookingService.cancelBookingWithId(eventId, bookingId, cancelBookingDto.getReason());
-        return cancelBooking(new User(dto.getLearner()), courseId, moduleId, eventId);
+        return cancelBooking(dto.getLearner(), courseId, moduleId, eventId);
     }
 
     public EventResponse approveBookingWithBookingId(String courseId, String moduleId, String eventId, String bookingId) {
-        BookingDto dto = bookingService.approveBookingWithId(eventId, bookingId);
-        return processCourseRecordActionWithResponse(new User(dto.getLearner()), courseId, moduleId, eventId, EventModuleRecordAction.APPROVE_BOOKING);
-    }
-
-    private EventResponse processCourseRecordActionWithResponse(User user, CourseWithModuleWithEvent courseWithModuleWithEvent, EventModuleRecordAction actionType) {
-        learnerRecordUpdateProcessor.processEventModuleRecordAction(courseWithModuleWithEvent, user, actionType);
-        return EventResponse.fromMetaData(actionType, courseWithModuleWithEvent);
-    }
-
-    private EventResponse processCourseRecordActionWithResponse(User user, String courseId, String moduleId, String eventId, EventModuleRecordAction actionType) {
         CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
-        return processCourseRecordActionWithResponse(user, courseWithModuleWithEvent, actionType);
+        BookingDto dto = bookingService.approveBookingWithId(eventId, bookingId);
+        UserToModuleAction action = new UserToModuleAction(dto.getLearner(), moduleRecordActionFactory.getApproveBookingAction(courseWithModuleWithEvent.getEvent()));
+        return processCourseRecordActionWithResponse(courseWithModuleWithEvent, action);
     }
 
-    private EventResponse cancelBooking(User user, String courseId, String moduleId, String eventId) {
-        return processCourseRecordActionWithResponse(user, courseId, moduleId, eventId, EventModuleRecordAction.CANCEL_BOOKING);
+    private EventResponse processCourseRecordActionWithResponse(CourseWithModuleWithEvent courseWithModuleWithEvent, UserToModuleAction action) {
+        moduleActionService.processModuleAction(courseWithModuleWithEvent, action);
+        return EventResponse.fromMetaData(action.getAction().getAction(), courseWithModuleWithEvent);
+    }
+
+    private EventResponse processCourseRecordActionWithResponse(String courseId, String moduleId, String eventId, UserToModuleAction action) {
+        CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
+        return processCourseRecordActionWithResponse(courseWithModuleWithEvent, action);
+    }
+
+    private EventResponse cancelBooking(String userId, String courseId, String moduleId, String eventId) {
+        UserToModuleAction action = new UserToModuleAction(userId, moduleRecordActionFactory.getCancelBookingAction());
+        return processCourseRecordActionWithResponse(courseId, moduleId, eventId, action);
     }
 
     private void cancelBookings(List<BookingDto> bookingDtos, CourseWithModuleWithEvent courseWithModuleWithEvent) {
-        List<UserToAction<EventModuleRecordAction>> actions = bookingDtos.stream()
-                .map(b -> new UserToAction<>(new User(b.getLearner()), EventModuleRecordAction.CANCEL_BOOKING)).toList();
-        learnerRecordUpdateProcessor.processMultipleEventModuleRecordActions(courseWithModuleWithEvent, actions);
+        List<UserToModuleAction> actions = bookingDtos.stream()
+                .map(b -> new UserToModuleAction(b.getLearner(), moduleRecordActionFactory.getCancelBookingAction())).toList();
+        moduleActionService.processModuleActions(courseWithModuleWithEvent, actions);
     }
 
     public void cancelEvent(String courseId, String moduleId, String eventId, CancelEventDto cancelEventDto) {

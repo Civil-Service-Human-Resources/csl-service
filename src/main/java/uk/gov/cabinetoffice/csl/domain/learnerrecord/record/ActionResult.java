@@ -14,10 +14,14 @@ public class ActionResult {
     private final List<IEmail> emails = new ArrayList<>();
     private final LearnerRecordResults learnerRecordResults = new LearnerRecordResults();
 
-    public void add(ActionResult result) {
-        this.messages.addAll(result.getMessages());
-        this.emails.addAll(result.getEmails());
-        this.learnerRecordResults.add(result.getLearnerRecordResults());
+    public void addLearnerRecordResults(LearnerRecordResults learnerRecordResults) {
+        this.learnerRecordResults.add(learnerRecordResults);
+    }
+
+    public void add(ActionResult actionResult) {
+        this.messages.addAll(actionResult.getMessages());
+        this.emails.addAll(actionResult.getEmails());
+        this.learnerRecordResults.add(actionResult.getLearnerRecordResults());
     }
 
 }

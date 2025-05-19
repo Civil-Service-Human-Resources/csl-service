@@ -1,44 +1,40 @@
 package uk.gov.cabinetoffice.csl.service;
 
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ILearnerRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.LearnerRecordResourceId;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ILearnerRecordActionType;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.ActionWithId;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordData;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventData;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 
 @Service
 public class LearnerRecordDataFactory {
 
-    public LearnerRecordData createNewRecordData(LearnerRecordResourceId id) {
-        return createNewRecordData(id, null);
-    }
-
-    public LearnerRecordData createNewRecordData(LearnerRecordResourceId id, @Nullable ILearnerRecordActionType action) {
-        LearnerRecordData data = new LearnerRecordData(id, true);
-        if (action != null) {
-            LearnerRecordEventData event = new LearnerRecordEventData(action, true);
-            data.getEvents().add(event);
-        }
-        return data;
-    }
-
-    public LearnerRecordData createRecordData(ILearnerRecord learnerRecord) {
-        return createRecordData(learnerRecord.getLearnerRecordId(), learnerRecord.getLatestEvent().getActionType());
-    }
-
-    public LearnerRecordData createRecordData(LearnerRecordResourceId id, @Nullable ILearnerRecordActionType existingAction) {
-        LearnerRecordData data = new LearnerRecordData(id, false);
-        if (existingAction != null) {
-            LearnerRecordEventData event = new LearnerRecordEventData(existingAction, false);
+    public LearnerRecordData createRecordData(LearnerRecord learnerRecord) {
+        LearnerRecordData data = new LearnerRecordData(learnerRecord.getLearnerRecordId());
+        data.setNewRecord(false);
+        data.setCreatedTimestamp(learnerRecord.getCreatedTimestamp());
+        LearnerRecordEvent latestEvent = learnerRecord.getLatestEvent();
+        if (latestEvent != null) {
+            LearnerRecordEventData event = new LearnerRecordEventData(latestEvent.getActionType(), latestEvent.getEventTimestamp(), false);
             data.getEvents().add(event);
         }
         return data;
     }
 
     public LearnerRecordData createNewRecordData(ActionWithId actionWithId) {
-        return createNewRecordData(actionWithId.getLearnerRecordId(), actionWithId.getAction());
+        LearnerRecordData data = new LearnerRecordData(actionWithId.getResourceId());
+        data.setNewRecord(true);
+        if (actionWithId.getTimestamp() != null) {
+            data.setCreatedTimestamp(actionWithId.getTimestamp());
+        }
+        LearnerRecordEventData event = createNewEventData(actionWithId);
+        data.getEvents().add(event);
+        return data;
     }
+
+    public LearnerRecordEventData createNewEventData(ActionWithId actionWithId) {
+        LearnerRecordEventData event = new LearnerRecordEventData(actionWithId.getAction(), true);
+        if (actionWithId.getTimestamp() != null) {
+            event.setTimestamp(actionWithId.getTimestamp());
+        }
+        return event;
+    }
+
 }

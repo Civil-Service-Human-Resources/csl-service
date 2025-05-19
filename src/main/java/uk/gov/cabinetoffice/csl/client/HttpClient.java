@@ -56,11 +56,10 @@ public class HttpClient implements IHttpClient {
     }
 
     @Override
-    public <T, R> T executeTypeReferenceRequest(RequestEntity<R> request) {
+    public <T, R> T executeTypeReferenceRequest(RequestEntity<R> request, ParameterizedTypeReference<T> parameterizedTypeReference) {
         try {
             log.debug("Sending request: {}", request);
-            ResponseEntity<T> response = restTemplate.exchange(request, new ParameterizedTypeReference<>() {
-            });
+            ResponseEntity<T> response = restTemplate.exchange(request, parameterizedTypeReference);
             log.debug("Request response: {}", response);
             return response.getBody();
         } catch (RestClientResponseException e) {

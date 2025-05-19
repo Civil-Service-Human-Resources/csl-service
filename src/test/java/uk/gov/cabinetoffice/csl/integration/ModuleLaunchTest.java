@@ -5,10 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
@@ -38,10 +34,7 @@ public class ModuleLaunchTest extends IntegrationTestBase {
     private String courseId;
     private String userId;
     private String moduleId;
-    private CourseRecord courseRecord;
-    private CourseRecords courseRecords;
     private Course course;
-    private ModuleRecord moduleRecord;
     private UserDetailsDto input;
     private LaunchLink launchLink;
 
@@ -50,9 +43,6 @@ public class ModuleLaunchTest extends IntegrationTestBase {
         courseId = testDataService.getCourseId();
         userId = testDataService.getUserId();
         moduleId = testDataService.getModuleId();
-        courseRecord = testDataService.generateCourseRecord(true);
-        courseRecords = new CourseRecords(List.of(courseRecord));
-        moduleRecord = courseRecord.getModuleRecord(moduleId).get();
         course = testDataService.generateCourse(true, false);
         input = testDataService.generateUserDetailsDto();
         launchLink = new LaunchLink("http://launch.link");
@@ -60,24 +50,40 @@ public class ModuleLaunchTest extends IntegrationTestBase {
 
     @Test
     public void testGetELearningLaunchLinkUidExists() throws Exception {
-        String expectedCourseRecordPUT = """
+        String getModuleRecordsResponse = """
+                {"moduleRecords": [{
+                    "id" : 1,
+                    "uid": "uid",
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "IN_PROGRESS"
+                }]}
+                """;
+        String expectedModuleRecordPUT = """
                 [{
-                    "courseId" : "courseId",
-                    "userId" : "userId",
-                    "courseTitle" : "Test Course",
-                    "state" : "IN_PROGRESS",
-                    "modules": [
-                        {
-                            "id" : 1,
-                            "moduleId" : "moduleId",
-                            "moduleTitle" : "Test Module",
-                            "state": "IN_PROGRESS"
-                        }
-                    ]
+                    "id" : 1,
+                    "uid": "uid",
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "IN_PROGRESS"
                 }]
                 """;
-        moduleRecord.setState(State.IN_PROGRESS);
-        cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, courseRecord);
+        String expectedModuleRecordPUTResponse = """
+                {"moduleRecords":[{
+                    "id" : 1,
+                    "uid": "uid",
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "IN_PROGRESS"
+                }]}
+                """;
+        cslStubService.stubUpdateModuleRecord(course, moduleId, userId, getModuleRecordsResponse, expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
         LaunchLinkRequest req = testDataService.generateLaunchLinkRequest();
         cslStubService.getRustici().postLaunchLink("uid", req, launchLink, false);
 
@@ -91,28 +97,42 @@ public class ModuleLaunchTest extends IntegrationTestBase {
 
     @Test
     public void testGetFileLaunchLink() throws Exception {
-        moduleRecord.setUid(null);
         course.getModule(moduleId).setModuleType(ModuleType.file);
         course.getModule(moduleId).setUrl("http://launch.link");
         cslStubService.getLearningCatalogue().getCourse(courseId, course);
-        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, courseRecords);
-        String expectedCourseRecordPOST = """
+        String getModuleRecordsResponse = """
+                {"moduleRecords": [{
+                    "id" : 1,
+                    "uid": "uid",
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "IN_PROGRESS"
+                }]}
+                """;
+        cslStubService.getLearnerRecord().getModuleRecord(moduleId, userId, getModuleRecordsResponse);
+        String expectedModuleRecordPUT = """
                 [{
-                    "courseId" : "courseId",
-                    "userId" : "userId",
-                    "courseTitle" : "Test Course",
-                    "state" : "COMPLETED",
-                    "modules": [
-                        {
-                            "id" : 1,
-                            "moduleId" : "moduleId",
-                            "moduleTitle" : "Test Module",
-                            "state": "COMPLETED"
-                        }
-                    ]
+                    "id" : 1,
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "COMPLETED"
                 }]
                 """;
-        cslStubService.getLearnerRecord().updateCourseRecords(expectedCourseRecordPOST, new CourseRecords(courseRecord));
+        String expectedModuleRecordPUTResponse = """
+                [{
+                    "id" : 1,
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "COMPLETED"
+                }]
+                """;
+        cslStubService.getLearnerRecord().updateModuleRecords(expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -130,25 +150,72 @@ public class ModuleLaunchTest extends IntegrationTestBase {
         requiredCourse.getModule(moduleId).setModuleType(ModuleType.file);
         requiredCourse.getModule(moduleId).setUrl("http://launch.link");
         cslStubService.getLearningCatalogue().getCourse(courseId, requiredCourse);
-        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, new CourseRecords());
-        String expectedCourseRecordPOST = """
+        cslStubService.getLearnerRecord().getLearnerRecords("userId", "courseId", 0, """
+                {
+                    "content": [],
+                    "totalPages": 0
+                }
+                """);
+        cslStubService.getLearnerRecord().getModuleRecord(moduleId, userId, """
+                {"moduleRecords": []}
+                """);
+        String expectedLearnerRecordsPOST = """
+                [
+                    {
+                        "recordType" : "COURSE",
+                        "learnerId": "userId",
+                        "resourceId": "courseId",
+                        "createdTimestamp" : "2023-01-01T10:00:00",
+                        "events" : [{
+                            "learnerId": "userId",
+                            "resourceId": "courseId",
+                            "eventType": "COMPLETE_COURSE",
+                            "eventTimestamp" : "2023-01-01T10:00:00",
+                            "eventSource": "csl_source_id"
+                        }]
+                    }
+                ]
+                """;
+        String expectedLearnerRecordsPOSTResponse = """
+                {
+                    "successfulResources": [{
+                        "recordType" : {"type": "COURSE"},
+                        "learnerId": "userId",
+                        "resourceId": "courseId",
+                        "createdTimestamp" : "2023-01-01T10:00:00",
+                        "events" : [{
+                            "learnerId": "userId",
+                            "resourceId": "courseId",
+                            "eventType": "COMPLETE_COURSE",
+                            "eventTimestamp" : "2023-01-01T10:00:00",
+                            "eventSource": {"source": "csl_source_id"}
+                        }]
+                    }],
+                    "failedResources": []
+                }
+                """;
+        String expectedModuleRecordPOST = """
                 [{
-                    "courseId" : "courseId",
-                    "userId" : "userId",
-                    "courseTitle" : "Test Course",
-                    "state" : "COMPLETED",
-                    "modules": [
-                        {
-                            "id" : null,
-                            "moduleId" : "moduleId",
-                            "moduleTitle" : "Test Module",
-                            "state": "COMPLETED",
-                            "completionDate" : "2023-01-01T10:00:00"
-                        }
-                    ]
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "COMPLETED",
+                    "completionDate" : "2023-01-01T10:00:00"
                 }]
                 """;
-        cslStubService.getLearnerRecord().createCourseRecord(expectedCourseRecordPOST, new CourseRecords(courseRecord));
+        String expectedModuleRecordPOSTResponse = """
+                {"moduleRecords":[{
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "COMPLETED",
+                    "completionDate" : "2023-01-01T10:00:00"
+                }]}
+                """;
+        cslStubService.getLearnerRecord().createModuleRecords(expectedModuleRecordPOST, expectedModuleRecordPOSTResponse);
+        cslStubService.getLearnerRecord().createLearnerRecord(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
         String expectedMessageDto = """
                 {
                     "recipient": "lineManager@email.com",
@@ -167,30 +234,76 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                         .content(utils.toJson(input)))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
+        cslStubService.getNotificationServiceStubService().validateSentEmails("NOTIFY_LINE_MANAGER_COMPLETED_LEARNING", 1);
     }
 
     @Test
     public void testLaunchNewCourse() throws Exception {
         course.getModule(moduleId).setModuleType(ModuleType.file);
         course.getModule(moduleId).setUrl("http://launch.link");
-        String expectedCourseRecordPOST = """
+        cslStubService.getLearnerRecord().getLearnerRecords("userId", "courseId", 0, """
+                {
+                    "content": [],
+                    "totalPages": 0
+                }
+                """);
+        String expectedLearnerRecordsPOST = """
+                [
+                    {
+                        "recordType" : "COURSE",
+                        "learnerId": "userId",
+                        "resourceId": "courseId",
+                        "createdTimestamp" : "2023-01-01T10:00:00",
+                        "events" : [{
+                            "learnerId": "userId",
+                            "resourceId": "courseId",
+                            "eventType": "COMPLETE_COURSE",
+                            "eventTimestamp" : "2023-01-01T10:00:00",
+                            "eventSource": "csl_source_id"
+                        }]
+                    }
+                ]
+                """;
+        String expectedLearnerRecordsPOSTResponse = """
+                {
+                    "successfulResources": [{
+                        "recordType" : {"type": "COURSE"},
+                        "learnerId": "userId",
+                        "resourceId": "courseId",
+                        "createdTimestamp" : "2023-01-01T10:00:00",
+                        "events" : [{
+                            "learnerId": "userId",
+                            "resourceId": "courseId",
+                            "eventType": "COMPLETE_COURSE",
+                            "eventTimestamp" : "2023-01-01T10:00:00",
+                            "eventSource": {"source": "csl_source_id"}
+                        }]
+                    }],
+                    "failedResources": []
+                }
+                """;
+        String expectedModuleRecordPOST = """
                 [{
-                    "courseId" : "courseId",
-                    "userId" : "userId",
-                    "courseTitle" : "Test Course",
-                    "state" : "COMPLETED",
-                    "modules": [
-                        {
-                            "id" : null,
-                            "moduleId" : "moduleId",
-                            "moduleTitle" : "Test Module",
-                            "state": "COMPLETED"
-                        }
-                    ]
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "COMPLETED",
+                    "completionDate" : "2023-01-01T10:00:00"
                 }]
                 """;
-        cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);
-
+        String expectedModuleRecordPOSTResponse = """
+                {"moduleRecords":[{
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "COMPLETED",
+                    "completionDate" : "2023-01-01T10:00:00"
+                }]}
+                """;
+        cslStubService.stubCreateModuleRecords(courseId, moduleId, course, userId, expectedModuleRecordPOST, expectedModuleRecordPOSTResponse);
+        cslStubService.getLearnerRecord().createLearnerRecord(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)

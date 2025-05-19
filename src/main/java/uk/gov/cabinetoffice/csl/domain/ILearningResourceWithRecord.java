@@ -1,14 +1,15 @@
 package uk.gov.cabinetoffice.csl.domain;
 
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ILearnerRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.LearnerRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ITypedLearnerRecordResourceID;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.TypedLearnerRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 
 public interface ILearningResourceWithRecord extends ILearningResource {
-    ILearnerRecord getRecord();
+    LearnerRecord getRecord();
 
     String getLearnerId();
 
-    default LearnerRecordResourceId getRecordResourceId() {
-        return new LearnerRecordResourceId(this.getType(), this.getLearnerId(), this.getResourceId());
+    default ITypedLearnerRecordResourceID getRecordResourceId() {
+        return new TypedLearnerRecordResourceId(this.getLearnerId(), this.getResourceId(), this.getType());
     }
 }

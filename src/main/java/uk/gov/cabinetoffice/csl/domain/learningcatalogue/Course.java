@@ -105,11 +105,13 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     }
 
     @Override
+    @JsonIgnore
     public String getResourceId() {
         return id;
     }
 
     @Override
+    @JsonIgnore
     public String getName() {
         return title;
     }
@@ -120,11 +122,13 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     }
 
     @Override
+    @JsonIgnore
     public Collection<Module> getChildren() {
         return this.modules;
     }
 
     @Override
+    @JsonIgnore
     public String getCacheableId() {
         return id;
     }

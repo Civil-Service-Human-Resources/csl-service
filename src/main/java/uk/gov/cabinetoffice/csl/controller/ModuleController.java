@@ -32,7 +32,7 @@ public class ModuleController {
                                          @RequestBody @Valid UserDetailsDto userDetailsDto) {
         log.debug("resourceId: {}, moduleId: {}", courseId, moduleId);
         User user = User.fromUserDetails(userAuthService.getUsername(), userDetailsDto);
-        return moduleService.completeModule(user, courseId, moduleId, null);
+        return moduleService.completeModule(user, courseId, moduleId);
     }
 
     @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/launch", produces = "application/json")

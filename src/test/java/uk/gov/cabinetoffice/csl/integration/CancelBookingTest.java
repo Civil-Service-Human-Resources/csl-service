@@ -5,16 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,8 +26,6 @@ public class CancelBookingTest extends IntegrationTestBase {
     private String userEmail;
     private String moduleId;
     private String eventId;
-    private CourseRecord courseRecord;
-    private CourseRecords courseRecords;
     private Course course;
 
     @Autowired
@@ -44,8 +38,6 @@ public class CancelBookingTest extends IntegrationTestBase {
         userEmail = testDataService.getUserEmail();
         moduleId = testDataService.getModuleId();
         eventId = testDataService.getEventId();
-        courseRecord = testDataService.generateCourseRecord(true);
-        courseRecords = new CourseRecords(List.of(courseRecord));
         course = testDataService.generateCourse(true, true);
     }
 
@@ -53,7 +45,6 @@ public class CancelBookingTest extends IntegrationTestBase {
     public void testCancelBookingAndUpdateCourseRecord() throws Exception {
         course.getModule(moduleId).setCost(BigDecimal.valueOf(0L));
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
-        courseRecord.setState(State.REGISTERED);
         String expectedCancellationJsonInput = """
                 {"cancellationReason": "PRIORITIES", "status":"Cancelled"}
                 """;
@@ -62,25 +53,42 @@ public class CancelBookingTest extends IntegrationTestBase {
                 {"event": "%s", "status":"Cancelled", "learner": "%s",
                 "learnerEmail": "%s", "learnerName":"testName", "cancellationReason": "Other work priorities"}
                 """, event, userId, userEmail);
-        String expectedCourseRecordPUT = """
+        String getModuleRecordsResponse = """
+                {"moduleRecords": [{
+                    "id" : 1,
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "eventId" : "eventId",
+                    "eventDate" : "2023-01-01",
+                    "state": "REGISTERED"
+                }]}
+                """;
+        String expectedModuleRecordPUT = """
                 [{
-                    "courseId" : "courseId",
-                    "userId" : "userId",
-                    "courseTitle" : "Test Course",
-                    "state" : "UNREGISTERED",
-                    "modules": [
-                        {
-                            "id" : 1,
-                            "moduleId" : "moduleId",
-                            "moduleTitle" : "Test Module",
-                            "state": "UNREGISTERED",
-                            "bookingStatus": "Cancelled"
-                        }
-                    ]
+                    "id" : 1,
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "UNREGISTERED",
+                    "bookingStatus": "Cancelled"
                 }]
                 """;
+        String expectedModuleRecordPUTResponse = """
+                {"moduleRecords":[{
+                    "id" : 1,
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "UNREGISTERED",
+                    "bookingStatus": "Cancelled"
+                }]}
+                """;
         cslStubService.getLearnerRecord().cancelBooking(eventId, userId, expectedCancellationJsonInput, bookingDtoJsonResponse);
-        cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, courseRecord);
+        cslStubService.stubUpdateModuleRecord(course, moduleId, userId, getModuleRecordsResponse, expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
         String inputJson = """
                 {"reason": "PRIORITIES"}
                 """;

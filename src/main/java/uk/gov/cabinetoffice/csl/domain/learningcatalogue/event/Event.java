@@ -44,21 +44,25 @@ public class Event implements IChildLearningResource, Cacheable {
     }
 
     @Override
+    @JsonIgnore
     public String getResourceId() {
         return id;
     }
 
     @Override
+    @JsonIgnore
     public String getName() {
         return String.format(venue.getLocation());
     }
 
     @Override
+    @JsonIgnore
     public LearningResourceType getType() {
         return LearningResourceType.EVENT;
     }
 
     @Override
+    @JsonIgnore
     public String getCacheableId() {
         return id;
     }

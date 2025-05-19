@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
@@ -29,6 +31,10 @@ public class ModuleRecord implements Cacheable {
     private String uid;
     private String userId;
     private String courseId;
+    /*
+    Temporary whilst we're dual-running the legacy course_record table
+     */
+    private String courseTitle;
     private String moduleId;
     private String moduleTitle;
     private ModuleType moduleType;
@@ -48,10 +54,13 @@ public class ModuleRecord implements Cacheable {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime updatedAt;
     private BookingStatus bookingStatus;
+    @JsonIgnore
+    private boolean isNewRecord = false;
 
-    public ModuleRecord(String courseId, String userId, String moduleId, String moduleTitle, ModuleType moduleType,
+    public ModuleRecord(String courseId, String courseTitle, String userId, String moduleId, String moduleTitle, ModuleType moduleType,
                         Long duration, Boolean optional, BigDecimal cost) {
         this.courseId = courseId;
+        this.courseTitle = courseTitle;
         this.userId = userId;
         this.moduleId = moduleId;
         this.moduleTitle = moduleTitle;
@@ -87,6 +96,7 @@ public class ModuleRecord implements Cacheable {
         return state;
     }
 
+    @JsonIgnore
     public LearnerRecordResourceId getLearnerRecordId() {
         return new ModuleRecordResourceId(userId, moduleId);
     }

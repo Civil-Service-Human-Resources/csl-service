@@ -71,21 +71,25 @@ public class Module implements IChildLearningResource, IParentLearningResource<E
     }
 
     @Override
+    @JsonIgnore
     public String getName() {
         return title;
     }
 
     @Override
+    @JsonIgnore
     public LearningResourceType getType() {
         return LearningResourceType.MODULE;
     }
 
     @Override
+    @JsonIgnore
     public Collection<Event> getChildren() {
         return this.events;
     }
 
     @Override
+    @JsonIgnore
     public String getCacheableId() {
         return id;
     }

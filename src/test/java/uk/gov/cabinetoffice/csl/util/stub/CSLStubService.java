@@ -4,9 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.LearnerRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 
 import java.util.List;
@@ -27,31 +25,27 @@ public class CSLStubService {
         getCsrsStubService().getCivilServant(uid, civilServant);
     }
 
-    public void stubCreateCourseRecord(String courseId, Course course, String userId,
-                                       String expectedUpdateInput, CourseRecords courseRecordResponse) {
+    public void stubCreateModuleRecords(String courseId, String moduleId, Course course, String userId,
+                                        String expectedUpdateInput, String moduleRecordResponse) {
         learningCatalogue.getCourse(courseId, course);
-        learnerRecord.getCourseRecord(courseId, userId, new CourseRecords());
-        learnerRecord.createCourseRecord(expectedUpdateInput, courseRecordResponse);
+        learnerRecord.getModuleRecord(moduleId, userId, """
+                {"moduleRecords": []}
+                """);
+        learnerRecord.createModuleRecords(expectedUpdateInput, moduleRecordResponse);
     }
 
-    public void stubCreateCourseRecord(String courseId, Course course, String userId,
-                                       String expectedUpdateInput, CourseRecord courseRecordResponse) {
-        stubCreateCourseRecord(courseId, course, userId, expectedUpdateInput, new CourseRecords(courseRecordResponse));
+    public void stubUpdateModuleRecord(Course course, String moduleId, String userId, String getModuleRecordsResponse,
+                                       String expectedUpdateInput, String updateModuleRecordResponse) {
+        learningCatalogue.getCourse(course);
+        learnerRecord.getModuleRecord(moduleId, userId, getModuleRecordsResponse);
+        learnerRecord.updateModuleRecords(expectedUpdateInput, updateModuleRecordResponse);
     }
 
-
-    public void stubUpdateCourseRecord(String courseId, Course course, String userId, CourseRecords getCourseRecordsResponse,
-                                       String expectedUpdateInput, CourseRecord updateCourseRecordResponse) {
-        learningCatalogue.getCourse(courseId, course);
-        learnerRecord.getCourseRecord(courseId, userId, getCourseRecordsResponse);
-        learnerRecord.updateCourseRecords(expectedUpdateInput, new CourseRecords(List.of(updateCourseRecordResponse)));
-    }
-
-    public void stubUpdateCourseRecords(List<LearnerRecordResourceId> courseRecordIds, List<Course> courses, CourseRecords getCourseRecordsResponse,
-                                        String expectedUpdateInput, CourseRecords updateCourseRecordResponse) {
+    public void stubUpdateModuleRecords(List<LearnerRecordResourceId> moduleRecordIds, List<Course> courses, String getModuleRecordsResponse,
+                                        String expectedUpdateInput, String updateModuleRecordResponse) {
         courses.forEach(c -> learningCatalogue.getCourse(c.getCacheableId(), c));
-        learnerRecord.getCourseRecords(courseRecordIds, getCourseRecordsResponse);
-        learnerRecord.updateCourseRecords(expectedUpdateInput, updateCourseRecordResponse);
+        learnerRecord.getModuleRecords(moduleRecordIds, getModuleRecordsResponse);
+        learnerRecord.updateModuleRecords(expectedUpdateInput, updateModuleRecordResponse);
     }
 
 }

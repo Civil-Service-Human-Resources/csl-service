@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @deprecated We should move away from using course records as it is a legacy data item.
@@ -36,29 +36,15 @@ public class CourseRecord {
 
     private Preference preference;
 
+    @JsonProperty("modules")
     private Collection<ModuleRecord> moduleRecords = new ArrayList<>();
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime lastUpdated;
 
-    public LearnerRecordResourceId getLearnerRecordId() {
-        return new LearnerRecordResourceId(userId, courseId);
-    }
-
     @JsonProperty("state")
     public State getStateJson() {
         return this.state;
-    }
-
-    @JsonIgnore
-    public Optional<ModuleRecord> getModuleRecord(String moduleId) {
-        return moduleRecords.stream()
-                .filter(mr -> mr.getModuleId().equals(moduleId))
-                .findFirst();
-    }
-
-    public State getState() {
-        return Objects.requireNonNullElse(this.state, State.NULL);
     }
 
     public CourseRecord(String courseId, String userId, String courseTitle) {
@@ -67,4 +53,8 @@ public class CourseRecord {
         this.courseTitle = courseTitle;
     }
 
+    @JsonIgnore
+    public Map<String, ModuleRecord> getModuleRecordsAsMap() {
+        return getModuleRecords().stream().collect(Collectors.toMap(ModuleRecord::getModuleId, moduleRecord -> moduleRecord));
+    }
 }

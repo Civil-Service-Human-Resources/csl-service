@@ -1,15 +1,13 @@
 package uk.gov.cabinetoffice.csl.domain.learningcatalogue;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 public class CourseWithModuleWithEvent extends CourseWithModule {
-    private Event event;
+    private final Event event;
 
     public CourseWithModuleWithEvent(CourseWithModule courseWithModule, Event event) {
         super(courseWithModule.getCourse(), courseWithModule.getModule());

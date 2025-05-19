@@ -4,8 +4,8 @@ import lombok.Getter;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.LearnerRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
@@ -25,13 +25,14 @@ import java.util.List;
 @Getter
 public class TestDataService {
 
-    private final String courseId = "resourceId";
+    private final String courseId = "courseId";
     private final String moduleId = "moduleId";
     private final String eventId = "eventId";
     private final String moduleTitle = "Test Module";
     private final String moduleUid = "uid";
     private final long moduleRecordId = 1;
     private final String userId = "userId";
+    private final ModuleRecordResourceId moduleRecordResourceId = new ModuleRecordResourceId(userId, moduleId);
     private final LearnerRecordResourceId courseRecordId = new LearnerRecordResourceId(userId, courseId);
     private final String userEmail = "userEmail@email.com";
     private final String learnerFirstName = "Learner";
@@ -52,39 +53,6 @@ public class TestDataService {
 
     public UserDetailsDto generateUserDetailsDto() {
         return new UserDetailsDto("", userEmail, learnerFirstName, 1, "professionName", lineManagerName, lineManagerEmail, 1, "gradeCode", depHierarchy);
-    }
-
-    /**
-     * Generate a course record with a blank status
-     *
-     * @param withModule
-     * @return
-     */
-    public CourseRecord generateCourseRecord(boolean withModule) {
-        CourseRecord cr = new CourseRecord();
-        cr.setCourseId(courseId);
-        cr.setUserId(userId);
-        cr.setCourseTitle(courseTitle);
-        if (withModule) {
-            cr.setModuleRecords(List.of(generateModuleRecord()));
-        }
-        return cr;
-    }
-
-    public CourseRecord generateCourseRecord(int moduleCount) {
-        CourseRecord cr = new CourseRecord();
-        cr.setCourseId(courseId);
-        cr.setUserId(userId);
-        cr.setCourseTitle(courseTitle);
-        List<ModuleRecord> moduleRecords = new ArrayList<>();
-        for (int i = 1; i <= moduleCount; i++) {
-            ModuleRecord moduleRecord = generateModuleRecord();
-            moduleRecord.setId(moduleRecordId + i);
-            moduleRecord.setModuleId(moduleId + i);
-            moduleRecords.add(moduleRecord);
-        }
-        cr.setModuleRecords(moduleRecords);
-        return cr;
     }
 
     public ModuleRecord generateModuleRecord() {

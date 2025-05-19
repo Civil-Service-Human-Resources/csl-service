@@ -2,7 +2,6 @@ package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.event;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.cabinetoffice.csl.domain.error.IncorrectStateException;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.Result;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
@@ -15,48 +14,27 @@ public class SkipBookingTest extends BaseEventModuleRecordActionTest<SkipBooking
 
     @Override
     protected SkipBooking buildProcessor() {
-        return new SkipBooking(utilService, courseWithModuleWithEvent, user);
+        return new SkipBooking();
     }
 
     @Test
     public void testCancelBooking() {
-        CourseRecord cr = generateCourseRecord(true);
-        cr.setState(State.APPROVED);
-        ModuleRecord mr = cr.getModuleRecord(getModuleId()).get();
+        ModuleRecord mr = generateModuleRecord();
         mr.setState(State.APPROVED);
         mr.setResult(Result.PASSED);
         mr.setCompletionDate(LocalDateTime.now());
-        cr = actionUnderTest.applyUpdatesToModuleRecord(cr);
-        assertEquals(State.SKIPPED, cr.getState());
-        ModuleRecord moduleRecord = cr.getModuleRecord(getModuleId()).get();
-        assertEquals(State.SKIPPED, moduleRecord.getState());
-        assertNull(moduleRecord.getBookingStatus());
-        assertNull(moduleRecord.getResult());
-    }
-
-    @Test
-    public void testCancelBookingNoModuleRecord() {
-        CourseRecord cr = generateCourseRecord(false);
-        assertThrows(IncorrectStateException.class, () -> {
-            actionUnderTest.updateCourseRecord(cr);
-        });
-    }
-
-    @Test
-    public void testCancelBookingNoCourseRecord() {
-        assertThrows(IncorrectStateException.class, () -> {
-            actionUnderTest.generateNewModuleRecord();
-        });
+        mr = actionUnderTest.applyUpdates(mr);
+        assertEquals(State.SKIPPED, mr.getState());
+        assertNull(mr.getBookingStatus());
+        assertNull(mr.getResult());
     }
 
     @Test
     public void testCompleteBookingIncorrectState() {
-        CourseRecord cr = generateCourseRecord(true);
-        cr.setState(State.REGISTERED);
-        ModuleRecord mr = cr.getModuleRecord(getModuleId()).get();
+        ModuleRecord mr = generateModuleRecord();
         mr.setState(State.REGISTERED);
         assertThrows(IncorrectStateException.class, () -> {
-            actionUnderTest.updateCourseRecord(cr);
+            actionUnderTest.applyUpdates(mr);
         });
     }
 }

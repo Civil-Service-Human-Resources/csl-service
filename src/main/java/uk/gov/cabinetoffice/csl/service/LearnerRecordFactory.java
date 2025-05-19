@@ -1,7 +1,7 @@
 package uk.gov.cabinetoffice.csl.service;
 
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.LearnerRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ITypedLearnerRecordResourceID;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ILearnerRecordActionType;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
@@ -25,11 +25,11 @@ public class LearnerRecordFactory {
         return createLearnerRecordDto(data.getResourceId(), data.getEvents().stream().map(LearnerRecordEventData::getActionType).toList());
     }
 
-    public LearnerRecordDto createLearnerRecordDto(LearnerRecordResourceId id, List<ILearnerRecordActionType> events) {
+    public LearnerRecordDto createLearnerRecordDto(ITypedLearnerRecordResourceID id, List<ILearnerRecordActionType> events) {
         return createLearnerRecordDto(id, utilService.getNowDateTime(), events);
     }
 
-    public LearnerRecordDto createLearnerRecordDto(LearnerRecordResourceId id,
+    public LearnerRecordDto createLearnerRecordDto(ITypedLearnerRecordResourceID id,
                                                    LocalDateTime timestamp, List<ILearnerRecordActionType> events) {
         List<LearnerRecordEventDto> eventDtos = events.stream()
                 .map(e -> learnerRecordEventFactory.createLearnerRecordEventDto(id.getResourceId(), id.getLearnerId(), e, timestamp)).toList();

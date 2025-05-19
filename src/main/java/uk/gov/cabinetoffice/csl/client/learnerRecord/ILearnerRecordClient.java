@@ -1,7 +1,7 @@
 package uk.gov.cabinetoffice.csl.client.learnerRecord;
 
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.BulkCreateOutput;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventDto;
@@ -11,8 +11,6 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 import java.util.List;
 
 public interface ILearnerRecordClient {
-
-    List<CourseRecord> getCourseRecordsForUser(String userId);
 
     BookingDto bookEvent(String eventId, BookingDto booking);
 

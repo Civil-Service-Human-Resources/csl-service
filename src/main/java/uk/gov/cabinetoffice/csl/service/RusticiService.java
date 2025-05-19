@@ -5,12 +5,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.RusticiEngineClient.IRusticiEngineClient;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.Result;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.module.ModuleRecordAction;
 import uk.gov.cabinetoffice.csl.domain.rustici.*;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -39,12 +37,6 @@ public class RusticiService {
         String courseId = courseIdDotModuleIdParts[0];
         String moduleId = courseIdDotModuleIdParts[1];
         String learnerId = rollupData.getLearner().getId();
-
-        List<ModuleRecordAction> moduleRecordActionList = new ArrayList<>();
-        if (rollupData.getCompletedDate() != null) {
-            moduleRecordActionList.add(ModuleRecordAction.ROLLUP_COMPLETE_MODULE);
-        }
-
         String resultStr = rollupData.getRegistrationSuccess();
         Result result = null;
         if (isNotBlank(resultStr)) {
@@ -55,21 +47,8 @@ public class RusticiService {
                 }
             }
         }
-
-        if (result != null) {
-            if (result.equals(Result.FAILED)) {
-                moduleRecordActionList.add(ModuleRecordAction.FAIL_MODULE);
-            } else {
-                moduleRecordActionList.add(ModuleRecordAction.PASS_MODULE);
-            }
-        }
-
-        return new CSLRusticiProps(
-                courseId,
-                moduleId,
-                learnerId,
-                moduleRecordActionList
-        );
+        LocalDateTime completedDate = rollupData.getCompletedDate();
+        return new CSLRusticiProps(courseId, moduleId, learnerId, result, completedDate);
     }
 
     public LaunchLink createLaunchLink(RegistrationInput registrationInput) {

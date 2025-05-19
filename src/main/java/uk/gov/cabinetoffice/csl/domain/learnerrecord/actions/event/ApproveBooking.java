@@ -1,19 +1,17 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.event;
 
-import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
-import uk.gov.cabinetoffice.csl.util.UtilService;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 
-public class ApproveBooking extends EventModuleRecordActionProcessor {
+public class ApproveBooking extends EventModuleAction {
 
-    public ApproveBooking(UtilService utilService, CourseWithModuleWithEvent courseWithModuleWithEvent, User user) {
-        super(utilService, courseWithModuleWithEvent, user, EventModuleRecordAction.APPROVE_BOOKING);
+    public ApproveBooking(Event event) {
+        super(event);
     }
 
     @Override
-    public ModuleRecord applyUpdatesToModuleRecord(ModuleRecord moduleRecord) {
+    public ModuleRecord applyUpdates(ModuleRecord moduleRecord) {
         moduleRecord.setState(State.APPROVED);
         moduleRecord.setEventId(event.getId());
         moduleRecord.setEventDate(event.getStartTime());
@@ -22,4 +20,13 @@ public class ApproveBooking extends EventModuleRecordActionProcessor {
         return moduleRecord;
     }
 
+    @Override
+    public EventModuleRecordAction getAction() {
+        return EventModuleRecordAction.APPROVE_BOOKING;
+    }
+
+    @Override
+    public boolean canCreateRecord() {
+        return true;
+    }
 }

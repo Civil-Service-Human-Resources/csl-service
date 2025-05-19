@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.client.courseCatalogue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
@@ -36,15 +37,11 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     @Override
     public List<Course> getCourses(Collection<String> courseIds) {
         log.info("Getting courses with ids '{}' from learning catalogue API", courseIds);
-        String url = String.format("%s?resourceId=%s", courses, String.join(",", courseIds));
+        String url = String.format("%s?courseId=%s", courses, String.join(",", courseIds));
         RequestEntity<Void> request = RequestEntity.get(url).build();
-        List<Course> course = httpClient.executeTypeReferenceRequest(request);
+        List<Course> course = httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
+        });
         return course.stream().map(this::buildCourseData).collect(Collectors.toList());
-    }
-
-    @Override
-    public Course getCourse(String courseId) {
-        return this.getCourses(List.of(courseId)).stream().findFirst().orElse(null);
     }
 
     @Override

@@ -3,19 +3,26 @@ package uk.gov.cabinetoffice.csl.client.learnerRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
+import uk.gov.cabinetoffice.csl.client.model.PagedResponse;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecords;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.BulkCreateOutput;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventStatusDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 @Slf4j
 @Component
@@ -25,10 +32,10 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     private String event;
     @Value("${learnerRecord.bookingsUrl}")
     private String booking;
-    @Value("${learnerRecord.v2CourseRecordsUrl}")
-    private String v2CourseRecordsUrl;
     @Value("${learnerRecord.learnerRecordsUrl}")
     private String learnerRecordsUrl;
+    @Value("${learnerRecord.learnerRecordsMaxPageSize}")
+    private Integer learnerRecordsMaxPageSize;
     @Value("${learnerRecord.moduleRecordsForLearnerUrl}")
     private String moduleRecordsUrl;
     @Value("${learnerRecord.learnerRecordEventsUrl}")
@@ -79,41 +86,77 @@ public class LearnerRecordClient implements ILearnerRecordClient {
         log.debug("Fetching bookings for event {}", eventId);
         String url = String.format("%s/%s/booking", event, eventId);
         RequestEntity<Void> request = RequestEntity.get(url).build();
-        return httpClient.executeTypeReferenceRequest(request);
+        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
+        });
+    }
+
+    private <T, R extends PagedResponse<T>> List<T> getPaginatedRequest(Class<R> pagedResponseClass, UriComponentsBuilder url, Integer maxPageSize) {
+        List<T> results = new ArrayList<>();
+        int totalPages = 1;
+        for (int i = 0; i < totalPages; i++) {
+            url.queryParam("page", i).queryParam("size", maxPageSize);
+            RequestEntity<Void> request = RequestEntity.get(url.build().toUriString()).build();
+            R response = httpClient.executeRequest(request, pagedResponseClass);
+            results.addAll(response.getContent());
+            totalPages = response.getTotalPages();
+        }
+        return results;
     }
 
     @Override
     public List<LearnerRecord> getLearnerRecords(LearnerRecordQuery query) {
-        return null;
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(learnerRecordsUrl);
+        if (!isEmpty(query.getLearnerRecordTypes())) {
+            uriBuilder.queryParam("learnerRecordTypes", query.getLearnerRecordTypes());
+        }
+        if (!isEmpty(query.getResourceIds())) {
+            uriBuilder.queryParam("resourceIds", query.getResourceIds());
+        }
+        if (!isEmpty(query.getLearnerIds())) {
+            uriBuilder.queryParam("learnerIds", query.getLearnerIds());
+        }
+        return getPaginatedRequest(LearnerRecordPagedResponse.class, uriBuilder, learnerRecordsMaxPageSize);
     }
 
     @Override
     public BulkCreateOutput<LearnerRecord, LearnerRecordDto> createLearnerRecords(List<LearnerRecordDto> newLearnerRecords) {
         log.debug("Creating learner records {}", newLearnerRecords);
         RequestEntity<List<LearnerRecordDto>> request = RequestEntity.post(learnerRecordsUrl).body(newLearnerRecords);
-        return httpClient.executeTypeReferenceRequest(request);
+        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
+        });
     }
 
     @Override
     public BulkCreateOutput<LearnerRecordEvent, LearnerRecordEventDto> createLearnerRecordEvents(List<LearnerRecordEventDto> body) {
         log.debug("Creating learner record events {}", body);
         RequestEntity<List<LearnerRecordEventDto>> request = RequestEntity.post(learnerRecordEventsUrl).body(body);
-        return httpClient.executeTypeReferenceRequest(request);
+        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
+        });
     }
 
     @Override
     public List<ModuleRecord> createModuleRecords(List<ModuleRecord> newRecords) {
-        return null;
+        log.debug("Creating module records '{}'", newRecords);
+        RequestEntity<List<ModuleRecord>> request = RequestEntity.post(String.format("%s/bulk", moduleRecordsUrl)).body(newRecords);
+        return httpClient.executeRequest(request, ModuleRecords.class).getModuleRecords();
     }
 
     @Override
     public List<ModuleRecord> getModuleRecords(List<ModuleRecordResourceId> moduleRecordIds) {
-        return null;
+        log.debug("Getting module records with ids '{}'", moduleRecordIds);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(moduleRecordsUrl);
+        uriBuilder.queryParam("userIds", moduleRecordIds.stream().map(ModuleRecordResourceId::getLearnerId).collect(Collectors.toSet()));
+        uriBuilder.queryParam("moduleIds", moduleRecordIds.stream().map(ModuleRecordResourceId::getResourceId).collect(Collectors.toSet()));
+        RequestEntity<Void> request = RequestEntity.get(uriBuilder.build().toUriString()).build();
+        ModuleRecords moduleRecords = httpClient.executeRequest(request, ModuleRecords.class);
+        return moduleRecords.getModuleRecords();
     }
 
     @Override
     public List<ModuleRecord> updateModuleRecords(List<ModuleRecord> input) {
-        return null;
+        log.debug("Updating module records '{}'", input);
+        RequestEntity<List<ModuleRecord>> request = RequestEntity.put(String.format("%s/bulk", moduleRecordsUrl)).body(input);
+        return httpClient.executeRequest(request, ModuleRecords.class).getModuleRecords();
     }
 
 }

@@ -19,6 +19,10 @@ public class LearningCatalogueStubService {
         this.utils = utils;
     }
 
+    public void getCourse(Course course) {
+        getCourses(List.of(course.getId()), List.of(course));
+    }
+
     public void getCourse(String courseId, Course response) {
         getCourses(List.of(courseId), List.of(response));
     }
@@ -40,7 +44,7 @@ public class LearningCatalogueStubService {
     public void getCourses(List<String> courseIds, String response) {
         stubFor(
                 WireMock.get(urlPathEqualTo("/learning_catalogue/courses"))
-                        .withQueryParam("resourceId", equalTo(String.join(",", courseIds)))
+                        .withQueryParam("courseId", equalTo(String.join(",", courseIds)))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")

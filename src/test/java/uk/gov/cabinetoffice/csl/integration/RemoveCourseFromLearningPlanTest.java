@@ -4,9 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
@@ -31,28 +28,66 @@ public class RemoveCourseFromLearningPlanTest extends IntegrationTestBase {
         Course course = this.testDataService.generateCourse(false, false);
         String courseId = testDataService.getCourseId();
         String userId = testDataService.getUserId();
-        CourseRecord inProgressCourseRecord = testDataService.generateCourseRecord(false);
-        inProgressCourseRecord.setState(State.IN_PROGRESS);
-        CourseRecords courseRecords = new CourseRecords(List.of(inProgressCourseRecord));
-        CourseRecord archivedCourseRecord = testDataService.generateCourseRecord(false);
-        archivedCourseRecord.setState(State.ARCHIVED);
-        String expectedCourseRecordPUT = """
-                [{
-                    "resourceId" : "resourceId",
-                    "userId" : "userId",
-                    "courseTitle" : "Test Course",
-                    "state" : "ARCHIVED"
-                }]
+        String expectedLearnerRecordGET = """
+                {
+                    "content": [
+                        {
+                            "resourceId": "courseId",
+                            "learnerId": "userId",
+                            "recordType": {
+                                "type": "COURSE"
+                            },
+                            "latestEvent": {
+                                "learnerId": "userId",
+                                "resourceId": "courseId",
+                                "eventType": {
+                                    "type": "ADD_TO_LEARNING_PLAN"
+                                },
+                                "eventTimestamp" : "2023-01-01T10:00:00",
+                                "eventSource": {
+                                    "source": "csl_source_id"
+                                }
+                            }
+                        }
+                    ],
+                    "totalPages": 1
+                }
                 """;
-        cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, archivedCourseRecord);
+        String expectedEventPOST = """
+                [
+                    {
+                        "learnerId": "userId",
+                        "resourceId": "courseId",
+                        "eventType": "REMOVE_FROM_LEARNING_PLAN",
+                        "eventTimestamp": "2023-01-01T10:00:00",
+                        "eventSource": "csl_source_id"
+                    }
+                ]
+                """;
+        String createEventResponse = """
+                {
+                    "successfulResources": [{
+                        "learnerId": "userId",
+                        "resourceId": "courseId",
+                        "eventType": {
+                            "type": "REMOVE_FROM_LEARNING_PLAN"
+                        },
+                        "eventTimestamp" : "2023-01-01T10:00:00",
+                        "eventSource": {"source": "csl_source_id"}
+                    }],
+                    "failedResources": []
+                }
+                """;
+        cslStubService.getLearningCatalogue().getCourses(List.of(courseId), List.of(course));
+        cslStubService.getLearnerRecord().getLearnerRecords(userId, courseId, 0, expectedLearnerRecordGET);
+        cslStubService.getLearnerRecord().createLearnerRecordEvent(expectedEventPOST, createEventResponse);
         String url = String.format("/courses/%s/remove_from_learning_plan", courseId);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.courseId").value("resourceId"))
+                .andExpect(jsonPath("$.courseId").value("courseId"))
                 .andExpect(jsonPath("$.courseTitle").value(testDataService.getCourseTitle()))
-                .andExpect(jsonPath("$.message").value("Successfully applied action 'Remove from learning plan' to course record"));
-        ;
+                .andExpect(jsonPath("$.message").value("Successfully applied action 'Remove from learning plan' to COURSE courseId (Test Course)"));
 
     }
 
@@ -61,14 +96,18 @@ public class RemoveCourseFromLearningPlanTest extends IntegrationTestBase {
         String courseId = testDataService.getCourseId();
         String userId = testDataService.getUserId();
         cslStubService.getLearningCatalogue().getCourse(courseId, this.testDataService.generateCourse(false, false));
-        cslStubService.getLearnerRecord().getCourseRecord(courseId, userId, new CourseRecords());
+        cslStubService.getLearnerRecord().getLearnerRecords(userId, courseId, 0, """
+                {
+                    "content": [],
+                    "totalPages": 0
+                }
+                """);
         String url = String.format("/courses/%s/remove_from_learning_plan", courseId);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.title").value("Record is in the incorrect state"))
-                .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.instance").value("/courses/resourceId/remove_from_learning_plan"));
-        ;
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.courseId").value("courseId"))
+                .andExpect(jsonPath("$.courseTitle").value(testDataService.getCourseTitle()))
+                .andExpect(jsonPath("$.message").value("Did not apply action 'Remove from learning plan' to COURSE courseId (Test Course)"));
     }
 }

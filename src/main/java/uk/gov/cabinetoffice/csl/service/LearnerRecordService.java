@@ -5,12 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.learnerRecord.ILearnerRecordClient;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.LearnerRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ILearnerRecordResourceID;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ITypedLearnerRecordResourceID;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.BulkCreateOutput;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
-import uk.gov.cabinetoffice.csl.service.learningResources.ILearnerRecordService;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LearnerRecordService implements ILearnerRecordService<LearnerRecord> {
+public class LearnerRecordService {
 
     private final LearnerRecordFactory learnerRecordFactory;
     private final ObjectCache<LearnerRecord> learnerRecordCache;
@@ -33,23 +34,18 @@ public class LearnerRecordService implements ILearnerRecordService<LearnerRecord
         moduleRecordCache.evict(moduleRecordId.getAsString());
     }
 
-    public void bustModuleRecordCache(List<ModuleRecordResourceId> moduleRecordIds) {
-        moduleRecordIds.forEach(this::bustModuleRecordCache);
+    public void bustLearnerRecordCache(String learnerId, String resourceId) {
+        learnerRecordCache.evict(String.format("%s,%s", learnerId, resourceId));
     }
 
-    public LearnerRecord getLearnerRecord(LearnerRecordResourceId id) {
+
+    public LearnerRecord getLearnerRecord(ILearnerRecordResourceID id) {
         List<LearnerRecord> records = getLearnerRecords(List.of(id));
         return records.isEmpty() ? null : records.get(0);
     }
 
     public Map<String, ModuleRecord> getModuleRecordsMap(List<ModuleRecordResourceId> moduleRecordIds) {
         return this.getModuleRecords(moduleRecordIds).stream().collect(Collectors.toMap(ModuleRecord::getCacheableId, mr -> mr));
-    }
-
-    public List<CourseRecord> getAllCourseRecords(String userId) {
-        List<CourseRecord> courseRecords = client.getCourseRecordsForUser(userId);
-        courseRecords.forEach(cache::put);
-        return courseRecords;
     }
 
     public List<ModuleRecord> getModuleRecords(List<ModuleRecordResourceId> moduleRecordIds) {
@@ -75,30 +71,17 @@ public class LearnerRecordService implements ILearnerRecordService<LearnerRecord
         }
     }
 
-    public LearnerRecordData getLearnerRecordAsData(LearnerRecordResourceId id) {
-        LearnerRecordData learnerRecordData = this.getLearnerRecordsAsData(List.of(id)).get(id.getAsString());
-        if (learnerRecordData == null) {
-            learnerRecordData = learnerRecordDataFactory.createNewRecordData(id);
-        }
-        return learnerRecordData;
+    public LearnerRecordData getLearnerRecordAsData(ITypedLearnerRecordResourceID id) {
+        return this.getLearnerRecordsAsData(List.of(id)).get(id.getAsString());
     }
 
-    public Map<String, LearnerRecordData> getLearnerRecordsAsData(List<LearnerRecordResourceId> ids) {
+    public Map<String, LearnerRecordData> getLearnerRecordsAsData(List<ITypedLearnerRecordResourceID> ids) {
         return this.getLearnerRecords(ids).stream().collect(Collectors.toMap(lr -> lr.getLearnerRecordId().getAsString(), learnerRecordDataFactory::createRecordData));
     }
 
-    public LearnerRecord getOrCreateLearnerRecord(LearnerRecordResourceId resourceId) {
-        List<LearnerRecord> records = getLearnerRecords(List.of(resourceId));
-        if (records.isEmpty()) {
-            LearnerRecordDto dto = learnerRecordFactory.createLearnerRecordDto(resourceId, List.of());
-            records = createLearnerRecords(List.of(dto));
-        }
-        return records.get(0);
-    }
-
-    public List<LearnerRecord> getLearnerRecords(List<LearnerRecordResourceId> ids) {
+    public List<LearnerRecord> getLearnerRecords(List<? extends ILearnerRecordResourceID> ids) {
         try {
-            List<String> stringIds = ids.stream().map(LearnerRecordResourceId::getAsString).toList();
+            List<String> stringIds = ids.stream().map(ILearnerRecordResourceID::getAsString).toList();
             CacheGetMultipleOp<LearnerRecord> result = learnerRecordCache.getMultiple(stringIds);
             List<LearnerRecord> learnerRecords = result.getCacheHits();
             if (!result.getCacheMisses().isEmpty()) {
@@ -130,7 +113,6 @@ public class LearnerRecordService implements ILearnerRecordService<LearnerRecord
         return courseRecords;
     }
 
-    @Override
     public LearnerRecordDtoCollection processLearnerRecordUpdates(List<LearnerRecordData> learnerRecordData) {
         LearnerRecordDtoCollection newDtos = learnerRecordFactory.createDtosFromData(learnerRecordData);
         if (!newDtos.getNewRecords().isEmpty()) {
@@ -142,22 +124,30 @@ public class LearnerRecordService implements ILearnerRecordService<LearnerRecord
         return newDtos;
     }
 
-    public List<ModuleRecord> processModuleRecordUpdates(List<ModuleRecord> newModuleRecords, List<ModuleRecord> updateModuleRecords) {
-        List<ModuleRecord> result = new ArrayList<>();
-        result.addAll(this.createModuleRecords(newModuleRecords));
-        result.addAll(this.updateModuleRecords(updateModuleRecords));
-        return result;
+    public LearnerRecordDtoCollection processLearnerRecordUpdates(LearnerRecordResults result) {
+        return processLearnerRecordUpdates(result.getLearnerRecordUpdates());
     }
 
-    @Override
-    public LearnerRecordDtoCollection processUpdates(LearnerRecordResults learnerRecordUpdates) {
-        if (!learnerRecordUpdates.getLearnerRecordUpdates().isEmpty()) {
-            LearnerRecordDtoCollection newDtos = processLearnerRecordUpdates(learnerRecordUpdates.getLearnerRecordUpdates());
+    public Map<String, ModuleRecord> applyModuleRecordUpdates(LearnerRecordResults result) {
+        Map<String, ModuleRecord> map = new HashMap<>();
+        List<ModuleRecord> creates = new ArrayList<>();
+        List<ModuleRecord> updates = new ArrayList<>();
+        result.getModuleRecordUpdates().forEach(mr -> {
+            if (mr.isNewRecord()) {
+                creates.add(mr);
+            } else {
+                updates.add(mr);
+            }
+        });
+        if (!creates.isEmpty()) {
+            map.putAll(createModuleRecords(creates).stream()
+                    .collect(Collectors.toMap(mr -> mr.getLearnerRecordId().getAsString(), mr -> mr)));
         }
-        if (!learnerRecordUpdates.getModuleRecordUpdates().isEmpty()) {
-            List<ModuleRecord> updatedModules = processModuleRecordUpdates(learnerRecordUpdates.getNewModuleRecords(), learnerRecordUpdates.getModuleRecordUpdates());
+        if (!updates.isEmpty()) {
+            map.putAll(updateModuleRecords(updates).stream()
+                    .collect(Collectors.toMap(mr -> mr.getLearnerRecordId().getAsString(), mr -> mr)));
         }
-        return newDtos;
+        return map;
     }
 
     public List<ModuleRecord> createModuleRecords(List<ModuleRecord> newRecords) {
@@ -184,4 +174,5 @@ public class LearnerRecordService implements ILearnerRecordService<LearnerRecord
                 });
         return results;
     }
+
 }
