@@ -47,12 +47,6 @@ public class CourseRecord {
         return this.state;
     }
 
-    public CourseRecord(String courseId, String userId, String courseTitle) {
-        this.courseId = courseId;
-        this.userId = userId;
-        this.courseTitle = courseTitle;
-    }
-
     @JsonIgnore
     public Map<String, ModuleRecord> getModuleRecordsAsMap() {
         return getModuleRecords().stream().collect(Collectors.toMap(ModuleRecord::getModuleId, moduleRecord -> moduleRecord));

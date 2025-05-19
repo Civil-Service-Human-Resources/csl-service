@@ -13,12 +13,7 @@ public class CourseWithModuleWithEvent extends CourseWithModule {
         super(courseWithModule.getCourse(), courseWithModule.getModule());
         this.event = event;
     }
-
-    public CourseWithModuleWithEvent(Course course, Module module, Event event) {
-        super(course, module);
-        this.event = event;
-    }
-
+    
     public String getEventUrl() {
         return String.format("courses/%s/modules/%s/events/%s", getCourse().getCacheableId(), getModule().getId(), getEvent().getId());
     }

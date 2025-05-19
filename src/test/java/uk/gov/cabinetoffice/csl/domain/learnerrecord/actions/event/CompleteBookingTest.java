@@ -27,8 +27,6 @@ public class CompleteBookingTest extends BaseEventModuleRecordActionTest<Complet
     public void testCompleteBookingIncorrectState() {
         ModuleRecord mr = generateModuleRecord();
         mr.setState(State.REGISTERED);
-        assertThrows(IncorrectStateException.class, () -> {
-            actionUnderTest.applyUpdates(mr);
-        });
+        assertThrows(IncorrectStateException.class, () -> actionUnderTest.applyUpdates(mr));
     }
 }

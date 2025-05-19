@@ -13,7 +13,4 @@ import java.util.List;
 public class ModuleRecords {
     public List<ModuleRecord> moduleRecords = new ArrayList<>();
 
-    public ModuleRecords(ModuleRecord moduleRecord) {
-        this(List.of(moduleRecord));
-    }
 }

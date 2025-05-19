@@ -35,11 +35,9 @@ public class LearnerRecordStubService {
     }
 
     public void getModuleRecords(List<String> userIds, List<String> moduleIds, String response) {
-        String moduleIdsFmt = String.join(",", moduleIds);
-        String userIdsFmt = String.join(",", userIds);
         MappingBuilder mappingBuilder = WireMock.get(urlPathEqualTo("/learner_record_api/module_records"))
                 .withQueryParam("userIds", including(userIds.toArray(String[]::new)));
-        if (!moduleIdsFmt.isEmpty()) {
+        if (!moduleIds.isEmpty()) {
             mappingBuilder.withQueryParam("moduleIds", including(moduleIds.toArray(String[]::new)));
         }
         stubFor(

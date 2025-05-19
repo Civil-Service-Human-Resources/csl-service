@@ -71,10 +71,6 @@ public class LearnerRecordService {
         }
     }
 
-    public LearnerRecordData getLearnerRecordAsData(ITypedLearnerRecordResourceID id) {
-        return this.getLearnerRecordsAsData(List.of(id)).get(id.getAsString());
-    }
-
     public Map<String, LearnerRecordData> getLearnerRecordsAsData(List<ITypedLearnerRecordResourceID> ids) {
         return this.getLearnerRecords(ids).stream().collect(Collectors.toMap(lr -> lr.getLearnerRecordId().getAsString(), learnerRecordDataFactory::createRecordData));
     }

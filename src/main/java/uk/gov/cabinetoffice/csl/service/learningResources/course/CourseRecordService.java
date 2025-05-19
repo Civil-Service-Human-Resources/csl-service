@@ -20,11 +20,6 @@ public class CourseRecordService {
         this.courseRecordFactory = courseRecordFactory;
     }
 
-    public CourseRecord getCourseRecord(String userId, String courseId) {
-        List<CourseRecord> result = getCourseRecords(userId, List.of(courseId));
-        return result.size() == 0 ? null : result.get(0);
-    }
-
     public List<CourseRecord> getCourseRecords(String userId, List<String> courseIds) {
         List<CourseWithRecord> courseWithRecords;
         if (courseIds.isEmpty()) {

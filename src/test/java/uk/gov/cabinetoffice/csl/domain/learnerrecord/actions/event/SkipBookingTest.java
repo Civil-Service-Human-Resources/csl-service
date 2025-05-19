@@ -33,8 +33,6 @@ public class SkipBookingTest extends BaseEventModuleRecordActionTest<SkipBooking
     public void testCompleteBookingIncorrectState() {
         ModuleRecord mr = generateModuleRecord();
         mr.setState(State.REGISTERED);
-        assertThrows(IncorrectStateException.class, () -> {
-            actionUnderTest.applyUpdates(mr);
-        });
+        assertThrows(IncorrectStateException.class, () -> actionUnderTest.applyUpdates(mr));
     }
 }

@@ -13,9 +13,4 @@ public class ActionWithId {
     private final ITypedLearnerRecordResourceID resourceId;
     private final ILearnerRecordActionType action;
     private LocalDateTime timestamp;
-
-    public ActionWithId(ITypedLearnerRecordResourceID resourceId, LocalDateTime timestamp, ILearnerRecordActionType action) {
-        this(resourceId, action);
-        this.timestamp = timestamp;
-    }
 }
