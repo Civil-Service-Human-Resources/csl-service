@@ -29,8 +29,8 @@ public class ActionResultService {
             messagingClient.sendMessages(actionResult.getMessages());
         }
         if (!isEmpty(actionResult.getLearnerRecordResults())) {
-            learnerRecordService.processLearnerRecordUpdates(actionResult.getLearnerRecordResults());
             learnerRecordService.applyModuleRecordUpdates(actionResult.getLearnerRecordResults());
+            learnerRecordService.processLearnerRecordUpdates(actionResult.getLearnerRecordResults());
         }
     }
 }

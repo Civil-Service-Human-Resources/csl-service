@@ -123,14 +123,14 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 }]
                 """;
         String expectedModuleRecordPUTResponse = """
-                [{
+                {"moduleRecords":[{
                     "id" : 1,
                     "userId": "userId",
                     "courseId": "courseId",
                     "moduleId" : "moduleId",
                     "moduleTitle" : "Test Module",
                     "state": "COMPLETED"
-                }]
+                }]}
                 """;
         cslStubService.getLearnerRecord().updateModuleRecords(expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);

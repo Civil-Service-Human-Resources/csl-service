@@ -106,7 +106,9 @@ public class ModuleActionService {
         }
         Map<String, ModuleRecord> moduleMap = learnerRecordService.getModuleRecordsMap(idsToFetch);
         ModuleRecord moduleRecord = moduleMap.get(recordResourceId.getAsString());
+        ActionResult actionResult = new ActionResult();
         moduleRecord = processAction(moduleRecord, courseWithModule, new UserToModuleAction(user.getId(), completionAction));
+        actionResult.getLearnerRecordResults().getModuleRecordUpdates().add(moduleRecord);
         if (checkForCompleteCourse) {
             LearningPeriod learningPeriod = course.getLearningPeriodForDepartmentHierarchy(user.getDepartmentCodes()).orElse(null);
             List<String> remainingModuleIds = new ArrayList<>();
@@ -117,9 +119,9 @@ public class ModuleActionService {
                 }
             }
             if (remainingModuleIds.size() == 1 && Objects.equals(remainingModuleIds.get(0), courseWithModule.getModule().getResourceId())) {
-                ActionResult actionResult = courseActionService.completeCourse(course, user, moduleRecord.getCompletionDate());
-                actionResultService.processResults(actionResult);
+                actionResult.add(courseActionService.completeCourse(course, user, moduleRecord.getCompletionDate()));
             }
         }
+        actionResultService.processResults(actionResult);
     }
 }
