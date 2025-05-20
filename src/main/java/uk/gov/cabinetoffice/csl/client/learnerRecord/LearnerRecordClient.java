@@ -121,7 +121,7 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     @Override
     public BulkCreateOutput<LearnerRecord, LearnerRecordDto> createLearnerRecords(List<LearnerRecordDto> newLearnerRecords) {
         log.debug("Creating learner records {}", newLearnerRecords);
-        RequestEntity<List<LearnerRecordDto>> request = RequestEntity.post(learnerRecordsUrl).body(newLearnerRecords);
+        RequestEntity<List<LearnerRecordDto>> request = RequestEntity.post(learnerRecordsUrl + "/bulk").body(newLearnerRecords);
         return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
         });
     }

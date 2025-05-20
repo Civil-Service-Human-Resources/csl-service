@@ -33,7 +33,7 @@ public class CourseController {
     @PostMapping("/{courseId}/add_to_learning_plan")
     @ResponseBody
     public CourseResponse addCourseToLearningPlan(@PathVariable("courseId") String courseId) {
-        ActionWithId action = actionWithIdFactory.create(courseId, userAuthService.getUsername(), CourseRecordAction.ADD_TO_LEARNING_PLAN);
+        ActionWithId action = actionWithIdFactory.create(courseId, userAuthService.getUsername(), CourseRecordAction.MOVE_TO_LEARNING_PLAN);
         return courseActionService.performCourseAction(action);
     }
 

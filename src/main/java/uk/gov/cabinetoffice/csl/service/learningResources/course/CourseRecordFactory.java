@@ -51,7 +51,7 @@ public class CourseRecordFactory {
                     courseRecord.setState(State.COMPLETED);
                 } else if (actionType.equals(CourseRecordAction.REMOVE_FROM_LEARNING_PLAN)) {
                     courseRecord.setState(State.ARCHIVED);
-                } else if (actionType.equals(CourseRecordAction.ADD_TO_LEARNING_PLAN)) {
+                } else if (actionType.equals(CourseRecordAction.MOVE_TO_LEARNING_PLAN)) {
                     courseRecord.setPreference(Preference.LIKED);
                 } else if (actionType.equals(CourseRecordAction.REMOVE_FROM_SUGGESTIONS)) {
                     courseRecord.setPreference(Preference.DISLIKED);

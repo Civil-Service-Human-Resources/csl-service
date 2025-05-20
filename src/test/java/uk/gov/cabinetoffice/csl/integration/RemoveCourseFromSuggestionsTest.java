@@ -71,7 +71,7 @@ public class RemoveCourseFromSuggestionsTest extends IntegrationTestBase {
                 """;
         cslStubService.getLearningCatalogue().getCourses(List.of(courseId), List.of(course));
         cslStubService.getLearnerRecord().getLearnerRecords(userId, courseId, 0, expectedLearnerRecordGET);
-        cslStubService.getLearnerRecord().createLearnerRecord(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
+        cslStubService.getLearnerRecord().createLearnerRecords(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
         String url = String.format("/courses/%s/remove_from_suggestions", courseId);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON))

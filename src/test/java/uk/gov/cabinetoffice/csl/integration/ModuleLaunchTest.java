@@ -215,7 +215,7 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 }]}
                 """;
         cslStubService.getLearnerRecord().createModuleRecords(expectedModuleRecordPOST, expectedModuleRecordPOSTResponse);
-        cslStubService.getLearnerRecord().createLearnerRecord(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
+        cslStubService.getLearnerRecord().createLearnerRecords(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
         String expectedMessageDto = """
                 {
                     "recipient": "lineManager@email.com",
@@ -303,7 +303,7 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 }]}
                 """;
         cslStubService.stubCreateModuleRecords(courseId, moduleId, course, userId, expectedModuleRecordPOST, expectedModuleRecordPOSTResponse);
-        cslStubService.getLearnerRecord().createLearnerRecord(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
+        cslStubService.getLearnerRecord().createLearnerRecords(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)

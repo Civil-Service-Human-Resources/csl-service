@@ -92,9 +92,9 @@ public class LearnerRecordStubService {
         );
     }
 
-    public void createLearnerRecord(String expectedEventPOST, String response) {
+    public void createLearnerRecords(String expectedEventPOST, String response) {
         stubFor(
-                WireMock.post(urlPathEqualTo("/learner_record_api/learner_records"))
+                WireMock.post(urlPathEqualTo("/learner_record_api/learner_records/bulk"))
                         .withRequestBody(equalToJson(expectedEventPOST))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()

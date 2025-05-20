@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum CourseRecordAction implements ICourseRecordActionType {
-    ADD_TO_LEARNING_PLAN("ADD_TO_LEARNING_PLAN", "Add to learning plan", true, false),
+    MOVE_TO_LEARNING_PLAN("MOVE_TO_LEARNING_PLAN", "Move to learning plan", true, false),
     REMOVE_FROM_LEARNING_PLAN("REMOVE_FROM_LEARNING_PLAN", "Remove from learning plan", false, false),
     REMOVE_FROM_SUGGESTIONS("REMOVE_FROM_SUGGESTIONS", "Remove from suggestions", true, false),
     COMPLETE_COURSE("COMPLETE_COURSE", "Complete a course", true, true);
@@ -15,7 +15,7 @@ public enum CourseRecordAction implements ICourseRecordActionType {
     private final String description;
     private final boolean canCreateRecord;
     private final boolean canRepeat;
-    
+
     public boolean canCreateRecord() {
         return canCreateRecord;
     }

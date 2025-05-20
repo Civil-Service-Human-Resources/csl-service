@@ -41,7 +41,7 @@ public class RemoveCourseFromLearningPlanTest extends IntegrationTestBase {
                                 "learnerId": "userId",
                                 "resourceId": "courseId",
                                 "eventType": {
-                                    "type": "ADD_TO_LEARNING_PLAN"
+                                    "type": "MOVE_TO_LEARNING_PLAN"
                                 },
                                 "eventTimestamp" : "2023-01-01T10:00:00",
                                 "eventSource": {
