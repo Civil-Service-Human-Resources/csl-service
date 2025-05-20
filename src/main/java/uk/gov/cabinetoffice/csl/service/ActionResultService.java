@@ -29,8 +29,13 @@ public class ActionResultService {
             messagingClient.sendMessages(actionResult.getMessages());
         }
         if (!isEmpty(actionResult.getLearnerRecordResults())) {
-            learnerRecordService.applyModuleRecordUpdates(actionResult.getLearnerRecordResults());
-            learnerRecordService.processLearnerRecordUpdates(actionResult.getLearnerRecordResults());
+            try {
+                learnerRecordService.applyModuleRecordUpdates(actionResult.getLearnerRecordResults());
+                learnerRecordService.processLearnerRecordUpdates(actionResult.getLearnerRecordResults());
+            } catch (Exception e) {
+                learnerRecordService.bustModuleRecordCache(actionResult.getLearnerRecordResults().getModuleRecordIds());
+                learnerRecordService.bustLearnerRecordCache(actionResult.getLearnerRecordResults().getLearnerRecordIds());
+            }
         }
     }
 }

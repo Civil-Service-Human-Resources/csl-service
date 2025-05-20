@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.BulkCreateOutput;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.FailedResource;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
@@ -30,8 +31,16 @@ public class LearnerRecordService {
     private final LearnerRecordDataFactory learnerRecordDataFactory;
     private final ILearnerRecordClient client;
 
-    public void bustModuleRecordCache(ModuleRecordResourceId moduleRecordId) {
+    public void bustModuleRecordCache(List<ITypedLearnerRecordResourceID> moduleRecordIds) {
+        moduleRecordIds.forEach(this::bustModuleRecordCache);
+    }
+
+    public void bustModuleRecordCache(ITypedLearnerRecordResourceID moduleRecordId) {
         moduleRecordCache.evict(moduleRecordId.getAsString());
+    }
+
+    public void bustLearnerRecordCache(List<ITypedLearnerRecordResourceID> learnerRecordIds) {
+        learnerRecordIds.forEach(id -> bustLearnerRecordCache(id.getLearnerId(), id.getResourceId()));
     }
 
     public void bustLearnerRecordCache(String learnerId, String resourceId) {
@@ -150,14 +159,22 @@ public class LearnerRecordService {
         return client.createModuleRecords(newRecords);
     }
 
+    private <Output, Input> List<Output> processBulkResourceOutput(BulkCreateOutput<Output, Input> response) {
+        if (!response.getFailedResources().isEmpty()) {
+            String message = response.getFailedResources().stream()
+                    .map(FailedResource::getReason).collect(Collectors.joining(", "));
+            message = String.format("%s resources failed to update. Reasons: %s", response.getFailedResources().size(), message);
+            throw new RuntimeException(message);
+        }
+        return response.getSuccessfulResources();
+    }
+
     public List<LearnerRecord> createLearnerRecords(List<LearnerRecordDto> newLearnerRecords) {
-        BulkCreateOutput<LearnerRecord, LearnerRecordDto> learnerRecords = client.createLearnerRecords(newLearnerRecords);
-        learnerRecords.getSuccessfulResources().forEach(learnerRecordCache::put);
-        return learnerRecords.getSuccessfulResources();
+        return processBulkResourceOutput(client.createLearnerRecords(newLearnerRecords));
     }
 
     public List<LearnerRecordEvent> createLearnerRecordEvents(List<LearnerRecordEventDto> newLearnerRecordEvents) {
-        return client.createLearnerRecordEvents(newLearnerRecordEvents).getSuccessfulResources();
+        return processBulkResourceOutput(client.createLearnerRecordEvents(newLearnerRecordEvents));
     }
 
     public List<ModuleRecord> updateModuleRecords(List<ModuleRecord> updatedRecords) {

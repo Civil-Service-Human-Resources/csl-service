@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ITypedLearnerRecordResourceID;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
@@ -97,7 +97,7 @@ public class ModuleRecord implements Cacheable {
     }
 
     @JsonIgnore
-    public LearnerRecordResourceId getLearnerRecordId() {
+    public ITypedLearnerRecordResourceID getLearnerRecordId() {
         return new ModuleRecordResourceId(userId, moduleId);
     }
 
