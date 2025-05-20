@@ -36,6 +36,7 @@ public class ActionResultService {
             } catch (Exception e) {
                 learnerRecordService.bustModuleRecordCache(actionResult.getLearnerRecordResults().getModuleRecordIds().toArray(ITypedLearnerRecordResourceID[]::new));
                 learnerRecordService.bustLearnerRecordCache(actionResult.getLearnerRecordResults().getLearnerRecordIds().toArray(ITypedLearnerRecordResourceID[]::new));
+                throw e;
             }
         }
     }
