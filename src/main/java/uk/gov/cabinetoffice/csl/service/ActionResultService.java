@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.service;
 
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ITypedLearnerRecordResourceID;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.ActionResult;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.notification.INotificationService;
@@ -33,8 +34,8 @@ public class ActionResultService {
                 learnerRecordService.applyModuleRecordUpdates(actionResult.getLearnerRecordResults());
                 learnerRecordService.processLearnerRecordUpdates(actionResult.getLearnerRecordResults());
             } catch (Exception e) {
-                learnerRecordService.bustModuleRecordCache(actionResult.getLearnerRecordResults().getModuleRecordIds());
-                learnerRecordService.bustLearnerRecordCache(actionResult.getLearnerRecordResults().getLearnerRecordIds());
+                learnerRecordService.bustModuleRecordCache(actionResult.getLearnerRecordResults().getModuleRecordIds().toArray(ITypedLearnerRecordResourceID[]::new));
+                learnerRecordService.bustLearnerRecordCache(actionResult.getLearnerRecordResults().getLearnerRecordIds().toArray(ITypedLearnerRecordResourceID[]::new));
             }
         }
     }

@@ -31,22 +31,17 @@ public class LearnerRecordService {
     private final LearnerRecordDataFactory learnerRecordDataFactory;
     private final ILearnerRecordClient client;
 
-    public void bustModuleRecordCache(List<ITypedLearnerRecordResourceID> moduleRecordIds) {
-        moduleRecordIds.forEach(this::bustModuleRecordCache);
+    public void bustModuleRecordCache(ITypedLearnerRecordResourceID... moduleRecordIds) {
+        Arrays.stream(moduleRecordIds).forEach(id -> moduleRecordCache.evict(id.getAsString()));
     }
 
-    public void bustModuleRecordCache(ITypedLearnerRecordResourceID moduleRecordId) {
-        moduleRecordCache.evict(moduleRecordId.getAsString());
-    }
-
-    public void bustLearnerRecordCache(List<ITypedLearnerRecordResourceID> learnerRecordIds) {
-        learnerRecordIds.forEach(id -> bustLearnerRecordCache(id.getLearnerId(), id.getResourceId()));
+    public void bustLearnerRecordCache(ITypedLearnerRecordResourceID... learnerRecordIds) {
+        Arrays.stream(learnerRecordIds).forEach(id -> bustLearnerRecordCache(id.getLearnerId(), id.getResourceId()));
     }
 
     public void bustLearnerRecordCache(String learnerId, String resourceId) {
         learnerRecordCache.evict(String.format("%s,%s", learnerId, resourceId));
     }
-
 
     public LearnerRecord getLearnerRecord(ILearnerRecordResourceID id) {
         List<LearnerRecord> records = getLearnerRecords(List.of(id));
