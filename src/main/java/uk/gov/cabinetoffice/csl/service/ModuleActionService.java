@@ -94,7 +94,6 @@ public class ModuleActionService {
     }
 
     public void completeModule(CourseWithModule courseWithModule, User user, IModuleAction completionAction) {
-        ActionResult actionResult = new ActionResult();
         Course course = courseWithModule.getCourse();
         ModuleRecordResourceId recordResourceId = new ModuleRecordResourceId(user.getId(), courseWithModule.getModule().getResourceId());
         List<ModuleRecordResourceId> idsToFetch = new ArrayList<>(List.of(recordResourceId));
@@ -102,7 +101,7 @@ public class ModuleActionService {
                 .stream().map(m -> new ModuleRecordResourceId(user.getId(), m.getResourceId())).toList();
         boolean checkForCompleteCourse = false;
         if (requiredModuleIds.contains(recordResourceId)) {
-            idsToFetch.addAll(requiredModuleIds);
+            idsToFetch.addAll(requiredModuleIds.stream().filter(mr -> !mr.equals(recordResourceId)).toList());
             checkForCompleteCourse = true;
         }
         Map<String, ModuleRecord> moduleMap = learnerRecordService.getModuleRecordsMap(idsToFetch);
@@ -118,9 +117,9 @@ public class ModuleActionService {
                 }
             }
             if (remainingModuleIds.size() == 1 && Objects.equals(remainingModuleIds.get(0), courseWithModule.getModule().getResourceId())) {
-                actionResult.add(courseActionService.completeCourse(course, user, moduleRecord.getCompletionDate()));
+                ActionResult actionResult = courseActionService.completeCourse(course, user, moduleRecord.getCompletionDate());
+                actionResultService.processResults(actionResult);
             }
         }
-        actionResultService.processResults(actionResult);
     }
 }
