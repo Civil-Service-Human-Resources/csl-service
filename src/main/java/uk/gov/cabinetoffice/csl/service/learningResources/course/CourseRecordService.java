@@ -30,7 +30,9 @@ public class CourseRecordService {
             ).toList();
             courseWithRecords = courseWithRecordService.get(courseRecordIds);
         }
-        return courseWithRecords.stream().map(courseRecordFactory::transformToCourseRecord).toList();
+        return courseWithRecords.stream()
+                .filter(course -> course.getRecord() != null)
+                .map(courseRecordFactory::transformToCourseRecord).toList();
     }
 
 }
