@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class LearnerRecordFactory {
+public class LearnerRecordDtoFactory {
 
     private final IUtilService utilService;
     private final LearnerRecordEventFactory learnerRecordEventFactory;
 
-    public LearnerRecordFactory(IUtilService utilService, LearnerRecordEventFactory learnerRecordEventFactory) {
+    public LearnerRecordDtoFactory(IUtilService utilService, LearnerRecordEventFactory learnerRecordEventFactory) {
         this.utilService = utilService;
         this.learnerRecordEventFactory = learnerRecordEventFactory;
     }

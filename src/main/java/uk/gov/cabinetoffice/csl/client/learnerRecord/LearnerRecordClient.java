@@ -14,6 +14,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecords;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.BulkCreateOutput;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.FailedResource;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventStatusDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
@@ -42,9 +43,11 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     private String learnerRecordEventsUrl;
 
     private final IHttpClient httpClient;
+    private final LearnerRecordFactory learnerRecordFactory;
 
-    public LearnerRecordClient(@Qualifier("learnerRecordHttpClient") IHttpClient httpClient) {
+    public LearnerRecordClient(@Qualifier("learnerRecordHttpClient") IHttpClient httpClient, LearnerRecordFactory learnerRecordFactory) {
         this.httpClient = httpClient;
+        this.learnerRecordFactory = learnerRecordFactory;
     }
 
     @Override
@@ -115,23 +118,36 @@ public class LearnerRecordClient implements ILearnerRecordClient {
         if (!isEmpty(query.getLearnerIds())) {
             uriBuilder.queryParam("learnerIds", query.getLearnerIds());
         }
-        return getPaginatedRequest(LearnerRecordPagedResponse.class, uriBuilder, learnerRecordsMaxPageSize);
+        return getPaginatedRequest(LearnerRecordPagedResponse.class, uriBuilder, learnerRecordsMaxPageSize)
+                .stream().map(learnerRecordFactory::transformLearnerRecord).toList();
+    }
+
+    private <Output, Input> List<Output> processBulkResourceOutput(BulkCreateOutput<Output, Input> response) {
+        if (!response.getFailedResources().isEmpty()) {
+            String message = response.getFailedResources().stream()
+                    .map(FailedResource::getReason).collect(Collectors.joining(", "));
+            message = String.format("%s resources failed to update. Reasons: %s", response.getFailedResources().size(), message);
+            throw new RuntimeException(message);
+        }
+        return response.getSuccessfulResources();
     }
 
     @Override
-    public BulkCreateOutput<LearnerRecord, LearnerRecordDto> createLearnerRecords(List<LearnerRecordDto> newLearnerRecords) {
+    public List<LearnerRecord> createLearnerRecords(List<LearnerRecordDto> newLearnerRecords) {
         log.debug("Creating learner records {}", newLearnerRecords);
         RequestEntity<List<LearnerRecordDto>> request = RequestEntity.post(learnerRecordsUrl + "/bulk").body(newLearnerRecords);
-        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
-        });
+        List<LearnerRecord> records = processBulkResourceOutput(httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
+        }));
+        return records.stream().map(learnerRecordFactory::transformLearnerRecord).toList();
     }
 
     @Override
-    public BulkCreateOutput<LearnerRecordEvent, LearnerRecordEventDto> createLearnerRecordEvents(List<LearnerRecordEventDto> body) {
+    public List<LearnerRecordEvent> createLearnerRecordEvents(List<LearnerRecordEventDto> body) {
         log.debug("Creating learner record events {}", body);
         RequestEntity<List<LearnerRecordEventDto>> request = RequestEntity.post(learnerRecordEventsUrl).body(body);
-        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
-        });
+        List<LearnerRecordEvent> events = processBulkResourceOutput(httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
+        }));
+        return events.stream().map(learnerRecordFactory::applyLearnerRecordEventData).toList();
     }
 
     @Override

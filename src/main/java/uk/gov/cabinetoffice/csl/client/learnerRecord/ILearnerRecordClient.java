@@ -3,7 +3,6 @@ package uk.gov.cabinetoffice.csl.client.learnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.BulkCreateOutput;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventStatusDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
@@ -24,9 +23,9 @@ public interface ILearnerRecordClient {
 
     List<LearnerRecord> getLearnerRecords(LearnerRecordQuery query);
 
-    BulkCreateOutput<LearnerRecord, LearnerRecordDto> createLearnerRecords(List<LearnerRecordDto> newLearnerRecords);
+    List<LearnerRecord> createLearnerRecords(List<LearnerRecordDto> newLearnerRecords);
 
-    BulkCreateOutput<LearnerRecordEvent, LearnerRecordEventDto> createLearnerRecordEvents(List<LearnerRecordEventDto> newLearnerRecordEvents);
+    List<LearnerRecordEvent> createLearnerRecordEvents(List<LearnerRecordEventDto> newLearnerRecordEvents);
 
     List<ModuleRecord> createModuleRecords(List<ModuleRecord> newRecords);
 

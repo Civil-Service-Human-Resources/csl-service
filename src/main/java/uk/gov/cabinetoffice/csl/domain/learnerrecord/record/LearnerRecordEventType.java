@@ -11,5 +11,6 @@ public class LearnerRecordEventType implements Serializable {
 
     private final String eventType;
     private final Integer id;
+    private final LearnerRecordType learnerRecordType;
 
 }

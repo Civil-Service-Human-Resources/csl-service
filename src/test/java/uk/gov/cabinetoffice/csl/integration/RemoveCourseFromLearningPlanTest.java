@@ -41,7 +41,10 @@ public class RemoveCourseFromLearningPlanTest extends IntegrationTestBase {
                                 "learnerId": "userId",
                                 "resourceId": "courseId",
                                 "eventType": {
-                                    "type": "MOVE_TO_LEARNING_PLAN"
+                                    "eventType": "MOVE_TO_LEARNING_PLAN",
+                                    "learnerRecordType": {
+                                        "type": "COURSE"
+                                    }
                                 },
                                 "eventTimestamp" : "2023-01-01T10:00:00",
                                 "eventSource": {
@@ -70,7 +73,10 @@ public class RemoveCourseFromLearningPlanTest extends IntegrationTestBase {
                         "learnerId": "userId",
                         "resourceId": "courseId",
                         "eventType": {
-                            "type": "REMOVE_FROM_LEARNING_PLAN"
+                            "eventType": "MOVE_TO_LEARNING_PLAN",
+                            "learnerRecordType": {
+                                "type": "COURSE"
+                            }
                         },
                         "eventTimestamp" : "2023-01-01T10:00:00",
                         "eventSource": {"source": "csl_source_id"}

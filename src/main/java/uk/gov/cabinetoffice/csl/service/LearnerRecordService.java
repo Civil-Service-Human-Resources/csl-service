@@ -10,8 +10,6 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ITypedLearnerRecordResou
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.BulkCreateOutput;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.FailedResource;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
@@ -24,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LearnerRecordService {
 
-    private final LearnerRecordFactory learnerRecordFactory;
+    private final LearnerRecordDtoFactory learnerRecordFactory;
     private final ObjectCache<LearnerRecord> learnerRecordCache;
     private final ObjectCache<ModuleRecord> moduleRecordCache;
     private final LearnerRecordParameterFactory learnerRecordQueryFactory;
@@ -154,22 +152,12 @@ public class LearnerRecordService {
         return client.createModuleRecords(newRecords);
     }
 
-    private <Output, Input> List<Output> processBulkResourceOutput(BulkCreateOutput<Output, Input> response) {
-        if (!response.getFailedResources().isEmpty()) {
-            String message = response.getFailedResources().stream()
-                    .map(FailedResource::getReason).collect(Collectors.joining(", "));
-            message = String.format("%s resources failed to update. Reasons: %s", response.getFailedResources().size(), message);
-            throw new RuntimeException(message);
-        }
-        return response.getSuccessfulResources();
-    }
-
     public List<LearnerRecord> createLearnerRecords(List<LearnerRecordDto> newLearnerRecords) {
-        return processBulkResourceOutput(client.createLearnerRecords(newLearnerRecords));
+        return client.createLearnerRecords(newLearnerRecords);
     }
 
     public List<LearnerRecordEvent> createLearnerRecordEvents(List<LearnerRecordEventDto> newLearnerRecordEvents) {
-        return processBulkResourceOutput(client.createLearnerRecordEvents(newLearnerRecordEvents));
+        return client.createLearnerRecordEvents(newLearnerRecordEvents);
     }
 
     public List<ModuleRecord> updateModuleRecords(List<ModuleRecord> updatedRecords) {
