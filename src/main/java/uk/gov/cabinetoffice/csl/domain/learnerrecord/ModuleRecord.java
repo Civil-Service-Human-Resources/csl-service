@@ -72,7 +72,7 @@ public class ModuleRecord implements Cacheable {
 
     @JsonIgnore
     public String getCacheableId() {
-        return String.format("%s,%s", userId, moduleId);
+        return getLearnerRecordId().getAsString();
     }
 
     public State getState() {

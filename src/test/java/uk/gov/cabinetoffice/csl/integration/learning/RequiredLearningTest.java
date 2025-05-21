@@ -208,6 +208,8 @@ public class RequiredLearningTest extends IntegrationTestBase {
                         {
                             "id": 1,
                             "uid": "module1",
+                            "userId": "userId",
+                            "courseId": "course1",
                             "moduleId": "module1",
                             "moduleTitle": "module1",
                             "moduleType": "link",
@@ -220,6 +222,8 @@ public class RequiredLearningTest extends IntegrationTestBase {
                         {
                             "id": 2,
                             "uid": "module2",
+                            "userId": "userId",
+                            "courseId": "course1",
                             "moduleId": "module2",
                             "moduleTitle": "module2",
                             "moduleType": "elearning",
@@ -287,6 +291,8 @@ public class RequiredLearningTest extends IntegrationTestBase {
                         {
                             "id": 1,
                             "uid": "module1",
+                            "userId": "userId",
+                            "courseId": "course1",
                             "moduleId": "module1",
                             "moduleTitle": "module1",
                             "moduleType": "link",
@@ -299,6 +305,8 @@ public class RequiredLearningTest extends IntegrationTestBase {
                         {
                             "id": 2,
                             "uid": "module2",
+                            "userId": "userId",
+                            "courseId": "course1",
                             "moduleId": "module2",
                             "moduleTitle": "module2",
                             "moduleType": "elearning",
@@ -366,6 +374,8 @@ public class RequiredLearningTest extends IntegrationTestBase {
                         {
                             "id": 1,
                             "uid": "module1",
+                            "userId": "userId",
+                            "courseId": "course1",
                             "moduleId": "module1",
                             "moduleTitle": "module1",
                             "moduleType": "link",
@@ -378,6 +388,8 @@ public class RequiredLearningTest extends IntegrationTestBase {
                         {
                             "id": 2,
                             "uid": "module2",
+                            "userId": "userId",
+                            "courseId": "course1",
                             "moduleId": "module2",
                             "moduleTitle": "module2",
                             "moduleType": "elearning",

@@ -13,8 +13,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class CourseRecordFactory {
@@ -25,14 +24,28 @@ public class CourseRecordFactory {
         this.learnerRecordService = learnerRecordService;
     }
 
-    public CourseRecord transformToCourseRecord(CourseWithRecord courseWithRecord) {
+    public List<CourseRecord> transformToCourseRecords(List<CourseWithRecord> coursesWithRecord) {
+        Map<String, List<ModuleRecord>> courseToModuleRecords = new HashMap<>();
+        learnerRecordService.getModuleRecords(
+                        coursesWithRecord.stream().flatMap(c -> c.getModuleResourceIds().stream()).toList())
+                .forEach(mr -> {
+                    List<ModuleRecord> mrs = courseToModuleRecords.getOrDefault(mr.getCourseId(), new ArrayList<>());
+                    mrs.add(mr);
+                    courseToModuleRecords.put(mr.getCourseId(), mrs);
+                });
+        return coursesWithRecord.stream().map(c -> transformToCourseRecord(c, courseToModuleRecords.get(c.getId()))).toList();
+    }
+
+    public CourseRecord transformToCourseRecord(CourseWithRecord coursesWithRecord) {
+        return transformToCourseRecords(List.of(coursesWithRecord)).get(0);
+    }
+
+    public CourseRecord transformToCourseRecord(CourseWithRecord courseWithRecord, List<ModuleRecord> moduleRecords) {
         LocalDateTime lastUpdated = null;
         CourseRecord courseRecord = new CourseRecord();
         courseRecord.setCourseId(courseWithRecord.getResourceId());
         courseRecord.setCourseTitle(courseWithRecord.getTitle());
         courseRecord.setUserId(courseWithRecord.getLearnerId());
-        LearnerRecord learnerRecord = courseWithRecord.getRecord();
-        List<ModuleRecord> moduleRecords = learnerRecordService.getModuleRecords(courseWithRecord.getModuleResourceIds());
         courseRecord.setModuleRecords(moduleRecords);
         if (moduleRecords.size() > 0) {
             courseRecord.setState(State.IN_PROGRESS);
@@ -42,6 +55,7 @@ public class CourseRecordFactory {
                     .max(LocalDateTime::compareTo)
                     .orElse(null);
         }
+        LearnerRecord learnerRecord = courseWithRecord.getRecord();
         if (learnerRecord != null) {
             LearnerRecordEvent latestEvent = learnerRecord.getLatestEvent();
             if (latestEvent != null) {

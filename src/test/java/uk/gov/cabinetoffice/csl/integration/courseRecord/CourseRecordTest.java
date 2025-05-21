@@ -44,6 +44,8 @@ public class CourseRecordTest extends IntegrationTestBase {
                         {
                             "id": 1,
                             "uid": "module1",
+                            "userId": "userId",
+                            "courseId": "courseId",
                             "moduleId": "module1",
                             "moduleTitle": "module1",
                             "moduleType": "link",
@@ -56,6 +58,8 @@ public class CourseRecordTest extends IntegrationTestBase {
                         {
                             "id": 2,
                             "uid": "module2",
+                            "userId": "userId",
+                            "courseId": "courseId",
                             "moduleId": "module2",
                             "moduleTitle": "module2",
                             "moduleType": "elearning",

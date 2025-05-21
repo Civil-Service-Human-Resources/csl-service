@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.util;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
+@Slf4j
 public class ObjectCache<T extends Cacheable> {
 
     private final Cache cache;
