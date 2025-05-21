@@ -13,7 +13,11 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class CourseRecordFactory {
@@ -25,11 +29,11 @@ public class CourseRecordFactory {
     }
 
     public List<CourseRecord> transformToCourseRecords(List<CourseWithRecord> coursesWithRecord) {
-        Map<String, List<ModuleRecord>> courseToModuleRecords = new HashMap<>();
+        Map<String, List<ModuleRecord>> courseToModuleRecords = coursesWithRecord.stream().collect(Collectors.toMap(CourseWithRecord::getId, c -> new ArrayList<>()));
         learnerRecordService.getModuleRecords(
                         coursesWithRecord.stream().flatMap(c -> c.getModuleResourceIds().stream()).toList())
                 .forEach(mr -> {
-                    List<ModuleRecord> mrs = courseToModuleRecords.getOrDefault(mr.getCourseId(), new ArrayList<>());
+                    List<ModuleRecord> mrs = courseToModuleRecords.get(mr.getCourseId());
                     mrs.add(mr);
                     courseToModuleRecords.put(mr.getCourseId(), mrs);
                 });
