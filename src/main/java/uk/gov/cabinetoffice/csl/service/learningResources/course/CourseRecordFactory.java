@@ -56,7 +56,7 @@ public class CourseRecordFactory {
                 } else if (actionType.equals(CourseRecordAction.REMOVE_FROM_SUGGESTIONS)) {
                     courseRecord.setPreference(Preference.DISLIKED);
                 }
-                if (lastUpdated != null && lastUpdated.isBefore(latestEvent.getEventTimestamp())) {
+                if (lastUpdated == null || lastUpdated.isBefore(latestEvent.getEventTimestamp())) {
                     lastUpdated = latestEvent.getEventTimestamp();
                 }
             }

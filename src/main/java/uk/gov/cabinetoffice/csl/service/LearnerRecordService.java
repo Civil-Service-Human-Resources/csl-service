@@ -73,10 +73,6 @@ public class LearnerRecordService {
         }
     }
 
-    public Map<String, LearnerRecordData> getLearnerRecordsAsData(List<ITypedLearnerRecordResourceID> ids) {
-        return this.getLearnerRecords(ids).stream().collect(Collectors.toMap(lr -> lr.getLearnerRecordId().getAsString(), learnerRecordDataFactory::createRecordData));
-    }
-
     public List<LearnerRecord> getLearnerRecords(List<? extends ILearnerRecordResourceID> ids) {
         try {
             List<String> stringIds = ids.stream().map(ILearnerRecordResourceID::getAsString).toList();
@@ -153,11 +149,19 @@ public class LearnerRecordService {
     }
 
     public List<LearnerRecord> createLearnerRecords(List<LearnerRecordDto> newLearnerRecords) {
-        return client.createLearnerRecords(newLearnerRecords);
+        return client.createLearnerRecords(newLearnerRecords)
+                .stream().peek(learnerRecordCache::put).toList();
     }
 
     public List<LearnerRecordEvent> createLearnerRecordEvents(List<LearnerRecordEventDto> newLearnerRecordEvents) {
-        return client.createLearnerRecordEvents(newLearnerRecordEvents);
+        return client.createLearnerRecordEvents(newLearnerRecordEvents)
+                .stream().peek(lre -> {
+                    LearnerRecord lr = learnerRecordCache.get(lre.getResourceId().getAsString());
+                    if (lr != null) {
+                        lr.setLatestEvent(lre);
+                        learnerRecordCache.put(lr);
+                    }
+                }).toList();
     }
 
     public List<ModuleRecord> updateModuleRecords(List<ModuleRecord> updatedRecords) {
