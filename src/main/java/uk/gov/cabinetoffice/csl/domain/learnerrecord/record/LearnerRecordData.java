@@ -24,4 +24,8 @@ public class LearnerRecordData {
         return !events.isEmpty() ? events.get(events.size() - 1).getActionType() : null;
     }
 
+    public boolean hasNewRecords() {
+        return newRecord && events.stream().anyMatch(LearnerRecordEventData::isNewEvent);
+    }
+
 }

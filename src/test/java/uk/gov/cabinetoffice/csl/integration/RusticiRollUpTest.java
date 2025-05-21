@@ -35,6 +35,47 @@ public class RusticiRollUpTest extends IntegrationTestBase {
         Course course = testDataService.generateCourse(true, false);
         CivilServant civilServant = testDataService.generateCivilServant();
         cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
+        cslStubService.getLearnerRecord().getLearnerRecords("userId", "courseId", 0, """
+                {
+                    "content": [],
+                    "totalPages": 0
+                }
+                """);
+        String expectedLearnerRecordsPOST = """
+                [
+                    {
+                        "recordType" : "COURSE",
+                        "learnerId": "userId",
+                        "resourceId": "courseId",
+                        "createdTimestamp" : "2023-01-01T10:00:00",
+                        "events" : [{
+                            "learnerId": "userId",
+                            "resourceId": "courseId",
+                            "eventType": "COMPLETE_COURSE",
+                            "eventTimestamp" : "2023-01-01T10:00:00",
+                            "eventSource": "csl_source_id"
+                        }]
+                    }
+                ]
+                """;
+        String expectedLearnerRecordsPOSTResponse = """
+                {
+                    "successfulResources": [{
+                        "recordType" : {"type": "COURSE"},
+                        "learnerId": "userId",
+                        "resourceId": "courseId",
+                        "createdTimestamp" : "2023-01-01T10:00:00",
+                        "events" : [{
+                            "learnerId": "userId",
+                            "resourceId": "courseId",
+                            "eventType": "COMPLETE_COURSE",
+                            "eventTimestamp" : "2023-01-01T10:00:00",
+                            "eventSource": {"source": "csl_source_id"}
+                        }]
+                    }],
+                    "failedResources": []
+                }
+                """;
         String getModuleRecordsResponse = """
                 {"moduleRecords": [{
                     "id" : 1,
@@ -69,6 +110,7 @@ public class RusticiRollUpTest extends IntegrationTestBase {
                 """;
         cslStubService.stubUpdateModuleRecord(course, testDataService.getModuleId(), testDataService.getUserId(),
                 getModuleRecordsResponse, expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
+        cslStubService.getLearnerRecord().createLearnerRecords(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
         mockMvc.perform(post("/rustici/rollup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(utils.toJson(rollupData)))

@@ -105,11 +105,9 @@ public class ModuleActionService {
             checkForCompleteCourse = true;
         }
         Map<String, ModuleRecord> moduleMap = learnerRecordService.getModuleRecordsMap(idsToFetch);
-        ModuleRecord moduleRecord = moduleMap.get(recordResourceId.getAsString());
-        ActionResult actionResult = new ActionResult();
-        moduleRecord = processAction(moduleRecord, courseWithModule, new UserToModuleAction(user.getId(), completionAction));
-        actionResult.getLearnerRecordResults().getModuleRecordUpdates().add(moduleRecord);
+        ModuleRecord moduleRecord = processModuleAction(courseWithModule, new UserToModuleAction(user.getId(), completionAction));
         if (checkForCompleteCourse) {
+            log.debug("Checking for course completion");
             LearningPeriod learningPeriod = course.getLearningPeriodForDepartmentHierarchy(user.getDepartmentCodes()).orElse(null);
             List<String> remainingModuleIds = new ArrayList<>();
             for (ModuleRecordResourceId requiredModuleId : requiredModuleIds) {
@@ -119,9 +117,10 @@ public class ModuleActionService {
                 }
             }
             if (remainingModuleIds.size() == 1 && Objects.equals(remainingModuleIds.get(0), courseWithModule.getModule().getResourceId())) {
-                actionResult.add(courseActionService.completeCourse(course, user, moduleRecord.getCompletionDate()));
+                log.debug("Completed module was the last required module remaining for course completion. Completing course.");
+                ActionResult actionResult = courseActionService.completeCourse(course, user, moduleRecord.getCompletionDate());
+                actionResultService.processResults(actionResult);
             }
         }
-        actionResultService.processResults(actionResult);
     }
 }

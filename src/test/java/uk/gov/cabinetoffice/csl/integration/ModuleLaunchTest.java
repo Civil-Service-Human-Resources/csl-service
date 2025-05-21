@@ -97,27 +97,29 @@ public class ModuleLaunchTest extends IntegrationTestBase {
 
     @Test
     public void testGetFileLaunchLink() throws Exception {
-        course.getModule(moduleId).setModuleType(ModuleType.file);
-        course.getModule(moduleId).setUrl("http://launch.link");
-        cslStubService.getLearningCatalogue().getCourse(courseId, course);
+        Course twoModuleCourse = testDataService.generateCourse(2);
+        String moduleId0 = "moduleId0";
+        twoModuleCourse.getModule(moduleId0).setModuleType(ModuleType.file);
+        twoModuleCourse.getModule(moduleId0).setUrl("http://launch.link");
+        cslStubService.getLearningCatalogue().getCourse(twoModuleCourse);
         String getModuleRecordsResponse = """
                 {"moduleRecords": [{
                     "id" : 1,
                     "uid": "uid",
                     "userId": "userId",
                     "courseId": "courseId",
-                    "moduleId" : "moduleId",
+                    "moduleId" : "moduleId0",
                     "moduleTitle" : "Test Module",
                     "state": "IN_PROGRESS"
                 }]}
                 """;
-        cslStubService.getLearnerRecord().getModuleRecord(moduleId, userId, getModuleRecordsResponse);
+        cslStubService.getLearnerRecord().getModuleRecord(moduleId0, userId, getModuleRecordsResponse);
         String expectedModuleRecordPUT = """
                 [{
                     "id" : 1,
                     "userId": "userId",
                     "courseId": "courseId",
-                    "moduleId" : "moduleId",
+                    "moduleId" : "moduleId0",
                     "moduleTitle" : "Test Module",
                     "state": "COMPLETED"
                 }]
@@ -127,13 +129,13 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                     "id" : 1,
                     "userId": "userId",
                     "courseId": "courseId",
-                    "moduleId" : "moduleId",
+                    "moduleId" : "moduleId0",
                     "moduleTitle" : "Test Module",
                     "state": "COMPLETED"
                 }]}
                 """;
         cslStubService.getLearnerRecord().updateModuleRecords(expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
-        String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
+        String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId0);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(utils.toJson(input)))

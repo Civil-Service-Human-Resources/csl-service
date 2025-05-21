@@ -45,9 +45,11 @@ public class CourseActionService {
         LearnerRecord courseRecord = learnerRecordService.getLearnerRecord(recordResourceId);
         ActionResult actionResult = new ActionResult();
         LearnerRecordData courseRecordData = learnerRecordActionWorker.processAction(courseRecord, action);
-        actionResult.getMessages().add(messageFactory.generateCourseCompletionMessage(completionDate, user, course));
-        if (user.hasLineManager() && course.isMandatoryLearningForUser(user)) {
-            actionResult.getEmails().add(emailFactory.getRequiredLearningCompleteMessage(user, course));
+        if (courseRecordData.hasNewRecords()) {
+            actionResult.getMessages().add(messageFactory.generateCourseCompletionMessage(completionDate, user, course));
+            if (user.hasLineManager() && course.isMandatoryLearningForUser(user)) {
+                actionResult.getEmails().add(emailFactory.getRequiredLearningCompleteMessage(user, course));
+            }
         }
         actionResult.getLearnerRecordResults().getLearnerRecordUpdates().add(courseRecordData);
         return actionResult;
