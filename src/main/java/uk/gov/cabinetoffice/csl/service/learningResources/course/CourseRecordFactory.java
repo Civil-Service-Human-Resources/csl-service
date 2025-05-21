@@ -40,10 +40,6 @@ public class CourseRecordFactory {
         return coursesWithRecord.stream().map(c -> transformToCourseRecord(c, courseToModuleRecords.get(c.getId()))).toList();
     }
 
-    public CourseRecord transformToCourseRecord(CourseWithRecord coursesWithRecord) {
-        return transformToCourseRecords(List.of(coursesWithRecord)).get(0);
-    }
-
     public CourseRecord transformToCourseRecord(CourseWithRecord courseWithRecord, List<ModuleRecord> moduleRecords) {
         LocalDateTime lastUpdated = null;
         CourseRecord courseRecord = new CourseRecord();
