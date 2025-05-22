@@ -50,6 +50,11 @@ public class CourseRecordFactory {
         if (moduleRecords.size() > 0) {
             courseRecord.setState(State.IN_PROGRESS);
             lastUpdated = moduleRecords.stream()
+                    .peek(mr -> {
+                        if (mr.getState().equals(State.SKIPPED)) {
+                            courseRecord.setState(State.SKIPPED);
+                        }
+                    })
                     .map(ModuleRecord::getUpdatedAt)
                     .filter(Objects::nonNull)
                     .max(LocalDateTime::compareTo)
@@ -58,7 +63,7 @@ public class CourseRecordFactory {
         LearnerRecord learnerRecord = courseWithRecord.getRecord();
         if (learnerRecord != null) {
             LearnerRecordEvent latestEvent = learnerRecord.getLatestEvent();
-            if (latestEvent != null) {
+            if (latestEvent != null && (lastUpdated == null || lastUpdated.isBefore(latestEvent.getEventTimestamp()))) {
                 ILearnerRecordActionType actionType = latestEvent.getActionType();
                 courseRecord.setLastUpdated(latestEvent.getEventTimestamp());
                 if (actionType.equals(CourseRecordAction.COMPLETE_COURSE)) {
@@ -70,9 +75,7 @@ public class CourseRecordFactory {
                 } else if (actionType.equals(CourseRecordAction.REMOVE_FROM_SUGGESTIONS)) {
                     courseRecord.setPreference(Preference.DISLIKED);
                 }
-                if (lastUpdated == null || lastUpdated.isBefore(latestEvent.getEventTimestamp())) {
-                    lastUpdated = latestEvent.getEventTimestamp();
-                }
+                lastUpdated = latestEvent.getEventTimestamp();
             }
         }
         courseRecord.setLastUpdated(lastUpdated);
