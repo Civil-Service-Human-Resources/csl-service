@@ -32,6 +32,20 @@ public class CourseRecordTest extends IntegrationTestBase {
                             "learnerId": "userId",
                             "recordType": {
                                 "type": "COURSE"
+                            },
+                            "latestEvent": {
+                                "learnerId": "userId",
+                                "resourceId": "courseId",
+                                "eventType": {
+                                    "eventType": "COMPLETE_COURSE",
+                                    "learnerRecordType": {
+                                        "type": "COURSE"
+                                    }
+                                },
+                                "eventTimestamp" : "2023-01-01T10:00:00",
+                                "eventSource": {
+                                    "source": "csl_source_id"
+                                }
                             }
                         }
                     ],
@@ -83,7 +97,7 @@ public class CourseRecordTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.courseRecords[0].courseId").value("courseId"))
                 .andExpect(jsonPath("$.courseRecords[0].userId").value("userId"))
                 .andExpect(jsonPath("$.courseRecords[0].courseTitle").value("Test Course"))
-                .andExpect(jsonPath("$.courseRecords[0].state").value("IN_PROGRESS"))
+                .andExpect(jsonPath("$.courseRecords[0].state").value("COMPLETED"))
 
                 .andExpect(jsonPath("$.courseRecords[0].modules.length()").value(2))
 
