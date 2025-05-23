@@ -63,9 +63,6 @@ public class CourseRecordFactory {
         }
         courseRecord.setModuleRecords(moduleRecords);
         if (moduleRecords.size() > 0) {
-            if (!courseRecord.equalsAnyState(State.COMPLETED)) {
-                courseRecord.setState(State.IN_PROGRESS);
-            }
             LocalDateTime moduleRecordLastUpdated = moduleRecords.stream()
                     .peek(mr -> {
                         if (mr.getState().equals(State.SKIPPED)) {
@@ -78,6 +75,9 @@ public class CourseRecordFactory {
                     .orElse(null);
             if (moduleRecordLastUpdated != null && lastUpdated != null && moduleRecordLastUpdated.isAfter(lastUpdated)) {
                 lastUpdated = moduleRecordLastUpdated;
+                if (!courseRecord.equalsAnyState(State.COMPLETED)) {
+                    courseRecord.setState(State.IN_PROGRESS);
+                }
             }
         }
         courseRecord.setLastUpdated(lastUpdated);
