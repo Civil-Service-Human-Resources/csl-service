@@ -7,9 +7,8 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 
 @Service
 public class CourseWithRecordFactory {
-    public CourseWithRecord build(Course course, String learnerId, LearnerRecord record) {
-        return new CourseWithRecord(course.getId(), course.getTitle(), course.getShortDescription(), course.getModules(),
-                course.getAudiences(), course.getDepartmentCodeToRequiredAudienceMap(), learnerId, record);
+    public CourseWithRecord build(String learnerId, Course course, LearnerRecord record) {
+        return new CourseWithRecord(learnerId, course.getId(), course.getTitle(), course.getModules(), record);
     }
 
 }

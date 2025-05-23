@@ -10,9 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +33,15 @@ public class CourseRecord {
     private State state;
 
     private Preference preference;
+
+    @JsonIgnore
+    public boolean equalsAnyState(State... states) {
+        return Arrays.stream(states).anyMatch(s -> getState().equals(s));
+    }
+
+    public State getState() {
+        return Objects.requireNonNullElse(this.state, State.NULL);
+    }
 
     @JsonProperty("modules")
     private Collection<ModuleRecord> moduleRecords = new ArrayList<>();

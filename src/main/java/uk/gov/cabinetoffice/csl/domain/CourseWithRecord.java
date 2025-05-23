@@ -3,34 +3,46 @@ package uk.gov.cabinetoffice.csl.domain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Audience;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 @AllArgsConstructor
 @Getter
 @Setter
-public class CourseWithRecord extends Course implements ILearningResourceWithRecord {
+public class CourseWithRecord implements ILearningResource {
 
     private final String learnerId;
+    private final String courseId;
+    private final String courseTitle;
+    private final Collection<Module> modules;
+    @Nullable
     private final LearnerRecord record;
 
-    public CourseWithRecord(String id, String title, String shortDescription, Collection<Module> modules,
-                            List<Audience> audiences, Map<String, Integer> departmentCodeToRequiredAudienceMap,
-                            String learnerId, LearnerRecord record) {
-        super(id, title, shortDescription, modules, audiences, departmentCodeToRequiredAudienceMap);
-        this.learnerId = learnerId;
-        this.record = record;
+    public LearnerRecordEvent getLatestEvent() {
+        return record == null ? null : record.getLatestEvent();
     }
 
-    public List<ModuleRecordResourceId> getModuleResourceIds() {
-        return this.getModules().stream().map(m -> new ModuleRecordResourceId(this.learnerId, m.getResourceId())).toList();
+    @Override
+    public String getResourceId() {
+        return courseId;
     }
 
+    @Override
+    public String getName() {
+        return courseTitle;
+    }
+
+    @Override
+    public LearningResourceType getType() {
+        return LearningResourceType.COURSE;
+    }
+
+    public Collection<ModuleRecordResourceId> getModuleResourceIds() {
+        return modules.stream().map(m -> new ModuleRecordResourceId(learnerId, m.getId())).toList();
+    }
 }

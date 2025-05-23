@@ -8,7 +8,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,32 +19,35 @@ public class CourseWithRecordService {
     private final LearningCatalogueService learningCatalogueService;
     private final CourseWithRecordFactory courseWithRecordFactory;
 
-    public CourseWithRecordService(LearnerRecordService learnerRecordService, LearningCatalogueService learningCatalogueService,
-                                   CourseWithRecordFactory courseWithRecordFactory) {
+    public CourseWithRecordService(LearnerRecordService learnerRecordService, LearningCatalogueService learningCatalogueService, CourseWithRecordFactory courseWithRecordFactory) {
         this.learnerRecordService = learnerRecordService;
         this.learningCatalogueService = learningCatalogueService;
         this.courseWithRecordFactory = courseWithRecordFactory;
     }
 
+    private List<CourseWithRecord> buildForUser(String userId, List<String> courseIds, Map<String, LearnerRecord> courseRecordMap) {
+        List<Course> courses = learningCatalogueService.getCourses(courseIds);
+        return courses.stream().map(c -> courseWithRecordFactory.build(userId, c, courseRecordMap.get(c.getId()))).toList();
+    }
+
+    private List<CourseWithRecord> buildForUser(String userId, Map<String, LearnerRecord> courseRecordMap) {
+        return buildForUser(userId, courseRecordMap.keySet().stream().toList(), courseRecordMap);
+    }
+
     public List<CourseWithRecord> getAllForUser(String userId) {
         Map<String, LearnerRecord> courseRecordMap = learnerRecordService.getLearnerRecords(userId)
                 .stream().collect(Collectors.toMap(LearnerRecord::getResourceId, r -> r));
-        List<Course> courses = learningCatalogueService.getCourses(courseRecordMap.keySet().stream().toList());
-        return courses.stream().map(c -> courseWithRecordFactory.build(c, userId, courseRecordMap.get(c.getResourceId()))).toList();
+        return buildForUser(userId, courseRecordMap);
     }
 
-    public List<CourseWithRecord> get(List<? extends ILearnerRecordResourceID> courseRecordIds) {
-        Map<String, LearnerRecord> courseRecordMap = learnerRecordService.getLearnerRecords(courseRecordIds)
+    public List<CourseWithRecord> get(String userId, String... courseIds) {
+        Map<String, LearnerRecord> courseRecordMap = learnerRecordService.getLearnerRecords(userId, courseIds)
                 .stream().collect(Collectors.toMap(LearnerRecord::getResourceId, r -> r));
-        Map<String, Course> courses = learningCatalogueService.getCourses(courseRecordIds.stream().map(ILearnerRecordResourceID::getResourceId).toList())
-                .stream().collect(Collectors.toMap(Course::getResourceId, c -> c));
-        List<CourseWithRecord> list = new ArrayList<>();
-        courseRecordIds.forEach(id -> list.add(courseWithRecordFactory.build(courses.get(id.getResourceId()), id.getLearnerId(), courseRecordMap.get(id.getResourceId()))));
-        return list;
+        return buildForUser(userId, Arrays.stream(courseIds).toList(), courseRecordMap);
     }
 
     public CourseWithRecord get(ILearnerRecordResourceID courseRecordId) {
-        List<CourseWithRecord> courseWithRecords = get(List.of(courseRecordId));
+        List<CourseWithRecord> courseWithRecords = get(courseRecordId.getLearnerId(), courseRecordId.getResourceId());
         return courseWithRecords.isEmpty() ? null : courseWithRecords.get(0);
     }
 

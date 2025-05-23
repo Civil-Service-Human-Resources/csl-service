@@ -2,10 +2,7 @@ package uk.gov.cabinetoffice.csl.service.learningResources.course;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.CourseWithRecord;
-import uk.gov.cabinetoffice.csl.domain.LearningResourceType;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ILearnerRecordResourceID;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.TypedLearnerRecordResourceId;
 
 import java.util.List;
 
@@ -25,10 +22,7 @@ public class CourseRecordService {
         if (courseIds.isEmpty()) {
             courseWithRecords = courseWithRecordService.getAllForUser(userId);
         } else {
-            List<? extends ILearnerRecordResourceID> courseRecordIds = courseIds.stream().map(
-                    courseId -> new TypedLearnerRecordResourceId(userId, courseId, LearningResourceType.COURSE)
-            ).toList();
-            courseWithRecords = courseWithRecordService.get(courseRecordIds);
+            courseWithRecords = courseWithRecordService.get(userId, courseIds.toArray(String[]::new));
         }
         return courseRecordFactory.transformToCourseRecords(courseWithRecords.stream()
                 .filter(course -> course.getRecord() != null).toList());

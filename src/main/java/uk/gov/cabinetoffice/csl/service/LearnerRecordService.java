@@ -73,6 +73,10 @@ public class LearnerRecordService {
         }
     }
 
+    public List<LearnerRecord> getLearnerRecords(String learnerId, String... resourceIds) {
+        return getLearnerRecords(Arrays.stream(resourceIds).map(rId -> new LearnerRecordResourceId(learnerId, rId)).toList());
+    }
+
     public List<LearnerRecord> getLearnerRecords(List<? extends ILearnerRecordResourceID> ids) {
         try {
             List<String> stringIds = ids.stream().map(ILearnerRecordResourceID::getAsString).toList();
