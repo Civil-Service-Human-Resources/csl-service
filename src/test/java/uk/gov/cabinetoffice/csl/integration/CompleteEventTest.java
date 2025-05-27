@@ -48,6 +48,47 @@ public class CompleteEventTest extends IntegrationTestBase {
     public void testCompleteBookingAndUpdateCourseRecord() {
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         cslStubService.getLearningCatalogue().getCourse(courseId, course);
+        cslStubService.getLearnerRecord().getLearnerRecords("userId", "courseId", 0, """
+                {
+                    "content": [],
+                    "totalPages": 0
+                }
+                """);
+        String expectedLearnerRecordsPOST = """
+                [
+                    {
+                        "recordType" : "COURSE",
+                        "learnerId": "userId",
+                        "resourceId": "courseId",
+                        "createdTimestamp" : "2023-01-01T10:00:00",
+                        "events" : [{
+                            "learnerId": "userId",
+                            "resourceId": "courseId",
+                            "eventType": "COMPLETE_COURSE",
+                            "eventTimestamp" : "2023-01-01T10:00:00",
+                            "eventSource": "csl_source_id"
+                        }]
+                    }
+                ]
+                """;
+        String expectedLearnerRecordsPOSTResponse = """
+                {
+                    "successfulResources": [{
+                        "recordType" : {"type": "COURSE"},
+                        "learnerId": "userId",
+                        "resourceId": "courseId",
+                        "createdTimestamp" : "2023-01-01T10:00:00",
+                        "events" : [{
+                            "learnerId": "userId",
+                            "resourceId": "courseId",
+                            "eventType": "COMPLETE_COURSE",
+                            "eventTimestamp" : "2023-01-01T10:00:00",
+                            "eventSource": {"source": "csl_source_id"}
+                        }]
+                    }],
+                    "failedResources": []
+                }
+                """;
         String getModuleRecordsResponse = """
                 {"moduleRecords": [{
                     "id" : 1,
@@ -61,6 +102,7 @@ public class CompleteEventTest extends IntegrationTestBase {
                 }]}
                 """;
         cslStubService.getLearnerRecord().getModuleRecord(moduleId, userId, getModuleRecordsResponse);
+        cslStubService.getLearnerRecord().createLearnerRecords(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
         UserDetailsDto dto = testDataService.generateUserDetailsDto();
         String expectedModuleRecordPUT = """
                 [{

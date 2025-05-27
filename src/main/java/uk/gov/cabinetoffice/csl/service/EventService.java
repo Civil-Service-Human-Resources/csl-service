@@ -52,8 +52,10 @@ public class EventService {
     }
 
     public EventResponse completeBooking(User user, String courseId, String moduleId, String eventId) {
-        UserToModuleAction action = new UserToModuleAction(user.getId(), moduleRecordActionFactory.getCompleteBookingAction());
-        return processCourseRecordActionWithResponse(courseId, moduleId, eventId, action);
+        IModuleAction action = moduleRecordActionFactory.getCompleteBookingAction();
+        CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
+        moduleActionService.completeModule(courseWithModuleWithEvent, user, action);
+        return EventResponse.fromMetaData(action.getAction(), courseWithModuleWithEvent);
     }
 
     public EventResponse skipBooking(User user, String courseId, String moduleId, String eventId) {
