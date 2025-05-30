@@ -314,4 +314,109 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
     }
 
+    @Test
+    public void testCompleteExistingCourseWithTwoModules() throws Exception {
+        Course testCourse = testDataService.generateCourse(2);
+        String module0 = "moduleId0";
+        String module1 = "moduleId1";
+        testCourse.getModule(module0).setModuleType(ModuleType.file);
+        testCourse.getModule(module0).setUrl("http://launch.link");
+        testCourse.getModule(module1).setModuleType(ModuleType.file);
+        testCourse.getModule(module1).setUrl("http://launch.link");
+        cslStubService.getLearnerRecord().getLearnerRecords("userId", "courseId", 0, """
+                {
+                    "content": [
+                        {
+                            "resourceId": "courseId",
+                            "learnerId": "userId",
+                            "recordType": {
+                                "type": "COURSE"
+                            },
+                            "latestEvent": {
+                                "learnerId": "userId",
+                                "resourceId": "courseId",
+                                "eventType": {
+                                    "eventType": "MOVE_TO_LEARNING_PLAN",
+                                    "learnerRecordType": {
+                                        "type": "COURSE"
+                                    }
+                                },
+                                "eventTimestamp" : "2023-01-01T10:00:00",
+                                "eventSource": {
+                                    "source": "csl_source_id"
+                                }
+                            }
+                        }
+                    ],
+                    "totalPages": 1
+                }
+                """);
+        String expectedLearnerRecordsPOST = """
+                [{
+                    "learnerId": "userId",
+                    "resourceId": "courseId",
+                    "eventType": "COMPLETE_COURSE",
+                    "eventTimestamp" : "2023-01-01T10:00:00",
+                    "eventSource": "csl_source_id"
+                }]
+                """;
+        String expectedLearnerRecordsPOSTResponse = """
+                {
+                    "successfulResources": [{
+                        "learnerId": "userId",
+                        "resourceId": "courseId",
+                        "eventType": {
+                            "eventType": "COMPLETE_COURSE",
+                            "learnerRecordType": {
+                                "type": "COURSE"
+                            }
+                        },
+                        "eventTimestamp" : "2023-01-01T10:00:00",
+                        "eventSource": {"source": "csl_source_id"}
+                    }],
+                    "failedResources": []
+                }
+                """;
+        String expectedModuleRecordGET = """
+                {"moduleRecords": [{
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId0",
+                    "moduleTitle" : "Test Module",
+                    "state": "COMPLETED",
+                    "completionDate" : "2023-01-01T10:00:00"
+                }]}
+                """;
+        String expectedModuleRecordPOST = """
+                [{
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId1",
+                    "moduleTitle" : "Test Module",
+                    "state": "COMPLETED",
+                    "completionDate" : "2023-01-01T10:00:00"
+                }]
+                """;
+        String expectedModuleRecordPOSTResponse = """
+                {"moduleRecords":[{
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId1",
+                    "moduleTitle" : "Test Module",
+                    "state": "COMPLETED",
+                    "completionDate" : "2023-01-01T10:00:00"
+                }]}
+                """;
+        cslStubService.getLearningCatalogue().getCourse(courseId, testCourse);
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("moduleId0", "moduleId1"), expectedModuleRecordGET);
+        cslStubService.getLearnerRecord().createModuleRecords(expectedModuleRecordPOST, expectedModuleRecordPOSTResponse);
+        cslStubService.getLearnerRecord().createLearnerRecordEvent(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
+        String url = String.format("/courses/%s/modules/%s/launch", courseId, module1);
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(utils.toJson(input)))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
+    }
+
 }
