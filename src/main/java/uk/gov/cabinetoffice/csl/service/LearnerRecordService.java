@@ -26,7 +26,6 @@ public class LearnerRecordService {
     private final ObjectCache<LearnerRecord> learnerRecordCache;
     private final ObjectCache<ModuleRecord> moduleRecordCache;
     private final LearnerRecordParameterFactory learnerRecordQueryFactory;
-    private final LearnerRecordDataFactory learnerRecordDataFactory;
     private final ILearnerRecordClient client;
 
     public void bustModuleRecordCache(ITypedLearnerRecordResourceID... moduleRecordIds) {

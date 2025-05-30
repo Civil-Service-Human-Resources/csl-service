@@ -17,8 +17,5 @@ import java.util.List;
 @NoArgsConstructor
 public class CourseRecords {
     public List<CourseRecord> courseRecords = new ArrayList<>();
-
-    public CourseRecords(CourseRecord courseRecord) {
-        this(List.of(courseRecord));
-    }
+    
 }
