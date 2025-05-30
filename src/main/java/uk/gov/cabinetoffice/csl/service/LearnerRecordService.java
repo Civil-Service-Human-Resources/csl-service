@@ -46,7 +46,7 @@ public class LearnerRecordService {
     }
 
     public Map<String, ModuleRecord> getModuleRecordsMap(List<ModuleRecordResourceId> moduleRecordIds) {
-        return this.getModuleRecords(moduleRecordIds).stream().collect(Collectors.toMap(mr -> mr.getLearnerRecordId().getAsString(), mr -> mr));
+        return this.getModuleRecords(moduleRecordIds).stream().collect(Collectors.toMap(ModuleRecord::getLearnerRecordIdAsString, mr -> mr));
     }
 
     public List<ModuleRecord> getModuleRecords(List<ModuleRecordResourceId> moduleRecordIds) {
