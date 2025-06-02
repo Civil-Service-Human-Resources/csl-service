@@ -19,4 +19,12 @@ public class OrganisationalUnit {
     private OrganisationalUnit parent;
     private List<OrganisationalUnit> children;
     private List<DomainDto> domains;
+
+    public OrganisationalUnit(Long id, String name, String code, String abbreviation, OrganisationalUnit parent) {
+        this.id = id;
+        this.name = name;
+        this.code = code;
+        this.abbreviation = abbreviation;
+        this.parent = parent;
+    }
 }
