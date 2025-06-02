@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.service;
 
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ITypedLearnerRecordResourceID;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ILearnerRecordActionType;
@@ -22,11 +23,11 @@ public class LearnerRecordDtoFactory {
     }
 
     public LearnerRecordDto createLearnerRecordDto(LearnerRecordData data) {
-        return createLearnerRecordDto(data.getResourceId(), data.getEvents().stream().map(LearnerRecordEventData::getActionType).toList());
+        return createLearnerRecordDto(data.getResourceId(), data.getEvents().stream().map(LearnerRecordEventData::getActionType).toList(), data.getCreatedTimestamp());
     }
 
-    public LearnerRecordDto createLearnerRecordDto(ITypedLearnerRecordResourceID id, List<ILearnerRecordActionType> events) {
-        return createLearnerRecordDto(id, utilService.getNowDateTime(), events);
+    public LearnerRecordDto createLearnerRecordDto(ITypedLearnerRecordResourceID id, List<ILearnerRecordActionType> events, @Nullable LocalDateTime timestamp) {
+        return createLearnerRecordDto(id, timestamp == null ? utilService.getNowDateTime() : timestamp, events);
     }
 
     public LearnerRecordDto createLearnerRecordDto(ITypedLearnerRecordResourceID id,
@@ -43,7 +44,9 @@ public class LearnerRecordDtoFactory {
             if (learnerRecord.isNewRecord()) {
                 newDtos.add(createLearnerRecordDto(learnerRecord));
             } else {
-                newEventDtos.addAll(learnerRecord.getEvents().stream().filter(LearnerRecordEventData::isNewEvent).map(e -> this.learnerRecordEventFactory.createLearnerRecordEventDto(learnerRecord.getResourceId(), e.getActionType())).toList());
+                newEventDtos.addAll(learnerRecord.getEvents().stream()
+                        .filter(LearnerRecordEventData::isNewEvent)
+                        .map(e -> this.learnerRecordEventFactory.createLearnerRecordEventDto(learnerRecord.getResourceId(), e.getActionType(), e.getTimestamp())).toList());
             }
         }
         return new LearnerRecordDtoCollection(newDtos, newEventDtos);

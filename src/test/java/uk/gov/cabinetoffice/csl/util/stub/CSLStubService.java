@@ -26,13 +26,13 @@ public class CSLStubService {
     private final CSRSStubService csrsStubService;
     private final NotificationServiceStubService notificationServiceStubService;
 
-    public void stubGetUserDetails(String uid, CivilServant civilServant) {
-        getCsrsStubService().getCivilServant(uid, civilServant);
-    }
-
     public void assertStubbedRequests(List<StubMapping> stubs) {
         stubs.forEach(stub -> assertEquals(1, WireMock.findAll(requestMadeFor(stub.getRequest())).size(),
                 String.format("Expected endpoint %s to have been called once", stub.getRequest().getExpected())));
+    }
+
+    public StubMapping stubGetUserDetails(String uid, CivilServant civilServant) {
+        return getCsrsStubService().getCivilServant(uid, civilServant);
     }
 
     public List<StubMapping> stubCreateModuleRecords(String courseId, String moduleId, Course course, String userId,
