@@ -147,22 +147,23 @@ public class ModuleLaunchTest extends IntegrationTestBase {
 
     @Test
     public void testCompleteRequiredCourse() throws Exception {
+        List<StubMapping> stubs = new ArrayList<>();
         Course requiredCourse = testDataService.generateCourse(true, false);
         requiredCourse.setAudiences(List.of(
                 testDataService.generateRequiredAudience(input.getDepartmentHierarchy().get(0).getCode())
         ));
         requiredCourse.getModule(moduleId).setModuleType(ModuleType.file);
         requiredCourse.getModule(moduleId).setUrl("http://launch.link");
-        cslStubService.getLearningCatalogue().getCourse(courseId, requiredCourse);
-        cslStubService.getLearnerRecord().getLearnerRecords("userId", "courseId", 0, """
+        stubs.add(cslStubService.getLearningCatalogue().getCourse(courseId, requiredCourse));
+        stubs.add(cslStubService.getLearnerRecord().getLearnerRecords("userId", "courseId", 0, """
                 {
                     "content": [],
                     "totalPages": 0
                 }
-                """);
-        cslStubService.getLearnerRecord().getModuleRecord(moduleId, userId, """
+                """));
+        stubs.add(cslStubService.getLearnerRecord().getModuleRecord(moduleId, userId, """
                 {"moduleRecords": []}
-                """);
+                """));
         String expectedLearnerRecordsPOST = """
                 [
                     {
@@ -218,8 +219,8 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                     "completionDate" : "2023-01-01T10:00:00"
                 }]}
                 """;
-        cslStubService.getLearnerRecord().createModuleRecords(expectedModuleRecordPOST, expectedModuleRecordPOSTResponse);
-        cslStubService.getLearnerRecord().createLearnerRecords(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
+        stubs.add(cslStubService.getLearnerRecord().createModuleRecords(expectedModuleRecordPOST, expectedModuleRecordPOSTResponse));
+        stubs.add(cslStubService.getLearnerRecord().createLearnerRecords(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse));
         String expectedMessageDto = """
                 {
                     "recipient": "lineManager@email.com",
@@ -231,14 +232,14 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                     }
                 }
                 """;
-        cslStubService.getNotificationServiceStubService().sendEmail("NOTIFY_LINE_MANAGER_COMPLETED_LEARNING", expectedMessageDto);
+        stubs.add(cslStubService.getNotificationServiceStubService().sendEmail("NOTIFY_LINE_MANAGER_COMPLETED_LEARNING", expectedMessageDto));
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(utils.toJson(input)))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
-        cslStubService.getNotificationServiceStubService().validateSentEmails("NOTIFY_LINE_MANAGER_COMPLETED_LEARNING", 1);
+        cslStubService.assertStubbedRequests(stubs);
     }
 
     @Test

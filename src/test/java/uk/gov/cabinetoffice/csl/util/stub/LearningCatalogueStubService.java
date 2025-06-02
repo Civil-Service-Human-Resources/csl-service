@@ -20,8 +20,8 @@ public class LearningCatalogueStubService {
         this.utils = utils;
     }
 
-    public void getCourse(Course course) {
-        getCourses(List.of(course.getId()), List.of(course));
+    public StubMapping getCourse(Course course) {
+        return getCourses(List.of(course.getId()), List.of(course));
     }
 
     public StubMapping getCourse(String courseId, Course response) {
