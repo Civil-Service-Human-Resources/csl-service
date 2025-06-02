@@ -138,11 +138,11 @@ public class LearnerRecordService {
         });
         if (!creates.isEmpty()) {
             map.putAll(createModuleRecords(creates).stream()
-                    .collect(Collectors.toMap(mr -> mr.getLearnerRecordId().getAsString(), mr -> mr)));
+                    .collect(Collectors.toMap(ModuleRecord::getLearnerRecordIdAsString, mr -> mr)));
         }
         if (!updates.isEmpty()) {
             map.putAll(updateModuleRecords(updates).stream()
-                    .collect(Collectors.toMap(mr -> mr.getLearnerRecordId().getAsString(), mr -> mr)));
+                    .collect(Collectors.toMap(ModuleRecord::getLearnerRecordIdAsString, mr -> mr)));
         }
         return map;
     }
