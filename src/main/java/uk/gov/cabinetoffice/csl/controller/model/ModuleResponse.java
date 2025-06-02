@@ -18,6 +18,6 @@ public class ModuleResponse {
 
     public static ModuleResponse fromMetada(ModuleRecordAction actionType, CourseWithModule courseWithModule) {
         return new ModuleResponse(String.format("Successfully applied action '%s' to course record", actionType.getDescription()), courseWithModule.getCourse().getTitle(),
-                courseWithModule.getModule().getTitle(), courseWithModule.getCourse().getId(), courseWithModule.getModule().getId());
+                courseWithModule.getModule().getTitle(), courseWithModule.getCourse().getCacheableId(), courseWithModule.getModule().getId());
     }
 }

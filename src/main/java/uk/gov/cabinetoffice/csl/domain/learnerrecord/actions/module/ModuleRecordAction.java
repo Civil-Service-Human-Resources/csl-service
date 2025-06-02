@@ -5,9 +5,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ICourseRecordAction
 public enum ModuleRecordAction implements ICourseRecordActionType {
     LAUNCH_MODULE("Launch a module"),
     COMPLETE_MODULE("Complete a module"),
-    ROLLUP_COMPLETE_MODULE("Complete a module with rollup data"),
-    PASS_MODULE("Pass a module"),
-    FAIL_MODULE("Fail a module");
+    ROLLUP_MODULE("Process rollup for a module");
 
     private final String description;
 

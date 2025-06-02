@@ -1,7 +1,6 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.event;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.Result;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
@@ -15,24 +14,19 @@ public class ApproveBookingTest extends BaseEventModuleRecordActionTest<ApproveB
 
     @Override
     protected ApproveBooking buildProcessor() {
-        return new ApproveBooking(utilService, courseWithModuleWithEvent, user);
+        return new ApproveBooking(event);
     }
 
     @Test
     public void testApproveBooking() {
-        CourseRecord cr = generateCourseRecord(true);
-        cr.setState(State.REGISTERED);
-        ModuleRecord mr = cr.getModuleRecord(getModuleId()).get();
+        ModuleRecord mr = generateModuleRecord();
         mr.setResult(Result.PASSED);
         mr.setCompletionDate(LocalDateTime.now());
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
-        assertEquals(State.APPROVED, cr.getState());
-
-        ModuleRecord moduleRecord = cr.getModuleRecord(getModuleId()).get();
-        assertEquals(State.APPROVED, moduleRecord.getState());
-        assertEquals(event.getId(), moduleRecord.getEventId());
-        assertEquals(event.getStartTime(), moduleRecord.getEventDate());
-        assertNull(moduleRecord.getResult());
-        assertNull(moduleRecord.getCompletionDate());
+        mr = actionUnderTest.applyUpdates(mr);
+        assertEquals(State.APPROVED, mr.getState());
+        assertEquals(event.getId(), mr.getEventId());
+        assertEquals(event.getStartTime(), mr.getEventDate());
+        assertNull(mr.getResult());
+        assertNull(mr.getCompletionDate());
     }
 }

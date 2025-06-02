@@ -7,7 +7,8 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.RequiredLearningMapCache;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
@@ -39,15 +40,23 @@ public class RedisCacheConfig {
     }
 
     @Bean
-    public ObjectCache<CourseRecord> courseRecordCache(CacheManager cacheManager) {
-        Cache cache = cacheManager.getCache("course-record");
-        return new ObjectCache<>(cache, CourseRecord.class);
+    public ObjectCache<ModuleRecord> moduleRecordCache(CacheManager cacheManager) {
+        Cache cache = cacheManager.getCache("module-record");
+        return new ObjectCache<>(cache, ModuleRecord.class);
+    }
+
+    @Bean
+    public ObjectCache<LearnerRecord> learnerRecordCache(CacheManager cacheManager) {
+        Cache cache = cacheManager.getCache("learner-record");
+        return new ObjectCache<>(cache, LearnerRecord.class);
     }
 
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
         return (builder) -> builder
-                .withCacheConfiguration("course-record",
+                .withCacheConfiguration("module-record",
+                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(learnerRecordCacheTTlSeconds)))
+                .withCacheConfiguration("learner-record",
                         RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(learnerRecordCacheTTlSeconds)))
                 .withCacheConfiguration("catalogue-course",
                         RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(learningCatalogueCacheTTlSeconds)))

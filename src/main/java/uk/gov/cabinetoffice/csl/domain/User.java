@@ -50,10 +50,6 @@ public class User implements Serializable {
         return departmentHierarchy.stream().findFirst().map(BasicOrganisationalUnit::getId).orElse(0);
     }
 
-    public String getOrganisationName() {
-        return departmentHierarchy.stream().findFirst().map(BasicOrganisationalUnit::getName).orElse("");
-    }
-
     public boolean hasLineManager() {
         return isNotBlank(lineManagerEmail) && isNotBlank(lineManagerName);
     }

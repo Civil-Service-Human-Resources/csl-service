@@ -4,20 +4,19 @@ import lombok.Getter;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
-import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.*;
+import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +31,8 @@ public class TestDataService {
     private final String moduleUid = "uid";
     private final long moduleRecordId = 1;
     private final String userId = "userId";
-    private final CourseRecordId courseRecordId = new CourseRecordId(userId, courseId);
+    private final ModuleRecordResourceId moduleRecordResourceId = new ModuleRecordResourceId(userId, moduleId);
+    private final LearnerRecordResourceId courseRecordId = new LearnerRecordResourceId(userId, courseId);
     private final String userEmail = "userEmail@email.com";
     private final String learnerFirstName = "Learner";
     private final String lineManagerName = "Manager";
@@ -52,39 +52,6 @@ public class TestDataService {
 
     public UserDetailsDto generateUserDetailsDto() {
         return new UserDetailsDto("", userEmail, learnerFirstName, 1, "professionName", lineManagerName, lineManagerEmail, 1, "gradeCode", depHierarchy);
-    }
-
-    /**
-     * Generate a course record with a blank status
-     *
-     * @param withModule
-     * @return
-     */
-    public CourseRecord generateCourseRecord(boolean withModule) {
-        CourseRecord cr = new CourseRecord();
-        cr.setCourseId(courseId);
-        cr.setUserId(userId);
-        cr.setCourseTitle(courseTitle);
-        if (withModule) {
-            cr.setModuleRecords(List.of(generateModuleRecord()));
-        }
-        return cr;
-    }
-
-    public CourseRecord generateCourseRecord(int moduleCount) {
-        CourseRecord cr = new CourseRecord();
-        cr.setCourseId(courseId);
-        cr.setUserId(userId);
-        cr.setCourseTitle(courseTitle);
-        List<ModuleRecord> moduleRecords = new ArrayList<>();
-        for (int i = 1; i <= moduleCount; i++) {
-            ModuleRecord moduleRecord = generateModuleRecord();
-            moduleRecord.setId(moduleRecordId + i);
-            moduleRecord.setModuleId(moduleId + i);
-            moduleRecords.add(moduleRecord);
-        }
-        cr.setModuleRecords(moduleRecords);
-        return cr;
     }
 
     public ModuleRecord generateModuleRecord() {
@@ -141,7 +108,7 @@ public class TestDataService {
         course.setId(courseId);
         course.setTitle(courseTitle);
         List<Module> modules = new ArrayList<>();
-        for (int i = 0; i <= moduleCount; i++) {
+        for (int i = 0; i < moduleCount; i++) {
             Module m = generateModule();
             m.setId(moduleId + i);
             modules.add(m);
@@ -167,7 +134,7 @@ public class TestDataService {
 
     public Audience generateRequiredAudience(String departmentCode) {
         return new Audience("audience", List.of(), List.of(departmentCode), List.of(), "P1M", Audience.Type.REQUIRED_LEARNING,
-                LocalDate.now().plus(1L, ChronoUnit.DAYS), null);
+                LocalDate.now().plusDays(1L), null);
     }
 
     public RusticiRollupData generateRusticiRollupData() {

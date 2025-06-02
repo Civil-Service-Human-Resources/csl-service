@@ -1,15 +1,18 @@
 package uk.gov.cabinetoffice.csl.util.stub;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 
 import java.util.List;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.requestMadeFor;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Service
 @Getter
@@ -23,35 +26,37 @@ public class CSLStubService {
     private final CSRSStubService csrsStubService;
     private final NotificationServiceStubService notificationServiceStubService;
 
-    public void stubGetUserDetails(String uid, CivilServant civilServant) {
-        getCsrsStubService().getCivilServant(uid, civilServant);
+    public void assertStubbedRequests(List<StubMapping> stubs) {
+        stubs.forEach(stub -> assertEquals(1, WireMock.findAll(requestMadeFor(stub.getRequest())).size(),
+                String.format("Expected endpoint %s to have been called once", stub.getRequest().getExpected())));
     }
 
-    public void stubCreateCourseRecord(String courseId, Course course, String userId,
-                                       String expectedUpdateInput, CourseRecords courseRecordResponse) {
-        learningCatalogue.getCourse(courseId, course);
-        learnerRecord.getCourseRecord(courseId, userId, new CourseRecords());
-        learnerRecord.createCourseRecord(expectedUpdateInput, courseRecordResponse);
+    public StubMapping stubGetUserDetails(String uid, CivilServant civilServant) {
+        return getCsrsStubService().getCivilServant(uid, civilServant);
     }
 
-    public void stubCreateCourseRecord(String courseId, Course course, String userId,
-                                       String expectedUpdateInput, CourseRecord courseRecordResponse) {
-        stubCreateCourseRecord(courseId, course, userId, expectedUpdateInput, new CourseRecords(courseRecordResponse));
+    public List<StubMapping> stubCreateModuleRecords(String courseId, String moduleId, Course course, String userId,
+                                                     String expectedUpdateInput, String moduleRecordResponse) {
+        return List.of(
+                learningCatalogue.getCourse(courseId, course),
+                learnerRecord.getModuleRecord(moduleId, userId, """
+                        {"moduleRecords": []}
+                        """),
+                learnerRecord.createModuleRecords(expectedUpdateInput, moduleRecordResponse));
     }
 
-
-    public void stubUpdateCourseRecord(String courseId, Course course, String userId, CourseRecords getCourseRecordsResponse,
-                                       String expectedUpdateInput, CourseRecord updateCourseRecordResponse) {
-        learningCatalogue.getCourse(courseId, course);
-        learnerRecord.getCourseRecord(courseId, userId, getCourseRecordsResponse);
-        learnerRecord.updateCourseRecords(expectedUpdateInput, new CourseRecords(List.of(updateCourseRecordResponse)));
+    public void stubUpdateModuleRecord(Course course, String moduleId, String userId, String getModuleRecordsResponse,
+                                       String expectedUpdateInput, String updateModuleRecordResponse) {
+        learningCatalogue.getCourse(course);
+        learnerRecord.getModuleRecord(moduleId, userId, getModuleRecordsResponse);
+        learnerRecord.updateModuleRecords(expectedUpdateInput, updateModuleRecordResponse);
     }
 
-    public void stubUpdateCourseRecords(List<CourseRecordId> courseRecordIds, List<Course> courses, CourseRecords getCourseRecordsResponse,
-                                        String expectedUpdateInput, CourseRecords updateCourseRecordResponse) {
-        courses.forEach(c -> learningCatalogue.getCourse(c.getId(), c));
-        learnerRecord.getCourseRecords(courseRecordIds, getCourseRecordsResponse);
-        learnerRecord.updateCourseRecords(expectedUpdateInput, updateCourseRecordResponse);
+    public void stubUpdateModuleRecords(List<LearnerRecordResourceId> moduleRecordIds, List<Course> courses, String getModuleRecordsResponse,
+                                        String expectedUpdateInput, String updateModuleRecordResponse) {
+        courses.forEach(c -> learningCatalogue.getCourse(c.getCacheableId(), c));
+        learnerRecord.getModuleRecords(moduleRecordIds, getModuleRecordsResponse);
+        learnerRecord.updateModuleRecords(expectedUpdateInput, updateModuleRecordResponse);
     }
 
 }

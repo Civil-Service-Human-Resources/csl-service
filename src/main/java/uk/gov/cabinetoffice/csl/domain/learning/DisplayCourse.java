@@ -26,7 +26,7 @@ public class DisplayCourse {
 
     public static DisplayCourse build(Course course, Collection<DisplayModule> modules, DisplayModuleSummary moduleSummary, DisplayAudience audience,
                                       LocalDateTime lastUpdated) {
-        return new DisplayCourse(course.getId(), course.getTitle(), course.getShortDescription(), lastUpdated,
+        return new DisplayCourse(course.getCacheableId(), course.getTitle(), course.getShortDescription(), lastUpdated,
                 moduleSummary.getCompletionDate(), moduleSummary.getStatus(), audience,
                 modules, moduleSummary.getRequiredForCompletionCount(), moduleSummary.getRequiredCompletedCount());
     }

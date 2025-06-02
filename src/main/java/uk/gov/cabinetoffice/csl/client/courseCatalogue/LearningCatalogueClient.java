@@ -45,11 +45,6 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
-    public Course getCourse(String courseId) {
-        return this.getCourses(List.of(courseId)).stream().findFirst().orElse(null);
-    }
-
-    @Override
     public RequiredLearningMap getRequiredLearningIdMap() {
         String url = String.format("%s/required-learning-map", v2Courses);
         RequestEntity<Void> request = RequestEntity.get(url).build();

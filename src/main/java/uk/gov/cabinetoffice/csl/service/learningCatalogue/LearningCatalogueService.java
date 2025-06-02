@@ -68,7 +68,7 @@ public class LearningCatalogueService {
     }
 
     public Map<String, String> getCourseIdToTitleMap(Collection<String> courseIds) {
-        return getCourses(courseIds).stream().collect(Collectors.toMap(Course::getId, Course::getTitle));
+        return getCourses(courseIds).stream().collect(Collectors.toMap(Course::getCacheableId, Course::getTitle));
     }
 
     public List<Course> getCourses(Collection<String> courseIds) {
@@ -111,7 +111,7 @@ public class LearningCatalogueService {
         Event event = data.getEvent();
         event.setCancellationReason(cancelEventDto.getReason());
         event.setStatus(EventStatus.CANCELLED);
-        event = client.updateEvent(course.getId(), module.getId(), event);
+        event = client.updateEvent(course.getCacheableId(), module.getId(), event);
         course.updateEvent(module.getId(), event);
         cache.put(course);
     }

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Course {
 
-    //This will be mapped to the <CourseRecord.courseId>.<ModuleRecord.moduleId>
+    //This will be mapped to the <CourseRecord.resourceId>.<ModuleRecord.moduleId>
     private String id;
 
     //This will be mapped to the <CourseRecord.courseTitle>
