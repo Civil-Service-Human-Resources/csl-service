@@ -19,6 +19,7 @@ public class OrganisationalUnit {
     private OrganisationalUnit parent;
     private List<OrganisationalUnit> children;
     private List<DomainDto> domains;
+    private AgencyToken agencyToken;
 
     public OrganisationalUnit(Long id, String name, String code, String abbreviation, OrganisationalUnit parent) {
         this.id = id;
