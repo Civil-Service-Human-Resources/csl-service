@@ -110,6 +110,7 @@ public class ModuleActionService {
         }
         Map<String, ModuleRecord> moduleMap = learnerRecordService.getModuleRecordsMap(idsToFetch);
         ModuleRecord moduleRecord = processModuleActions(courseWithModule, List.of(new UserToModuleAction(user.getId(), completionAction)), moduleMap).get(recordResourceId.getAsString());
+        moduleMap.put(moduleRecord.getLearnerRecordIdAsString(), moduleRecord);
         if (checkForCompleteCourse) {
             log.debug("Checking for course completion");
             LearningPeriod learningPeriod = course.getLearningPeriodForDepartmentHierarchy(user.getDepartmentCodes()).orElse(null);
