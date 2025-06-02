@@ -3,7 +3,7 @@ package uk.gov.cabinetoffice.csl.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
+import uk.gov.cabinetoffice.csl.client.civilservantregistry.ICivilServantRegistryClient;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.BasicOrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserDetailsService {
 
-    private final ICSRSClient csrsClient;
+    private final ICivilServantRegistryClient csrsClient;
 
     @Cacheable(value = "user", key = "#uid", unless = "#result == null")
     public User getUserWithUid(String uid) {

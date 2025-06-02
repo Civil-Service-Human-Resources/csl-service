@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.client.csrs;
+package uk.gov.cabinetoffice.csl.client.civilservantregistry;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class CSRSClient implements ICSRSClient {
+public class CivilServantRegistryClient implements ICivilServantRegistryClient {
 
     @Value("${csrs.organisationalUnitMaxPageSize}")
     private Integer organisationalUnitMaxPageSize;
@@ -30,7 +30,7 @@ public class CSRSClient implements ICSRSClient {
 
     private final IHttpClient httpClient;
 
-    public CSRSClient(@Qualifier("csrsHttpClient") IHttpClient httpClient) {
+    public CivilServantRegistryClient(@Qualifier("csrsHttpClient") IHttpClient httpClient) {
         this.httpClient = httpClient;
     }
 

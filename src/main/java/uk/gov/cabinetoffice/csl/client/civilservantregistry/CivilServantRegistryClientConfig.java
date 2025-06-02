@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.client.csrs;
+package uk.gov.cabinetoffice.csl.client.civilservantregistry;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -10,14 +10,14 @@ import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.service.auth.RestTemplateOAuthInterceptor;
 
 @Configuration
-public class CSRSClientConfig {
+public class CivilServantRegistryClientConfig {
 
     @Value("${csrs.serviceUrl}")
     private String csrsBaseUrl;
 
     private final RestTemplateOAuthInterceptor restTemplateOAuthInterceptor;
 
-    public CSRSClientConfig(RestTemplateOAuthInterceptor restTemplateOAuthInterceptor) {
+    public CivilServantRegistryClientConfig(RestTemplateOAuthInterceptor restTemplateOAuthInterceptor) {
         this.restTemplateOAuthInterceptor = restTemplateOAuthInterceptor;
     }
 
