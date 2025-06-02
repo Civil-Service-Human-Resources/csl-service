@@ -42,6 +42,7 @@ public class CourseActionService {
     public ActionResult completeCourse(Course course, User user, LocalDateTime completionDate) {
         CourseRecordResourceId recordResourceId = new CourseRecordResourceId(user.getId(), course.getResourceId());
         ActionWithId action = new ActionWithId(recordResourceId, CourseRecordAction.COMPLETE_COURSE);
+        action.setTimestamp(completionDate);
         LearnerRecord courseRecord = learnerRecordService.getLearnerRecord(recordResourceId);
         ActionResult actionResult = new ActionResult();
         LearnerRecordData courseRecordData = learnerRecordActionWorker.processAction(courseRecord, action);

@@ -47,12 +47,12 @@ public class RusticiRollUpTest extends IntegrationTestBase {
                         "recordType" : "COURSE",
                         "learnerId": "userId",
                         "resourceId": "courseId",
-                        "createdTimestamp" : "2023-01-01T10:00:00",
+                        "createdTimestamp" : "2023-02-02T10:00:00",
                         "events" : [{
                             "learnerId": "userId",
                             "resourceId": "courseId",
                             "eventType": "COMPLETE_COURSE",
-                            "eventTimestamp" : "2023-01-01T10:00:00",
+                            "eventTimestamp" : "2023-02-02T10:00:00",
                             "eventSource": "csl_source_id"
                         }]
                     }
@@ -64,12 +64,12 @@ public class RusticiRollUpTest extends IntegrationTestBase {
                         "recordType" : {"type": "COURSE"},
                         "learnerId": "userId",
                         "resourceId": "courseId",
-                        "createdTimestamp" : "2023-01-01T10:00:00",
+                        "createdTimestamp" : "2023-02-02T10:00:00",
                         "events" : [{
                             "learnerId": "userId",
                             "resourceId": "courseId",
                             "eventType": "COMPLETE_COURSE",
-                            "eventTimestamp" : "2023-01-01T10:00:00",
+                            "eventTimestamp" : "2023-02-02T10:00:00",
                             "eventSource": {"source": "csl_source_id"}
                         }]
                     }],

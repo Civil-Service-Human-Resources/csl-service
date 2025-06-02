@@ -1,5 +1,7 @@
 package uk.gov.cabinetoffice.csl.util.stub;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,6 +10,9 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 
 import java.util.List;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.requestMadeFor;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Service
 @Getter
@@ -25,13 +30,19 @@ public class CSLStubService {
         getCsrsStubService().getCivilServant(uid, civilServant);
     }
 
-    public void stubCreateModuleRecords(String courseId, String moduleId, Course course, String userId,
-                                        String expectedUpdateInput, String moduleRecordResponse) {
-        learningCatalogue.getCourse(courseId, course);
-        learnerRecord.getModuleRecord(moduleId, userId, """
-                {"moduleRecords": []}
-                """);
-        learnerRecord.createModuleRecords(expectedUpdateInput, moduleRecordResponse);
+    public void assertStubbedRequests(List<StubMapping> stubs) {
+        stubs.forEach(stub -> assertEquals(1, WireMock.findAll(requestMadeFor(stub.getRequest())).size(),
+                String.format("Expected endpoint %s to have been called once", stub.getRequest().getExpected())));
+    }
+
+    public List<StubMapping> stubCreateModuleRecords(String courseId, String moduleId, Course course, String userId,
+                                                     String expectedUpdateInput, String moduleRecordResponse) {
+        return List.of(
+                learningCatalogue.getCourse(courseId, course),
+                learnerRecord.getModuleRecord(moduleId, userId, """
+                        {"moduleRecords": []}
+                        """),
+                learnerRecord.createModuleRecords(expectedUpdateInput, moduleRecordResponse));
     }
 
     public void stubUpdateModuleRecord(Course course, String moduleId, String userId, String getModuleRecordsResponse,

@@ -101,4 +101,9 @@ public class ModuleRecord implements Cacheable {
         return new ModuleRecordResourceId(userId, moduleId);
     }
 
+    @JsonIgnore
+    public String getLearnerRecordIdAsString() {
+        return getLearnerRecordId().getAsString();
+    }
+
 }

@@ -7,17 +7,16 @@ import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
-import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.*;
+import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,7 +108,7 @@ public class TestDataService {
         course.setId(courseId);
         course.setTitle(courseTitle);
         List<Module> modules = new ArrayList<>();
-        for (int i = 0; i <= moduleCount; i++) {
+        for (int i = 0; i < moduleCount; i++) {
             Module m = generateModule();
             m.setId(moduleId + i);
             modules.add(m);
@@ -135,7 +134,7 @@ public class TestDataService {
 
     public Audience generateRequiredAudience(String departmentCode) {
         return new Audience("audience", List.of(), List.of(departmentCode), List.of(), "P1M", Audience.Type.REQUIRED_LEARNING,
-                LocalDate.now().plus(1L, ChronoUnit.DAYS), null);
+                LocalDate.now().plusDays(1L), null);
     }
 
     public RusticiRollupData generateRusticiRollupData() {

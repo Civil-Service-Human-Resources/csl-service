@@ -25,7 +25,7 @@ public class LearnerRecordData {
     }
 
     public boolean hasNewRecords() {
-        return newRecord && events.stream().anyMatch(LearnerRecordEventData::isNewEvent);
+        return newRecord || events.stream().anyMatch(LearnerRecordEventData::isNewEvent);
     }
 
 }

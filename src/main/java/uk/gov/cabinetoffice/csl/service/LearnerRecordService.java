@@ -26,7 +26,6 @@ public class LearnerRecordService {
     private final ObjectCache<LearnerRecord> learnerRecordCache;
     private final ObjectCache<ModuleRecord> moduleRecordCache;
     private final LearnerRecordParameterFactory learnerRecordQueryFactory;
-    private final LearnerRecordDataFactory learnerRecordDataFactory;
     private final ILearnerRecordClient client;
 
     public void bustModuleRecordCache(ITypedLearnerRecordResourceID... moduleRecordIds) {
@@ -47,7 +46,7 @@ public class LearnerRecordService {
     }
 
     public Map<String, ModuleRecord> getModuleRecordsMap(List<ModuleRecordResourceId> moduleRecordIds) {
-        return this.getModuleRecords(moduleRecordIds).stream().collect(Collectors.toMap(ModuleRecord::getCacheableId, mr -> mr));
+        return this.getModuleRecords(moduleRecordIds).stream().collect(Collectors.toMap(ModuleRecord::getLearnerRecordIdAsString, mr -> mr));
     }
 
     public List<ModuleRecord> getModuleRecords(List<ModuleRecordResourceId> moduleRecordIds) {
@@ -139,11 +138,11 @@ public class LearnerRecordService {
         });
         if (!creates.isEmpty()) {
             map.putAll(createModuleRecords(creates).stream()
-                    .collect(Collectors.toMap(mr -> mr.getLearnerRecordId().getAsString(), mr -> mr)));
+                    .collect(Collectors.toMap(ModuleRecord::getLearnerRecordIdAsString, mr -> mr)));
         }
         if (!updates.isEmpty()) {
             map.putAll(updateModuleRecords(updates).stream()
-                    .collect(Collectors.toMap(mr -> mr.getLearnerRecordId().getAsString(), mr -> mr)));
+                    .collect(Collectors.toMap(ModuleRecord::getLearnerRecordIdAsString, mr -> mr)));
         }
         return map;
     }
