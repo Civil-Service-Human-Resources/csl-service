@@ -15,6 +15,7 @@ public class OrganisationalUnit {
     private String code;
     private String abbreviation;
     protected String formattedName;
+    protected String href;
     private Long parentId;
     private OrganisationalUnit parent;
     private List<OrganisationalUnit> children;
