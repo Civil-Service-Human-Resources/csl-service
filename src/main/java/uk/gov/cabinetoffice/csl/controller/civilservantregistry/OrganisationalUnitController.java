@@ -11,6 +11,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@RequestMapping("/v2")
 public class OrganisationalUnitController {
 
     private final CivilServantRegistryService civilServantRegistryService;
@@ -19,8 +20,7 @@ public class OrganisationalUnitController {
         this.civilServantRegistryService = civilServantRegistryService;
     }
 
-    @GetMapping("/v2/organisationalUnits")
-    @PreAuthorize("isAuthenticated()")
+    @GetMapping(path = "/organisationalUnits", produces = "application/json")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public List<OrganisationalUnit> getAllOrganisationalUnits() {
