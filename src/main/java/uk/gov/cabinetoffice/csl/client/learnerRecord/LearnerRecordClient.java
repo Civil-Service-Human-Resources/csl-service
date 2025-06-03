@@ -96,12 +96,13 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     private <T, R extends PagedResponse<T>> List<T> getPaginatedRequest(Class<R> pagedResponseClass, UriComponentsBuilder url, Integer maxPageSize) {
         List<T> results = new ArrayList<>();
         int totalPages = 1;
+        url.queryParam("size", maxPageSize).queryParam("page", 0);
         for (int i = 0; i < totalPages; i++) {
-            url.queryParam("page", i).queryParam("size", maxPageSize);
             RequestEntity<Void> request = RequestEntity.get(url.build().toUriString()).build();
             R response = httpClient.executeRequest(request, pagedResponseClass);
             results.addAll(response.getContent());
             totalPages = response.getTotalPages();
+            url.replaceQueryParam("page", i+1);
         }
         return results;
     }
