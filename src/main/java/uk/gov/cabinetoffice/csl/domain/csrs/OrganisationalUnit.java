@@ -14,12 +14,12 @@ public class OrganisationalUnit {
     private String name;
     private String code;
     private String abbreviation;
-    protected String formattedName;
-    protected String href;
+    private String formattedName;
+    private String href;
     private Long parentId;
     private OrganisationalUnit parent;
     private List<OrganisationalUnit> children;
-    private List<DomainDto> domains;
+    private List<Domain> domains;
     private AgencyToken agencyToken;
 
     public OrganisationalUnit(Long id, String name, String code, String abbreviation, OrganisationalUnit parent) {

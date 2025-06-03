@@ -63,6 +63,7 @@ public class SecurityConfig {
     public SecurityFilterChain oauthChain(HttpSecurity httpSecurity) throws Exception {
         log.info("Building oauth filter chain");
         httpSecurity.securityMatcher("/v2/organisationalUnits/**",
+                        "/organisations/formatted_list",
                         "/learning/**",
                         "/courses/**",
                         "/course_records/**",
