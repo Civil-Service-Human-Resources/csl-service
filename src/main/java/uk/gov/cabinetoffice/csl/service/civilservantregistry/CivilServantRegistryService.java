@@ -35,7 +35,7 @@ public class CivilServantRegistryService {
                 while(parentId != null) {
                     OrganisationalUnit parentOrganisationalUnit = orgMap.get(parentId);
                     String parentName = parentOrganisationalUnit.getName();
-                    formattedName.insert(0, parentName + "|");
+                    formattedName.insert(0, parentName + " | ");
                     parentId = parentOrganisationalUnit.getParentId();
                 }
                 FormattedOrganisationalUnitName fn = new FormattedOrganisationalUnitName();

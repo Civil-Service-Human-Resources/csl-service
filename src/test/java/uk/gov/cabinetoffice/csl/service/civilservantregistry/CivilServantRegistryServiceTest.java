@@ -36,10 +36,10 @@ public class CivilServantRegistryServiceTest {
         Map<Long, FormattedOrganisationalUnitName> orgMap = formattedOrganisationalUnitNames.stream()
                 .collect(Collectors.toMap(FormattedOrganisationalUnitName::getId, o -> o));
         assertEquals("OrgName1", orgMap.get(1L).getFormattedName());
-        assertEquals("OrgName1|OrgName2", orgMap.get(2L).getFormattedName());
-        assertEquals("OrgName1|OrgName2|OrgName3", orgMap.get(3L).getFormattedName());
-        assertEquals("OrgName1|OrgName2|OrgName3|OrgName4", orgMap.get(4L).getFormattedName());
-        assertEquals("OrgName1|OrgName5", orgMap.get(5L).getFormattedName());
+        assertEquals("OrgName1 | OrgName2", orgMap.get(2L).getFormattedName());
+        assertEquals("OrgName1 | OrgName2 | OrgName3", orgMap.get(3L).getFormattedName());
+        assertEquals("OrgName1 | OrgName2 | OrgName3 | OrgName4", orgMap.get(4L).getFormattedName());
+        assertEquals("OrgName1 | OrgName5", orgMap.get(5L).getFormattedName());
         assertEquals("OrgName6", orgMap.get(6L).getFormattedName());
     }
 
