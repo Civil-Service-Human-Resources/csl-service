@@ -40,7 +40,7 @@ public class CivilServantRegistryService {
                 }
                 FormattedOrganisationalUnitName fn = new FormattedOrganisationalUnitName();
                 fn.setId(o.getId());
-                fn.setFormattedName(formattedName.toString());
+                fn.setName(formattedName.toString());
                 return fn;
             }).toList();
     }

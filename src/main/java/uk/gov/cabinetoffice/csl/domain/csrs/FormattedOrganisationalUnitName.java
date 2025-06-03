@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FormattedOrganisationalUnitName {
     private Long id;
-    private String formattedName;
+    private String name;
 }
