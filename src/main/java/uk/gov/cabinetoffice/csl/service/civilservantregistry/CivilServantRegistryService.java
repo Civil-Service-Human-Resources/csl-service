@@ -7,8 +7,10 @@ import uk.gov.cabinetoffice.csl.client.civilservantregistry.ICivilServantRegistr
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.toMap;
 
 @Service
 @Slf4j
@@ -26,9 +28,8 @@ public class CivilServantRegistryService {
         log.info("Getting formatted organisational unit names");
         List<OrganisationalUnit> allOrganisationalUnits = getAllOrganisationalUnits();
         Map<Long, OrganisationalUnit> orgMap = allOrganisationalUnits.stream()
-                .collect(Collectors.toMap(OrganisationalUnit::getId, o -> o));
-        return allOrganisationalUnits
-            .stream()
+                .collect(toMap(OrganisationalUnit::getId, o -> o));
+        return allOrganisationalUnits.stream()
             .map(o -> {
                 StringBuilder formattedName = new StringBuilder(o.getName());
                 Long parentId = o.getParentId();
@@ -38,10 +39,7 @@ public class CivilServantRegistryService {
                     formattedName.insert(0, parentName + " | ");
                     parentId = parentOrganisationalUnit.getParentId();
                 }
-                FormattedOrganisationalUnitName fn = new FormattedOrganisationalUnitName();
-                fn.setId(o.getId());
-                fn.setName(formattedName.toString());
-                return fn;
+                return new FormattedOrganisationalUnitName(o.getId(), formattedName.toString());
             }).toList();
     }
 }
