@@ -12,6 +12,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@RequestMapping("/organisations")
 public class OrganisationalUnitController {
 
     private final CivilServantRegistryService civilServantRegistryService;
@@ -20,7 +21,7 @@ public class OrganisationalUnitController {
         this.civilServantRegistryService = civilServantRegistryService;
     }
 
-    @GetMapping(path = "/organisations", produces = "application/json")
+    @GetMapping(path = "/full", produces = "application/json")
     @PreAuthorize("isAuthenticated()")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
@@ -29,7 +30,7 @@ public class OrganisationalUnitController {
         return civilServantRegistryService.getAllOrganisationalUnits();
     }
 
-    @GetMapping(path = "/organisations/formatted_list", produces = "application/json")
+    @GetMapping(path = "/formatted_list", produces = "application/json")
     @PreAuthorize("isAuthenticated()")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
