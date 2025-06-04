@@ -15,8 +15,13 @@ import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
 import java.time.Duration;
 
+import static java.time.Duration.ofSeconds;
+
 @Configuration
 public class RedisCacheConfig {
+
+    @Value("${spring.cache.redis.use-key-prefix}")
+    private String redisCacheKeyPrefix;
 
     @Value("${learnerRecord.cache.ttlSeconds}")
     private int learnerRecordCacheTTlSeconds;
@@ -66,6 +71,10 @@ public class RedisCacheConfig {
                 .withCacheConfiguration("user",
                         RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(userCacheTTlSeconds)))
                 .withCacheConfiguration("organisations",
-                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(organisationsTTlSeconds)));
+                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(ofSeconds(organisationsTTlSeconds))
+                                .prefixCacheNameWith(redisCacheKeyPrefix).disableCachingNullValues())
+                .withCacheConfiguration("organisations-formatted",
+                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(ofSeconds(organisationsTTlSeconds))
+                                .prefixCacheNameWith(redisCacheKeyPrefix).disableCachingNullValues());
     }
 }

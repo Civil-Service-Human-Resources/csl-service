@@ -33,11 +33,17 @@ public class CivilServantRegistryService {
         log.info("Organisations are removed from the cache.");
     }
 
+    @Cacheable("organisations-formatted")
     public List<FormattedOrganisationalUnitName> getFormattedOrganisationalUnitNames() {
         log.info("Getting formatted organisational unit names");
         List<OrganisationalUnit> allOrganisationalUnits = getAllOrganisationalUnits();
         return allOrganisationalUnits.stream()
                 .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName())).toList();
+    }
+
+    @CacheEvict(value = "organisations-formatted", allEntries = true)
+    public void removeFormattedOrganisationsFromCache() {
+        log.info("Formatted organisations are removed from the cache.");
     }
 
     private List<OrganisationalUnit> setFormattedName(List<OrganisationalUnit> allOrganisationalUnits) {

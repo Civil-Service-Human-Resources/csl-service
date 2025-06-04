@@ -63,4 +63,10 @@ public class CacheResetController {
         civilServantRegistryService.removeOrganisationsFromCache();
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
+    @GetMapping(path = "/formatted_organisations", produces = "application/json")
+    public ResponseEntity<?> removeFormattedOrganisationsFromCache() {
+        civilServantRegistryService.removeFormattedOrganisationsFromCache();
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
 }
