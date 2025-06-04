@@ -20,8 +20,7 @@ public class OrganisationalUnitController {
         this.civilServantRegistryService = civilServantRegistryService;
     }
 
-    @GetMapping(path = "/v2/organisationalUnits", produces = "application/json")
-    @PreAuthorize("isAuthenticated()")
+    @GetMapping(path = "/organisations", produces = "application/json")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public List<OrganisationalUnit> getAllOrganisationalUnits() {
@@ -30,7 +29,6 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping(path = "/organisations/formatted_list", produces = "application/json")
-    @PreAuthorize("isAuthenticated()")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public List<FormattedOrganisationalUnitName> getFormattedOrganisationalUnitNames() {

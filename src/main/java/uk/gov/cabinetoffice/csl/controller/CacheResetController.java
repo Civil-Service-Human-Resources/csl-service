@@ -61,11 +61,13 @@ public class CacheResetController {
     @GetMapping(path = "/organisations", produces = "application/json")
     public ResponseEntity<?> removeOrganisationsFromCache() {
         civilServantRegistryService.removeOrganisationsFromCache();
+        civilServantRegistryService.removeFormattedOrganisationsFromCache();
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @GetMapping(path = "/formatted_organisations", produces = "application/json")
+    @GetMapping(path = "/organisations/formatted_list", produces = "application/json")
     public ResponseEntity<?> removeFormattedOrganisationsFromCache() {
+        civilServantRegistryService.removeOrganisationsFromCache();
         civilServantRegistryService.removeFormattedOrganisationsFromCache();
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
