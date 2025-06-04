@@ -20,7 +20,7 @@ import static java.time.Duration.ofSeconds;
 @Configuration
 public class RedisCacheConfig {
 
-    @Value("${spring.cache.redis.use-key-prefix}")
+    @Value("${spring.cache.redis.key-prefix}")
     private String redisCacheKeyPrefix;
 
     @Value("${learnerRecord.cache.ttlSeconds}")
