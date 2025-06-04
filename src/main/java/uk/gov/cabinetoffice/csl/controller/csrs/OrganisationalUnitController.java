@@ -21,6 +21,7 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping(path = "/organisations", produces = "application/json")
+    @PreAuthorize("isAuthenticated()")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public List<OrganisationalUnit> getAllOrganisationalUnits() {
@@ -29,6 +30,7 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping(path = "/organisations/formatted_list", produces = "application/json")
+    @PreAuthorize("isAuthenticated()")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public List<FormattedOrganisationalUnitName> getFormattedOrganisationalUnitNames() {
