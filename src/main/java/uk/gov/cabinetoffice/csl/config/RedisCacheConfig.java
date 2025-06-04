@@ -27,6 +27,9 @@ public class RedisCacheConfig {
     @Value("${csrs.cache.ttlSeconds}")
     private int userCacheTTlSeconds;
 
+    @Value("${csrs.organisations.cache.ttlSeconds}")
+    private int organisationsTTlSeconds;
+
     @Bean
     public RequiredLearningMapCache requiredLearningMapCache(CacheManager cacheManager) {
         Cache cache = cacheManager.getCache("catalogue-course");
@@ -61,6 +64,8 @@ public class RedisCacheConfig {
                 .withCacheConfiguration("catalogue-course",
                         RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(learningCatalogueCacheTTlSeconds)))
                 .withCacheConfiguration("user",
-                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(userCacheTTlSeconds)));
+                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(userCacheTTlSeconds)))
+                .withCacheConfiguration("organisations",
+                        RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(organisationsTTlSeconds)));
     }
 }

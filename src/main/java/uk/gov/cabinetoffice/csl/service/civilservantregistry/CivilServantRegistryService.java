@@ -2,6 +2,8 @@ package uk.gov.cabinetoffice.csl.service.civilservantregistry;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.civilservantregistry.ICivilServantRegistryClient;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
@@ -19,27 +21,39 @@ public class CivilServantRegistryService {
 
     private final ICivilServantRegistryClient civilServantRegistryClient;
 
+    @Cacheable("organisations")
     public List<OrganisationalUnit> getAllOrganisationalUnits() {
         log.info("Getting all organisational units");
-        return civilServantRegistryClient.getAllOrganisationalUnits();
+        List<OrganisationalUnit> allOrganisationalUnits = civilServantRegistryClient.getAllOrganisationalUnits();
+        return setFormattedName(allOrganisationalUnits);
+    }
+
+    @CacheEvict(value = "organisations", allEntries = true)
+    public void removeOrganisationsFromCache() {
+        log.info("Organisations are removed from the cache.");
     }
 
     public List<FormattedOrganisationalUnitName> getFormattedOrganisationalUnitNames() {
         log.info("Getting formatted organisational unit names");
         List<OrganisationalUnit> allOrganisationalUnits = getAllOrganisationalUnits();
+        return allOrganisationalUnits.stream()
+                .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName())).toList();
+    }
+
+    private List<OrganisationalUnit> setFormattedName(List<OrganisationalUnit> allOrganisationalUnits) {
         Map<Long, OrganisationalUnit> orgMap = allOrganisationalUnits.stream()
                 .collect(toMap(OrganisationalUnit::getId, o -> o));
         return allOrganisationalUnits.stream()
-            .map(o -> {
-                StringBuilder formattedName = new StringBuilder(o.getName());
-                Long parentId = o.getParentId();
-                while(parentId != null) {
-                    OrganisationalUnit parentOrganisationalUnit = orgMap.get(parentId);
-                    String parentName = parentOrganisationalUnit.getName();
-                    formattedName.insert(0, parentName + " | ");
-                    parentId = parentOrganisationalUnit.getParentId();
-                }
-                return new FormattedOrganisationalUnitName(o.getId(), formattedName.toString());
-            }).toList();
+                .peek(o -> {
+                    StringBuilder formattedName = new StringBuilder(o.getName());
+                    Long parentId = o.getParentId();
+                    while(parentId != null) {
+                        OrganisationalUnit parentOrganisationalUnit = orgMap.get(parentId);
+                        String parentName = parentOrganisationalUnit.getName();
+                        formattedName.insert(0, parentName + " | ");
+                        parentId = parentOrganisationalUnit.getParentId();
+                    }
+                    o.setFormattedName(formattedName.toString());
+                }).toList();
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
+import uk.gov.cabinetoffice.csl.service.civilservantregistry.CivilServantRegistryService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
 @Slf4j
@@ -19,14 +20,16 @@ public class CacheResetController {
 
     private final LearnerRecordService learnerRecordService;
     private final IdentityService identityService;
-
     private final LearningCatalogueService learningCatalogueService;
+    private final CivilServantRegistryService civilServantRegistryService;
 
     public CacheResetController(LearnerRecordService learnerRecordService,
-                                IdentityService identityService, LearningCatalogueService learningCatalogueService) {
+                                IdentityService identityService, LearningCatalogueService learningCatalogueService,
+                                CivilServantRegistryService civilServantRegistryService) {
         this.learnerRecordService = learnerRecordService;
         this.identityService = identityService;
         this.learningCatalogueService = learningCatalogueService;
+        this.civilServantRegistryService = civilServantRegistryService;
     }
 
     @GetMapping(path = "/service-token", produces = "application/json")
@@ -52,6 +55,12 @@ public class CacheResetController {
     public ResponseEntity<?> removeLearnerRecordFromCache(@PathVariable String learnerId,
                                                           @PathVariable String resourceId) {
         learnerRecordService.bustLearnerRecordCache(learnerId, resourceId);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping(path = "/organisations", produces = "application/json")
+    public ResponseEntity<?> removeOrganisationsFromCache() {
+        civilServantRegistryService.removeOrganisationsFromCache();
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }
