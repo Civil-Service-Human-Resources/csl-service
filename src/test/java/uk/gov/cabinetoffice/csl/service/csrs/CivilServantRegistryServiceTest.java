@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.service.civilservantregistry;
+package uk.gov.cabinetoffice.csl.service.csrs;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.cabinetoffice.csl.client.civilservantregistry.ICivilServantRegistryClient;
+import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 public class CivilServantRegistryServiceTest {
 
     @Mock
-    private ICivilServantRegistryClient civilServantRegistryClient;
+    private ICSRSClient civilServantRegistryClient;
 
     @InjectMocks
     private CivilServantRegistryService civilServantRegistryService;

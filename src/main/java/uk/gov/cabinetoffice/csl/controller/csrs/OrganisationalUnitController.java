@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.controller.civilservantregistry;
+package uk.gov.cabinetoffice.csl.controller.csrs;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -6,7 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
-import uk.gov.cabinetoffice.csl.service.civilservantregistry.CivilServantRegistryService;
+import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
 
 import java.util.List;
 

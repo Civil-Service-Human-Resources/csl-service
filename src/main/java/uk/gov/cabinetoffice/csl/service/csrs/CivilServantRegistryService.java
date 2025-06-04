@@ -1,11 +1,11 @@
-package uk.gov.cabinetoffice.csl.service.civilservantregistry;
+package uk.gov.cabinetoffice.csl.service.csrs;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.client.civilservantregistry.ICivilServantRegistryClient;
+import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 
@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.toMap;
 @AllArgsConstructor
 public class CivilServantRegistryService {
 
-    private final ICivilServantRegistryClient civilServantRegistryClient;
+    private final ICSRSClient civilServantRegistryClient;
 
     @Cacheable("organisations")
     public List<OrganisationalUnit> getAllOrganisationalUnits() {
