@@ -2,7 +2,6 @@ package uk.gov.cabinetoffice.csl.controller.csrs;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
@@ -22,7 +21,6 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping(path = "/full", produces = "application/json")
-    @PreAuthorize("isAuthenticated()")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public List<OrganisationalUnit> getAllOrganisationalUnits() {
@@ -31,7 +29,6 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping(path = "/formatted_list", produces = "application/json")
-    @PreAuthorize("isAuthenticated()")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public List<FormattedOrganisationalUnitName> getFormattedOrganisationalUnitNames() {
