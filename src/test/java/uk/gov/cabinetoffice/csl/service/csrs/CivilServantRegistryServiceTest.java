@@ -30,7 +30,7 @@ public class CivilServantRegistryServiceTest {
 
     @Test
     void shouldReturnFormattedOrganisationalUnitNames() {
-        List<OrganisationalUnit> organisationalUnits = createOrgList();
+        List<OrganisationalUnit> organisationalUnits = createOrganisationsList();
         when(civilServantRegistryClient.getAllOrganisationalUnits()).thenReturn(organisationalUnits);
         List<FormattedOrganisationalUnitName> formattedOrganisationalUnitNames = civilServantRegistryService.getFormattedOrganisationalUnitNames();
         Map<Long, FormattedOrganisationalUnitName> orgMap = formattedOrganisationalUnitNames.stream()
@@ -43,7 +43,7 @@ public class CivilServantRegistryServiceTest {
         assertEquals("OrgName6", orgMap.get(6L).getName());
     }
 
-    private List<OrganisationalUnit> createOrgList() {
+    private List<OrganisationalUnit> createOrganisationsList() {
         List<OrganisationalUnit> organisationalUnits = new ArrayList<>();
 
         OrganisationalUnit organisationalUnits1 = new OrganisationalUnit();
