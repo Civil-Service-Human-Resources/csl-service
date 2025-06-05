@@ -62,7 +62,14 @@ public class SecurityConfig {
     @Order(3)
     public SecurityFilterChain oauthChain(HttpSecurity httpSecurity) throws Exception {
         log.info("Building oauth filter chain");
-        httpSecurity.securityMatcher("/learning/**", "/courses/**", "/course_records/**", "/admin/**", "/reset-cache/**").cors().and().csrf().disable()
+        httpSecurity.securityMatcher(
+                        "/organisations/**",
+                        "/learning/**",
+                        "/courses/**",
+                        "/course_records/**",
+                        "/admin/**",
+                        "/reset-cache/**")
+                .cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeHttpRequests(requests -> requests.anyRequest().authenticated())
                 .oauth2ResourceServer().jwt(jwtSpec -> jwtSpec.decoder(jwtDecoder()));

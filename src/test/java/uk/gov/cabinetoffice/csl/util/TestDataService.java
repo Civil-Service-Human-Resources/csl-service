@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
+import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
@@ -159,5 +160,75 @@ public class TestDataService {
 
     public CivilServant generateCivilServant() {
         return new CivilServant(getLearnerFirstName(), userEmail, userId, grade, organisationalUnit, profession, lineManagerEmail, lineManagerName);
+    }
+
+    public OrganisationalUnitsPagedResponse generateOrganisationalUnitsPagedResponse() {
+        OrganisationalUnitsPagedResponse organisationalUnitsPagedResponse = new OrganisationalUnitsPagedResponse();
+        organisationalUnitsPagedResponse.setContent(createOrganisationsList());
+        organisationalUnitsPagedResponse.setLast(true);
+        organisationalUnitsPagedResponse.setNumber(0);
+        organisationalUnitsPagedResponse.setTotalPages(1);
+        organisationalUnitsPagedResponse.setTotalElements(6);
+        organisationalUnitsPagedResponse.setSize(10);
+        return organisationalUnitsPagedResponse;
+    }
+
+    private List<OrganisationalUnit> createOrganisationsList() {
+        List<OrganisationalUnit> organisationalUnits = new ArrayList<>();
+
+        OrganisationalUnit organisationalUnits1 = new OrganisationalUnit();
+        organisationalUnits1.setId(1L);
+        organisationalUnits1.setName("OrgName1");
+        organisationalUnits1.setParentId(null);
+        organisationalUnits1.setAbbreviation("OName1");
+        organisationalUnits1.setCode("ON1");
+        organisationalUnits1.setHref("https://hostname/organisationalUnits/1");
+        organisationalUnits.add(organisationalUnits1);
+
+        OrganisationalUnit organisationalUnits2 = new OrganisationalUnit();
+        organisationalUnits2.setId(2L);
+        organisationalUnits2.setName("OrgName2");
+        organisationalUnits2.setParentId(1L);
+        organisationalUnits1.setAbbreviation("OName2");
+        organisationalUnits1.setCode("ON2");
+        organisationalUnits1.setHref("https://hostname/organisationalUnits/2");
+        organisationalUnits.add(organisationalUnits2);
+
+        OrganisationalUnit organisationalUnits3 = new OrganisationalUnit();
+        organisationalUnits3.setId(3L);
+        organisationalUnits3.setName("OrgName3");
+        organisationalUnits3.setParentId(2L);
+        organisationalUnits1.setAbbreviation("OName3");
+        organisationalUnits1.setCode("ON3");
+        organisationalUnits1.setHref("https://hostname/organisationalUnits/3");
+        organisationalUnits.add(organisationalUnits3);
+
+        OrganisationalUnit organisationalUnits4 = new OrganisationalUnit();
+        organisationalUnits4.setId(4L);
+        organisationalUnits4.setName("OrgName4");
+        organisationalUnits4.setParentId(3L);
+        organisationalUnits1.setAbbreviation("OName4");
+        organisationalUnits1.setCode("ON4");
+        organisationalUnits1.setHref("https://hostname/organisationalUnits/4");
+        organisationalUnits.add(organisationalUnits4);
+
+        OrganisationalUnit organisationalUnits5 = new OrganisationalUnit();
+        organisationalUnits5.setId(5L);
+        organisationalUnits5.setName("OrgName5");
+        organisationalUnits5.setParentId(1L);
+        organisationalUnits1.setAbbreviation("OName5");
+        organisationalUnits1.setCode("ON5");
+        organisationalUnits1.setHref("https://hostname/organisationalUnits/5");
+        organisationalUnits.add(organisationalUnits5);
+
+        OrganisationalUnit organisationalUnits6 = new OrganisationalUnit();
+        organisationalUnits6.setId(6L);
+        organisationalUnits6.setName("OrgName6");
+        organisationalUnits1.setAbbreviation("OName6");
+        organisationalUnits1.setCode("ON6");
+        organisationalUnits1.setHref("https://hostname/organisationalUnits/6");
+        organisationalUnits.add(organisationalUnits6);
+
+        return organisationalUnits;
     }
 }
