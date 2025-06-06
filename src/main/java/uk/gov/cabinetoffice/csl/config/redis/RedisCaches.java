@@ -5,7 +5,6 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
@@ -22,11 +21,6 @@ public class RedisCaches {
 
     public RedisCaches(RedisCacheConfig redisCacheConfig) {
         this.redisCacheConfig = redisCacheConfig;
-    }
-
-    @Bean
-    LettuceConnectionFactory connectionFactory() {
-        return new LettuceConnectionFactory();
     }
 
     @Bean
