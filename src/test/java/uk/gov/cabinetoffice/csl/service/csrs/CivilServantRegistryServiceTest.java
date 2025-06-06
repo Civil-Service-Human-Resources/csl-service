@@ -34,7 +34,7 @@ public class CivilServantRegistryServiceTest {
         List<OrganisationalUnit> organisationalUnits = createOrganisationsList();
         when(civilServantRegistryClient.getAllOrganisationalUnits()).thenReturn(organisationalUnits);
         FormattedOrganisationalUnitNames formattedOrganisationalUnitNames = civilServantRegistryService.getFormattedOrganisationalUnitNames();
-        Map<Long, FormattedOrganisationalUnitName> orgMap = formattedOrganisationalUnitNames.getFormattedOrganisations()
+        Map<Long, FormattedOrganisationalUnitName> orgMap = formattedOrganisationalUnitNames.getFormattedOrganisationalUnitNames()
                 .stream()
                 .collect(Collectors.toMap(FormattedOrganisationalUnitName::getId, o -> o));
         assertEquals("OrgName1", orgMap.get(1L).getName());

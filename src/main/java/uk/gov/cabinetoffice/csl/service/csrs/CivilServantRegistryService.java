@@ -37,7 +37,7 @@ public class CivilServantRegistryService {
     @Cacheable("organisations-formatted")
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames() {
         log.info("Getting formatted organisational unit names");
-        return new FormattedOrganisationalUnitNames(getAllOrganisationalUnits().getFormattedOrganisations()
+        return new FormattedOrganisationalUnitNames(getAllOrganisationalUnits().getOrganisationalUnits()
                         .stream()
                         .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName()))
                         .toList());

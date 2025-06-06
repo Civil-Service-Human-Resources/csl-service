@@ -11,5 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrganisationalUnits implements Serializable {
-    private List<OrganisationalUnit> formattedOrganisations;
+    private List<OrganisationalUnit> organisationalUnits;
 }
