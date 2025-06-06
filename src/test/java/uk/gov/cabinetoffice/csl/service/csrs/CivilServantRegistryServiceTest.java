@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
+import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 
 import java.util.ArrayList;
@@ -32,8 +33,9 @@ public class CivilServantRegistryServiceTest {
     void shouldReturnFormattedOrganisationalUnitNames() {
         List<OrganisationalUnit> organisationalUnits = createOrganisationsList();
         when(civilServantRegistryClient.getAllOrganisationalUnits()).thenReturn(organisationalUnits);
-        List<FormattedOrganisationalUnitName> formattedOrganisationalUnitNames = civilServantRegistryService.getFormattedOrganisationalUnitNames();
-        Map<Long, FormattedOrganisationalUnitName> orgMap = formattedOrganisationalUnitNames.stream()
+        FormattedOrganisationalUnitNames formattedOrganisationalUnitNames = civilServantRegistryService.getFormattedOrganisationalUnitNames();
+        Map<Long, FormattedOrganisationalUnitName> orgMap = formattedOrganisationalUnitNames.getFormattedOrganisations()
+                .stream()
                 .collect(Collectors.toMap(FormattedOrganisationalUnitName::getId, o -> o));
         assertEquals("OrgName1", orgMap.get(1L).getName());
         assertEquals("OrgName1 | OrgName2", orgMap.get(2L).getName());
