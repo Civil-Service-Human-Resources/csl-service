@@ -1,12 +1,11 @@
-package uk.gov.cabinetoffice.csl.config;
+package uk.gov.cabinetoffice.csl.config.redis;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
@@ -17,22 +16,18 @@ import static java.time.Duration.ofSeconds;
 import static org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig;
 
 @Configuration
-public class RedisCacheConfig {
+public class RedisCaches {
 
-    @Value("${spring.cache.redis.key-prefix}")
-    private String redisCacheKeyPrefix;
+    private final RedisCacheConfig redisCacheConfig;
 
-    @Value("${learnerRecord.cache.ttlSeconds}")
-    private int learnerRecordCacheTTlSeconds;
+    public RedisCaches(RedisCacheConfig redisCacheConfig) {
+        this.redisCacheConfig = redisCacheConfig;
+    }
 
-    @Value("${learningCatalogue.cache.ttlSeconds}")
-    private int learningCatalogueCacheTTlSeconds;
-
-    @Value("${csrs.cache.ttlSeconds}")
-    private int userCacheTTlSeconds;
-
-    @Value("${csrs.organisations.cache.ttlSeconds}")
-    private int organisationsTTlSeconds;
+    @Bean
+    LettuceConnectionFactory connectionFactory() {
+        return new LettuceConnectionFactory();
+    }
 
     @Bean
     public RequiredLearningMapCache requiredLearningMapCache(CacheManager cacheManager) {
@@ -60,20 +55,9 @@ public class RedisCacheConfig {
 
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
-        return (builder) -> builder
-                .withCacheConfiguration("module-record",
-                        defaultCacheConfig().entryTtl(ofSeconds(learnerRecordCacheTTlSeconds)))
-                .withCacheConfiguration("learner-record",
-                        defaultCacheConfig().entryTtl(ofSeconds(learnerRecordCacheTTlSeconds)))
-                .withCacheConfiguration("catalogue-course",
-                        defaultCacheConfig().entryTtl(ofSeconds(learningCatalogueCacheTTlSeconds)))
-                .withCacheConfiguration("user",
-                        defaultCacheConfig().entryTtl(ofSeconds(userCacheTTlSeconds)))
-                .withCacheConfiguration("organisations",
-                        defaultCacheConfig().entryTtl(ofSeconds(organisationsTTlSeconds))
-                                .prefixCacheNameWith(redisCacheKeyPrefix).disableCachingNullValues())
-                .withCacheConfiguration("organisations-formatted",
-                        defaultCacheConfig().entryTtl(ofSeconds(organisationsTTlSeconds))
-                                .prefixCacheNameWith(redisCacheKeyPrefix).disableCachingNullValues());
+        return (builder) -> redisCacheConfig.getCaches().values().forEach(config -> builder
+                .withCacheConfiguration(config.getName(), defaultCacheConfig().entryTtl(ofSeconds(config.getTtl()))
+                        .prefixCacheNameWith(redisCacheConfig.getKeyPrefix()).disableCachingNullValues()));
     }
+
 }

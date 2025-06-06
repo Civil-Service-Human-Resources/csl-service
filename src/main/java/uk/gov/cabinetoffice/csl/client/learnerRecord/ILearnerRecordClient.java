@@ -1,6 +1,5 @@
 package uk.gov.cabinetoffice.csl.client.learnerRecord;
 
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventDto;
@@ -29,7 +28,7 @@ public interface ILearnerRecordClient {
 
     List<ModuleRecord> createModuleRecords(List<ModuleRecord> newRecords);
 
-    List<ModuleRecord> getModuleRecords(List<ModuleRecordResourceId> missingModuleRecordIds);
+    List<ModuleRecord> getModuleRecords(GetModuleRecordParams query);
 
     List<ModuleRecord> updateModuleRecords(List<ModuleRecord> input);
 }

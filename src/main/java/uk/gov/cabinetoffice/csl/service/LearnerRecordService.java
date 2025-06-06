@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.client.learnerRecord.GetModuleRecordParams;
 import uk.gov.cabinetoffice.csl.client.learnerRecord.ILearnerRecordClient;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ILearnerRecordResourceID;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ITypedLearnerRecordResourceID;
@@ -60,7 +61,8 @@ public class LearnerRecordService {
                     String[] splitId = id.split(",");
                     missingModuleRecordIds.add(new ModuleRecordResourceId(splitId[0], splitId[1]));
                 });
-                client.getModuleRecords(missingModuleRecordIds).forEach(moduleRecord -> {
+                GetModuleRecordParams query = learnerRecordQueryFactory.getModuleRecordParams(missingModuleRecordIds);
+                client.getModuleRecords(query).forEach(moduleRecord -> {
                     moduleRecords.add(moduleRecord);
                     moduleRecordCache.put(moduleRecord);
                 });
@@ -68,7 +70,8 @@ public class LearnerRecordService {
             return moduleRecords;
         } catch (Cache.ValueRetrievalException ex) {
             log.error("Failed to retrieve module records from cache, falling back to API");
-            return client.getModuleRecords(moduleRecordIds);
+            GetModuleRecordParams query = learnerRecordQueryFactory.getModuleRecordParams(moduleRecordIds);
+            return client.getModuleRecords(query);
         }
     }
 
@@ -82,14 +85,12 @@ public class LearnerRecordService {
             CacheGetMultipleOp<LearnerRecord> result = learnerRecordCache.getMultiple(stringIds);
             List<LearnerRecord> learnerRecords = result.getCacheHits();
             if (!result.getCacheMisses().isEmpty()) {
-                Set<String> missingResourceIds = new HashSet<>();
-                Set<String> missingLearnerIds = new HashSet<>();
+                List<LearnerRecordResourceId> missingIds = new ArrayList<>();
                 result.getCacheMisses().forEach(id -> {
                     String[] splitId = id.split(",");
-                    missingResourceIds.add(splitId[1]);
-                    missingLearnerIds.add(splitId[0]);
+                    missingIds.add(new LearnerRecordResourceId(splitId[0], splitId[1]));
                 });
-                LearnerRecordQuery query = learnerRecordQueryFactory.getLearnerRecordQuery(missingLearnerIds, missingResourceIds);
+                LearnerRecordQuery query = learnerRecordQueryFactory.getLearnerRecordQuery(missingIds);
                 client.getLearnerRecords(query).forEach(learnerRecord -> {
                     learnerRecords.add(learnerRecord);
                     learnerRecordCache.put(learnerRecord);
