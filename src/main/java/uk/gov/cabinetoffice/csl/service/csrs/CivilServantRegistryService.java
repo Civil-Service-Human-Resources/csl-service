@@ -7,7 +7,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
+import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnits;
 
 import java.util.List;
 import java.util.Map;
@@ -22,10 +24,9 @@ public class CivilServantRegistryService {
     private final ICSRSClient civilServantRegistryClient;
 
     @Cacheable("organisations")
-    public List<OrganisationalUnit> getAllOrganisationalUnits() {
+    public OrganisationalUnits getAllOrganisationalUnits() {
         log.info("Getting all organisational units");
-        List<OrganisationalUnit> allOrganisationalUnits = civilServantRegistryClient.getAllOrganisationalUnits();
-        return setFormattedName(allOrganisationalUnits);
+        return new OrganisationalUnits(setFormattedName(civilServantRegistryClient.getAllOrganisationalUnits()));
     }
 
     @CacheEvict(value = "organisations", allEntries = true)
@@ -34,11 +35,12 @@ public class CivilServantRegistryService {
     }
 
     @Cacheable("organisations-formatted")
-    public List<FormattedOrganisationalUnitName> getFormattedOrganisationalUnitNames() {
+    public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames() {
         log.info("Getting formatted organisational unit names");
-        List<OrganisationalUnit> allOrganisationalUnits = getAllOrganisationalUnits();
-        return allOrganisationalUnits.stream()
-                .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName())).toList();
+        return new FormattedOrganisationalUnitNames(getAllOrganisationalUnits().getOrganisationalUnits()
+                        .stream()
+                        .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName()))
+                        .toList());
     }
 
     @CacheEvict(value = "organisations-formatted", allEntries = true)
