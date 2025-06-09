@@ -33,7 +33,8 @@ public class OrganisationTest extends IntegrationTestBase {
     public void testFormattedOrganisationsList() throws Exception {
         cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
         String expectedFormattedOrganisations = """
-                [
+                {
+                    "formattedOrganisationalUnitNames": [
                          {
                              "id": 1,
                              "name": "OrgName1"
@@ -58,7 +59,8 @@ public class OrganisationTest extends IntegrationTestBase {
                              "id": 6,
                              "name": "OrgName6"
                          }
-                ]
+                    ]
+                }
                 """;
 
         mockMvc.perform(get("/organisations/formatted_list")
@@ -71,7 +73,8 @@ public class OrganisationTest extends IntegrationTestBase {
     public void testFullOrganisationsList() throws Exception {
         cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
         String expectedOrganisations = """
-                [
+                {
+                    "organisationalUnits": [
                          {
                              "id": 1,
                              "name": "OrgName1"
@@ -152,7 +155,8 @@ public class OrganisationTest extends IntegrationTestBase {
                              "domains": [],
                              "agencyToken": null
                          }
-                ]
+                    ]
+                }
                 """;
 
         mockMvc.perform(get("/organisations/full")
