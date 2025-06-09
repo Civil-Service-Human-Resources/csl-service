@@ -5,14 +5,14 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.RequiredLearningMapCache;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
-import static java.time.Duration.ofSeconds;
-import static org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig;
+import java.util.Map;
 
 @Configuration
 public class RedisCaches {
@@ -43,15 +43,15 @@ public class RedisCaches {
 
     @Bean
     public ObjectCache<LearnerRecord> learnerRecordCache(CacheManager cacheManager) {
+        Cache cache2 = cacheManager.getCache("organisations");
         Cache cache = cacheManager.getCache("learner-record");
         return new ObjectCache<>(cache, LearnerRecord.class);
     }
 
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
-        return (builder) -> redisCacheConfig.getCaches().values().forEach(config -> builder
-                .withCacheConfiguration(config.getName(), defaultCacheConfig().entryTtl(ofSeconds(config.getTtl()))
-                        .prefixCacheNameWith(redisCacheConfig.getKeyPrefix()).disableCachingNullValues()));
+        Map<String, RedisCacheConfiguration> configs = redisCacheConfig.getAsDefaultConfigMap();
+        return (builder) -> builder.withInitialCacheConfigurations(configs);
     }
 
 }
