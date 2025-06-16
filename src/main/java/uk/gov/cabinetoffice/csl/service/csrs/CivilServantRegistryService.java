@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnits;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -38,9 +39,10 @@ public class CivilServantRegistryService {
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames() {
         log.info("Getting formatted organisational unit names");
         return new FormattedOrganisationalUnitNames(getAllOrganisationalUnits().getOrganisationalUnits()
-                        .stream()
-                        .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName()))
-                        .toList());
+                .stream()
+                .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName()))
+                .sorted(Comparator.comparing(FormattedOrganisationalUnitName::getName))
+                .toList());
     }
 
     @CacheEvict(value = "organisations-formatted", allEntries = true)
