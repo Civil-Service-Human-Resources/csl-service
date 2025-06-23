@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -37,27 +38,27 @@ public class OrganisationTest extends IntegrationTestBase {
                     "formattedOrganisationalUnitNames": [
                          {
                              "id": 1,
-                             "name": "OrgName1"
+                             "name": "OrgName1 (OName1)"
                          },
                          {
                              "id": 2,
-                             "name": "OrgName1 | OrgName2"
+                             "name": "OrgName1 (OName1) | OrgName2"
                          },
                          {
                              "id": 3,
-                             "name": "OrgName1 | OrgName2 | OrgName3"
+                             "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)"
                          },
                          {
                              "id": 4,
-                             "name": "OrgName1 | OrgName2 | OrgName3 | OrgName4"
+                             "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)"
                          },
                          {
                              "id": 5,
-                             "name": "OrgName1 | OrgName5"
+                             "name": "OrgName1 (OName1) | OrgName5 (OName5)"
                          },
                          {
                              "id": 6,
-                             "name": "OrgName6"
+                             "name": "OrgName6 (OName6)"
                          }
                     ]
                 }
@@ -65,7 +66,7 @@ public class OrganisationTest extends IntegrationTestBase {
 
         mockMvc.perform(get("/organisations/formatted_list")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> utils.toJson(expectedFormattedOrganisations))
+                .andExpect(content().json(expectedFormattedOrganisations, true))
                 .andExpect(status().is2xxSuccessful());
     }
 
@@ -77,82 +78,80 @@ public class OrganisationTest extends IntegrationTestBase {
                     "organisationalUnits": [
                          {
                              "id": 1,
-                             "name": "OrgName1"
+                             "name": "OrgName1",
                              "code": "ON1",
-                             "abbreviation": "ON1",
-                             "formattedName": "OrgName1",
+                             "abbreviation": "OName1",
+                             "formattedName": "OrgName1 (OName1)",
                              "href": "https://hostname/organisationalUnits/1",
                              "parentId": null,
                              "parent": null,
                              "children": null,
-                             "domains":
-                             [],
+                             "domains": null,
                              "agencyToken": null
                          },
                          {
                              "id": 2,
-                             "name": "OrgName2"
+                             "name": "OrgName2",
                              "code": "ON2",
-                             "abbreviation": "ON2",
-                             "formattedName": "OrgName1 | OrgName2",
+                             "abbreviation": "",
+                             "formattedName": "OrgName1 (OName1) | OrgName2",
                              "href": "https://hostname/organisationalUnits/2",
                              "parentId": 1,
                              "parent": null,
                              "children": null,
-                             "domains":
-                             [],
+                             "domains": null,
                              "agencyToken": null
                          },
                          {
                              "id": 3,
-                             "name": "OrgName3"
+                             "name": "OrgName3",
                              "code": "ON3",
-                             "abbreviation": "ON3",
-                             "formattedName": "OrgName1 | OrgName2 | OrgName3",
+                             "abbreviation": "OName3",
+                             "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)",
                              "href": "https://hostname/organisationalUnits/3",
                              "parentId": 2,
                              "parent": null,
                              "children": null,
-                             "domains": [],
+                             "domains": null,
                              "agencyToken": null
                          },
                          {
                              "id": 4,
-                             "name": "OrgName4"
+                             "name": "OrgName4",
                              "code": "ON4",
-                             "abbreviation": "ON4",
-                             "formattedName": "OrgName1 | OrgName2 | OrgName3 | OrgName4",
+                             "abbreviation": "OName4",
+                             "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)",
                              "href": "https://hostname/organisationalUnits/4",
                              "parentId": 3,
                              "parent": null,
                              "children": null,
-                             "domains": [],
+                             "domains": null,
                              "agencyToken": null
                          },
                          {
                              "id": 5,
-                             "name": "OrgName5"
+                             "name": "OrgName5",
                              "code": "ON5",
-                             "abbreviation": "ON5",
-                             "formattedName": "OrgName1 | OrgName5",
+                             "abbreviation": "OName5",
+                             "formattedName": "OrgName1 (OName1) | OrgName5 (OName5)",
                              "href": "https://hostname/organisationalUnits/5",
                              "parentId": 1,
                              "parent": null,
                              "children": null,
-                             "domains": [],
+                             "domains": null,
                              "agencyToken": null
                          },
                          {
                              "id": 6,
                              "name": "OrgName6",
                              "code": "ON6",
-                             "abbreviation": "ON6",
-                             "formattedName": "OrgName6",
+                             "abbreviation": "OName6",
+                             "formattedName": "OrgName6 (OName6)",
                              "href": "https://hostname/organisationalUnits/6",
                              "parentId": null,
                              "parent": null,
                              "children": null,
-                             "domains": [],
+                             "domains": null,
                              "agencyToken": null
                          }
                     ]
@@ -161,7 +160,7 @@ public class OrganisationTest extends IntegrationTestBase {
 
         mockMvc.perform(get("/organisations/full")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> utils.toJson(expectedOrganisations))
+                .andExpect(content().json(expectedOrganisations, true))
                 .andExpect(status().is2xxSuccessful());
     }
 }

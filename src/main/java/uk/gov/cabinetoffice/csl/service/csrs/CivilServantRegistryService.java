@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Service
 @Slf4j
@@ -55,15 +56,22 @@ public class CivilServantRegistryService {
                 .collect(toMap(OrganisationalUnit::getId, o -> o));
         return allOrganisationalUnits.stream()
                 .peek(o -> {
-                    StringBuilder formattedName = new StringBuilder(o.getName());
+                    StringBuilder formattedName = new StringBuilder(getFormattedNameWithAbbreviation(o.getName(), o.getAbbreviation()));
                     Long parentId = o.getParentId();
                     while(parentId != null) {
                         OrganisationalUnit parentOrganisationalUnit = orgMap.get(parentId);
-                        String parentName = parentOrganisationalUnit.getName();
+                        String parentName = getFormattedNameWithAbbreviation(parentOrganisationalUnit.getName(), parentOrganisationalUnit.getAbbreviation());
                         formattedName.insert(0, parentName + " | ");
                         parentId = parentOrganisationalUnit.getParentId();
                     }
                     o.setFormattedName(formattedName.toString());
                 }).toList();
+    }
+
+    private String getFormattedNameWithAbbreviation(String name, String abbreviation) {
+        if (isNotBlank(abbreviation)) {
+            return name + " (" + abbreviation + ")";
+        }
+        return name;
     }
 }
