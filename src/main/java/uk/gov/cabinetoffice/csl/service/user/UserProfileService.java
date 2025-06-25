@@ -33,7 +33,7 @@ public class UserProfileService {
                 .filter(p -> otherAreasOfWorkIds.contains(p.getId())).toList();
         if (!areasOfWork.isEmpty()) {
             PatchCivilServantDto patch = PatchCivilServantDto.builder().otherAreasOfWork(areasOfWork).build();
-            client.patchCivilServant(patch);
+            client.patchCivilServant(uid, patch);
             if (newProfile) {
                 User user = userDetailsService.getUserWithUid(uid);
                 CompleteProfileMessage message = messageMetadataFactory.generateCompleteProfileMessage(user);

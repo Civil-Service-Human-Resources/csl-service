@@ -44,13 +44,13 @@ public class UserProfileTests extends IntegrationTestBase {
                     }
                 ]
                 """);
-        cslStubService.getCsrsStubService().patchCivilServant("""
+        cslStubService.getCsrsStubService().patchCivilServant("userId", """
                 {
                     "otherAreasOfWork": ["/professions/1", "/professions/2"]
                 }
                 """);
         mockMvc.perform(post("/user/profile/other-areas-of-work?newProfile=true")
-                        .content("[1,2,3]")
+                        .content("[1,2,3]}")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
         verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
