@@ -48,7 +48,7 @@ public class TestDataService {
             new BasicOrganisationalUnit(4, "HMRC", "HMRC")
     ));
     private final Grade grade = new Grade(1L, "SEO", "Senior Executive Officer");
-    private final Profession profession = new Profession(3L, "DDaT");
+    private final AreaOfWork profession = new AreaOfWork(3L, "DDaT");
 
 
     public UserDetailsDto generateUserDetailsDto() {

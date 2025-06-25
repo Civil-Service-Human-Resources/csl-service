@@ -17,7 +17,7 @@ public class CivilServant {
     private String uid;
     private Grade grade;
     private OrganisationalUnit organisationalUnit;
-    private Profession profession;
+    private AreaOfWork profession;
     private String lineManagerEmail;
     private String lineManagerName;
 

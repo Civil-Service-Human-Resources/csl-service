@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 import uk.gov.cabinetoffice.csl.service.user.UserProfileService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/user/profile")
 @Slf4j
@@ -19,16 +21,12 @@ public class UserController {
         this.userProfileService = userProfileService;
     }
 
-    /*
-    This should be reworked into a POST /other-areas-of-work endpoint. Other areas of work is the last required field
-    for users, so we know that when they submit that then there's also a chance they'll be completing their profile.
-     */
-    @PostMapping(path = "/complete-profile")
+    @PostMapping(path = "/other-areas-of-work")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public void completeProfile() {
+    public void completeProfile(@RequestParam(required = false, defaultValue = "false") boolean newProfile, @RequestBody List<Long> otherAreasOfWorkIds) {
         String uid = userAuthService.getUsername();
-        userProfileService.completeProfile(uid);
+        userProfileService.setOtherAreasOfWork(uid, otherAreasOfWorkIds, newProfile);
     }
 
 }

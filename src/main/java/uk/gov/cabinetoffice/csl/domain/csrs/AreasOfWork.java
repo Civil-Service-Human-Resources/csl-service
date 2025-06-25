@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Profession {
-    private Long id;
-    private String name;
+public class AreasOfWork {
+    private List<AreaOfWork> professions;
 }

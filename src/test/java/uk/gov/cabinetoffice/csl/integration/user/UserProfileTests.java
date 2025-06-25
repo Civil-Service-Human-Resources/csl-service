@@ -29,10 +29,28 @@ public class UserProfileTests extends IntegrationTestBase {
     private CSLStubService cslStubService;
 
     @Test
-    public void testCompleteProfile() throws Exception {
+    public void testSetOtherAreasOfWorkNewProfile() throws Exception {
         CivilServant civilServant = testDataService.generateCivilServant();
         cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
-        mockMvc.perform(post("/user/profile/complete-profile")
+        cslStubService.getCsrsStubService().getAreasOfWork("""
+                [
+                    {
+                        "id": 1,
+                        "name": "DdaT"
+                    },
+                    {
+                        "id": 2,
+                        "name": "Finance"
+                    }
+                ]
+                """);
+        cslStubService.getCsrsStubService().patchCivilServant("""
+                {
+                    "otherAreasOfWork": ["/professions/1", "/professions/2"]
+                }
+                """);
+        mockMvc.perform(post("/user/profile/other-areas-of-work?newProfile=true")
+                        .content("[1,2,3]")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
         verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));

@@ -6,10 +6,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
-import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
-import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnits;
+import uk.gov.cabinetoffice.csl.domain.csrs.*;
 
 import java.util.Comparator;
 import java.util.List;
@@ -23,6 +20,10 @@ import static java.util.stream.Collectors.toMap;
 public class CivilServantRegistryService {
 
     private final ICSRSClient civilServantRegistryClient;
+
+    public List<AreaOfWork> getAreasOfWork() {
+        return civilServantRegistryClient.getAreasOfWork();
+    }
 
     @Cacheable("organisations")
     public OrganisationalUnits getAllOrganisationalUnits() {
@@ -57,7 +58,7 @@ public class CivilServantRegistryService {
                 .peek(o -> {
                     StringBuilder formattedName = new StringBuilder(o.getName());
                     Long parentId = o.getParentId();
-                    while(parentId != null) {
+                    while (parentId != null) {
                         OrganisationalUnit parentOrganisationalUnit = orgMap.get(parentId);
                         String parentName = parentOrganisationalUnit.getName();
                         formattedName.insert(0, parentName + " | ");
