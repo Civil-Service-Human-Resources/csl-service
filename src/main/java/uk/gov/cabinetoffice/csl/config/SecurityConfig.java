@@ -64,6 +64,7 @@ public class SecurityConfig {
         log.info("Building oauth filter chain");
         httpSecurity.securityMatcher(
                         "/organisations/**",
+                        "/areas-of-work/**",
                         "/learning/**",
                         "/courses/**",
                         "/course_records/**",

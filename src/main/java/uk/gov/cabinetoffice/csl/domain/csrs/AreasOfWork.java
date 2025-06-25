@@ -10,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AreasOfWork {
-    private List<AreaOfWork> professions;
+    private List<AreaOfWork> areasOfWork;
 }
