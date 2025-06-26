@@ -44,7 +44,7 @@ public class UserProfileTests extends IntegrationTestBase {
                     }
                 ]
                 """);
-        cslStubService.getCsrsStubService().patchCivilServant("userId", """
+        cslStubService.getCsrsStubService().patchCivilServant("""
                 {
                     "otherAreasOfWork": ["/professions/1", "/professions/2"]
                 }

@@ -15,5 +15,5 @@ public interface ICSRSClient {
 
     List<AreaOfWork> getAreasOfWork();
 
-    void patchCivilServant(String uid, PatchCivilServantDto patch);
+    void patchCivilServant(PatchCivilServantDto patch);
 }

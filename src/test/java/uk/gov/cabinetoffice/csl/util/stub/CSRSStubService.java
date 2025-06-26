@@ -32,9 +32,9 @@ public class CSRSStubService {
         );
     }
 
-    public StubMapping patchCivilServant(String uid, String expectedInput) {
+    public StubMapping patchCivilServant(String expectedInput) {
         return stubFor(
-                WireMock.patch(urlPathEqualTo("/csrs/civilServants/" + uid))
+                WireMock.patch(urlPathEqualTo("/csrs/civilServants/me"))
                         .withRequestBody(equalToJson(expectedInput, true, true))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
