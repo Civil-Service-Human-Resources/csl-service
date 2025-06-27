@@ -11,12 +11,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/user/profile")
 @Slf4j
-public class UserController {
+public class UserProfileController {
 
     private final IUserAuthService userAuthService;
     private final UserProfileService userProfileService;
 
-    public UserController(IUserAuthService userAuthService, UserProfileService userProfileService) {
+    public UserProfileController(IUserAuthService userAuthService, UserProfileService userProfileService) {
         this.userAuthService = userAuthService;
         this.userProfileService = userProfileService;
     }
