@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.FetchCourseRecordParams;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
-import uk.gov.cabinetoffice.csl.service.CourseRecordService;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
+import uk.gov.cabinetoffice.csl.service.learningResources.course.CourseRecordService;
 
 import java.util.List;
 

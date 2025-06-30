@@ -7,9 +7,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecordId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
+import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
 @Slf4j
@@ -19,14 +20,16 @@ public class CacheResetController {
 
     private final LearnerRecordService learnerRecordService;
     private final IdentityService identityService;
-
     private final LearningCatalogueService learningCatalogueService;
+    private final CivilServantRegistryService civilServantRegistryService;
 
     public CacheResetController(LearnerRecordService learnerRecordService,
-                                IdentityService identityService, LearningCatalogueService learningCatalogueService) {
+                                IdentityService identityService, LearningCatalogueService learningCatalogueService,
+                                CivilServantRegistryService civilServantRegistryService) {
         this.learnerRecordService = learnerRecordService;
         this.identityService = identityService;
         this.learningCatalogueService = learningCatalogueService;
+        this.civilServantRegistryService = civilServantRegistryService;
     }
 
     @GetMapping(path = "/service-token", produces = "application/json")
@@ -41,10 +44,31 @@ public class CacheResetController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @GetMapping(path = "/learner/{learnerId}/course_record/{courseId}")
-    public ResponseEntity<?> removeCourseRecordFromCache(@PathVariable String learnerId,
-                                                         @PathVariable String courseId) {
-        learnerRecordService.bustCourseRecordCache(new CourseRecordId(learnerId, courseId));
+    @GetMapping(path = "/learner/{learnerId}/module_record/{moduleRecordId}")
+    public ResponseEntity<?> removeModuleRecordFromCache(@PathVariable String learnerId,
+                                                         @PathVariable String moduleRecordId) {
+        learnerRecordService.bustModuleRecordCache(new ModuleRecordResourceId(learnerId, moduleRecordId));
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping(path = "/learner/{learnerId}/learner_record/{resourceId}")
+    public ResponseEntity<?> removeLearnerRecordFromCache(@PathVariable String learnerId,
+                                                          @PathVariable String resourceId) {
+        learnerRecordService.bustLearnerRecordCache(learnerId, resourceId);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping(path = "/organisations", produces = "application/json")
+    public ResponseEntity<?> removeOrganisationsFromCache() {
+        civilServantRegistryService.removeOrganisationsFromCache();
+        civilServantRegistryService.removeFormattedOrganisationsFromCache();
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping(path = "/organisations/formatted_list", produces = "application/json")
+    public ResponseEntity<?> removeFormattedOrganisationsFromCache() {
+        civilServantRegistryService.removeOrganisationsFromCache();
+        civilServantRegistryService.removeFormattedOrganisationsFromCache();
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

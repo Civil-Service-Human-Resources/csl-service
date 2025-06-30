@@ -5,15 +5,26 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
+import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
+
+import java.util.List;
 
 @Component
 @Slf4j
 public class CSRSClient implements ICSRSClient {
 
+    @Value("${csrs.organisationalUnitMaxPageSize}")
+    private Integer organisationalUnitMaxPageSize;
+
     @Value("${csrs.civilServants}")
     private String civilServants;
+
+    @Value("${csrs.allOrganisationalUnits}")
+    private String allOrganisationalUnits;
 
     private final IHttpClient httpClient;
 
@@ -28,4 +39,13 @@ public class CSRSClient implements ICSRSClient {
         RequestEntity<Void> request = RequestEntity.get(url).build();
         return httpClient.executeRequest(request, CivilServant.class);
     }
+
+    @Override
+    public List<OrganisationalUnit> getAllOrganisationalUnits() {
+        log.info("Getting all organisational units");
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(allOrganisationalUnits);
+        return httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
+                .stream().toList();
+    }
+
 }

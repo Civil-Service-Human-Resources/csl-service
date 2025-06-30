@@ -6,13 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.cabinetoffice.csl.domain.IParentLearningResource;
+import uk.gov.cabinetoffice.csl.domain.LearningResourceType;
 import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.util.Cacheable;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Course implements Serializable, Cacheable {
+public class Course implements IParentLearningResource<Module>, Cacheable {
     private String id;
     private String title;
     private String shortDescription;
@@ -88,14 +89,14 @@ public class Course implements Serializable, Cacheable {
     }
 
     @JsonIgnore
-    public Collection<String> getRemainingModuleIdsForCompletion(CourseRecord courseRecord, User user) {
+    public Collection<String> getRemainingModuleIdsForCompletion(Map<String, ModuleRecord> moduleRecordMap, User user) {
         log.debug(String.format("Getting learning period for course %s and department codes %s", this.getId(), user.getDepartmentCodes()));
         LearningPeriod learningPeriod = getLearningPeriodForDepartmentHierarchy(user.getDepartmentCodes()).orElse(null);
         log.debug(String.format("Selected learning period: %s", learningPeriod));
         Map<String, State> realModuleStates = new HashMap<>();
-        courseRecord.getModuleRecords().forEach(mr -> {
-            State moduleRecordState = mr.getStateForLearningPeriod(learningPeriod);
-            realModuleStates.put(mr.getModuleId(), moduleRecordState);
+        moduleRecordMap.forEach((moduleId, moduleRecord) -> {
+            State moduleRecordState = moduleRecord.getStateForLearningPeriod(learningPeriod);
+            realModuleStates.put(moduleId, moduleRecordState);
         });
         return getRequiredModulesForCompletion().stream().filter(mod -> {
             State moduleState = realModuleStates.getOrDefault(mod.getId(), State.NULL);
@@ -103,4 +104,32 @@ public class Course implements Serializable, Cacheable {
         }).map(Module::getId).collect(Collectors.toSet());
     }
 
+    @Override
+    @JsonIgnore
+    public String getResourceId() {
+        return id;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getName() {
+        return title;
+    }
+
+    @Override
+    public LearningResourceType getType() {
+        return LearningResourceType.COURSE;
+    }
+
+    @Override
+    @JsonIgnore
+    public Collection<Module> getChildren() {
+        return this.modules;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getCacheableId() {
+        return id;
+    }
 }

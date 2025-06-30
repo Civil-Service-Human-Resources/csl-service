@@ -40,7 +40,6 @@ public class GetCourseCompletionsParams {
     protected List<String> courseIds;
 
     @Size(min = 1)
-    @NotNull
     protected List<String> organisationIds;
 
     protected List<String> professionIds;

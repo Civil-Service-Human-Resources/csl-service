@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.util.stub;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
@@ -19,16 +20,20 @@ public class LearningCatalogueStubService {
         this.utils = utils;
     }
 
-    public void getCourse(String courseId, Course response) {
-        getCourses(List.of(courseId), List.of(response));
+    public StubMapping getCourse(Course course) {
+        return getCourses(List.of(course.getId()), List.of(course));
     }
 
-    public void getCourses(List<String> courseIds, List<Course> response) {
-        getCourses(courseIds, utils.toJson(response));
+    public StubMapping getCourse(String courseId, Course response) {
+        return getCourses(List.of(courseId), List.of(response));
     }
 
-    public void getMandatoryLearningMap(String response) {
-        stubFor(
+    public StubMapping getCourses(List<String> courseIds, List<Course> response) {
+        return getCourses(courseIds, utils.toJson(response));
+    }
+
+    public StubMapping getMandatoryLearningMap(String response) {
+        return stubFor(
                 WireMock.get(urlPathEqualTo("/learning_catalogue/v2/courses/required-learning-map"))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
@@ -37,8 +42,8 @@ public class LearningCatalogueStubService {
         );
     }
 
-    public void getCourses(List<String> courseIds, String response) {
-        stubFor(
+    public StubMapping getCourses(List<String> courseIds, String response) {
+        return stubFor(
                 WireMock.get(urlPathEqualTo("/learning_catalogue/courses"))
                         .withQueryParam("courseId", equalTo(String.join(",", courseIds)))
                         .withHeader("Authorization", equalTo("Bearer token"))
@@ -48,8 +53,8 @@ public class LearningCatalogueStubService {
         );
     }
 
-    public void updateEvent(String courseId, String moduleId, String eventId, Event expectedInput) {
-        stubFor(
+    public StubMapping updateEvent(String courseId, String moduleId, String eventId, Event expectedInput) {
+        return stubFor(
                 WireMock.put(urlPathEqualTo(String.format("/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .withRequestBody(equalToJson(utils.toJson(expectedInput), true, true))

@@ -6,10 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecords;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
@@ -35,10 +31,7 @@ public class BookEventTest extends IntegrationTestBase {
     private String userEmail;
     private String moduleId;
     private String eventId;
-    private CourseRecord courseRecord;
-    private CourseRecords courseRecords;
     private Course course;
-    private ModuleRecord moduleRecord;
 
     @Autowired
     private CSLStubService cslStubService;
@@ -50,14 +43,11 @@ public class BookEventTest extends IntegrationTestBase {
         userEmail = testDataService.getUserEmail();
         moduleId = testDataService.getModuleId();
         eventId = testDataService.getEventId();
-        courseRecord = testDataService.generateCourseRecord(true);
-        courseRecords = new CourseRecords(List.of(courseRecord));
-        moduleRecord = courseRecord.getModuleRecord(moduleId).get();
         course = testDataService.generateCourse(true, true);
     }
 
     @Test
-    public void testBookFreeEventAndCreateCourseRecord() throws Exception {
+    public void testBookFreeEventAndCreateModuleRecord() throws Exception {
         course.getModule(moduleId).setCost(BigDecimal.valueOf(0L));
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         BookingDto dto = BookingDto.builder()
@@ -67,23 +57,27 @@ public class BookEventTest extends IntegrationTestBase {
                 .learner(userId)
                 .learnerEmail(userEmail)
                 .learnerName("testName").build();
-        String expectedCourseRecordPOST = """
+        String expectedModuleRecordPOST = """
                 [{
-                    "courseId" : "courseId",
-                    "userId" : "userId",
-                    "courseTitle" : "Test Course",
-                    "state" : "APPROVED",
-                    "modules": [
-                        {
-                            "id" : null,
-                            "moduleId" : "moduleId",
-                            "moduleTitle" : "Test Module",
-                            "state": "APPROVED",
-                            "eventId" : "eventId",
-                            "eventDate" : "2023-01-01"
-                        }
-                    ]
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "APPROVED",
+                    "eventId" : "eventId",
+                    "eventDate" : "2023-01-01"
                 }]
+                """;
+        String expectedModuleRecordPOSTResponse = """
+                {"moduleRecords":[{
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "APPROVED",
+                    "eventId" : "eventId",
+                    "eventDate" : "2023-01-01"
+                }]}
                 """;
         String expectedBookingJsonInput = String.format("""
                         {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
@@ -91,7 +85,7 @@ public class BookEventTest extends IntegrationTestBase {
                         """, dto.getEvent(), userId, userEmail, testDataService.getLearnerFirstName(), "2023-01-01T10:00:00Z", "access1,access2",
                 "Confirmed");
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
-        cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);
+        cslStubService.stubCreateModuleRecords(courseId, moduleId, course, userId, expectedModuleRecordPOST, expectedModuleRecordPOSTResponse);
         BookEventDto inputDto = new BookEventDto(List.of("access1", "access2"), "", testDataService.generateUserDetailsDto());
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
         mockMvc.perform(post(url)
@@ -102,51 +96,7 @@ public class BookEventTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testBookFreeEventAndUpdateCourseRecord() throws Exception {
-        course.getModule(moduleId).setCost(BigDecimal.valueOf(0L));
-        course.getModule(moduleId).setModuleType(ModuleType.facetoface);
-        courseRecord.setState(State.IN_PROGRESS);
-        BookingDto dto = BookingDto.builder()
-                .event(URI.create(String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
-                .status(BookingStatus.CONFIRMED)
-                .learner(userId)
-                .learnerEmail(userEmail)
-                .learnerName("testName").build();
-        String expectedBookingJsonInput = String.format("""
-                {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
-                "status": "%s", "accessibilityOptions" : ""}
-                """, dto.getEvent(), userId, userEmail, testDataService.getLearnerFirstName(), "2023-01-01T10:00:00Z", "Confirmed");
-        String expectedCourseRecordPUT = """
-                [{
-                    "courseId" : "courseId",
-                    "userId" : "userId",
-                    "courseTitle" : "Test Course",
-                    "state" : "IN_PROGRESS",
-                    "modules": [
-                        {
-                            "id" : 1,
-                            "moduleId" : "moduleId",
-                            "moduleTitle" : "Test Module",
-                            "state": "APPROVED",
-                            "eventId" : "eventId",
-                            "eventDate" : "2023-01-01"
-                        }
-                    ]
-                }]
-                """;
-        cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
-        cslStubService.stubUpdateCourseRecord(courseId, course, userId, courseRecords, expectedCourseRecordPUT, courseRecord);
-        BookEventDto inputDto = new BookEventDto(List.of(), "", testDataService.generateUserDetailsDto());
-        String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(utils.toJson(inputDto)))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.message").value("Successfully applied action 'Approve a booking' to course record"));
-    }
-
-    @Test
-    public void testBookPaidEventAndCreateCourseRecord() throws Exception {
+    public void testBookPaidEventAndCreateModuleRecord() throws Exception {
         course.getModule(moduleId).setCost(BigDecimal.valueOf(5L));
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         BookingDto dto = BookingDto.builder()
@@ -162,26 +112,32 @@ public class BookEventTest extends IntegrationTestBase {
                         "accessibilityOptions": "%s", "status": "%s", "poNumber":"%s"}
                         """, dto.getEvent(), userId, userEmail, testDataService.getLearnerFirstName(), "2023-01-01T10:00:00Z", "access1",
                 "Requested", "poNumber123");
-        String expectedCourseRecordPOST = """
+        String expectedModuleRecordPOST = """
                 [{
-                    "courseId" : "courseId",
-                    "userId" : "userId",
-                    "courseTitle" : "Test Course",
-                    "state" : "REGISTERED",
-                    "modules": [
-                        {
-                            "id" : null,
-                            "moduleId" : "moduleId",
-                            "moduleTitle" : "Test Module",
-                            "state": "REGISTERED",
-                            "eventId" : "eventId",
-                            "eventDate" : "2023-01-01"
-                        }
-                    ]
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "REGISTERED",
+                    "eventId" : "eventId",
+                    "eventDate" : "2023-01-01"
                 }]
                 """;
+        String expectedModuleRecordPOSTResponse = """
+                {"moduleRecords":[{
+                    "userId": "userId",
+                    "courseId": "courseId",
+                    "moduleId" : "moduleId",
+                    "moduleId" : "moduleId",
+                    "moduleTitle" : "Test Module",
+                    "state": "REGISTERED",
+                    "eventId" : "eventId",
+                    "eventDate" : "2023-01-01"
+                }]}
+                """;
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
-        cslStubService.stubCreateCourseRecord(courseId, course, userId, expectedCourseRecordPOST, courseRecord);
+        cslStubService.stubCreateModuleRecords(courseId, moduleId, course, userId, expectedModuleRecordPOST, expectedModuleRecordPOSTResponse);
         BookEventDto inputDto = new BookEventDto(List.of("access1"), "poNumber123", testDataService.generateUserDetailsDto());
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
         mockMvc.perform(post(url)

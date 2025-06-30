@@ -1,7 +1,6 @@
 package uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.event;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.Result;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
@@ -16,26 +15,21 @@ public class RegisterBookingTest extends BaseEventModuleRecordActionTest<Registe
 
     @Override
     protected RegisterEvent buildProcessor() {
-        return new RegisterEvent(utilService, courseWithModuleWithEvent, user);
+        return new RegisterEvent(event);
     }
 
     @Test
     public void testRegisterBooking() {
-        CourseRecord cr = generateCourseRecord(true);
-        cr.setState(State.NULL);
-        ModuleRecord mr = cr.getModuleRecord(getModuleId()).get();
+        ModuleRecord mr = generateModuleRecord();
         mr.setResult(Result.PASSED);
         mr.setCompletionDate(LocalDateTime.now());
         mr.setBookingStatus(BookingStatus.CONFIRMED);
-        cr = actionUnderTest.applyUpdatesToCourseRecord(cr);
-        assertEquals(State.REGISTERED, cr.getState());
-
-        ModuleRecord moduleRecord = cr.getModuleRecord(getModuleId()).get();
-        assertEquals(State.REGISTERED, moduleRecord.getState());
-        assertEquals(event.getId(), moduleRecord.getEventId());
-        assertEquals(event.getStartTime(), moduleRecord.getEventDate());
-        assertNull(moduleRecord.getResult());
-        assertNull(moduleRecord.getCompletionDate());
+        mr = actionUnderTest.applyUpdates(mr);
+        assertEquals(State.REGISTERED, mr.getState());
+        assertEquals(event.getId(), mr.getEventId());
+        assertEquals(event.getStartTime(), mr.getEventDate());
+        assertNull(mr.getResult());
+        assertNull(mr.getCompletionDate());
     }
 
 }

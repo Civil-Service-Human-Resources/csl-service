@@ -9,11 +9,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ITypedLearnerRecordResourceID;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
+import uk.gov.cabinetoffice.csl.util.Cacheable;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,10 +25,16 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ModuleRecord implements Serializable {
+public class ModuleRecord implements Cacheable {
 
     private Long id;
     private String uid;
+    private String userId;
+    private String courseId;
+    /*
+    Temporary whilst we're dual-running the legacy course_record table
+     */
+    private String courseTitle;
     private String moduleId;
     private String moduleTitle;
     private ModuleType moduleType;
@@ -38,7 +46,6 @@ public class ModuleRecord implements Serializable {
     private BigDecimal cost;
     private State state;
     private Result result;
-    private String score;
     private Boolean rated = Boolean.FALSE;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime completionDate;
@@ -46,20 +53,26 @@ public class ModuleRecord implements Serializable {
     private LocalDateTime createdAt;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime updatedAt;
-    private String paymentMethod;
-    private String paymentDetails;
     private BookingStatus bookingStatus;
     @JsonIgnore
-    private CourseRecord courseRecord;
+    private boolean isNewRecord = false;
 
-    public ModuleRecord(String moduleId, String moduleTitle, ModuleType moduleType,
+    public ModuleRecord(String courseId, String courseTitle, String userId, String moduleId, String moduleTitle, ModuleType moduleType,
                         Long duration, Boolean optional, BigDecimal cost) {
+        this.courseId = courseId;
+        this.courseTitle = courseTitle;
+        this.userId = userId;
         this.moduleId = moduleId;
         this.moduleTitle = moduleTitle;
         this.moduleType = moduleType;
         this.duration = duration;
         this.optional = optional;
         this.cost = cost;
+    }
+
+    @JsonIgnore
+    public String getCacheableId() {
+        return getLearnerRecordId().getAsString();
     }
 
     public State getState() {
@@ -81,6 +94,16 @@ public class ModuleRecord implements Serializable {
             }
         }
         return state;
+    }
+
+    @JsonIgnore
+    public ITypedLearnerRecordResourceID getLearnerRecordId() {
+        return new ModuleRecordResourceId(userId, moduleId);
+    }
+
+    @JsonIgnore
+    public String getLearnerRecordIdAsString() {
+        return getLearnerRecordId().getAsString();
     }
 
 }

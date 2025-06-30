@@ -30,9 +30,9 @@ public class ModuleController {
     public ModuleResponse completeModule(@PathVariable("courseId") String courseId,
                                          @PathVariable("moduleId") String moduleId,
                                          @RequestBody @Valid UserDetailsDto userDetailsDto) {
-        log.debug("courseId: {}, moduleId: {}", courseId, moduleId);
+        log.debug("resourceId: {}, moduleId: {}", courseId, moduleId);
         User user = User.fromUserDetails(userAuthService.getUsername(), userDetailsDto);
-        return moduleService.completeModule(user, courseId, moduleId, null);
+        return moduleService.completeModule(user, courseId, moduleId);
     }
 
     @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/launch", produces = "application/json")
@@ -41,11 +41,11 @@ public class ModuleController {
     public LaunchLink createModuleLaunchLink(@PathVariable("courseId") String courseId,
                                              @PathVariable("moduleId") String moduleId,
                                              @RequestBody @Valid UserDetailsDto userDetailsDto) {
-        log.debug("courseId: {}, moduleId: {}", courseId, moduleId);
+        log.debug("resourceId: {}, moduleId: {}", courseId, moduleId);
         User user = User.fromUserDetails(userAuthService.getUsername(), userDetailsDto);
         LaunchLink launchLink = moduleService.launchModule(user, courseId, moduleId, userDetailsDto);
         if (launchLink == null) {
-            throw new GenericServerException("Unable to retrieve module launch link for the learnerId: " + user.getId() + ", courseId: "
+            throw new GenericServerException("Unable to retrieve module launch link for the learnerId: " + user.getId() + ", resourceId: "
                     + courseId + " and moduleId: " + moduleId);
         } else {
             return launchLink;

@@ -1,14 +1,11 @@
 package uk.gov.cabinetoffice.csl.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.CourseResponse;
-import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.service.CourseService;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.ActionWithId;
+import uk.gov.cabinetoffice.csl.service.CourseActionService;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 
 @Slf4j
@@ -16,32 +13,34 @@ import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 @RequestMapping("courses")
 public class CourseController {
 
-    private final CourseService courseService;
+    private final CourseActionService courseActionService;
+    private final ActionWithIdFactory actionWithIdFactory;
     private final IUserAuthService userAuthService;
 
-    public CourseController(CourseService courseService, IUserAuthService userAuthService) {
-        this.courseService = courseService;
+    public CourseController(CourseActionService courseActionService, ActionWithIdFactory actionWithIdFactory, IUserAuthService userAuthService) {
+        this.courseActionService = courseActionService;
+        this.actionWithIdFactory = actionWithIdFactory;
         this.userAuthService = userAuthService;
     }
 
     @PostMapping("/{courseId}/remove_from_learning_plan")
-    public ResponseEntity<CourseResponse> removeCourseFromLearningPlan(@PathVariable("courseId") String courseId) {
-        String learnerId = userAuthService.getUsername();
-        CourseResponse response = courseService.removeFromLearningPlan(new User(learnerId), courseId);
-        return ResponseEntity.ok(response);
+    @ResponseBody
+    public CourseResponse removeCourseFromLearningPlan(@PathVariable("courseId") String courseId) {
+        ActionWithId action = actionWithIdFactory.create(courseId, userAuthService.getUsername(), CourseRecordAction.REMOVE_FROM_LEARNING_PLAN);
+        return courseActionService.performCourseAction(action);
     }
 
     @PostMapping("/{courseId}/add_to_learning_plan")
-    public ResponseEntity<CourseResponse> addCourseToLearningPlan(@PathVariable("courseId") String courseId) {
-        String learnerId = userAuthService.getUsername();
-        CourseResponse response = courseService.addToLearningPlan(new User(learnerId), courseId);
-        return ResponseEntity.ok(response);
+    @ResponseBody
+    public CourseResponse addCourseToLearningPlan(@PathVariable("courseId") String courseId) {
+        ActionWithId action = actionWithIdFactory.create(courseId, userAuthService.getUsername(), CourseRecordAction.MOVE_TO_LEARNING_PLAN);
+        return courseActionService.performCourseAction(action);
     }
 
     @PostMapping("/{courseId}/remove_from_suggestions")
-    public ResponseEntity<CourseResponse> removeCourseSuggestions(@PathVariable("courseId") String courseId) {
-        String learnerId = userAuthService.getUsername();
-        CourseResponse response = courseService.removeFromSuggestions(new User(learnerId), courseId);
-        return ResponseEntity.ok(response);
+    @ResponseBody
+    public CourseResponse removeCourseSuggestions(@PathVariable("courseId") String courseId) {
+        ActionWithId action = actionWithIdFactory.create(courseId, userAuthService.getUsername(), CourseRecordAction.REMOVE_FROM_SUGGESTIONS);
+        return courseActionService.performCourseAction(action);
     }
 }

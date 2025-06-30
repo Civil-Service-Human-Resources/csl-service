@@ -44,9 +44,9 @@ public class LearningCatalogueServiceTest {
         when(cache.getMultiple(List.of("course1", "course2", "course3"))).thenReturn(cacheResult);
 
         List<Course> result = learningCatalogueService.getCourses(List.of("course1", "course2", "course3"));
-        assertEquals("course1", result.get(0).getId());
-        assertEquals("course2", result.get(1).getId());
-        assertEquals("course3", result.get(2).getId());
+        assertEquals("course1", result.get(0).getCacheableId());
+        assertEquals("course2", result.get(1).getCacheableId());
+        assertEquals("course3", result.get(2).getCacheableId());
     }
 
     @Test
@@ -65,9 +65,9 @@ public class LearningCatalogueServiceTest {
         when(client.getCourses(List.of("cache-miss-course3"))).thenReturn(List.of(course3));
 
         List<Course> result = learningCatalogueService.getCourses(List.of("course1", "course2", "cache-miss-course3"));
-        assertEquals("course1", result.get(0).getId());
-        assertEquals("course2", result.get(1).getId());
-        assertEquals("cache-miss-course3", result.get(2).getId());
+        assertEquals("course1", result.get(0).getCacheableId());
+        assertEquals("course2", result.get(1).getCacheableId());
+        assertEquals("cache-miss-course3", result.get(2).getCacheableId());
         verify(cache, atLeastOnce()).put(course3);
     }
 }

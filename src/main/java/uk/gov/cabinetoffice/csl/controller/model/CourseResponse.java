@@ -1,20 +1,18 @@
 package uk.gov.cabinetoffice.csl.controller.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.LearningResourceType;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class CourseResponse {
-    private String message;
-    private String courseTitle;
-    private String courseId;
+public class CourseResponse extends ResourceActionResponse {
 
-    public static CourseResponse fromMetaData(CourseRecordAction actionType, Course course) {
-        return new CourseResponse(String.format("Successfully applied action '%s' to course record", actionType.getDescription()), course.getTitle(), course.getId());
+    public CourseResponse(String actionDescription, String resourceId, String resourceTitle, boolean performedUpdate) {
+        super(actionDescription, LearningResourceType.COURSE, resourceId, resourceTitle, performedUpdate);
+    }
+
+    public String getCourseTitle() {
+        return this.getResourceTitle();
+    }
+
+    public String getCourseId() {
+        return this.getResourceId();
     }
 }

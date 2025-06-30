@@ -11,8 +11,6 @@ public interface ILearningCatalogueClient {
 
     List<Course> getCourses(Collection<String> courseIds);
 
-    Course getCourse(String courseId);
-
     RequiredLearningMap getRequiredLearningIdMap();
 
     Event updateEvent(String courseId, String moduleId, Event event);

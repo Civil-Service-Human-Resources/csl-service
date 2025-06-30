@@ -29,7 +29,7 @@ public class EventController {
                                    @PathVariable("moduleId") String moduleId,
                                    @PathVariable("eventId") String eventId,
                                    @Valid @RequestBody BookEventDto dto) {
-        log.debug("courseId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
+        log.debug("resourceId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
         String learnerId = userAuthService.getUsername();
         User user = new User(learnerId);
         return eventService.bookEvent(user, courseId, moduleId, eventId, dto);
@@ -41,7 +41,7 @@ public class EventController {
                                        @PathVariable("moduleId") String moduleId,
                                        @PathVariable("eventId") String eventId,
                                        @Valid @RequestBody CancelBookingDto dto) {
-        log.debug("courseId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
+        log.debug("resourceId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
         String learnerId = userAuthService.getUsername();
         User user = new User(learnerId);
         return eventService.cancelBooking(user, courseId, moduleId, eventId, dto);
@@ -53,7 +53,7 @@ public class EventController {
                                          @PathVariable("moduleId") String moduleId,
                                          @PathVariable("eventId") String eventId,
                                          @Valid @RequestBody UserDetailsDto dto) {
-        log.debug("courseId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
+        log.debug("resourceId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
         User user = User.fromUserDetails(userAuthService.getUsername(), dto);
         return eventService.completeBooking(user, courseId, moduleId, eventId);
     }
@@ -63,7 +63,7 @@ public class EventController {
     public EventResponse skipBooking(@PathVariable("courseId") String courseId,
                                      @PathVariable("moduleId") String moduleId,
                                      @PathVariable("eventId") String eventId) {
-        log.debug("courseId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
+        log.debug("resourceId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
         String learnerId = userAuthService.getUsername();
         return eventService.skipBooking(new User(learnerId), courseId, moduleId, eventId);
     }
