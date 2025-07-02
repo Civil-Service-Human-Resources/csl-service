@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public class RegisteredLearnerAccount {
+public class RegisteredLearnerAccountActivate {
     private final String uid;
     private final Boolean active;
 }

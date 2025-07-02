@@ -3,7 +3,7 @@ package uk.gov.cabinetoffice.csl.service.user;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
-import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.ActivateAccountMessage;
+import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerAccountActivateMessage;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class UserAccountService {
     }
 
     public void activateUser(String uid) {
-        ActivateAccountMessage message = messageMetadataFactory.generateActivateAccountMessage(uid);
+        RegisteredLearnerAccountActivateMessage message = messageMetadataFactory.generateRegisteredLearnerAccountActivateMessage(uid);
         messagingClient.sendMessages(List.of(message));
     }
 }

@@ -5,12 +5,12 @@ import lombok.Getter;
 import java.io.Serial;
 
 @Getter
-public final class ActivateAccountMessage extends RegisteredLearnerMessage<RegisteredLearnerAccount> {
+public final class RegisteredLearnerAccountActivateMessage extends RegisteredLearnerMessage<RegisteredLearnerAccountActivate> {
     @Serial
     private static final long serialVersionUID = 0L;
-    private final RegisteredLearnerAccount data;
+    private final RegisteredLearnerAccountActivate data;
 
-    public ActivateAccountMessage(RegisteredLearnerAccount data) {
+    public RegisteredLearnerAccountActivateMessage(RegisteredLearnerAccountActivate data) {
         super(RegisteredLearnerOperation.UPDATE, RegisteredLearnerDataType.ACCOUNT_ACTIVATE, data);
         this.data = data;
     }
