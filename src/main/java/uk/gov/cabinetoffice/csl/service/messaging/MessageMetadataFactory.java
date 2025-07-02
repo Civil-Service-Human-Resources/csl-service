@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.messaging.model.CourseCompletionMessage;
+import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.CompleteProfileMessage;
+import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerProfile;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +16,12 @@ public class MessageMetadataFactory {
         return new CourseCompletionMessage(completionDate, user.getId(), user.getEmail(), course.getId(), course.getTitle(),
                 user.getOrganisationId(), user.getFormattedOrganisationName(), user.getProfessionId(),
                 user.getProfessionName(), user.getGradeId(), user.getGradeName());
+    }
+
+    public CompleteProfileMessage generateCompleteProfileMessage(User user) {
+        return new CompleteProfileMessage(new RegisteredLearnerProfile(user.getId(), user.getEmail(), user.getName(), user.getOrganisationId(),
+                user.getFormattedOrganisationName(), user.getGradeId(), user.getGradeName(), user.getProfessionId(),
+                user.getProfessionName()));
     }
 
 }

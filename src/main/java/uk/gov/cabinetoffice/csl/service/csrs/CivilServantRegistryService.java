@@ -6,10 +6,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
-import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
-import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnits;
+import uk.gov.cabinetoffice.csl.domain.csrs.*;
 
 import java.util.Comparator;
 import java.util.List;
@@ -24,6 +21,10 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class CivilServantRegistryService {
 
     private final ICSRSClient civilServantRegistryClient;
+
+    public List<AreaOfWork> getAreasOfWork() {
+        return civilServantRegistryClient.getAreasOfWork();
+    }
 
     @Cacheable("organisations")
     public OrganisationalUnits getAllOrganisationalUnits() {
@@ -58,7 +59,7 @@ public class CivilServantRegistryService {
                 .peek(o -> {
                     StringBuilder formattedName = new StringBuilder(getFormattedNameWithAbbreviation(o.getName(), o.getAbbreviation()));
                     Long parentId = o.getParentId();
-                    while(parentId != null) {
+                    while (parentId != null) {
                         OrganisationalUnit parentOrganisationalUnit = orgMap.get(parentId);
                         String parentName = getFormattedNameWithAbbreviation(parentOrganisationalUnit.getName(), parentOrganisationalUnit.getAbbreviation());
                         formattedName.insert(0, parentName + " | ");
