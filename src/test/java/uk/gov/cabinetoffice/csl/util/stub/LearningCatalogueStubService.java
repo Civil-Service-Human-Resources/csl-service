@@ -45,7 +45,7 @@ public class LearningCatalogueStubService {
     public StubMapping getCourses(List<String> courseIds, String response) {
         return stubFor(
                 WireMock.get(urlPathEqualTo("/learning_catalogue/courses"))
-                        .withQueryParam("courseId", equalTo(String.join(",", courseIds)))
+                        .withQueryParam("courseId", including(courseIds.toArray(String[]::new)))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
