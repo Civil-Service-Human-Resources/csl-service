@@ -35,6 +35,15 @@ public class Module implements IChildLearningResource, IParentLearningResource<E
 
     private boolean requiredForCompletion;
 
+    public Integer getDurationInMinutes() {
+        if (this.moduleType.equals(ModuleType.facetoface) && !this.events.isEmpty()) {
+            Event e = this.events.stream().findFirst().get();
+            return e.getDurationInMinutes();
+        } else {
+            return this.duration == null ? 0 : this.duration.intValue();
+        }
+    }
+
     @JsonIgnore
     public void updateEvent(Event event) {
         events.stream().collect(Collectors.toMap(Event::getId, e -> e)).put(event.getId(), event);

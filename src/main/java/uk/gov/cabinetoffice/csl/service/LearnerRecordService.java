@@ -79,6 +79,10 @@ public class LearnerRecordService {
         return getLearnerRecords(Arrays.stream(resourceIds).map(rId -> new LearnerRecordResourceId(learnerId, rId)).toList());
     }
 
+    public List<LearnerRecordEvent> getLearnerRecordEvents(LearnerRecordEventQuery query) {
+        return client.getLearnerRecordEvents(query);
+    }
+
     public List<LearnerRecord> getLearnerRecords(List<? extends ILearnerRecordResourceID> ids) {
         try {
             List<String> stringIds = ids.stream().map(ILearnerRecordResourceID::getAsString).toList();
@@ -160,7 +164,7 @@ public class LearnerRecordService {
     public List<LearnerRecordEvent> createLearnerRecordEvents(List<LearnerRecordEventDto> newLearnerRecordEvents) {
         return client.createLearnerRecordEvents(newLearnerRecordEvents)
                 .stream().peek(lre -> {
-                    LearnerRecord lr = learnerRecordCache.get(lre.getResourceId().getAsString());
+                    LearnerRecord lr = learnerRecordCache.get(lre.getRecordResourceId().getAsString());
                     if (lr != null) {
                         lr.setLatestEvent(lre);
                         learnerRecordCache.put(lr);

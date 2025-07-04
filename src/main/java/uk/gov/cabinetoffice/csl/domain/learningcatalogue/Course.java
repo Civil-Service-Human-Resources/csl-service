@@ -32,6 +32,22 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     private Map<String, Integer> departmentCodeToRequiredAudienceMap = new HashMap<>();
 
     @JsonIgnore
+    public String getCourseType() {
+        if (modules.isEmpty()) {
+            return "unknown";
+        } else if (modules.size() == 1) {
+            return modules.stream().findFirst().get().getModuleType().getText();
+        } else {
+            return "blended";
+        }
+    }
+
+    @JsonIgnore
+    public Integer getDurationInMinutes() {
+        return modules.stream().mapToInt(Module::getDurationInMinutes).sum();
+    }
+
+    @JsonIgnore
     public void updateEvent(String moduleId, Event event) {
         Optional.ofNullable(getModule(moduleId))
                 .ifPresent(module -> module.updateEvent(event));
@@ -73,6 +89,11 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
             }
         }
         return Optional.empty();
+    }
+
+    @JsonIgnore
+    public Optional<LearningPeriod> getLearningPeriodForUser(User user) {
+        return getLearningPeriodForDepartmentHierarchy(user.getDepartmentCodes());
     }
 
     @JsonIgnore
@@ -132,4 +153,5 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     public String getCacheableId() {
         return id;
     }
+
 }

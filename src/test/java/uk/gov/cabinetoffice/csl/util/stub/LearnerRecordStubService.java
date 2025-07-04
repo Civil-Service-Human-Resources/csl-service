@@ -170,4 +170,18 @@ public class LearnerRecordStubService {
         );
     }
 
+    public StubMapping getLearnerRecordEvents(Integer page, List<String> eventTypes, String userId, String response) {
+        MappingBuilder mappingBuilder = WireMock.get(urlPathEqualTo("/learner_record_api/learner_record_events"))
+                .withQueryParam("userId", equalTo(userId))
+                .withQueryParam("size", equalTo("50"))
+                .withQueryParam("page", equalTo(page.toString()))
+                .withQueryParam("eventTypes", equalTo(String.join(",", eventTypes)));
+        return stubFor(
+                mappingBuilder
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
 }
