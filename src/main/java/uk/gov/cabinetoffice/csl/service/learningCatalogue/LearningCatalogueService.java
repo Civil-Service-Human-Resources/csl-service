@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
@@ -17,7 +17,6 @@ import uk.gov.cabinetoffice.csl.util.ObjectCache;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -88,14 +87,17 @@ public class LearningCatalogueService {
         }
     }
 
-    public List<Course> getRequiredLearningForDepartments(Collection<String> departmentCodes) {
+    public List<String> getRequiredLearningIdsForDepartments(Collection<String> departmentCodes) {
         RequiredLearningMap map = requiredLearningMapCache.get();
         if (map == null) {
             map = client.getRequiredLearningIdMap();
             requiredLearningMapCache.put(map);
         }
-        Set<String> uniqueCourseIds = map.getRequiredLearningWithDepartmentCodes(departmentCodes);
-        return this.getCourses(uniqueCourseIds);
+        return map.getRequiredLearningWithDepartmentCodes(departmentCodes).stream().toList();
+    }
+
+    public List<Course> getRequiredLearningForDepartments(Collection<String> departmentCodes) {
+        return this.getCourses(getRequiredLearningIdsForDepartments(departmentCodes));
     }
 
     public void removeCourseFromCache(String courseId) {
