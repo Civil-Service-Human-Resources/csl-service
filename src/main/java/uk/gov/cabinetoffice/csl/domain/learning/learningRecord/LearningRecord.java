@@ -18,7 +18,7 @@ public class LearningRecord {
 
     @JsonIgnore
     public void sort() {
-        this.requiredLearningRecord.completedCourses.sort(Comparator.comparing(LearningRecordCourse::getCompletionDate));
-        this.otherLearning.sort(Comparator.comparing(LearningRecordCourse::getCompletionDate));
+        this.requiredLearningRecord.completedCourses.sort(Comparator.comparing(LearningRecordCourse::getCompletionDate).reversed());
+        this.otherLearning.sort(Comparator.comparing(LearningRecordCourse::getCompletionDate).reversed());
     }
 }
