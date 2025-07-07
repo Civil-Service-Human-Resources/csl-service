@@ -186,6 +186,7 @@ public class LearningRecordTest extends IntegrationTestBase {
         mockMvc.perform(get("/learning/record")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.userId").value("userId"))
                 .andExpect(jsonPath("$.requiredLearningRecord.totalRequired").value(2))
                 .andExpect(jsonPath("$.requiredLearningRecord.completedCourses.length()").value(1))
                 .andExpect(jsonPath("$.requiredLearningRecord.completedCourses[0].id").value("course1"))

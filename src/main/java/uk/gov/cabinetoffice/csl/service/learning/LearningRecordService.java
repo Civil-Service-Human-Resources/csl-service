@@ -58,7 +58,7 @@ public class LearningRecordService {
                     }
                 });
         RequiredLearningRecord requiredLearningRecord = new RequiredLearningRecord(requiredLearning, requiredLearningIds.size());
-        LearningRecord learningRecord = new LearningRecord(requiredLearningRecord, otherLearning);
+        LearningRecord learningRecord = new LearningRecord(uid, requiredLearningRecord, otherLearning);
         learningRecord.sort();
         return learningRecord;
     }

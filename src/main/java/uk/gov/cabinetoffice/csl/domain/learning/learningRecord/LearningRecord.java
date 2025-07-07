@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 public class LearningRecord {
+    public String userId;
     public RequiredLearningRecord requiredLearningRecord;
     public List<LearningRecordCourse> otherLearning;
 
