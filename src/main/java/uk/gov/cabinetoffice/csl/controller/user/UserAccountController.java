@@ -23,4 +23,12 @@ public class UserAccountController {
         log.info("activate uid: {}", uid);
         userAccountService.activateUser(uid);
     }
+
+    @PostMapping(path = "/{uid}/updateEmail/{email}")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void updateEmail(@PathVariable String uid, @PathVariable String email) {
+        log.info("updateEmail: uid: {}, email: {}", uid, email);
+        userAccountService.updateEmail(uid, email);
+    }
 }

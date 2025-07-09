@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerAccountActivateMessage;
+import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerEmailUpdateMessage;
 
 import java.util.List;
 
@@ -20,6 +21,11 @@ public class UserAccountService {
 
     public void activateUser(String uid) {
         RegisteredLearnerAccountActivateMessage message = messageMetadataFactory.generateRegisteredLearnerAccountActivateMessage(uid);
+        messagingClient.sendMessages(List.of(message));
+    }
+
+    public void updateEmail(String uid, String email) {
+        RegisteredLearnerEmailUpdateMessage message = messageMetadataFactory.generateRegisteredLearnerEmailUpdateMessage(uid, email);
         messagingClient.sendMessages(List.of(message));
     }
 }

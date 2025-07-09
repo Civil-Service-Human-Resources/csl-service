@@ -4,10 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.messaging.model.CourseCompletionMessage;
-import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerAccountActivateMessage;
-import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.CompleteProfileMessage;
-import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerAccountActivate;
-import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerProfile;
+import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.*;
 
 import java.time.LocalDateTime;
 
@@ -28,5 +25,9 @@ public class MessageMetadataFactory {
 
     public RegisteredLearnerAccountActivateMessage generateRegisteredLearnerAccountActivateMessage(String uid) {
         return new RegisteredLearnerAccountActivateMessage(new RegisteredLearnerAccountActivate(uid, true));
+    }
+
+    public RegisteredLearnerEmailUpdateMessage generateRegisteredLearnerEmailUpdateMessage(String uid, String email) {
+        return new RegisteredLearnerEmailUpdateMessage(new RegisteredLearnerEmailUpdate(uid, email));
     }
 }
