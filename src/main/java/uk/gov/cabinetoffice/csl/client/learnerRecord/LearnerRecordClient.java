@@ -105,6 +105,9 @@ public class LearnerRecordClient implements ILearnerRecordClient {
         if (!isEmpty(query.getEventTypes())) {
             uriBuilder.queryParam("eventTypes", query.getEventTypes());
         }
+        if (!isEmpty(query.getResourceIds())) {
+            uriBuilder.queryParam("resourceIds", query.getResourceIds());
+        }
         if (!isEmpty(query.getUserId())) {
             uriBuilder.queryParam("userId", query.getUserId());
         }
