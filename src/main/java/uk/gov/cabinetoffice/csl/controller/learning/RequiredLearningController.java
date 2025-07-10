@@ -3,6 +3,8 @@ package uk.gov.cabinetoffice.csl.controller.learning;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.domain.learning.Learning;
+import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearning;
+import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 import uk.gov.cabinetoffice.csl.service.learning.RequiredLearningService;
 
 @Slf4j
@@ -11,9 +13,17 @@ import uk.gov.cabinetoffice.csl.service.learning.RequiredLearningService;
 public class RequiredLearningController {
 
     private final RequiredLearningService requiredLearningService;
+    private final IUserAuthService userAuthService;
 
-    public RequiredLearningController(RequiredLearningService requiredLearningService) {
+    public RequiredLearningController(RequiredLearningService requiredLearningService, IUserAuthService userAuthService) {
         this.requiredLearningService = requiredLearningService;
+        this.userAuthService = userAuthService;
+    }
+
+    @GetMapping
+    public RequiredLearning getRequiredLearning() {
+        String uid = userAuthService.getUsername();
+        return requiredLearningService.getRequiredLearning(uid);
     }
 
     @GetMapping("/detailed/{userId}")

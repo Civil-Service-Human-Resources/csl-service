@@ -10,33 +10,31 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ILearnerRecordActionType;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
-import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
+import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class CourseRecordFactory {
 
-    private final LearnerRecordService learnerRecordService;
+    private final LearnerRecordDataUtils learnerRecordDataUtils;
 
-    public CourseRecordFactory(LearnerRecordService learnerRecordService) {
-        this.learnerRecordService = learnerRecordService;
+    public CourseRecordFactory(LearnerRecordDataUtils learnerRecordDataUtils) {
+        this.learnerRecordDataUtils = learnerRecordDataUtils;
     }
 
     public List<CourseRecord> transformToCourseRecords(List<CourseWithRecord> coursesWithRecord) {
-        Map<String, List<ModuleRecord>> courseToModuleRecords = coursesWithRecord.stream().collect(Collectors.toMap(CourseWithRecord::getCourseId, c -> new ArrayList<>()));
-        List<ModuleRecordResourceId> moduleRecordIds = coursesWithRecord.stream().flatMap(c -> c.getModuleResourceIds().stream()).toList();
-        learnerRecordService.getModuleRecords(moduleRecordIds)
-                .forEach(mr -> {
-                    List<ModuleRecord> mrs = courseToModuleRecords.get(mr.getCourseId());
-                    mrs.add(mr);
-                    courseToModuleRecords.put(mr.getCourseId(), mrs);
-                });
+        List<String> courseIds = new ArrayList<>();
+        List<ModuleRecordResourceId> moduleRecordResourceIds = new ArrayList<>();
+        coursesWithRecord.forEach(courseWithRecord -> {
+            courseIds.add(courseWithRecord.getCourseId());
+            moduleRecordResourceIds.addAll(courseWithRecord.getModuleResourceIds());
+        });
+        Map<String, List<ModuleRecord>> courseToModuleRecords = learnerRecordDataUtils.getModuleRecordsForCourses(courseIds, moduleRecordResourceIds);
         return coursesWithRecord.stream().map(c -> transformToCourseRecord(c, courseToModuleRecords.get(c.getCourseId()))).toList();
     }
 

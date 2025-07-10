@@ -64,10 +64,12 @@ public class SecurityConfig {
         log.info("Building oauth filter chain");
         httpSecurity.securityMatcher(
                         "/organisations/**",
+                        "/areas-of-work/**",
                         "/learning/**",
                         "/courses/**",
                         "/course_records/**",
                         "/admin/**",
+                        "/user/**",
                         "/reset-cache/**")
                 .cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

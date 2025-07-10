@@ -23,7 +23,7 @@ public class LearnerRecordEvent implements Serializable {
     private LearnerRecordEventSource eventSource;
     private LocalDateTime eventTimestamp;
 
-    public ITypedLearnerRecordResourceID getResourceId() {
+    public ITypedLearnerRecordResourceID getRecordResourceId() {
         return new TypedLearnerRecordResourceId(learnerId, resourceId, actionType.getRecordType());
     }
 }

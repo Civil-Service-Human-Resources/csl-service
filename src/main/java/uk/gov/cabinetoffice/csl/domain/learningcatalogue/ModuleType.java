@@ -2,8 +2,10 @@ package uk.gov.cabinetoffice.csl.domain.learningcatalogue;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@Getter
 public enum ModuleType {
     elearning("elearning"),
     file("file"),

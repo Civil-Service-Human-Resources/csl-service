@@ -3,12 +3,16 @@ package uk.gov.cabinetoffice.csl.client.csrs;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
+import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
+import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
 import java.util.List;
@@ -25,6 +29,9 @@ public class CSRSClient implements ICSRSClient {
 
     @Value("${csrs.allOrganisationalUnits}")
     private String allOrganisationalUnits;
+
+    @Value("${csrs.professions}")
+    private String professionsTree;
 
     private final IHttpClient httpClient;
 
@@ -63,6 +70,22 @@ public class CSRSClient implements ICSRSClient {
 
 
         return organisationalUnits;
+    }
+
+    @Override
+    @Cacheable("areas-of-work")
+    public List<AreaOfWork> getAreasOfWork() {
+        return httpClient.executeTypeReferenceRequest(
+                RequestEntity.get(professionsTree).build(),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+    }
+
+    @Override
+    public void patchCivilServant(PatchCivilServantDto patch) {
+        String url = String.format("%s/me", civilServants);
+        httpClient.executeRequest(RequestEntity.patch(url).body(patch.getAsApiParams()), Void.class);
     }
 
 }
