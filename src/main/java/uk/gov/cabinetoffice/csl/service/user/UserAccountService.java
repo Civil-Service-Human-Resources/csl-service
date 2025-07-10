@@ -11,10 +11,14 @@ import java.util.List;
 @Service
 public class UserAccountService {
 
+    private final UserDetailsService userDetailsService;
     private final MessageMetadataFactory messageMetadataFactory;
     private final IMessagingClient messagingClient;
 
-    public UserAccountService(MessageMetadataFactory messageMetadataFactory, IMessagingClient messagingClient) {
+    public UserAccountService(UserDetailsService userDetailsService,
+                              MessageMetadataFactory messageMetadataFactory,
+                              IMessagingClient messagingClient) {
+        this.userDetailsService = userDetailsService;
         this.messageMetadataFactory = messageMetadataFactory;
         this.messagingClient = messagingClient;
     }
@@ -27,5 +31,6 @@ public class UserAccountService {
     public void updateEmail(String uid, String email) {
         RegisteredLearnerEmailUpdateMessage message = messageMetadataFactory.generateRegisteredLearnerEmailUpdateMessage(uid, email);
         messagingClient.sendMessages(List.of(message));
+        userDetailsService.removeUserFromCache(uid);
     }
 }
