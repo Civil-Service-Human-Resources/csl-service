@@ -3,11 +3,12 @@ package uk.gov.cabinetoffice.csl.service.chart;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
-import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
+import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
 
 import java.util.List;
 
@@ -17,8 +18,8 @@ public class CourseCompletionByCourseChartFactory extends CourseCompletionChartF
 
     private final CourseCompletionsChartBuilder chartBuilder;
 
-    public CourseCompletionByCourseChartFactory(IReportServiceClient reportServiceClient, CourseCompletionsChartBuilder chartBuilder) {
-        super(reportServiceClient, chartBuilder);
+    public CourseCompletionByCourseChartFactory(IReportServiceClient reportServiceClient, CourseCompletionsChartBuilder chartBuilder, CivilServantRegistryService civilServantRegistryService) {
+        super(reportServiceClient, chartBuilder, civilServantRegistryService);
         this.chartBuilder = chartBuilder;
     }
 
@@ -28,7 +29,7 @@ public class CourseCompletionByCourseChartFactory extends CourseCompletionChartF
     }
 
     @Override
-    public CourseCompletionChart buildCourseCompletionsChart(GetCourseCompletionsParams params, IdentityDto user) {
+    public CourseCompletionChart buildCourseCompletionsChart(OrganisationIdsCourseCompletionsParams params, IdentityDto user) {
         AggregationResponse<CourseCompletionAggregation> aggregations = reportServiceClient.getCourseCompletionAggregationsByCourse(params);
         List<AggregationChart> charts = chartBuilder.buildCourseCompletionCharts(params, aggregations.getResults());
         boolean hasRequests = this.getHasRequests(user);

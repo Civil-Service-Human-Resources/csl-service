@@ -32,4 +32,10 @@ public class OrganisationalUnit implements Serializable {
         this.abbreviation = abbreviation;
         this.parent = parent;
     }
+
+    public boolean hasDomain(String domain){
+        return this.domains.stream().map(d -> d.domain)
+                .toList()
+                .contains(domain);
+    }
 }

@@ -6,9 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
+import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -48,7 +51,7 @@ public class ReportTest extends IntegrationTestBase {
                   ]
                 }
                 """;
-        String expectedInput = """
+        String expectedInputForCompletionAggregations = """
                 {
                     "startDate":"2023-12-31T23:00:00",
                     "endDate":"2024-01-01T12:00:00",
@@ -56,12 +59,40 @@ public class ReportTest extends IntegrationTestBase {
                     "organisationIds":["1","2"]
                 }
                 """;
+
+        String expectedInputForGenerateGraph = """
+                {
+                    "startDate":"2023-12-31T23:00:00",
+                    "endDate":"2024-01-01T12:00:00",
+                    "timezone": "+01:00",
+                    "selectedOrganisationIds":["1","2"]
+                }
+                """;
+
+        OrganisationalUnit org1 = new OrganisationalUnit();
+        org1.setId(1L);
+        org1.setName("Org1");
+        OrganisationalUnit org2 = new OrganisationalUnit();
+        org2.setId(2L);
+        org2.setName("Org2");
+        List<OrganisationalUnit> orgs = new ArrayList<>();
+        orgs.add(org1);
+        orgs.add(org2);
+
+        OrganisationalUnitsPagedResponse organisationalUnitsPagedResponse = new OrganisationalUnitsPagedResponse();
+        organisationalUnitsPagedResponse.setContent(orgs);
+        organisationalUnitsPagedResponse.setTotalPages(1);
+        organisationalUnitsPagedResponse.setTotalElements(2);
+        organisationalUnitsPagedResponse.setSize(2);
+
+        cslStubService.getCsrsStubService().getOrganisations(organisationalUnitsPagedResponse);
         cslStubService.getReportServiceStubService().getCourseCompletionAggregations(
-                expectedInput, response
+                expectedInputForCompletionAggregations, response
         );
+
         mockMvc.perform(post("/admin/reporting/course-completions/generate-graph")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(expectedInput))
+                        .content(expectedInputForGenerateGraph))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.chart[\"2024-01-01T00:00:00\"]").value(0))
                 .andExpect(jsonPath("$.chart[\"2024-01-01T00:00:00\"]").value(0))
@@ -134,15 +165,45 @@ public class ReportTest extends IntegrationTestBase {
                   ]
                 }
                 """;
-        String expectedInput = """
+
+        String expectedInputForCompletionAggregations = """
                 {
                     "startDate":"2023-12-31T23:00:00",
                     "endDate":"2024-01-01T12:00:00",
                     "timezone": "+01:00",
-                    "courseIds":["course1", "course2"],
-                    "organisationIds":["1","2"]
+                    "organisationIds":["1","2"],
+                    "courseIds":["course1", "course2"]
                 }
                 """;
+
+        String expectedInputForGenerateGraph = """
+                {
+                    "startDate":"2023-12-31T23:00:00",
+                    "endDate":"2024-01-01T12:00:00",
+                    "timezone": "+01:00",
+                    "selectedOrganisationIds":["1","2"],
+                    "courseIds":["course1", "course2"]
+                }
+                """;
+
+        OrganisationalUnit org1 = new OrganisationalUnit();
+        org1.setId(1L);
+        org1.setName("Org1");
+        OrganisationalUnit org2 = new OrganisationalUnit();
+        org2.setId(2L);
+        org2.setName("Org2");
+        List<OrganisationalUnit> orgs = new ArrayList<>();
+        orgs.add(org1);
+        orgs.add(org2);
+
+        OrganisationalUnitsPagedResponse organisationalUnitsPagedResponse = new OrganisationalUnitsPagedResponse();
+        organisationalUnitsPagedResponse.setContent(orgs);
+        organisationalUnitsPagedResponse.setTotalPages(1);
+        organisationalUnitsPagedResponse.setTotalElements(2);
+        organisationalUnitsPagedResponse.setSize(2);
+
+        cslStubService.getCsrsStubService().getOrganisations(organisationalUnitsPagedResponse);
+
         Course course1 = new Course();
         course1.setId("course1");
         course1.setTitle("Course 1 title");
@@ -150,12 +211,13 @@ public class ReportTest extends IntegrationTestBase {
         course2.setId("course2");
         course2.setTitle("Course 2 title");
         cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course2"), List.of(course1, course2));
+
         cslStubService.getReportServiceStubService().getCourseCompletionAggregationsByCourse(
-                expectedInput, response
+                expectedInputForCompletionAggregations, response
         );
         mockMvc.perform(post("/admin/reporting/course-completions/generate-graph")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(expectedInput))
+                        .content(expectedInputForGenerateGraph))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.chart[\"2024-01-01T00:00:00\"]").value(0))
                 .andExpect(jsonPath("$.chart[\"2024-01-01T00:00:00\"]").value(0))
@@ -188,7 +250,7 @@ public class ReportTest extends IntegrationTestBase {
                     "details": "addedSuccessfully"
                 }
                 """;
-        String input = """
+        String inputForReportRequest = """
                 {
                     "startDate":"2024-05-08T00:00:00",
                     "endDate":"2024-05-09T00:00:00",
@@ -200,11 +262,42 @@ public class ReportTest extends IntegrationTestBase {
                     "downloadBaseUrl": "http://localhost:3005/download"
                 }
                 """;
-        cslStubService.getReportServiceStubService().postReportRequest(input, reportRequestsResponse);
+
+        String inputForRequestSourceData = """
+                {
+                    "startDate":"2024-05-08T00:00:00",
+                    "endDate":"2024-05-09T00:00:00",
+                    "timezone": "Europe/London",
+                    "courseIds":["course1", "course2"],
+                    "selectedOrganisationIds":["1","2"],
+                    "userEmail": "email",
+                    "userId": "id",
+                    "downloadBaseUrl": "http://localhost:3005/download"
+                }
+                """;
+
+        OrganisationalUnit org1 = new OrganisationalUnit();
+        org1.setId(1L);
+        org1.setName("Org1");
+        OrganisationalUnit org2 = new OrganisationalUnit();
+        org2.setId(2L);
+        org2.setName("Org2");
+        List<OrganisationalUnit> orgs = new ArrayList<>();
+        orgs.add(org1);
+        orgs.add(org2);
+
+        OrganisationalUnitsPagedResponse organisationalUnitsPagedResponse = new OrganisationalUnitsPagedResponse();
+        organisationalUnitsPagedResponse.setContent(orgs);
+        organisationalUnitsPagedResponse.setTotalPages(1);
+        organisationalUnitsPagedResponse.setTotalElements(2);
+        organisationalUnitsPagedResponse.setSize(2);
+
+        cslStubService.getCsrsStubService().getOrganisations(organisationalUnitsPagedResponse);
+        cslStubService.getReportServiceStubService().postReportRequest(inputForReportRequest, reportRequestsResponse);
         mockMvc.perform(post("/admin/reporting/course-completions/request-source-data")
                         .with(jwt().authorities(new SimpleGrantedAuthority("REPORT_EXPORT")))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(input))
+                        .content(inputForRequestSourceData))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.addedSuccessfully").value(true))
                 .andExpect(jsonPath("$.details").value("addedSuccessfully"));

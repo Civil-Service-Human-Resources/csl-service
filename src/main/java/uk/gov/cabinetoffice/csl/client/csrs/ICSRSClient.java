@@ -12,8 +12,8 @@ public interface ICSRSClient {
     CivilServant getCivilServantProfileWithUid(String uid);
 
     List<OrganisationalUnit> getAllOrganisationalUnits();
-
     List<AreaOfWork> getAreasOfWork();
 
     void patchCivilServant(PatchCivilServantDto patch);
+    List<OrganisationalUnit> getOrganisationalUnitsById(Integer[] ids, boolean fetchChildren);
 }
