@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
+import uk.gov.cabinetoffice.csl.controller.model.FormattedOrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
@@ -33,7 +34,10 @@ public class CivilServantRegistryServiceTest {
     void shouldReturnFormattedOrganisationalUnitNames() {
         List<OrganisationalUnit> organisationalUnits = createOrganisationsList();
         when(civilServantRegistryClient.getAllOrganisationalUnits()).thenReturn(organisationalUnits);
-        FormattedOrganisationalUnitNames formattedOrganisationalUnitNames = civilServantRegistryService.getFormattedOrganisationalUnitNames();
+        FormattedOrganisationalUnitsParams formattedOrganisationalUnitsParams = new FormattedOrganisationalUnitsParams();
+        formattedOrganisationalUnitsParams.setOrganisationId(null);
+        formattedOrganisationalUnitsParams.setDomain(null);
+        FormattedOrganisationalUnitNames formattedOrganisationalUnitNames = civilServantRegistryService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams);
         Map<Long, FormattedOrganisationalUnitName> orgMap = formattedOrganisationalUnitNames.getFormattedOrganisationalUnitNames()
                 .stream()
                 .collect(Collectors.toMap(FormattedOrganisationalUnitName::getId, o -> o));

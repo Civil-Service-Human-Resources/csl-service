@@ -6,6 +6,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
+import uk.gov.cabinetoffice.csl.controller.model.FormattedOrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
@@ -25,9 +26,15 @@ public class CivilServantRegistryService {
     private final ICSRSClient civilServantRegistryClient;
 
     @Cacheable("organisations")
-    public OrganisationalUnits getAllOrganisationalUnits() {
+    public OrganisationalUnits getOrganisationalUnitsByIds() {
         log.info("Getting all organisational units");
         return new OrganisationalUnits(setFormattedName(civilServantRegistryClient.getAllOrganisationalUnits()));
+    }
+
+    @Cacheable("organisations-by-ids")
+    public OrganisationalUnits getOrganisationalUnitsByIds(Integer[] ids, boolean fetchChildren) {
+        log.info("Getting organisational units by IDs: " + ids.toString());
+        return new OrganisationalUnits(setFormattedName(civilServantRegistryClient.getOrganisationalUnitsById(ids, fetchChildren)));
     }
 
     @CacheEvict(value = "organisations", allEntries = true)
@@ -35,10 +42,29 @@ public class CivilServantRegistryService {
         log.info("Organisations are removed from the cache.");
     }
 
+    @CacheEvict(value = "organisations-by-ids", allEntries = true)
+    public void removeOrganisationsByIdsFromCache() {
+        log.info("Organisations by ID are removed from the cache.");
+    }
+
     @Cacheable("organisations-formatted")
-    public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames() {
+    public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(FormattedOrganisationalUnitsParams formattedOrganisationalUnitsParams) {
         log.info("Getting formatted organisational unit names");
-        return new FormattedOrganisationalUnitNames(getAllOrganisationalUnits().getOrganisationalUnits()
+        OrganisationalUnits organisationalUnits;
+        if(formattedOrganisationalUnitsParams.getOrganisationId() == null){
+            organisationalUnits = getOrganisationalUnitsByIds();
+        }
+        else{
+            organisationalUnits = getOrganisationalUnitsByIds(formattedOrganisationalUnitsParams.getOrganisationId(), false);
+        }
+
+        List<OrganisationalUnit> organisationList = organisationalUnits.getOrganisationalUnits();
+
+        if(formattedOrganisationalUnitsParams.getDomain() != null){
+            organisationList = organisationList.stream().filter(org -> org.hasDomain(formattedOrganisationalUnitsParams.getDomain())).toList();
+        }
+
+        return new FormattedOrganisationalUnitNames(organisationList
                 .stream()
                 .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName()))
                 .sorted(Comparator.comparing(FormattedOrganisationalUnitName::getName))
@@ -51,8 +77,9 @@ public class CivilServantRegistryService {
     }
 
     private List<OrganisationalUnit> setFormattedName(List<OrganisationalUnit> allOrganisationalUnits) {
-        Map<Long, OrganisationalUnit> orgMap = allOrganisationalUnits.stream()
+        Map<Long, OrganisationalUnit> orgMap = civilServantRegistryClient.getAllOrganisationalUnits().stream()
                 .collect(toMap(OrganisationalUnit::getId, o -> o));
+
         return allOrganisationalUnits.stream()
                 .peek(o -> {
                     StringBuilder formattedName = new StringBuilder(o.getName());

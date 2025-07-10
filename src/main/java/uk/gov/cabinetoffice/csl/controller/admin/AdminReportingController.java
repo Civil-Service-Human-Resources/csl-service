@@ -9,8 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
-import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
-import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithSelectedOrganisationIdsParams;
+import uk.gov.cabinetoffice.csl.controller.model.SelectedOrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
@@ -28,14 +28,14 @@ public class AdminReportingController {
 
     @PostMapping(path = "/course-completions/generate-graph", produces = "application/json")
     @ResponseBody
-    public CourseCompletionChart getCourseCompletions(@Valid @RequestBody GetCourseCompletionsParams params) {
+    public CourseCompletionChart getCourseCompletions(@Valid @RequestBody SelectedOrganisationIdsCourseCompletionsParams params) {
         IdentityDto user = userAuthService.getIdentity();
         return reportService.getCourseCompletionsChart(params, user);
     }
 
     @PostMapping(path = "/course-completions/request-source-data", produces = "application/json")
     @ResponseBody
-    public AddCourseCompletionReportRequestResponse requestSourceData(@Valid @RequestBody CreateReportRequestParams params) {
+    public AddCourseCompletionReportRequestResponse requestSourceData(@Valid @RequestBody CreateReportRequestWithSelectedOrganisationIdsParams params) {
         return reportService.requestCourseCompletionsExport(params);
     }
 

@@ -10,4 +10,5 @@ public interface ICSRSClient {
     CivilServant getCivilServantProfileWithUid(String uid);
 
     List<OrganisationalUnit> getAllOrganisationalUnits();
+    List<OrganisationalUnit> getOrganisationalUnitsById(Integer[] ids, boolean fetchChildren);
 }
