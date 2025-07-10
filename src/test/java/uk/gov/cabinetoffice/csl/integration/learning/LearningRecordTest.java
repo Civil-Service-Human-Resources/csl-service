@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventQuery;
 import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
@@ -182,7 +183,8 @@ public class LearningRecordTest extends IntegrationTestBase {
         cslStubService.getLearningCatalogue().getMandatoryLearningMap(requiredLearningMap);
         cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course2", "course3"), courses);
         cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
-        cslStubService.getLearnerRecord().getLearnerRecordEvents(0, List.of("COMPLETE_COURSE"), "userId", eventsResponse);
+        cslStubService.getLearnerRecord().getLearnerRecordEvents(0, LearnerRecordEventQuery.builder().userId("userId")
+                .eventTypes(List.of("COMPLETE_COURSE")).build(), eventsResponse);
         mockMvc.perform(get("/learning/record")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())

@@ -103,6 +103,13 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     }
 
     @JsonIgnore
+    public List<String> getRequiredModuleIdsForCompletion() {
+        return getRequiredModulesForCompletion().stream()
+                .map(Module::getId)
+                .collect(Collectors.toList());
+    }
+
+    @JsonIgnore
     public List<Module> getRequiredModulesForCompletion() {
         return this.modules.stream()
                 .filter(Module::isRequiredForCompletion)
