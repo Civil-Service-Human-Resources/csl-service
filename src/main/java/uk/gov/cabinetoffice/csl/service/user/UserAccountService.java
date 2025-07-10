@@ -29,8 +29,8 @@ public class UserAccountService {
     }
 
     public void updateEmail(String uid, String email) {
+        userDetailsService.removeUserFromCache(uid);
         RegisteredLearnerEmailUpdateMessage message = messageMetadataFactory.generateRegisteredLearnerEmailUpdateMessage(uid, email);
         messagingClient.sendMessages(List.of(message));
-        userDetailsService.removeUserFromCache(uid);
     }
 }
