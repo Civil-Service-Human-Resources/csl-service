@@ -28,7 +28,7 @@ public class CivilServantRegistryService {
     }
 
     @Cacheable("organisations")
-    public OrganisationalUnits getOrganisationalUnitsByIds() {
+    public OrganisationalUnits getAllOrganisationalUnits() {
         log.info("Getting all organisational units");
         return new OrganisationalUnits(setFormattedName(civilServantRegistryClient.getAllOrganisationalUnits()));
     }
@@ -54,7 +54,7 @@ public class CivilServantRegistryService {
         log.info("Getting formatted organisational unit names");
         OrganisationalUnits organisationalUnits;
         if(formattedOrganisationalUnitsParams.getOrganisationId() == null){
-            organisationalUnits = getOrganisationalUnitsByIds();
+            organisationalUnits = getAllOrganisationalUnits();
         }
         else{
             organisationalUnits = getOrganisationalUnitsByIds(formattedOrganisationalUnitsParams.getOrganisationId(), false);

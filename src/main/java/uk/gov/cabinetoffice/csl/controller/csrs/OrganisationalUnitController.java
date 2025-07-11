@@ -24,7 +24,7 @@ public class OrganisationalUnitController {
     @ResponseStatus(HttpStatus.OK)
     public OrganisationalUnits getAllOrganisationalUnits() {
         log.info("Getting all organisational units");
-        return civilServantRegistryService.getOrganisationalUnitsByIds();
+        return civilServantRegistryService.getAllOrganisationalUnits();
 
     }
 
