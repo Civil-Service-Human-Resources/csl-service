@@ -55,4 +55,20 @@ public class UserProfileTests extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful());
         verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
     }
+
+    @Test
+    public void testSetFullName() throws Exception {
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
+        cslStubService.getCsrsStubService().patchCivilServant("""
+                {
+                    "fullName": "fullName"
+                }
+                """);
+        mockMvc.perform(post("/user/profile/fullName")
+                        .content("fullName")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful());
+        verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
+    }
 }

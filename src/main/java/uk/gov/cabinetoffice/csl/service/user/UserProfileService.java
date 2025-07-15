@@ -8,6 +8,7 @@ import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.CompleteProfileMessage;
+import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.UpdateProfileMessage;
 
 import java.util.List;
 
@@ -40,5 +41,14 @@ public class UserProfileService {
                 messagingClient.sendMessages(List.of(message));
             }
         }
+    }
+
+    public void setFullName(String uid, String fullName) {
+        PatchCivilServantDto patch = PatchCivilServantDto.builder().fullName(fullName).build();
+        client.patchCivilServant(patch);
+        userDetailsService.removeUserFromCache(uid);
+        User user = userDetailsService.getUserWithUid(uid);
+        UpdateProfileMessage message = messageMetadataFactory.generateUpdateProfileMessage(user);
+        messagingClient.sendMessages(List.of(message));
     }
 }
