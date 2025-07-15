@@ -12,6 +12,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.domain.rustici.*;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
+import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 @Service
 @Slf4j

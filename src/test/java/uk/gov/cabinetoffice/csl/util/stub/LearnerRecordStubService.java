@@ -7,6 +7,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventQuery;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
 import java.util.List;
@@ -170,4 +171,23 @@ public class LearnerRecordStubService {
         );
     }
 
+    public StubMapping getLearnerRecordEvents(Integer page, LearnerRecordEventQuery query, String response) {
+        MappingBuilder mappingBuilder = WireMock.get(urlPathEqualTo("/learner_record_api/learner_record_events"))
+                .withQueryParam("userId", equalTo(query.getUserId()))
+                .withQueryParam("size", equalTo("50"))
+                .withQueryParam("page", equalTo(page.toString()));
+        if (query.getEventTypes() != null) {
+            mappingBuilder.withQueryParam("eventTypes", equalTo(String.join(",", query.getEventTypes())));
+        }
+        if (query.getResourceIds() != null) {
+            mappingBuilder.withQueryParam("resourceIds", equalTo(String.join(",", query.getResourceIds())));
+        }
+        return stubFor(
+                mappingBuilder
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
 }

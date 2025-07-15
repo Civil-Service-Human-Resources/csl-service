@@ -33,6 +33,10 @@ public class Event implements IChildLearningResource, Cacheable {
         return dateRanges.get(0).getDate();
     }
 
+    public Integer getDurationInMinutes() {
+        return dateRanges.stream().mapToInt(DateRange::getDurationInMinutes).sum();
+    }
+
     @JsonIgnore
     public String getStartTimeAsString() {
         return this.getStartTime().format(DateTimeFormatter.ofPattern("dd MMM uuuu"));
