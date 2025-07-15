@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseFactory;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.RequiredLearningMap;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
+import uk.gov.cabinetoffice.csl.util.IUtilService;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,23 +27,31 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     private String courses;
     @Value("${learningCatalogue.courseV2Url}")
     private String v2Courses;
+    @Value("${learningCatalogue.courseBatchSize}")
+    private Integer courseBatchSize;
     private final IHttpClient httpClient;
     private final CourseFactory courseFactory;
+    private final IUtilService utilService;
 
     public LearningCatalogueClient(@Qualifier("learningCatalogueHttpClient") IHttpClient httpClient,
-                                   CourseFactory courseFactory) {
+                                   CourseFactory courseFactory, IUtilService utilService) {
         this.httpClient = httpClient;
         this.courseFactory = courseFactory;
+        this.utilService = utilService;
     }
 
     @Override
     public List<Course> getCourses(Collection<String> courseIds) {
         log.info("Getting courses with ids '{}' from learning catalogue API", courseIds);
-        String url = String.format("%s?courseId=%s", courses, String.join(",", courseIds));
-        RequestEntity<Void> request = RequestEntity.get(url).build();
-        List<Course> course = httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
-        });
-        return course.stream().map(this::buildCourseData).collect(Collectors.toList());
+        return utilService.batchList(courseIds.stream().toList(), courseBatchSize)
+                .stream().flatMap(courseIdsBatch -> {
+                    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(courses);
+                    uriBuilder.queryParam("courseId", courseIdsBatch);
+                    RequestEntity<Void> request = RequestEntity.get(uriBuilder.build().toUriString()).build();
+                    List<Course> courses = httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
+                    });
+                    return courses.stream();
+                }).map(this::buildCourseData).collect(Collectors.toList());
     }
 
     @Override
