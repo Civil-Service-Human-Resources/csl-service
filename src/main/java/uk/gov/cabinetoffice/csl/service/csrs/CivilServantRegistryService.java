@@ -9,6 +9,7 @@ import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.controller.model.FormattedOrganisationalUnitsParams;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,8 @@ public class CivilServantRegistryService {
     }
 
     @Cacheable("organisations-by-ids")
-    public OrganisationalUnits getOrganisationalUnitsByIds(Integer[] ids, boolean fetchChildren) {
-        log.info("Getting organisational units by IDs: " + ids.toString());
+    public OrganisationalUnits getOrganisationalUnitsByIds(List<Integer> ids, Boolean fetchChildren) {
+        log.info("Getting organisational units by IDs: " + ids);
         return new OrganisationalUnits(setFormattedName(civilServantRegistryClient.getOrganisationalUnitsById(ids, fetchChildren)));
     }
 

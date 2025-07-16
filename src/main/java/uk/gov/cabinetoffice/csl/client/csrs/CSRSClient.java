@@ -58,7 +58,7 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public List<OrganisationalUnit> getOrganisationalUnitsById(Integer[] ids, boolean fetchChildren) {
+    public List<OrganisationalUnit> getOrganisationalUnitsById(List<Integer> ids, boolean fetchChildren) {
         log.info("Getting organisational units by IDs: " + ids.toString());
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(allOrganisationalUnits);
         uriBuilder.queryParam("ids", ids);

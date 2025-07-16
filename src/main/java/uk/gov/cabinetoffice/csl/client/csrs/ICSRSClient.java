@@ -15,5 +15,5 @@ public interface ICSRSClient {
     List<AreaOfWork> getAreasOfWork();
 
     void patchCivilServant(PatchCivilServantDto patch);
-    List<OrganisationalUnit> getOrganisationalUnitsById(Integer[] ids, boolean fetchChildren);
+    List<OrganisationalUnit> getOrganisationalUnitsById(List<Integer> ids, boolean fetchChildren);
 }

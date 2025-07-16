@@ -54,7 +54,7 @@ public class ReportService {
         organisationIdsCourseCompletionsParams.setProfessionIds(params.getProfessionIds());
         organisationIdsCourseCompletionsParams.setGradeIds(params.getGradeIds());
         if(params.getSelectedOrganisationIds() != null) {
-            organisationIdsCourseCompletionsParams.setOrganisationIds(getOrgananisationIdsWithChildrenAsFlatList(params.getSelectedOrganisationIds()));
+            organisationIdsCourseCompletionsParams.setOrganisationIds(getOrganisationIdsWithChildrenAsFlatList(params.getSelectedOrganisationIds()));
         }
 
         return factory.buildCourseCompletionsChart(organisationIdsCourseCompletionsParams, user);
@@ -74,7 +74,7 @@ public class ReportService {
         createReportServiceReportRequestParams.setDownloadBaseUrl(params.getDownloadBaseUrl());
         createReportServiceReportRequestParams.setFullName(params.getFullName());
         if(params.getSelectedOrganisationIds() != null) {
-            createReportServiceReportRequestParams.setOrganisationIds(getOrgananisationIdsWithChildrenAsFlatList(params.getSelectedOrganisationIds()));
+            createReportServiceReportRequestParams.setOrganisationIds(getOrganisationIdsWithChildrenAsFlatList(params.getSelectedOrganisationIds()));
         }
 
         return reportServiceClient.postCourseCompletionsExportRequest(createReportServiceReportRequestParams);
@@ -95,8 +95,8 @@ public class ReportService {
         }
     }
 
-    public List<String> getOrgananisationIdsWithChildrenAsFlatList(List<String> organisationIds) {
-        List<OrganisationalUnit> organisationalUnits = civilServantRegistryService.getOrganisationalUnitsByIds(organisationIds.stream().map(Integer::valueOf).toArray(Integer[]::new), true).getOrganisationalUnits();
+    public List<String> getOrganisationIdsWithChildrenAsFlatList(List<String> organisationIds) {
+        List<OrganisationalUnit> organisationalUnits = civilServantRegistryService.getOrganisationalUnitsByIds(organisationIds.stream().map(Integer::parseInt).toList(), true).getOrganisationalUnits();
         List<OrganisationalUnit> orgUnitsWithChildren = getOrganisationsWithChildrenAsFlatList(organisationalUnits);
         List<String> orgIds = orgUnitsWithChildren.stream().map(o -> Long.toString(o.getId())).toList();
         return orgIds;
