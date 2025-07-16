@@ -47,6 +47,10 @@ public class UserProfileService {
         PatchCivilServantDto patch = PatchCivilServantDto.builder().fullName(fullName).build();
         client.patchCivilServant(patch);
         userDetailsService.removeUserFromCache(uid);
+        updateReportingData(uid);
+    }
+
+    private void updateReportingData(String uid) {
         User user = userDetailsService.getUserWithUid(uid);
         UpdateProfileMessage message = messageMetadataFactory.generateUpdateProfileMessage(user);
         messagingClient.sendMessages(List.of(message));
