@@ -96,7 +96,12 @@ public class ReportService {
     }
 
     public List<String> getOrganisationIdsWithChildrenAsFlatList(List<String> organisationIds) {
-        List<OrganisationalUnit> organisationalUnits = civilServantRegistryService.getOrganisationalUnitsByIds(organisationIds.stream().map(Integer::parseInt).toList(), true).getOrganisationalUnits();
+        List<OrganisationalUnit> organisationalUnits = civilServantRegistryService
+                .getAllOrganisationalUnitsWithChildren().getOrganisationalUnits()
+                .stream()
+                .filter(organisationalUnit -> organisationIds.contains(organisationalUnit.getId().toString()))
+                .toList();
+
         List<OrganisationalUnit> orgUnitsWithChildren = getOrganisationsWithChildrenAsFlatList(organisationalUnits);
         List<String> orgIds = orgUnitsWithChildren.stream().map(o -> Long.toString(o.getId())).toList();
         return orgIds;

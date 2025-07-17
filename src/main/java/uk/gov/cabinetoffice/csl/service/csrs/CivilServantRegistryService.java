@@ -34,6 +34,12 @@ public class CivilServantRegistryService {
         return new OrganisationalUnits(setFormattedName(civilServantRegistryClient.getAllOrganisationalUnits()));
     }
 
+    @Cacheable("organisations-with-children")
+    public OrganisationalUnits getAllOrganisationalUnitsWithChildren() {
+        log.info("Getting all organisational units with children");
+        return new OrganisationalUnits(setFormattedName(civilServantRegistryClient.getAllOrganisationalUnits(true)));
+    }
+
     @Cacheable("organisations-by-ids")
     public OrganisationalUnits getOrganisationalUnitsByIds(List<Integer> ids, Boolean fetchChildren) {
         log.info("Getting organisational units by IDs: " + ids);

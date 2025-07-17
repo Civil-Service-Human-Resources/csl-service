@@ -48,13 +48,19 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public List<OrganisationalUnit> getAllOrganisationalUnits() {
+    public List<OrganisationalUnit> getAllOrganisationalUnits(Boolean fetchChildren) {
         log.info("Getting all organisational units");
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(allOrganisationalUnits);
+        uriBuilder.queryParam("fetchChildren", fetchChildren);
         List<OrganisationalUnit> organisationalUnits = httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
                 .stream().toList();
 
         return organisationalUnits;
+    }
+
+    @Override
+    public List<OrganisationalUnit> getAllOrganisationalUnits() {
+        return getAllOrganisationalUnits(false);
     }
 
     @Override
@@ -66,9 +72,6 @@ public class CSRSClient implements ICSRSClient {
 
         List<OrganisationalUnit> organisationalUnits = httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
                 .stream().toList();
-
-
-
         return organisationalUnits;
     }
 
