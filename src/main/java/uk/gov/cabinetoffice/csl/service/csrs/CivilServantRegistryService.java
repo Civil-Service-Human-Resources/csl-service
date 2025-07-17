@@ -40,34 +40,20 @@ public class CivilServantRegistryService {
         return new OrganisationalUnits(setFormattedName(civilServantRegistryClient.getAllOrganisationalUnits(true)));
     }
 
-    @Cacheable("organisations-by-ids")
-    public OrganisationalUnits getOrganisationalUnitsByIds(List<Integer> ids, Boolean fetchChildren) {
-        log.info("Getting organisational units by IDs: " + ids);
-        return new OrganisationalUnits(setFormattedName(civilServantRegistryClient.getOrganisationalUnitsById(ids, fetchChildren)));
-    }
-
     @CacheEvict(value = "organisations", allEntries = true)
     public void removeOrganisationsFromCache() {
         log.info("Organisations are removed from the cache.");
     }
 
-    @CacheEvict(value = "organisations-by-ids", allEntries = true)
-    public void removeOrganisationsByIdsFromCache() {
-        log.info("Organisations by ID are removed from the cache.");
-    }
-
     @Cacheable("organisations-formatted")
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(FormattedOrganisationalUnitsParams formattedOrganisationalUnitsParams) {
         log.info("Getting formatted organisational unit names");
-        OrganisationalUnits organisationalUnits;
-        if(formattedOrganisationalUnitsParams.getOrganisationId() == null){
-            organisationalUnits = getAllOrganisationalUnits();
-        }
-        else{
-            organisationalUnits = getOrganisationalUnitsByIds(formattedOrganisationalUnitsParams.getOrganisationId(), false);
-        }
 
-        List<OrganisationalUnit> organisationList = organisationalUnits.getOrganisationalUnits();
+        List<OrganisationalUnit> organisationList = getAllOrganisationalUnits().getOrganisationalUnits();
+
+        if(formattedOrganisationalUnitsParams.getOrganisationId() != null){
+            organisationList = organisationList.stream().filter(organisationalUnit -> formattedOrganisationalUnitsParams.getOrganisationId().contains(organisationalUnit.getId().intValue())).toList();
+        }
 
         if(formattedOrganisationalUnitsParams.getDomain() != null){
             organisationList = organisationList.stream().filter(org -> org.hasDomain(formattedOrganisationalUnitsParams.getDomain())).toList();
