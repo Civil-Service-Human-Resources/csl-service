@@ -1,6 +1,8 @@
 package uk.gov.cabinetoffice.csl.service.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
@@ -12,6 +14,7 @@ import uk.gov.cabinetoffice.csl.domain.csrs.Grade;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserDetailsService {
@@ -33,5 +36,10 @@ public class UserDetailsService {
                 civilServant.getLineManagerName(),
                 civilServant.getLineManagerEmail(),
                 orgs);
+    }
+
+    @CacheEvict(value = "user", key = "#uid")
+    public void removeUserFromCache(String uid) {
+        log.info("User with uid {} is removed from the cache.", uid);
     }
 }

@@ -26,4 +26,12 @@ public class UserAccountTests extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful());
         verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
     }
+
+    @Test
+    public void testEmailUpdate() throws Exception {
+        mockMvc.perform(post("/user/uid/updateEmail/email")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful());
+        verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
+    }
 }
