@@ -14,8 +14,6 @@ import uk.gov.cabinetoffice.csl.domain.error.GenericServerException;
 
 import java.util.List;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-
 @Slf4j
 @AllArgsConstructor
 public class HttpClient implements IHttpClient {
@@ -38,7 +36,6 @@ public class HttpClient implements IHttpClient {
     private <T, R> ResponseEntity<T> executeRawRequest(RequestEntity<R> request, Class<T> responseClass) {
         try {
             log.debug("Sending request: {}", request);
-            request.getHeaders().setContentType(APPLICATION_JSON);
             ResponseEntity<T> response = restTemplate.exchange(request, responseClass);
             log.debug("Request response: {}", response);
             return response;
