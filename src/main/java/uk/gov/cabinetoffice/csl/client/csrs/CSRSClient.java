@@ -17,6 +17,8 @@ import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedRespo
 
 import java.util.List;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
 @Component
 @Slf4j
 public class CSRSClient implements ICSRSClient {
@@ -68,7 +70,9 @@ public class CSRSClient implements ICSRSClient {
     @Override
     public void patchCivilServant(PatchCivilServantDto patch) {
         String url = String.format("%s/me", civilServants);
-        httpClient.executeRequest(RequestEntity.patch(url).body(patch.getAsApiParams()), Void.class);
+        httpClient.executeRequest(RequestEntity.patch(url)
+                .contentType(APPLICATION_JSON)
+                .body(patch.getAsApiParams()),
+                Void.class);
     }
-
 }
