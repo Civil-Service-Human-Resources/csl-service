@@ -9,13 +9,8 @@ import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.controller.model.FormattedOrganisationalUnitsParams;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-
-import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Service
 @Slf4j
@@ -23,33 +18,17 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class CivilServantRegistryService {
 
     private final ICSRSClient civilServantRegistryClient;
+    private final OrganisationalUnitListService organisationalUnitListService;
 
     public List<AreaOfWork> getAreasOfWork() {
         return civilServantRegistryClient.getAreasOfWork();
-    }
-
-    @Cacheable("organisations")
-    public OrganisationalUnits getAllOrganisationalUnits() {
-        log.info("Getting all organisational units");
-        return new OrganisationalUnits(setFormattedName(civilServantRegistryClient.getAllOrganisationalUnits()));
-    }
-
-    @Cacheable("organisations-with-children")
-    public OrganisationalUnits getAllOrganisationalUnitsWithChildren() {
-        log.info("Getting all organisational units with children");
-        return new OrganisationalUnits(setFormattedName(civilServantRegistryClient.getAllOrganisationalUnits(true)));
-    }
-
-    @CacheEvict(value = "organisations", allEntries = true)
-    public void removeOrganisationsFromCache() {
-        log.info("Organisations are removed from the cache.");
     }
 
     @Cacheable("organisations-formatted")
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(FormattedOrganisationalUnitsParams formattedOrganisationalUnitsParams) {
         log.info("Getting formatted organisational unit names");
 
-        List<OrganisationalUnit> organisationList = getAllOrganisationalUnits().getOrganisationalUnits();
+        List<OrganisationalUnit> organisationList = organisationalUnitListService.getAllOrganisationalUnitsWithChildren().getOrganisationalUnits();
 
         if(formattedOrganisationalUnitsParams.getOrganisationId() != null){
             organisationList = organisationList.stream().filter(organisationalUnit -> formattedOrganisationalUnitsParams.getOrganisationId().contains(organisationalUnit.getId().intValue())).toList();
@@ -59,40 +38,17 @@ public class CivilServantRegistryService {
             organisationList = organisationList.stream().filter(org -> org.hasDomain(formattedOrganisationalUnitsParams.getDomain())).toList();
         }
 
-        return new FormattedOrganisationalUnitNames(organisationList
+        FormattedOrganisationalUnitNames formattedOrganisationalUnitNames = new FormattedOrganisationalUnitNames(organisationList
                 .stream()
                 .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName()))
                 .sorted(Comparator.comparing(FormattedOrganisationalUnitName::getName))
                 .toList());
+
+        return formattedOrganisationalUnitNames;
     }
 
     @CacheEvict(value = "organisations-formatted", allEntries = true)
     public void removeFormattedOrganisationsFromCache() {
         log.info("Formatted organisations are removed from the cache.");
-    }
-
-    private List<OrganisationalUnit> setFormattedName(List<OrganisationalUnit> allOrganisationalUnits) {
-        Map<Long, OrganisationalUnit> orgMap = civilServantRegistryClient.getAllOrganisationalUnits().stream()
-                .collect(toMap(OrganisationalUnit::getId, o -> o));
-
-        return allOrganisationalUnits.stream()
-                .peek(o -> {
-                    StringBuilder formattedName = new StringBuilder(getFormattedNameWithAbbreviation(o.getName(), o.getAbbreviation()));
-                    Long parentId = o.getParentId();
-                    while (parentId != null) {
-                        OrganisationalUnit parentOrganisationalUnit = orgMap.get(parentId);
-                        String parentName = getFormattedNameWithAbbreviation(parentOrganisationalUnit.getName(), parentOrganisationalUnit.getAbbreviation());
-                        formattedName.insert(0, parentName + " | ");
-                        parentId = parentOrganisationalUnit.getParentId();
-                    }
-                    o.setFormattedName(formattedName.toString());
-                }).toList();
-    }
-
-    private String getFormattedNameWithAbbreviation(String name, String abbreviation) {
-        if (isNotBlank(abbreviation)) {
-            return name + " (" + abbreviation + ")";
-        }
-        return name;
     }
 }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
@@ -23,17 +24,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("no-redis")
 public class CivilServantRegistryServiceTest {
-
-    @Mock
-    private ICSRSClient civilServantRegistryClient;
-
-    @InjectMocks
-    private CivilServantRegistryService civilServantRegistryService;
-
     @Test
     void shouldReturnFormattedOrganisationalUnitNames() {
+        ICSRSClient client = Mockito.mock(ICSRSClient.class);
         List<OrganisationalUnit> organisationalUnits = createOrganisationsList();
-        when(civilServantRegistryClient.getAllOrganisationalUnits()).thenReturn(organisationalUnits);
+        OrganisationalUnitListService organisationalUnitListService = new OrganisationalUnitListService(client);
+        CivilServantRegistryService civilServantRegistryService = new CivilServantRegistryService(client, organisationalUnitListService);
+        when(client.getAllOrganisationalUnits(true)).thenReturn(organisationalUnits);
+
         FormattedOrganisationalUnitsParams formattedOrganisationalUnitsParams = new FormattedOrganisationalUnitsParams();
         formattedOrganisationalUnitsParams.setOrganisationId(null);
         formattedOrganisationalUnitsParams.setDomain(null);

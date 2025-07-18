@@ -23,6 +23,7 @@ import uk.gov.cabinetoffice.csl.service.chart.ChartFactoryService;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartFactoryBase;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
 import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 
 import java.time.ZoneId;
 import java.util.Collections;
@@ -41,6 +42,7 @@ public class ReportService {
     private final IReportServiceClient reportServiceClient;
     private final ChartFactoryService chartFactoryService;
     private final CivilServantRegistryService civilServantRegistryService;
+    private final OrganisationalUnitListService organisationalUnitService;
 
     public CourseCompletionChart getCourseCompletionsChart(SelectedOrganisationIdsCourseCompletionsParams params, IdentityDto user) {
         CourseCompletionChartType type = isEmpty(params.getCourseIds()) ? CourseCompletionChartType.BASIC : CourseCompletionChartType.BY_COURSE;
@@ -96,7 +98,7 @@ public class ReportService {
     }
 
     public List<String> getOrganisationIdsWithChildrenAsFlatList(List<String> organisationIds) {
-        List<OrganisationalUnit> organisationalUnits = civilServantRegistryService
+        List<OrganisationalUnit> organisationalUnits = organisationalUnitService
                 .getAllOrganisationalUnitsWithChildren().getOrganisationalUnits()
                 .stream()
                 .filter(organisationalUnit -> organisationIds.contains(organisationalUnit.getId().toString()))
