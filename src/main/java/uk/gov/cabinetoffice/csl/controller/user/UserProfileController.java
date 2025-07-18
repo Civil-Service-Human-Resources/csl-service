@@ -33,6 +33,7 @@ public class UserProfileController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public void updateFullName(@RequestBody String fullName) {
+        log.debug("UserProfileController: fullName: {}", fullName);
         String uid = userAuthService.getUsername();
         userProfileService.setFullName(uid, fullName);
     }
