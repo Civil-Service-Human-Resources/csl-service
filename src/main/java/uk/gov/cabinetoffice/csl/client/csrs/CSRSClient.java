@@ -70,4 +70,5 @@ public class CSRSClient implements ICSRSClient {
         String url = String.format("%s/me", civilServants);
         httpClient.executeRequest(RequestEntity.patch(url).body(patch.getAsApiParams()), Void.class);
     }
+
 }
