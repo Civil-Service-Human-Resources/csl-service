@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.service.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.User;
@@ -12,6 +13,7 @@ import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.Updat
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class UserProfileService {
 
@@ -52,6 +54,7 @@ public class UserProfileService {
 
     private void updateReportingData(String uid) {
         User user = userDetailsService.getUserWithUid(uid);
+        log.debug("user: {}", user);
         UpdateProfileMessage message = messageMetadataFactory.generateUpdateProfileMessage(user);
         messagingClient.sendMessages(List.of(message));
     }
