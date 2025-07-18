@@ -14,6 +14,7 @@ import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
+import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 @Slf4j
 @RestController
@@ -26,6 +27,8 @@ public class CacheResetController {
     private final LearningCatalogueService learningCatalogueService;
     private final CivilServantRegistryService civilServantRegistryService;
     private final OrganisationalUnitListService organisationalUnitService;
+    private final UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
     @GetMapping(path = "/service-token", produces = "application/json")
     public ResponseEntity<?> removeServiceTokenFromCache() {
@@ -64,6 +67,12 @@ public class CacheResetController {
     public ResponseEntity<?> removeFormattedOrganisationsFromCache() {
         organisationalUnitService.removeOrganisationsFromCache();
         civilServantRegistryService.removeFormattedOrganisationsFromCache();
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping(path = "/user/{uid}", produces = "application/json")
+    public ResponseEntity<?> removeUserFromCache(@PathVariable String uid) {
+        userDetailsService.removeUserFromCache(uid);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }
