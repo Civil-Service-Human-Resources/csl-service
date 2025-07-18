@@ -29,7 +29,7 @@ public class UserProfileController {
         userProfileService.setOtherAreasOfWork(uid, otherAreasOfWorkIds, newProfile);
     }
 
-    @PostMapping(path = "/fullName")
+    @PostMapping(path = "/full-name")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public void updateFullName(@RequestBody String fullName) {

@@ -65,7 +65,7 @@ public class UserProfileTests extends IntegrationTestBase {
                     "fullName": "fullName"
                 }
                 """);
-        mockMvc.perform(post("/user/profile/fullName")
+        mockMvc.perform(post("/user/profile/full-name")
                         .content("fullName")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
