@@ -8,6 +8,8 @@ import uk.gov.cabinetoffice.csl.service.user.UserProfileService;
 
 import java.util.List;
 
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
+
 @RestController
 @RequestMapping("/user/profile")
 @Slf4j
@@ -29,7 +31,7 @@ public class UserProfileController {
         userProfileService.setOtherAreasOfWork(uid, otherAreasOfWorkIds, newProfile);
     }
 
-    @PostMapping(path = "/full-name")
+    @PostMapping(path = "/full-name", consumes = APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public void updateFullName(@RequestBody String fullName) {
