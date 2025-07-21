@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.service.csrs;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,11 +10,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.model.FormattedOrganisationalUnitsParams;
+import uk.gov.cabinetoffice.csl.domain.csrs.Domain;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,14 +28,21 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("no-redis")
 public class CivilServantRegistryServiceTest {
-    @Test
-    void shouldReturnFormattedOrganisationalUnitNames() {
-        ICSRSClient client = Mockito.mock(ICSRSClient.class);
-        List<OrganisationalUnit> organisationalUnits = createOrganisationsList();
-        OrganisationalUnitListService organisationalUnitListService = new OrganisationalUnitListService(client);
-        CivilServantRegistryService civilServantRegistryService = new CivilServantRegistryService(client, organisationalUnitListService);
-        when(client.getAllOrganisationalUnits(true)).thenReturn(organisationalUnits);
+    private ICSRSClient client;
+    private OrganisationalUnitListService organisationalUnitListService;
+    private CivilServantRegistryService civilServantRegistryService;
 
+    @BeforeEach
+    public void setUp() {
+        client = Mockito.mock(ICSRSClient.class);
+        organisationalUnitListService = new OrganisationalUnitListService(client);
+        civilServantRegistryService = new CivilServantRegistryService(client, organisationalUnitListService);
+        when(client.getAllOrganisationalUnits(true)).thenReturn(createOrganisationsList());
+    }
+
+
+    @Test
+    public void shouldReturnFormattedOrganisationalUnitNamesForAllOrganisationsIfParametersAreNotSpecified() {
         FormattedOrganisationalUnitsParams formattedOrganisationalUnitsParams = new FormattedOrganisationalUnitsParams();
         formattedOrganisationalUnitsParams.setOrganisationId(null);
         formattedOrganisationalUnitsParams.setDomain(null);
@@ -39,6 +50,8 @@ public class CivilServantRegistryServiceTest {
         Map<Long, FormattedOrganisationalUnitName> orgMap = formattedOrganisationalUnitNames.getFormattedOrganisationalUnitNames()
                 .stream()
                 .collect(Collectors.toMap(FormattedOrganisationalUnitName::getId, o -> o));
+
+        assertEquals(orgMap.size(), 6);
         assertEquals("OrgName1 (OName1)", orgMap.get(1L).getName());
         assertEquals("OrgName1 (OName1) | OrgName2", orgMap.get(2L).getName());
         assertEquals("OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)", orgMap.get(3L).getName());
@@ -47,7 +60,28 @@ public class CivilServantRegistryServiceTest {
         assertEquals("OrgName6 (OName6)", orgMap.get(6L).getName());
     }
 
+    @Test
+    public void shouldReturnFormattedOrganisationalUnitNamesForFilteredOrganisationsIfParametersAreSpecified() {
+        FormattedOrganisationalUnitsParams formattedOrganisationalUnitsParams = new FormattedOrganisationalUnitsParams();
+        formattedOrganisationalUnitsParams.setOrganisationId(Arrays.asList(1,2,3));
+        formattedOrganisationalUnitsParams.setDomain("domain1.com");
+
+        FormattedOrganisationalUnitNames formattedOrganisationalUnitNames = civilServantRegistryService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams);
+        Map<Long, FormattedOrganisationalUnitName> orgMap = formattedOrganisationalUnitNames.getFormattedOrganisationalUnitNames()
+                .stream()
+                .collect(Collectors.toMap(FormattedOrganisationalUnitName::getId, o -> o));
+
+        assertEquals(orgMap.size(), 2);
+        assertEquals("OrgName1 (OName1)", orgMap.get(1L).getName());
+        assertEquals("OrgName1 (OName1) | OrgName2", orgMap.get(2L).getName());
+    }
+
     private List<OrganisationalUnit> createOrganisationsList() {
+
+        Domain domain1 = new Domain(1L, "domain1.com", LocalDateTime.now());
+        Domain domain2 = new Domain(2L, "domain2.com", LocalDateTime.now());
+        Domain domain3 = new Domain(3L, "domain3.com", LocalDateTime.now());
+
         List<OrganisationalUnit> organisationalUnits = new ArrayList<>();
 
         OrganisationalUnit organisationalUnits1 = new OrganisationalUnit();
@@ -57,6 +91,7 @@ public class CivilServantRegistryServiceTest {
         organisationalUnits1.setAbbreviation("OName1");
         organisationalUnits1.setCode("ON1");
         organisationalUnits1.setHref("https://hostname/organisationalUnits/1");
+        organisationalUnits1.setDomains(Arrays.asList(domain1, domain2));
         organisationalUnits.add(organisationalUnits1);
 
         OrganisationalUnit organisationalUnits2 = new OrganisationalUnit();
@@ -66,6 +101,7 @@ public class CivilServantRegistryServiceTest {
         organisationalUnits2.setAbbreviation("");
         organisationalUnits2.setCode("ON2");
         organisationalUnits2.setHref("https://hostname/organisationalUnits/2");
+        organisationalUnits2.setDomains(Arrays.asList(domain1, domain2, domain3));
         organisationalUnits.add(organisationalUnits2);
 
         OrganisationalUnit organisationalUnits3 = new OrganisationalUnit();
@@ -93,6 +129,7 @@ public class CivilServantRegistryServiceTest {
         organisationalUnits5.setAbbreviation("OName5");
         organisationalUnits5.setCode("ON5");
         organisationalUnits5.setHref("https://hostname/organisationalUnits/5");
+        organisationalUnits5.setDomains(Arrays.asList(domain1, domain2, domain3));
         organisationalUnits.add(organisationalUnits5);
 
         OrganisationalUnit organisationalUnits6 = new OrganisationalUnit();
@@ -101,6 +138,7 @@ public class CivilServantRegistryServiceTest {
         organisationalUnits6.setAbbreviation("OName6");
         organisationalUnits6.setCode("ON6");
         organisationalUnits6.setHref("https://hostname/organisationalUnits/6");
+        organisationalUnits6.setDomains(Arrays.asList(domain3));
         organisationalUnits.add(organisationalUnits6);
 
         return organisationalUnits;

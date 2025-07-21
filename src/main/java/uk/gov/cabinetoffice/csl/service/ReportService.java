@@ -41,7 +41,6 @@ public class ReportService {
 
     private final IReportServiceClient reportServiceClient;
     private final ChartFactoryService chartFactoryService;
-    private final CivilServantRegistryService civilServantRegistryService;
     private final OrganisationalUnitListService organisationalUnitService;
 
     public CourseCompletionChart getCourseCompletionsChart(SelectedOrganisationIdsCourseCompletionsParams params, IdentityDto user) {
