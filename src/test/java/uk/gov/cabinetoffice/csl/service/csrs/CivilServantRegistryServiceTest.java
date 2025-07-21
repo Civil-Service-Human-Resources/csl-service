@@ -28,16 +28,18 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("no-redis")
 public class CivilServantRegistryServiceTest {
-    private ICSRSClient client;
+    @Mock
+    private ICSRSClient icsrsClient;
+
+    @InjectMocks
     private OrganisationalUnitListService organisationalUnitListService;
+
     private CivilServantRegistryService civilServantRegistryService;
 
     @BeforeEach
     public void setUp() {
-        client = Mockito.mock(ICSRSClient.class);
-        organisationalUnitListService = new OrganisationalUnitListService(client);
-        civilServantRegistryService = new CivilServantRegistryService(client, organisationalUnitListService);
-        when(client.getAllOrganisationalUnits(true)).thenReturn(createOrganisationsList());
+        civilServantRegistryService = new CivilServantRegistryService(icsrsClient, organisationalUnitListService);
+        when(icsrsClient.getAllOrganisationalUnits(true)).thenReturn(createOrganisationsList());
     }
 
 
