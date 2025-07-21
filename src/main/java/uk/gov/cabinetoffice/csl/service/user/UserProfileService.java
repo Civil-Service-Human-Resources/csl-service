@@ -8,6 +8,7 @@ import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
 import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
+import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.CompleteProfileMessage;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.UpdateProfileMessage;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public class UserProfileService {
             PatchCivilServantDto patch = PatchCivilServantDto.builder().otherAreasOfWork(areasOfWork).build();
             User user = patchCivilServant(patch, uid);
             if (newProfile) {
-                updateReportingData(user);
+                createReportingData(user);
             }
         }
     }
@@ -54,8 +55,14 @@ public class UserProfileService {
         return userDetailsService.getUserWithUid(uid);
     }
 
+    private void createReportingData(User user) {
+        log.debug("createReportingData:user: {}", user);
+        CompleteProfileMessage message = messageMetadataFactory.generateCompleteProfileMessage(user);
+        messagingClient.sendMessages(List.of(message));
+    }
+
     private void updateReportingData(User user) {
-        log.debug("user: {}", user);
+        log.debug("updateReportingData:user: {}", user);
         UpdateProfileMessage message = messageMetadataFactory.generateUpdateProfileMessage(user);
         messagingClient.sendMessages(List.of(message));
     }
