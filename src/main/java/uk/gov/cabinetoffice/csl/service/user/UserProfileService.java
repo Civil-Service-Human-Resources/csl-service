@@ -35,9 +35,7 @@ public class UserProfileService {
                 .filter(p -> otherAreasOfWorkIds.contains(p.getId())).toList();
         if (!areasOfWork.isEmpty()) {
             PatchCivilServantDto patch = PatchCivilServantDto.builder().otherAreasOfWork(areasOfWork).build();
-            client.patchCivilServant(patch);
-            userDetailsService.removeUserFromCache(uid);
-            User user = userDetailsService.getUserWithUid(uid);
+            User user = patchCivilServant(patch, uid);
             if (newProfile) {
                 updateReportingData(user);
             }
@@ -46,10 +44,14 @@ public class UserProfileService {
 
     public void setFullName(String uid, String fullName) {
         PatchCivilServantDto patch = PatchCivilServantDto.builder().fullName(fullName).build();
+        User user = patchCivilServant(patch, uid);
+        updateReportingData(user);
+    }
+
+    private User patchCivilServant(PatchCivilServantDto patch, String uid) {
         client.patchCivilServant(patch);
         userDetailsService.removeUserFromCache(uid);
-        User user = userDetailsService.getUserWithUid(uid);
-        updateReportingData(user);
+        return userDetailsService.getUserWithUid(uid);
     }
 
     private void updateReportingData(User user) {
