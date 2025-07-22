@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 import uk.gov.cabinetoffice.csl.service.chart.AggregationChart;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionsChartBuilder;
@@ -45,7 +45,8 @@ class CourseCompletionsChartBuilderTest {
         aggregations.add(new CourseCompletionAggregation(date1, 42, "course3"));
         aggregations.add(new CourseCompletionAggregation(date2, 100, "course1"));
         aggregations.add(new CourseCompletionAggregation(date2, 21, "course2"));
-        GetCourseCompletionsParams params = new GetCourseCompletionsParams();
+
+        OrganisationIdsCourseCompletionsParams params = new OrganisationIdsCourseCompletionsParams();
         params.setStartDate(LocalDateTime.of(2024, 1, 1, 0, 0, 0));
         params.setEndDate(LocalDateTime.of(2024, 1, 2, 0, 0, 0));
         params.setTimezone(ZoneId.of("Europe/London"));

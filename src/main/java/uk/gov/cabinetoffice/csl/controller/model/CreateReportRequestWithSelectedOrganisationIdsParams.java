@@ -9,18 +9,18 @@ import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateReportRequestParams extends GetCourseCompletionsParams {
+public class CreateReportRequestWithSelectedOrganisationIdsParams extends SelectedOrganisationIdsCourseCompletionsParams {
 
     @NotNull
-    private String userId;
+    protected String userId;
 
     @NotNull
-    private String userEmail;
+    protected String userEmail;
 
     @NotNull
     @ValidFrontendUrl
-    private String downloadBaseUrl;
+    protected String downloadBaseUrl;
 
-    private String fullName;
+    protected String fullName;
 
 }

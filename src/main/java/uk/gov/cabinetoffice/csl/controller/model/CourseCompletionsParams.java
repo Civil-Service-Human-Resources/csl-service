@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationBinDelimiter;
 
@@ -20,7 +21,8 @@ import static java.time.temporal.ChronoUnit.DAYS;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetCourseCompletionsParams {
+@ToString
+public class CourseCompletionsParams {
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     protected LocalDateTime startDate;
@@ -38,9 +40,6 @@ public class GetCourseCompletionsParams {
 
     @Size(max = 30)
     protected List<String> courseIds;
-
-    @Size(min = 1)
-    protected List<String> organisationIds;
 
     protected List<String> professionIds;
 
@@ -74,5 +73,4 @@ public class GetCourseCompletionsParams {
     public AggregationBinDelimiter getBinDelimiter() {
         return this.getBinDelimiterVal();
     }
-
 }
