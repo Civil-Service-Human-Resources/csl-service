@@ -26,6 +26,10 @@ public class CivilServantRegistryService {
         return civilServantRegistryClient.getAreasOfWork();
     }
 
+    public List<Grade> getGrades() {
+        return civilServantRegistryClient.getGrades();
+    }
+
     @Cacheable("organisations")
     public OrganisationalUnits getAllOrganisationalUnits() {
         log.info("Getting all organisational units");

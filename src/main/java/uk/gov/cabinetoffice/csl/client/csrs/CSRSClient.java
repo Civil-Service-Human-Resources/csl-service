@@ -9,10 +9,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
-import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
-import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
-import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
+import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
 import java.util.List;
@@ -32,6 +29,9 @@ public class CSRSClient implements ICSRSClient {
 
     @Value("${csrs.professions}")
     private String professionsTree;
+
+    @Value("${csrs.grades}")
+    private String grades;
 
     private final IHttpClient httpClient;
 
@@ -60,6 +60,16 @@ public class CSRSClient implements ICSRSClient {
     public List<AreaOfWork> getAreasOfWork() {
         return httpClient.executeTypeReferenceRequest(
                 RequestEntity.get(professionsTree).build(),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+    }
+
+    @Override
+    @Cacheable("grades")
+    public List<Grade> getGrades() {
+        return httpClient.executeTypeReferenceRequest(
+                RequestEntity.get(grades).build(),
                 new ParameterizedTypeReference<>() {
                 }
         );
