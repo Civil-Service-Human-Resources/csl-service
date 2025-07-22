@@ -37,4 +37,13 @@ public class UserProfileController {
         String uid = userAuthService.getUsername();
         userProfileService.setFullName(uid, fullNameRequest.getFullName());
     }
+
+    @PostMapping(path = "/grade")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void updateGrade(@RequestBody Long gradeId) {
+        log.debug("UserProfileController: gradeId: {}", gradeId);
+        String uid = userAuthService.getUsername();
+        userProfileService.setGrade(uid, gradeId);
+    }
 }
