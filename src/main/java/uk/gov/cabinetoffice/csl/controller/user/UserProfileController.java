@@ -29,4 +29,12 @@ public class UserProfileController {
         userProfileService.setOtherAreasOfWork(uid, otherAreasOfWorkIds, newProfile);
     }
 
+    @PostMapping(path = "/full-name")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void updateFullName(@RequestBody FullNameRequest fullNameRequest) {
+        log.debug("UserProfileController: fullNameRequest: {}", fullNameRequest);
+        String uid = userAuthService.getUsername();
+        userProfileService.setFullName(uid, fullNameRequest.getFullName());
+    }
 }
