@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,29 +12,22 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 @Slf4j
 @RestController
 @RequestMapping("/reset-cache")
+@RequiredArgsConstructor
 public class CacheResetController {
 
     private final LearnerRecordService learnerRecordService;
     private final IdentityService identityService;
     private final LearningCatalogueService learningCatalogueService;
     private final CivilServantRegistryService civilServantRegistryService;
+    private final OrganisationalUnitListService organisationalUnitService;
     private final UserDetailsService userDetailsService;
-
-    public CacheResetController(LearnerRecordService learnerRecordService,
-                                IdentityService identityService, LearningCatalogueService learningCatalogueService,
-                                CivilServantRegistryService civilServantRegistryService, UserDetailsService userDetailsService) {
-        this.learnerRecordService = learnerRecordService;
-        this.identityService = identityService;
-        this.learningCatalogueService = learningCatalogueService;
-        this.civilServantRegistryService = civilServantRegistryService;
-        this.userDetailsService = userDetailsService;
-    }
 
     @GetMapping(path = "/service-token", produces = "application/json")
     public ResponseEntity<?> removeServiceTokenFromCache() {
@@ -63,14 +57,14 @@ public class CacheResetController {
 
     @GetMapping(path = "/organisations", produces = "application/json")
     public ResponseEntity<?> removeOrganisationsFromCache() {
-        civilServantRegistryService.removeOrganisationsFromCache();
+        organisationalUnitService.removeOrganisationsFromCache();
         civilServantRegistryService.removeFormattedOrganisationsFromCache();
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @GetMapping(path = "/organisations/formatted_list", produces = "application/json")
     public ResponseEntity<?> removeFormattedOrganisationsFromCache() {
-        civilServantRegistryService.removeOrganisationsFromCache();
+        organisationalUnitService.removeOrganisationsFromCache();
         civilServantRegistryService.removeFormattedOrganisationsFromCache();
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }

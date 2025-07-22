@@ -8,8 +8,8 @@ public interface ICSRSClient {
 
     CivilServant getCivilServantProfileWithUid(String uid);
 
+    List<OrganisationalUnit> getAllOrganisationalUnits(Boolean fetchChildren);
     List<OrganisationalUnit> getAllOrganisationalUnits();
-
     List<AreaOfWork> getAreasOfWork();
 
     List<Grade> getGrades();

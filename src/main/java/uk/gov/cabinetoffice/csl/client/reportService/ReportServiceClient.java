@@ -8,8 +8,8 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
-import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestParams;
-import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithOrganisationIdsParams;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.GetCourseCompletionReportRequestsResponse;
@@ -37,25 +37,25 @@ public class ReportServiceClient implements IReportServiceClient {
         this.httpClient = httpClient;
     }
 
-    public AggregationResponse<Aggregation> getCourseCompletionAggregations(GetCourseCompletionsParams body) {
+    public AggregationResponse<Aggregation> getCourseCompletionAggregations(OrganisationIdsCourseCompletionsParams body) {
         log.debug("Getting course completion aggregation report with body '{}'", body);
-        RequestEntity<GetCourseCompletionsParams> request = RequestEntity.post(courseCompletionAggregations).body(body);
+        RequestEntity<OrganisationIdsCourseCompletionsParams> request = RequestEntity.post(courseCompletionAggregations).body(body);
         return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
         });
     }
 
     @Override
-    public AggregationResponse<CourseCompletionAggregation> getCourseCompletionAggregationsByCourse(GetCourseCompletionsParams body) {
+    public AggregationResponse<CourseCompletionAggregation> getCourseCompletionAggregationsByCourse(OrganisationIdsCourseCompletionsParams body) {
         log.debug("Getting course completion aggregation report by course with body '{}'", body);
-        RequestEntity<GetCourseCompletionsParams> request = RequestEntity.post(courseCompletionAggregationsByCourse).body(body);
+        RequestEntity<OrganisationIdsCourseCompletionsParams> request = RequestEntity.post(courseCompletionAggregationsByCourse).body(body);
         return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
         });
     }
 
     @Override
-    public AddCourseCompletionReportRequestResponse postCourseCompletionsExportRequest(CreateReportRequestParams body) {
+    public AddCourseCompletionReportRequestResponse postCourseCompletionsExportRequest(CreateReportRequestWithOrganisationIdsParams body) {
         log.debug("Submitting course completion export request '{}'", body);
-        RequestEntity<CreateReportRequestParams> request = RequestEntity.post(requestCourseCompletionReport).body(body);
+        RequestEntity<CreateReportRequestWithOrganisationIdsParams> request = RequestEntity.post(requestCourseCompletionReport).body(body);
         return httpClient.executeRequest(request, AddCourseCompletionReportRequestResponse.class);
     }
 
