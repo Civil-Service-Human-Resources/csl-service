@@ -50,14 +50,14 @@ public class UserProfileTests extends IntegrationTestBase {
                 }
                 """);
         mockMvc.perform(post("/user/profile/other-areas-of-work?newProfile=true")
-                        .content("[1,2,3]}")
+                        .content("[1,2,3]")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
         verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
     }
 
     @Test
-    public void testSetFullName() throws Exception {
+    public void testUpdateFullName() throws Exception {
         CivilServant civilServant = testDataService.generateCivilServant();
         cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
         cslStubService.getCsrsStubService().patchCivilServant("""
@@ -71,6 +71,46 @@ public class UserProfileTests extends IntegrationTestBase {
                                 "fullName": "test full Name"
                             }
                             """)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful());
+        verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
+    }
+
+    @Test
+    public void testUpdateGrade() throws Exception {
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
+        cslStubService.getCsrsStubService().getGrades("""
+                [
+                    {
+                        "id": 1,
+                        "code": "AA",
+                        "name": "Administrative assistant"
+                    },
+                    {
+                        "id": 2,
+                        "code": "AO",
+                        "name": "Administrative officer"
+                    },
+                    {
+                        "id": 3,
+                        "code": "EO",
+                        "name": "Executive officer"
+                    },
+                    {
+                        "id": 4,
+                        "code": "G6",
+                        "name": "Grade 6"
+                    }
+                ]
+                """);
+        cslStubService.getCsrsStubService().patchCivilServant("""
+                {
+                    "grade": "/grades/1"
+                }
+                """);
+        mockMvc.perform(post("/user/profile/grade")
+                        .content("1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
         verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));

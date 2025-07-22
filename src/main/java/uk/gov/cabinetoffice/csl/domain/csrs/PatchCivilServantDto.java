@@ -22,7 +22,7 @@ public class PatchCivilServantDto {
             apiParams.put("fullName", fullName);
         }
         if (grade != null) {
-            apiParams.put("grade", grade);
+            apiParams.put("grade", String.format("/grades/%s", grade.getId()));
         }
         return apiParams;
     }

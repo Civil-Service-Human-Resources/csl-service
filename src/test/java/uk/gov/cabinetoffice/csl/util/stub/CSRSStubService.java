@@ -52,6 +52,16 @@ public class CSRSStubService {
         );
     }
 
+    public StubMapping getGrades(String response) {
+        return stubFor(
+                WireMock.get(urlPathEqualTo("/csrs/grades"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
     public StubMapping getOrganisations(OrganisationalUnitsPagedResponse response) {
         return getOrganisations(utils.toJson(response));
     }
