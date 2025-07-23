@@ -17,6 +17,9 @@ import uk.gov.cabinetoffice.csl.util.Cacheable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus.ARCHIVED;
+import static uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus.PUBLISHED;
+
 @Data
 @Slf4j
 @AllArgsConstructor
@@ -26,6 +29,7 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     private String id;
     private String title;
     private String shortDescription;
+    private CourseStatus status;
     private Collection<Module> modules = Collections.emptyList();
     private List<Audience> audiences = Collections.emptyList();
 
@@ -161,4 +165,13 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
         return id;
     }
 
+    @JsonIgnore
+    public boolean ShouldBeDisplayed() {
+        return (!List.of(ARCHIVED, PUBLISHED).contains(getStatus()) && !getModules().isEmpty());
+    }
+
+    @JsonIgnore
+    public Integer getCost() {
+        return getModules().stream().mapToInt(m -> m.getCost().intValue()).sum();
+    }
 }

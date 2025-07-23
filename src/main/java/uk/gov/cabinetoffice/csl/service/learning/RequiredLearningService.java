@@ -57,7 +57,7 @@ public class RequiredLearningService {
                         RequiredLearningCourse requiredLearningCourse = new RequiredLearningCourse(
                                 course.getId(), course.getTitle(), course.getShortDescription(),
                                 course.getCourseType(), course.getDurationInMinutes(), course.getModules().size(),
-                                State.NULL, lp);
+                                course.getCost(), State.NULL, lp);
                         requiredLearningCourses.add(requiredLearningCourse);
                         moduleRecordIdsToFetch.addAll(course.getRequiredModuleIdsForCompletion().stream()
                                 .map(id -> new ModuleRecordResourceId(uid, id)).toList());

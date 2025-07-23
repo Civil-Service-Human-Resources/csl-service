@@ -110,9 +110,11 @@ public class LearnerRecordService {
 
     public List<LearnerRecord> getLearnerRecords(String learnerId) {
         LearnerRecordQuery query = learnerRecordQueryFactory.getLearnerRecordQuery(learnerId);
-        List<LearnerRecord> courseRecords = client.getLearnerRecords(query);
-        courseRecords.forEach(learnerRecordCache::put);
-        return courseRecords;
+        return client.getLearnerRecords(query).stream().peek(learnerRecordCache::put).toList();
+    }
+
+    public List<LearnerRecord> getLearnerRecords(LearnerRecordQuery query) {
+        return client.getLearnerRecords(query).stream().peek(learnerRecordCache::put).toList();
     }
 
     public LearnerRecordDtoCollection processLearnerRecordUpdates(List<LearnerRecordData> learnerRecordData) {
@@ -173,14 +175,11 @@ public class LearnerRecordService {
     }
 
     public List<ModuleRecord> updateModuleRecords(List<ModuleRecord> updatedRecords) {
-        List<ModuleRecord> results = new ArrayList<>();
-        client.updateModuleRecords(updatedRecords)
-                .forEach(mr -> {
+        return client.updateModuleRecords(updatedRecords)
+                .stream().peek(mr -> {
                     log.debug(String.format("Updated module record %s ", mr));
                     moduleRecordCache.put(mr);
-                    results.add(mr);
-                });
-        return results;
+                }).toList();
     }
 
 }

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
+import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlanCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 
 import java.time.LocalDate;
@@ -16,14 +17,13 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class RequiredLearningCourse {
-    private String id;
-    private String title;
-    private String shortDescription;
-    private String type;
-    private Integer duration;
-    private Integer moduleCount;
-    private State status;
+public class RequiredLearningCourse extends LearningPlanCourse {
+
+    public RequiredLearningCourse(String id, String title, String shortDescription, String type, Integer duration,
+                                  Integer moduleCount, Integer costInPounds, State status, LearningPeriod learningPeriod) {
+        super(id, title, shortDescription, type, duration, moduleCount, costInPounds, status);
+        this.learningPeriod = learningPeriod;
+    }
 
     @JsonIgnore
     private LearningPeriod learningPeriod;

@@ -3,11 +3,11 @@ package uk.gov.cabinetoffice.csl.util.stub;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventQuery;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
 import java.util.List;
@@ -73,11 +73,7 @@ public class LearnerRecordStubService {
         );
     }
 
-    public StubMapping getLearnerRecords(String learnerIds, Integer page, String response) {
-        return getLearnerRecords(learnerIds, null, page, response);
-    }
-
-    public StubMapping getLearnerRecords(String learnerIds, @Nullable String resourceIds, Integer page, String response) {
+    public StubMapping getLearnerRecords(LearnerRecordQuery query, Integer page, String response) {
         MappingBuilder mappingBuilder = WireMock.get(urlPathEqualTo("/learner_record_api/learner_records"))
                 .withQueryParam("learnerIds", equalTo(learnerIds))
                 .withQueryParam("size", equalTo("50"))
