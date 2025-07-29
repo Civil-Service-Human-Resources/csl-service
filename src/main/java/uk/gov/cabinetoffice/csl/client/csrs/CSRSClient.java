@@ -76,11 +76,12 @@ public class CSRSClient implements ICSRSClient {
     @Override
     @Cacheable("grades")
     public List<Grade> getGrades() {
-        return httpClient.executeTypeReferenceRequest(
+        GetGradesResponse response = httpClient.executeTypeReferenceRequest(
                 RequestEntity.get(grades).build(),
                 new ParameterizedTypeReference<>() {
                 }
         );
+        return response.getGrades();
     }
 
     @Override

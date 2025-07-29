@@ -81,28 +81,53 @@ public class UserProfileTests extends IntegrationTestBase {
         CivilServant civilServant = testDataService.generateCivilServant();
         cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
         cslStubService.getCsrsStubService().getGrades("""
-                [
-                    {
-                        "id": 1,
-                        "code": "AA",
-                        "name": "Administrative assistant"
-                    },
-                    {
-                        "id": 2,
-                        "code": "AO",
-                        "name": "Administrative officer"
-                    },
-                    {
-                        "id": 3,
-                        "code": "EO",
-                        "name": "Executive officer"
-                    },
-                    {
-                        "id": 4,
-                        "code": "G6",
-                        "name": "Grade 6"
-                    }
-                ]
+                {
+                     "_embedded": {
+                         "grades": [
+                             {
+                                 "code": "AA",
+                                 "name": "Administrative assistant",
+                                 "_links": {
+                                     "self": {
+                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/1"
+                                     },
+                                     "grade": {
+                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/1"
+                                     },
+                                     "organisationalUnit": {
+                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/1/organisationalUnit"
+                                     }
+                                 }
+                             },
+                             {
+                                 "code": "AO",
+                                 "name": "Administrative officer",
+                                 "_links": {
+                                     "self": {
+                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/2"
+                                     },
+                                     "grade": {
+                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/2"
+                                     },
+                                     "organisationalUnit": {
+                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/2/organisationalUnit"
+                                     }
+                                 }
+                             }
+                         ]
+                     },
+                     "_links": {
+                         "self": {
+                             "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades"
+                         },
+                         "profile": {
+                             "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/profile/grades"
+                         },
+                         "search": {
+                             "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/search"
+                         }
+                     }
+                 }
                 """);
         cslStubService.getCsrsStubService().patchCivilServant("""
                 {

@@ -18,28 +18,53 @@ public class GradesTest extends IntegrationTestBase {
     @Test
     public void testGetGrades() throws Exception {
         cslStubService.getCsrsStubService().getGrades("""
-                [
-                    {
-                        "id": 1,
-                        "code": "AA",
-                        "name": "Administrative assistant"
-                    },
-                    {
-                        "id": 2,
-                        "code": "AO",
-                        "name": "Administrative officer"
-                    },
-                    {
-                        "id": 3,
-                        "code": "EO",
-                        "name": "Executive officer"
-                    },
-                    {
-                        "id": 4,
-                        "code": "G6",
-                        "name": "Grade 6"
-                    }
-                ]
+                {
+                     "_embedded": {
+                         "grades": [
+                             {
+                                 "code": "AA",
+                                 "name": "Administrative assistant",
+                                 "_links": {
+                                     "self": {
+                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/1"
+                                     },
+                                     "grade": {
+                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/1"
+                                     },
+                                     "organisationalUnit": {
+                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/1/organisationalUnit"
+                                     }
+                                 }
+                             },
+                             {
+                                 "code": "AO",
+                                 "name": "Administrative officer",
+                                 "_links": {
+                                     "self": {
+                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/2"
+                                     },
+                                     "grade": {
+                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/2"
+                                     },
+                                     "organisationalUnit": {
+                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/2/organisationalUnit"
+                                     }
+                                 }
+                             }
+                         ]
+                     },
+                     "_links": {
+                         "self": {
+                             "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades"
+                         },
+                         "profile": {
+                             "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/profile/grades"
+                         },
+                         "search": {
+                             "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/search"
+                         }
+                     }
+                 }
                 """);
 
         mockMvc.perform(get("/grades")
@@ -50,12 +75,6 @@ public class GradesTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.grades[0].name").value("Administrative assistant"))
                 .andExpect(jsonPath("$.grades[1].id").value("2"))
                 .andExpect(jsonPath("$.grades[1].code").value("AO"))
-                .andExpect(jsonPath("$.grades[1].name").value("Administrative officer"))
-                .andExpect(jsonPath("$.grades[2].id").value("3"))
-                .andExpect(jsonPath("$.grades[2].code").value("EO"))
-                .andExpect(jsonPath("$.grades[2].name").value("Executive officer"))
-                .andExpect(jsonPath("$.grades[3].id").value("4"))
-                .andExpect(jsonPath("$.grades[3].code").value("G6"))
-                .andExpect(jsonPath("$.grades[3].name").value("Grade 6"));
+                .andExpect(jsonPath("$.grades[1].name").value("Administrative officer"));
     }
 }
