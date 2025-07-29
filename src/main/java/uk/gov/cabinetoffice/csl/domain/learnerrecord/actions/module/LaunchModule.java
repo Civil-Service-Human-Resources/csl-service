@@ -8,7 +8,9 @@ public class LaunchModule implements IModuleAction {
 
     @Override
     public ModuleRecord applyUpdates(ModuleRecord moduleRecord) {
-        moduleRecord.setState(State.IN_PROGRESS);
+        if (!moduleRecord.getState().equals(State.COMPLETED)) {
+            moduleRecord.setState(State.IN_PROGRESS);
+        }
         return moduleRecord;
     }
 
