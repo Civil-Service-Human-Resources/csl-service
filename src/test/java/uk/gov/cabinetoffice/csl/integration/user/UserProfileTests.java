@@ -135,7 +135,11 @@ public class UserProfileTests extends IntegrationTestBase {
                 }
                 """);
         mockMvc.perform(post("/user/profile/grade")
-                        .content("1")
+                        .content("""
+                            {
+                                "gradeId": "1"
+                            }
+                            """)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
         verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));

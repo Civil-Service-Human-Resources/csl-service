@@ -32,18 +32,18 @@ public class UserProfileController {
     @PostMapping(path = "/full-name")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public void updateFullName(@RequestBody FullNameRequest fullNameRequest) {
-        log.debug("UserProfileController: fullNameRequest: {}", fullNameRequest);
+    public void updateFullName(@RequestBody FullNameUpdateRequest fullNameUpdateRequest) {
+        log.debug("UserProfileController: fullNameUpdateRequest: {}", fullNameUpdateRequest);
         String uid = userAuthService.getUsername();
-        userProfileService.setFullName(uid, fullNameRequest.getFullName());
+        userProfileService.setFullName(uid, fullNameUpdateRequest.getFullName());
     }
 
     @PostMapping(path = "/grade")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public void updateGrade(@RequestBody Long gradeId) {
-        log.debug("UserProfileController: gradeId: {}", gradeId);
+    public void updateGrade(@RequestBody GradeUpdateRequest gradeUpdateRequest) {
+        log.debug("UserProfileController: gradeUpdateRequest: {}", gradeUpdateRequest);
         String uid = userAuthService.getUsername();
-        userProfileService.setGrade(uid, gradeId);
+        userProfileService.setGrade(uid, gradeUpdateRequest.getGradeId());
     }
 }
