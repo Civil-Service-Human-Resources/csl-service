@@ -89,13 +89,13 @@ public class UserProfileTests extends IntegrationTestBase {
                                  "name": "Administrative assistant",
                                  "_links": {
                                      "self": {
-                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/1"
+                                         "href": "https://hostname/grades/1"
                                      },
                                      "grade": {
-                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/1"
+                                         "href": "https://hostname/grades/1"
                                      },
                                      "organisationalUnit": {
-                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/1/organisationalUnit"
+                                         "href": "https://hostname/grades/1/organisationalUnit"
                                      }
                                  }
                              },
@@ -104,13 +104,13 @@ public class UserProfileTests extends IntegrationTestBase {
                                  "name": "Administrative officer",
                                  "_links": {
                                      "self": {
-                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/2"
+                                         "href": "https://hostname/grades/2"
                                      },
                                      "grade": {
-                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/2"
+                                         "href": "https://hostname/grades/2"
                                      },
                                      "organisationalUnit": {
-                                         "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/2/organisationalUnit"
+                                         "href": "https://hostname/grades/2/organisationalUnit"
                                      }
                                  }
                              }
@@ -118,13 +118,13 @@ public class UserProfileTests extends IntegrationTestBase {
                      },
                      "_links": {
                          "self": {
-                             "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades"
+                             "href": "https://hostname/grades"
                          },
                          "profile": {
-                             "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/profile/grades"
+                             "href": "https://hostname/profile/grades"
                          },
                          "search": {
-                             "href": "https://civil-servant-registry.performance.learn.civilservice.gov.uk/grades/search"
+                             "href": "https://hostname/grades/search"
                          }
                      }
                  }
