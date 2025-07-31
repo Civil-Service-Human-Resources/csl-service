@@ -182,7 +182,6 @@ public class TestDataService {
         organisationalUnits1.setParentId(null);
         organisationalUnits1.setAbbreviation("OName1");
         organisationalUnits1.setCode("ON1");
-        organisationalUnits1.setHref("https://hostname/organisationalUnits/1");
         organisationalUnits.add(organisationalUnits1);
 
         OrganisationalUnit organisationalUnits2 = new OrganisationalUnit();
@@ -191,7 +190,7 @@ public class TestDataService {
         organisationalUnits2.setParentId(1L);
         organisationalUnits2.setAbbreviation("");
         organisationalUnits2.setCode("ON2");
-        organisationalUnits2.setHref("https://hostname/organisationalUnits/2");
+        organisationalUnits2.setDomains(List.of(new Domain(1L, "domain2.com", LocalDateTime.of(2025, 1, 1, 10, 0, 0))));
         organisationalUnits.add(organisationalUnits2);
 
         OrganisationalUnit organisationalUnits3 = new OrganisationalUnit();
@@ -200,7 +199,6 @@ public class TestDataService {
         organisationalUnits3.setParentId(2L);
         organisationalUnits3.setAbbreviation("OName3");
         organisationalUnits3.setCode("ON3");
-        organisationalUnits3.setHref("https://hostname/organisationalUnits/3");
         organisationalUnits.add(organisationalUnits3);
 
         OrganisationalUnit organisationalUnits4 = new OrganisationalUnit();
@@ -209,7 +207,6 @@ public class TestDataService {
         organisationalUnits4.setParentId(3L);
         organisationalUnits4.setAbbreviation("OName4");
         organisationalUnits4.setCode("ON4");
-        organisationalUnits4.setHref("https://hostname/organisationalUnits/4");
         organisationalUnits.add(organisationalUnits4);
 
         OrganisationalUnit organisationalUnits5 = new OrganisationalUnit();
@@ -218,7 +215,6 @@ public class TestDataService {
         organisationalUnits5.setParentId(1L);
         organisationalUnits5.setAbbreviation("OName5");
         organisationalUnits5.setCode("ON5");
-        organisationalUnits5.setHref("https://hostname/organisationalUnits/5");
         organisationalUnits.add(organisationalUnits5);
 
         OrganisationalUnit organisationalUnits6 = new OrganisationalUnit();
@@ -226,7 +222,6 @@ public class TestDataService {
         organisationalUnits6.setName("OrgName6");
         organisationalUnits6.setAbbreviation("OName6");
         organisationalUnits6.setCode("ON6");
-        organisationalUnits6.setHref("https://hostname/organisationalUnits/6");
         organisationalUnits.add(organisationalUnits6);
 
         return organisationalUnits;

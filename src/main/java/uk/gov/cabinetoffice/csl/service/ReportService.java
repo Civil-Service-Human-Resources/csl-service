@@ -9,11 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
-import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithSelectedOrganisationIdsParams;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithOrganisationIdsParams;
-import uk.gov.cabinetoffice.csl.controller.model.SelectedOrganisationIdsCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithSelectedOrganisationIdsParams;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
+import uk.gov.cabinetoffice.csl.controller.model.SelectedOrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.error.ForbiddenException;
 import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
 import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
@@ -22,15 +21,10 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart
 import uk.gov.cabinetoffice.csl.service.chart.ChartFactoryService;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartFactoryBase;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
-import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 
 import java.time.ZoneId;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -54,8 +48,9 @@ public class ReportService {
         organisationIdsCourseCompletionsParams.setCourseIds(params.getCourseIds());
         organisationIdsCourseCompletionsParams.setProfessionIds(params.getProfessionIds());
         organisationIdsCourseCompletionsParams.setGradeIds(params.getGradeIds());
-        if(params.getSelectedOrganisationIds() != null) {
-            organisationIdsCourseCompletionsParams.setOrganisationIds(getOrganisationIdsWithChildrenAsFlatList(params.getSelectedOrganisationIds()));
+        if (params.getSelectedOrganisationIds() != null) {
+            List<Long> organisationIds = organisationalUnitService.getOrganisationIdsWithChildrenAsFlatList(params.getSelectedOrganisationIds());
+            organisationIdsCourseCompletionsParams.setOrganisationIds(organisationIds);
         }
 
         return factory.buildCourseCompletionsChart(organisationIdsCourseCompletionsParams, user);
@@ -74,8 +69,9 @@ public class ReportService {
         createReportServiceReportRequestParams.setUserEmail(params.getUserEmail());
         createReportServiceReportRequestParams.setDownloadBaseUrl(params.getDownloadBaseUrl());
         createReportServiceReportRequestParams.setFullName(params.getFullName());
-        if(params.getSelectedOrganisationIds() != null) {
-            createReportServiceReportRequestParams.setOrganisationIds(getOrganisationIdsWithChildrenAsFlatList(params.getSelectedOrganisationIds()));
+        if (params.getSelectedOrganisationIds() != null) {
+            List<Long> organisationIds = organisationalUnitService.getOrganisationIdsWithChildrenAsFlatList(params.getSelectedOrganisationIds());
+            createReportServiceReportRequestParams.setOrganisationIds(organisationIds);
         }
 
         return reportServiceClient.postCourseCompletionsExportRequest(createReportServiceReportRequestParams);
@@ -96,32 +92,4 @@ public class ReportService {
         }
     }
 
-    public List<String> getOrganisationIdsWithChildrenAsFlatList(List<String> organisationIds) {
-        List<OrganisationalUnit> organisationalUnits = organisationalUnitService
-                .getAllOrganisationalUnitsWithChildren().getOrganisationalUnits()
-                .stream()
-                .filter(organisationalUnit -> organisationIds.contains(organisationalUnit.getId().toString()))
-                .toList();
-
-        List<OrganisationalUnit> orgUnitsWithChildren = getOrganisationsWithChildrenAsFlatList(organisationalUnits);
-        List<String> orgIds = orgUnitsWithChildren.stream().map(o -> Long.toString(o.getId())).toList();
-        return orgIds;
-    }
-
-    public List<OrganisationalUnit> getOrganisationsWithChildrenAsFlatList(List<OrganisationalUnit> organisations) {
-        List<OrganisationalUnit> result = organisations.stream()
-                .flatMap(org -> flatten(org).stream())
-                .distinct().toList();
-
-        return result;
-    }
-
-    public List<OrganisationalUnit> flatten(OrganisationalUnit organisationalUnit) {
-        return Stream.concat(
-                Stream.of(organisationalUnit),
-                Optional.ofNullable(organisationalUnit.getChildren())
-                        .orElse(Collections.emptyList()).stream()
-                        .flatMap(child -> flatten(child).stream())
-        ).collect(Collectors.toList());
-    }
 }

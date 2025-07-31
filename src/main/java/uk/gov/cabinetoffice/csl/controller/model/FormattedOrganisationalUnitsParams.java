@@ -4,8 +4,15 @@ import lombok.Data;
 
 import java.util.List;
 
+import static com.azure.core.util.CoreUtils.isNullOrEmpty;
+
 @Data
 public class FormattedOrganisationalUnitsParams {
-    private List<Integer> organisationId;
+    private List<Long> organisationId;
     String domain;
+    boolean tierOne;
+
+    public boolean shouldGetAll() {
+        return !tierOne && isNullOrEmpty(organisationId) && domain == null;
+    }
 }

@@ -9,10 +9,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
-import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
-import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
-import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
+import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
 import java.util.List;
@@ -34,9 +31,11 @@ public class CSRSClient implements ICSRSClient {
     private String professionsTree;
 
     private final IHttpClient httpClient;
+    private final OrganisationalUnitFactory organisationalUnitFactory;
 
-    public CSRSClient(@Qualifier("csrsHttpClient") IHttpClient httpClient) {
+    public CSRSClient(@Qualifier("csrsHttpClient") IHttpClient httpClient, OrganisationalUnitFactory organisationalUnitFactory) {
         this.httpClient = httpClient;
+        this.organisationalUnitFactory = organisationalUnitFactory;
     }
 
     @Override
@@ -48,19 +47,13 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public List<OrganisationalUnit> getAllOrganisationalUnits(Boolean fetchChildren) {
-        log.info("Getting all organisational units " + (fetchChildren ? "with children" : "without children"));
+    @Cacheable("organisations")
+    public OrganisationalUnitMap getAllOrganisationalUnits() {
+        log.info("Getting all organisational units");
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(allOrganisationalUnits);
-        uriBuilder.queryParam("fetchChildren", fetchChildren);
         List<OrganisationalUnit> organisationalUnits = httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
                 .stream().toList();
-
-        return organisationalUnits;
-    }
-
-    @Override
-    public List<OrganisationalUnit> getAllOrganisationalUnits() {
-        return getAllOrganisationalUnits(false);
+        return organisationalUnitFactory.buildOrganisationalUnits(organisationalUnits);
     }
 
     @Override

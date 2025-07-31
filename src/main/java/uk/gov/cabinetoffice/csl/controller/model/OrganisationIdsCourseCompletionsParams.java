@@ -1,18 +1,20 @@
 package uk.gov.cabinetoffice.csl.controller.model;
 
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
-public class OrganisationIdsCourseCompletionsParams extends CourseCompletionsParams{
+public class OrganisationIdsCourseCompletionsParams extends CourseCompletionsParams {
     @Size(min = 1)
     protected List<String> organisationIds;
+
+    public void setOrganisationIds(List<Long> organisationIds) {
+        this.organisationIds = organisationIds.stream().map(Object::toString).toList();
+    }
 }

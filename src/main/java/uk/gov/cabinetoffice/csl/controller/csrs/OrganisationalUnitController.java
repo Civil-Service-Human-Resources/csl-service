@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.FormattedOrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnits;
-import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 
 @Slf4j
@@ -16,7 +15,6 @@ import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 @AllArgsConstructor
 public class OrganisationalUnitController {
 
-    private final CivilServantRegistryService civilServantRegistryService;
     private final OrganisationalUnitListService organisationalUnitService;
 
     @GetMapping(path = "/full", produces = "application/json")
@@ -24,7 +22,7 @@ public class OrganisationalUnitController {
     @ResponseStatus(HttpStatus.OK)
     public OrganisationalUnits getAllOrganisationalUnits() {
         log.info("Getting all organisational units");
-        return organisationalUnitService.getAllOrganisationalUnitsWithChildren();
+        return organisationalUnitService.getAllOrganisationalUnits();
 
     }
 
@@ -33,6 +31,6 @@ public class OrganisationalUnitController {
     @ResponseStatus(HttpStatus.OK)
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(FormattedOrganisationalUnitsParams formattedOrganisationalUnitsParams) {
         log.info("Getting formatted organisational unit names");
-        return civilServantRegistryService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams);
+        return organisationalUnitService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams);
     }
 }
