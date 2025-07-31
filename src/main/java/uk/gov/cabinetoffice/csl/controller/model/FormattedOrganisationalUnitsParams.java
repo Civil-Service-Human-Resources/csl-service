@@ -15,4 +15,9 @@ public class FormattedOrganisationalUnitsParams {
     public boolean shouldGetAll() {
         return !tierOne && isNullOrEmpty(organisationId) && domain == null;
     }
+
+    public boolean hasOrganisationIds(Long id) {
+        return !isNullOrEmpty(organisationId) && organisationId.contains(id);
+    }
+    
 }

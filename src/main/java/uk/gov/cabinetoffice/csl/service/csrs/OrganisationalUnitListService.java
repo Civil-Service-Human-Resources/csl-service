@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.azure.core.util.CoreUtils.isNullOrEmpty;
+
 @Service
 @Slf4j
 @AllArgsConstructor
@@ -31,9 +33,9 @@ public class OrganisationalUnitListService {
         } else {
             for (OrganisationalUnit organisationalUnit : allOrgs.values()) {
                 boolean add = false;
-                if (params.getOrganisationId().contains(organisationalUnit.getId())) {
+                if (params.hasOrganisationIds(organisationalUnit.getId())) {
                     add = true;
-                } else if (organisationalUnit.hasDomain(params.getDomain())) {
+                } else if (!isNullOrEmpty(params.getDomain()) && organisationalUnit.hasDomain(params.getDomain())) {
                     if (params.isTierOne()) {
                         Long currentParentId = organisationalUnit.getParentId();
                         while (currentParentId != null) {
