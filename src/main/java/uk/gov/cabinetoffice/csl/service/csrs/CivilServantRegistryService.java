@@ -24,6 +24,10 @@ public class CivilServantRegistryService {
         return civilServantRegistryClient.getAreasOfWork();
     }
 
+    public List<Grade> getGrades() {
+        return civilServantRegistryClient.getGrades();
+    }
+
     @Cacheable("organisations-formatted")
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(FormattedOrganisationalUnitsParams formattedOrganisationalUnitsParams) {
         log.info("Getting formatted organisational unit names");
@@ -38,13 +42,11 @@ public class CivilServantRegistryService {
             organisationList = organisationList.stream().filter(org -> org.hasDomain(formattedOrganisationalUnitsParams.getDomain())).toList();
         }
 
-        FormattedOrganisationalUnitNames formattedOrganisationalUnitNames = new FormattedOrganisationalUnitNames(organisationList
+        return new FormattedOrganisationalUnitNames(organisationList
                 .stream()
                 .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName()))
                 .sorted(Comparator.comparing(FormattedOrganisationalUnitName::getName))
                 .toList());
-
-        return formattedOrganisationalUnitNames;
     }
 
     @CacheEvict(value = "organisations-formatted", allEntries = true)

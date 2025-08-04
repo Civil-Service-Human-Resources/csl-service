@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FullNameRequest {
-    private String fullName;
+public class GradeUpdateRequest {
+    private Long gradeId;
 }
