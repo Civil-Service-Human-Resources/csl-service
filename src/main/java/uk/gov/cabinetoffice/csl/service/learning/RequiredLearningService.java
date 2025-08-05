@@ -87,8 +87,12 @@ public class RequiredLearningService {
         Map<String, List<Course>> courseMap = learningCatalogueService.getRequiredLearningForDepartmentsMap(orgHierarchies.values().stream().flatMap(organisationalUnits -> organisationalUnits.stream().map(OrganisationalUnit::getCode)).collect(Collectors.toSet()));
         orgHierarchies.forEach((key, value) -> {
             List<CourseWithTitle> courses = new ArrayList<>();
-            value.forEach(organisationalUnit -> courses.addAll(courseMap.get(organisationalUnit.getCode())
-                    .stream().map(c -> new CourseWithTitle(c.getId(), c.getTitle())).toList()));
+            value.forEach(organisationalUnit -> {
+                List<Course> coursesForOrgCode = courseMap.get(organisationalUnit.getCode());
+                if (coursesForOrgCode != null) {
+                    courses.addAll(coursesForOrgCode.stream().map(c -> new CourseWithTitle(c.getId(), c.getTitle())).toList());
+                }
+            });
             result.put(key, courses);
         });
         return new RequiredLearningMapResponse(result);
