@@ -1,9 +1,6 @@
 package uk.gov.cabinetoffice.csl.domain.csrs;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
 
@@ -13,6 +10,24 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
             map.put(organisationalUnit.getId(), organisationalUnit);
         }
         return map;
+    }
+
+    public List<OrganisationalUnit> getHierarchy(Long organisationId) {
+        OrganisationalUnit organisationalUnit = get(organisationId);
+        List<OrganisationalUnit> hierarchy = new ArrayList<>(List.of(organisationalUnit));
+        Long parentId = organisationalUnit.getParentId();
+        while (parentId != null) {
+            OrganisationalUnit parent = get(parentId);
+            hierarchy.add(parent);
+            parentId = parent.getParentId();
+        }
+        return hierarchy;
+    }
+
+    public Map<Long, List<OrganisationalUnit>> getHierarchies(List<Long> organisationIds) {
+        Map<Long, List<OrganisationalUnit>> hierarchies = new HashMap<>();
+        organisationIds.forEach(organisationId -> hierarchies.put(organisationId, getHierarchy(organisationId)));
+        return hierarchies;
     }
 
     public List<OrganisationalUnit> getMultiple(Collection<Long> ids, boolean includeChildren) {

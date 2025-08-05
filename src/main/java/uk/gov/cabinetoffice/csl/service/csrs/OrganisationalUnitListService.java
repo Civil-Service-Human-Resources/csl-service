@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import static com.azure.core.util.CoreUtils.isNullOrEmpty;
 
@@ -68,4 +69,7 @@ public class OrganisationalUnitListService {
         log.info("Organisations are removed from the cache.");
     }
 
+    public Map<Long, List<OrganisationalUnit>> getHierarchies(List<Long> organisationIds) {
+        return civilServantRegistryClient.getAllOrganisationalUnits().getHierarchies(organisationIds);
+    }
 }
