@@ -53,7 +53,7 @@ public class OrganisationalUnitListService {
             }
         }
         return new FormattedOrganisationalUnitNames(filtered.stream()
-                .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName()))
+                .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName(), o.getCode(), o.getAbbreviation()))
                 .sorted(Comparator.comparing(FormattedOrganisationalUnitName::getName))
                 .toList());
     }

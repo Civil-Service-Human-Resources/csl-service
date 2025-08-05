@@ -38,27 +38,39 @@ public class OrganisationTest extends IntegrationTestBase {
                     "formattedOrganisationalUnitNames": [
                          {
                              "id": 1,
-                             "name": "OrgName1 (OName1)"
+                             "name": "OrgName1 (OName1)",
+                             "code": "ON1",
+                             "abbreviation": "OName1"
                          },
                          {
                              "id": 2,
-                             "name": "OrgName1 (OName1) | OrgName2"
+                             "name": "OrgName1 (OName1) | OrgName2",
+                             "code": "ON2",
+                             "abbreviation": null
                          },
                          {
                              "id": 3,
-                             "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)"
+                             "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)",
+                             "code": "ON3",
+                             "abbreviation":  "OName3"
                          },
                          {
                              "id": 4,
-                             "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)"
+                             "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)",
+                             "code": "ON4",
+                             "abbreviation":  "OName4"
                          },
                          {
                              "id": 5,
-                             "name": "OrgName1 (OName1) | OrgName5 (OName5)"
+                             "name": "OrgName1 (OName1) | OrgName5 (OName5)",
+                             "code": "ON5",
+                             "abbreviation":  "OName5"
                          },
                          {
                              "id": 6,
-                             "name": "OrgName6 (OName6)"
+                             "name": "OrgName6 (OName6)",
+                             "code": "ON6",
+                             "abbreviation":  "OName6"
                          }
                     ]
                 }
@@ -78,15 +90,21 @@ public class OrganisationTest extends IntegrationTestBase {
                     "formattedOrganisationalUnitNames": [
                          {
                              "id": 1,
-                             "name": "OrgName1 (OName1)"
+                             "name": "OrgName1 (OName1)",
+                             "code": "ON1",
+                             "abbreviation": "OName1"
                          },
                          {
                              "id": 2,
-                             "name": "OrgName1 (OName1) | OrgName2"
+                             "name": "OrgName1 (OName1) | OrgName2",
+                             "code": "ON2",
+                             "abbreviation": null
                          },
                          {
                              "id": 6,
-                             "name": "OrgName6 (OName6)"
+                             "name": "OrgName6 (OName6)",
+                             "code": "ON6",
+                             "abbreviation": "OName6"
                          }
                     ]
                 }
@@ -122,7 +140,7 @@ public class OrganisationTest extends IntegrationTestBase {
                              "id": 2,
                              "name": "OrgName2",
                              "code": "ON2",
-                             "abbreviation": "",
+                             "abbreviation": null,
                              "formattedName": "OrgName1 (OName1) | OrgName2",
                              "parentId": 1,
                              "parent": null,

@@ -188,7 +188,6 @@ public class TestDataService {
         organisationalUnits2.setId(2L);
         organisationalUnits2.setName("OrgName2");
         organisationalUnits2.setParentId(1L);
-        organisationalUnits2.setAbbreviation("");
         organisationalUnits2.setCode("ON2");
         organisationalUnits2.setDomains(List.of(new Domain(1L, "domain2.com", LocalDateTime.of(2025, 1, 1, 10, 0, 0))));
         organisationalUnits.add(organisationalUnits2);
