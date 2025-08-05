@@ -109,12 +109,17 @@ public class LearningCatalogueService {
         Map<String, Course> courseMap = getCourses(
                 new HashSet<>(map.entrySet().stream().flatMap(entry -> entry.getValue().stream()).collect(Collectors.toSet()))
         ).stream().collect(Collectors.toMap(Course::getId, Function.identity()));
-        departmentCodes.forEach(departmentCode -> map.get(departmentCode).forEach(courseId -> {
-            Course course = courseMap.get(courseId);
-            List<Course> courses = result.getOrDefault(departmentCode, new ArrayList<>());
-            courses.add(course);
-            result.put(departmentCode, courses);
-        }));
+        departmentCodes.forEach(departmentCode -> {
+            List<String> courseIdsForDep = map.get(departmentCode);
+            if (courseIdsForDep != null) {
+                courseIdsForDep.forEach(courseId -> {
+                    Course course = courseMap.get(courseId);
+                    List<Course> courses = result.getOrDefault(departmentCode, new ArrayList<>());
+                    courses.add(course);
+                    result.put(departmentCode, courses);
+                });
+            }
+        });
         return result;
     }
 
