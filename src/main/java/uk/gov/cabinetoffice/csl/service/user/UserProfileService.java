@@ -63,6 +63,18 @@ public class UserProfileService {
         }
     }
 
+    public void setProfession(String uid, Long professionId) {
+        Optional<AreaOfWork> optAreaOfWork = client.getAreasOfWork()
+                .stream()
+                .filter(g -> g.getId().equals(professionId))
+                .findFirst();
+        if (optAreaOfWork.isPresent()) {
+            PatchCivilServantDto patch = PatchCivilServantDto.builder().profession(optAreaOfWork.get()).build();
+            User user = patchCivilServant(patch, uid);
+            updateReportingData(user);
+        }
+    }
+
     private User patchCivilServant(PatchCivilServantDto patch, String uid) {
         client.patchCivilServant(patch);
         userDetailsService.removeUserFromCache(uid);
