@@ -46,4 +46,13 @@ public class UserProfileController {
         String uid = userAuthService.getUsername();
         userProfileService.setGrade(uid, gradeUpdateRequest.getGradeId());
     }
+
+    @PostMapping(path = "/profession")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void updateProfession(@RequestBody ProfessionUpdateRequest professionUpdateRequest) {
+        log.debug("UserProfileController: professionUpdateRequest: {}", professionUpdateRequest);
+        String uid = userAuthService.getUsername();
+        userProfileService.setProfession(uid, professionUpdateRequest.getProfessionId());
+    }
 }

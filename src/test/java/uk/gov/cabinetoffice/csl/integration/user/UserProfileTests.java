@@ -144,4 +144,50 @@ public class UserProfileTests extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful());
         verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
     }
+
+    @Test
+    public void testUpdateProfession() throws Exception {
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
+        cslStubService.getCsrsStubService().getAreasOfWork("""
+                [
+                      {
+                          "id": 1,
+                          "name": "Analysis",
+                          "children": []
+                      },
+                      {
+                          "id": 2,
+                          "name": "Commercial",
+                          "children": [
+                              {
+                                  "id": 15,
+                                  "name": "Strategy and Policy Development",
+                                  "children": [
+                                      {
+                                          "id": 22,
+                                          "name": "Commercial Risk and Assurance Specialist",
+                                          "children": []
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ]
+                """);
+        cslStubService.getCsrsStubService().patchCivilServant("""
+                {
+                    "profession": "/profession/2"
+                }
+                """);
+        mockMvc.perform(post("/user/profile/profession")
+                        .content("""
+                            {
+                                "professionId": "2"
+                            }
+                            """)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful());
+        verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
+    }
 }
