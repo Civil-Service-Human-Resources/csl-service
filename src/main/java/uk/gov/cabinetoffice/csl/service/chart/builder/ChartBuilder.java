@@ -1,8 +1,10 @@
-package uk.gov.cabinetoffice.csl.service.chart;
+package uk.gov.cabinetoffice.csl.service.chart.builder;
 
 import org.springframework.stereotype.Component;
-import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.Aggregation;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.IAggregation;
+import uk.gov.cabinetoffice.csl.service.chart.AggregationChart;
+import uk.gov.cabinetoffice.csl.service.chart.ChartWithBreakdowns;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -12,13 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Component
-public class ChartBuilder {
-
-    public AggregationChart buildBasicChart(List<String> textRows) {
-        AggregationChart chart = new AggregationChart();
-        textRows.forEach(row -> chart.put(row, 0));
-        return chart;
-    }
+public class ChartBuilder<T extends IAggregation> {
 
     public AggregationChart buildBasicChart(ZonedDateTime startDate, ZonedDateTime endDate,
                                             ChronoUnit interval) {
@@ -33,14 +29,18 @@ public class ChartBuilder {
         return chart;
     }
 
-    public AggregationChart buildChartWithAggregations(ZonedDateTime startDate, ZonedDateTime endDate,
-                                                       ChronoUnit interval, List<Aggregation> aggregations) {
+    public ChartWithBreakdowns buildCourseCompletionCharts(ZonedDateTime startDate, ZonedDateTime endDate,
+                                                           ChronoUnit interval, List<T> aggregations) {
         AggregationChart chart = this.buildBasicChart(startDate, endDate, interval);
         for (IAggregation result : aggregations) {
             String stringedDateTime = result.getDateBin().format(DateTimeFormatter.ISO_DATE_TIME);
             chart.putAndAggregate(stringedDateTime, result.getTotal());
         }
-        return chart;
+        return new ChartWithBreakdowns(chart);
+    }
+
+    public ChartWithBreakdowns buildCourseCompletionCharts(OrganisationIdsCourseCompletionsParams params, List<T> aggregations) {
+        return buildCourseCompletionCharts(params.getStartDateZoned(), params.getEndDateZoned(), params.getBinDelimiterVal().getChronoUnit(), aggregations);
     }
 
 }

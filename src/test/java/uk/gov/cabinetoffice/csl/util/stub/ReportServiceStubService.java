@@ -37,6 +37,17 @@ public class ReportServiceStubService {
         );
     }
 
+    public void getCourseCompletionAggregationsByCourseAndOrganisation(String expectedInput, String response) {
+        stubFor(
+                WireMock.post(urlPathEqualTo("/report-service/course-completions/aggregations/by-organisation"))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
     public void downloadCourseCompletionReport(String slug, String fileName, String content) throws IOException {
         ByteArrayOutputStream resp = new ByteArrayOutputStream();
         resp.write(content.getBytes(StandardCharsets.UTF_8));

@@ -1,13 +1,17 @@
 package uk.gov.cabinetoffice.csl.controller.model;
 
-import lombok.Data;
+import lombok.*;
 
 import java.util.List;
 
 import static com.azure.core.util.CoreUtils.isNullOrEmpty;
 
-@Data
-public class FormattedOrganisationalUnitsParams {
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrganisationalUnitsParams {
     private List<Long> organisationId;
     String domain;
     boolean tierOne;
@@ -19,5 +23,5 @@ public class FormattedOrganisationalUnitsParams {
     public boolean hasOrganisationIds(Long id) {
         return !isNullOrEmpty(organisationId) && organisationId.contains(id);
     }
-    
+
 }

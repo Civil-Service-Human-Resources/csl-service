@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -15,4 +16,8 @@ import java.util.List;
 public class SelectedOrganisationIdsCourseCompletionsParams extends CourseCompletionsParams {
     @Size(min = 1)
     protected List<Long> selectedOrganisationIds;
+
+    public List<Long> getSelectedOrganisationIds() {
+        return this.selectedOrganisationIds == null ? new ArrayList<>() : this.selectedOrganisationIds;
+    }
 }

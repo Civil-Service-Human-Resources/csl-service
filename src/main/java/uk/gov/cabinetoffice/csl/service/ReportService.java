@@ -13,14 +13,16 @@ import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithOrganisa
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithSelectedOrganisationIdsParams;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.controller.model.SelectedOrganisationIdsCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.error.ForbiddenException;
 import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
 import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
+import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.IAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
 import uk.gov.cabinetoffice.csl.service.chart.ChartFactoryService;
-import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartFactoryBase;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
+import uk.gov.cabinetoffice.csl.service.chart.factory.CourseCompletionChartFactoryBase;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 
 import java.time.ZoneId;
@@ -38,8 +40,17 @@ public class ReportService {
     private final OrganisationalUnitListService organisationalUnitService;
 
     public CourseCompletionChart getCourseCompletionsChart(SelectedOrganisationIdsCourseCompletionsParams params, IdentityDto user) {
-        CourseCompletionChartType type = isEmpty(params.getCourseIds()) ? CourseCompletionChartType.BASIC : CourseCompletionChartType.BY_COURSE;
-        CourseCompletionChartFactoryBase factory = chartFactoryService.getFactory(type);
+        CourseCompletionChartType type;
+        if (isEmpty(params.getCourseIds())) {
+            type = CourseCompletionChartType.BASIC;
+        } else {
+            if (params.getSelectedOrganisationIds().size() <= 1) {
+                type = CourseCompletionChartType.BY_COURSE;
+            } else {
+                type = CourseCompletionChartType.BY_ORGANISATION;
+            }
+        }
+        CourseCompletionChartFactoryBase<? extends IAggregation> factory = chartFactoryService.getFactory(type);
 
         OrganisationIdsCourseCompletionsParams organisationIdsCourseCompletionsParams = new OrganisationIdsCourseCompletionsParams();
         organisationIdsCourseCompletionsParams.setStartDate(params.getStartDate());
@@ -49,8 +60,8 @@ public class ReportService {
         organisationIdsCourseCompletionsParams.setProfessionIds(params.getProfessionIds());
         organisationIdsCourseCompletionsParams.setGradeIds(params.getGradeIds());
         if (params.getSelectedOrganisationIds() != null) {
-            List<Long> organisationIds = organisationalUnitService.getOrganisationIdsWithChildrenAsFlatList(params.getSelectedOrganisationIds());
-            organisationIdsCourseCompletionsParams.setOrganisationIds(organisationIds);
+            List<OrganisationalUnit> organisations = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(params.getSelectedOrganisationIds());
+            organisationIdsCourseCompletionsParams.setOrganisations(organisations);
         }
 
         return factory.buildCourseCompletionsChart(organisationIdsCourseCompletionsParams, user);
@@ -70,8 +81,8 @@ public class ReportService {
         createReportServiceReportRequestParams.setDownloadBaseUrl(params.getDownloadBaseUrl());
         createReportServiceReportRequestParams.setFullName(params.getFullName());
         if (params.getSelectedOrganisationIds() != null) {
-            List<Long> organisationIds = organisationalUnitService.getOrganisationIdsWithChildrenAsFlatList(params.getSelectedOrganisationIds());
-            createReportServiceReportRequestParams.setOrganisationIds(organisationIds);
+            List<OrganisationalUnit> organisations = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(params.getSelectedOrganisationIds());
+            createReportServiceReportRequestParams.setOrganisations(organisations);
         }
 
         return reportServiceClient.postCourseCompletionsExportRequest(createReportServiceReportRequestParams);

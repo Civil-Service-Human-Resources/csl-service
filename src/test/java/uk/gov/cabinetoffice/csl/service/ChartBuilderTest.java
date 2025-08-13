@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.Aggregation;
 import uk.gov.cabinetoffice.csl.service.chart.AggregationChart;
-import uk.gov.cabinetoffice.csl.service.chart.ChartBuilder;
+import uk.gov.cabinetoffice.csl.service.chart.builder.ChartBuilder;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class ChartBuilderTest {
 
-    ChartBuilder chartBuilder = new ChartBuilder();
+    ChartBuilder<Aggregation> chartBuilder = new ChartBuilder<>();
 
 
     @Test
@@ -68,7 +68,7 @@ class ChartBuilderTest {
         aggregations.add(new Aggregation(date1, 42));
         aggregations.add(new Aggregation(date2, 100));
         aggregations.add(new Aggregation(date2, 21));
-        AggregationChart result = chartBuilder.buildChartWithAggregations(startDate, endDate, unit, aggregations);
+        AggregationChart result = chartBuilder.buildCourseCompletionCharts(startDate, endDate, unit, aggregations).getChart();
         assertEquals(190, result.getTotal());
         assertEquals(69, result.get("2024-01-01T10:00:00"));
         assertEquals(121, result.get("2024-01-01T15:00:00"));

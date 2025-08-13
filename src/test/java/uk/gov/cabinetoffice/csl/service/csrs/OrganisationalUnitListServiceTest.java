@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
-import uk.gov.cabinetoffice.csl.controller.model.FormattedOrganisationalUnitsParams;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.Domain;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
@@ -41,7 +41,7 @@ class OrganisationalUnitListServiceTest {
 
     @Test
     public void shouldReturnFormattedOrganisationalUnitNamesForAllOrganisationsIfParametersAreNotSpecified() {
-        FormattedOrganisationalUnitsParams formattedOrganisationalUnitsParams = new FormattedOrganisationalUnitsParams();
+        OrganisationalUnitsParams formattedOrganisationalUnitsParams = new OrganisationalUnitsParams();
         formattedOrganisationalUnitsParams.setOrganisationId(null);
         formattedOrganisationalUnitsParams.setDomain(null);
 
@@ -59,7 +59,7 @@ class OrganisationalUnitListServiceTest {
 
     @Test
     public void shouldReturnFormattedOrganisationalUnitNamesForFilteredOrganisationsIfParametersAreSpecified() {
-        FormattedOrganisationalUnitsParams formattedOrganisationalUnitsParams = new FormattedOrganisationalUnitsParams();
+        OrganisationalUnitsParams formattedOrganisationalUnitsParams = new OrganisationalUnitsParams();
         formattedOrganisationalUnitsParams.setOrganisationId(Arrays.asList(1L, 2L, 3L));
         formattedOrganisationalUnitsParams.setDomain("domain1.com");
 

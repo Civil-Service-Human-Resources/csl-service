@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
-import uk.gov.cabinetoffice.csl.controller.model.FormattedOrganisationalUnitsParams;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class OrganisationalUnitListService {
         return new OrganisationalUnits(civilServantRegistryClient.getAllOrganisationalUnits().values().stream().toList());
     }
 
-    public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(FormattedOrganisationalUnitsParams params) {
+    public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(OrganisationalUnitsParams params) {
         OrganisationalUnitMap allOrgs = civilServantRegistryClient.getAllOrganisationalUnits();
         List<OrganisationalUnit> filtered = new ArrayList<>();
         if (params.shouldGetAll()) {
@@ -58,10 +58,9 @@ public class OrganisationalUnitListService {
                 .toList());
     }
 
-    public List<Long> getOrganisationIdsWithChildrenAsFlatList(List<Long> organisationIds) {
+    public List<OrganisationalUnit> getOrganisationsWithChildrenAsFlatList(List<Long> organisationIds) {
         return civilServantRegistryClient.getAllOrganisationalUnits()
-                .getMultiple(organisationIds, true)
-                .stream().map(OrganisationalUnit::getId).toList();
+                .getMultiple(organisationIds, true);
     }
 
     @CacheEvict(value = "organisations", allEntries = true)

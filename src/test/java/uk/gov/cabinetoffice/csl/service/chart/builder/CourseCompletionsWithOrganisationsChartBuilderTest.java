@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.service;
+package uk.gov.cabinetoffice.csl.service.chart.builder;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -6,11 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
-import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
+import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionWithOrganisationAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseBreakdown;
 import uk.gov.cabinetoffice.csl.service.chart.AggregationChart;
 import uk.gov.cabinetoffice.csl.service.chart.ChartWithBreakdowns;
-import uk.gov.cabinetoffice.csl.service.chart.builder.CourseCompletionsChartBuilder;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
 import java.time.LocalDateTime;
@@ -23,13 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CourseCompletionsChartBuilderTest {
+class CourseCompletionsWithOrganisationsChartBuilderTest {
 
     @Mock
     private LearningCatalogueService learningCatalogueService;
 
     @InjectMocks
-    CourseCompletionsChartBuilder<CourseCompletionAggregation> chartBuilder;
+    CourseCompletionsChartBuilder<CourseCompletionWithOrganisationAggregation> chartBuilder;
 
     @Test
     void buildCourseCompletionsChart() {
@@ -41,12 +40,12 @@ class CourseCompletionsChartBuilderTest {
 
         LocalDateTime date1 = LocalDateTime.of(2024, 1, 1, 10, 0, 0, 0);
         LocalDateTime date2 = LocalDateTime.of(2024, 1, 1, 15, 0, 0, 0);
-        List<CourseCompletionAggregation> aggregations = new ArrayList<>();
-        aggregations.add(new CourseCompletionAggregation(date1, 10, "course1"));
-        aggregations.add(new CourseCompletionAggregation(date1, 17, "course2"));
-        aggregations.add(new CourseCompletionAggregation(date1, 42, "course3"));
-        aggregations.add(new CourseCompletionAggregation(date2, 100, "course1"));
-        aggregations.add(new CourseCompletionAggregation(date2, 21, "course2"));
+        List<CourseCompletionWithOrganisationAggregation> aggregations = new ArrayList<>();
+        aggregations.add(new CourseCompletionWithOrganisationAggregation(date1, 10, "course1", 1L));
+        aggregations.add(new CourseCompletionWithOrganisationAggregation(date1, 17, "course2", 1L));
+        aggregations.add(new CourseCompletionWithOrganisationAggregation(date1, 42, "course3", 2L));
+        aggregations.add(new CourseCompletionWithOrganisationAggregation(date2, 100, "course1", 2L));
+        aggregations.add(new CourseCompletionWithOrganisationAggregation(date2, 21, "course2", 3L));
 
         OrganisationIdsCourseCompletionsParams params = new OrganisationIdsCourseCompletionsParams();
         params.setStartDate(LocalDateTime.of(2024, 1, 1, 0, 0, 0));

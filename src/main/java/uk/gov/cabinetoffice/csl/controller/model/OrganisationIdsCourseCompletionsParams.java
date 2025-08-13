@@ -1,9 +1,13 @@
 package uk.gov.cabinetoffice.csl.controller.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -14,7 +18,13 @@ public class OrganisationIdsCourseCompletionsParams extends CourseCompletionsPar
     @Size(min = 1)
     protected List<String> organisationIds;
 
-    public void setOrganisationIds(List<Long> organisationIds) {
-        this.organisationIds = organisationIds.stream().map(Object::toString).toList();
+    @JsonIgnore
+    private Map<Long, String> orgMap = new HashMap<>();
+
+    public void setOrganisations(List<OrganisationalUnit> organisations) {
+        this.organisationIds = organisations.stream()
+                .peek(org -> orgMap.put(org.getId(), org.getFormattedName()))
+                .map(o -> o.getId().toString()).toList();
     }
+
 }

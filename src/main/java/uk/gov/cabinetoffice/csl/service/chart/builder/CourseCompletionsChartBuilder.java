@@ -1,29 +1,35 @@
-package uk.gov.cabinetoffice.csl.service.chart;
+package uk.gov.cabinetoffice.csl.service.chart.builder;
 
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
+import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseBreakdown;
+import uk.gov.cabinetoffice.csl.service.chart.AggregationChart;
+import uk.gov.cabinetoffice.csl.service.chart.ChartWithBreakdowns;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
-public class CourseCompletionsChartBuilder extends ChartBuilder {
+public class CourseCompletionsChartBuilder<T extends CourseCompletionAggregation> extends ChartBuilder<T> {
 
-    private final LearningCatalogueService learningCatalogueService;
+    protected final LearningCatalogueService learningCatalogueService;
 
     public CourseCompletionsChartBuilder(LearningCatalogueService learningCatalogueService) {
         this.learningCatalogueService = learningCatalogueService;
     }
 
-    public List<AggregationChart> buildCourseCompletionCharts(OrganisationIdsCourseCompletionsParams params, List<CourseCompletionAggregation> aggregations) {
+    public CourseBreakdown buildCourseBreakdown(String title, Collection<String> courseTitles) {
+        return new CourseBreakdown(new LinkedHashMap<>(courseTitles.stream().collect(Collectors.toMap(o -> o, o -> 0))), title);
+    }
+
+    public ChartWithBreakdowns buildCourseCompletionCharts(OrganisationIdsCourseCompletionsParams params, List<T> aggregations) {
         AggregationChart chart = buildBasicChart(params.getStartDateZoned(),
                 params.getEndDateZoned(), params.getBinDelimiterVal().getChronoUnit());
         Map<String, String> courseIdToTitleMap = learningCatalogueService.getCourseIdToTitleMap(params.getCourseIds());
-        AggregationChart courseBreakdown = buildBasicChart(new ArrayList<>(courseIdToTitleMap.values()));
+        CourseBreakdown courseBreakdown = buildCourseBreakdown("Course breakdown", new ArrayList<>(courseIdToTitleMap.values()));
         for (CourseCompletionAggregation result : aggregations) {
             Integer total = result.getTotal();
             String courseId = result.getCourseId();
@@ -35,7 +41,7 @@ public class CourseCompletionsChartBuilder extends ChartBuilder {
             }
             chart.putAndAggregate(stringedDateTime, total);
         }
-        return List.of(chart, courseBreakdown);
+        return new ChartWithBreakdowns(chart, courseBreakdown);
     }
 
 }
