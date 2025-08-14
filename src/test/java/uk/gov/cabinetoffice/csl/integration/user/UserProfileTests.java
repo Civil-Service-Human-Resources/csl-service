@@ -190,4 +190,93 @@ public class UserProfileTests extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful());
         verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
     }
+
+    @Test
+    public void testUpdateOrganisationalUnit() throws Exception {
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
+        cslStubService.getCsrsStubService().getOrganisations("""
+                {
+                       "content": [
+                           {
+                               "name": "Cabinet Office",
+                               "id": 1,
+                               "href": "https://hostname/organisationalUnits/1",
+                               "abbreviation": "CO",
+                               "formattedName": null,
+                               "parentId": null,
+                               "parent": null,
+                               "code": "10211",
+                               "agencyToken": null,
+                               "children": null,
+                               "domains": [
+                                   {
+                                       "id": 79,
+                                       "domain": "cabinetoffice.gov.uk",
+                                       "createdTimestamp": [
+                                           2023,
+                                           10,
+                                           23,
+                                           7,
+                                           44,
+                                           42
+                                       ]
+                                   }
+                               ]
+                           },
+                           {
+                               "name": "Department of Health & Social Care",
+                               "id": 2,
+                               "href": "https://hostname/organisationalUnits/2",
+                               "abbreviation": "DHSC",
+                               "formattedName": null,
+                               "parentId": null,
+                               "parent": null,
+                               "code": "10427",
+                               "agencyToken": null,
+                               "children": null,
+                               "domains": []
+                           }
+                       ],
+                       "pageable": {
+                           "sort": {
+                               "unsorted": true,
+                               "sorted": false
+                           },
+                           "pageNumber": 0,
+                           "pageSize": 2,
+                           "offset": 0,
+                           "paged": true,
+                           "unpaged": false
+                       },
+                       "sortList": [],
+                       "page": 0,
+                       "last": false,
+                       "totalElements": 2,
+                       "totalPages": 1,
+                       "first": true,
+                       "numberOfElements": 2,
+                       "sort": {
+                           "unsorted": true,
+                           "sorted": false
+                       },
+                       "size": 2,
+                       "number": 0
+                   }
+                """);
+        cslStubService.getCsrsStubService().patchCivilServant("""
+                {
+                    "organisationalUnit": "/organisationalUnit/1"
+                }
+                """);
+        mockMvc.perform(post("/user/profile/organisationalUnit")
+                        .content("""
+                            {
+                                "organisationalUnitId": "1"
+                            }
+                            """)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful());
+        verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
+    }
 }

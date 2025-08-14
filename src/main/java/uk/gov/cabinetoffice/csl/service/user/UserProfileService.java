@@ -6,6 +6,7 @@ import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
 import uk.gov.cabinetoffice.csl.domain.csrs.Grade;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
@@ -70,6 +71,19 @@ public class UserProfileService {
                 .findFirst();
         if (optAreaOfWork.isPresent()) {
             PatchCivilServantDto patch = PatchCivilServantDto.builder().profession(optAreaOfWork.get()).build();
+            User user = patchCivilServant(patch, uid);
+            updateReportingData(user);
+        }
+    }
+
+    public void setOrganisationalUnit(String uid, Long organisationalUnitId) {
+        Optional<OrganisationalUnit> optOrganisationalUnit = client.getAllOrganisationalUnits()
+                .stream()
+                .filter(g -> g.getId().equals(organisationalUnitId))
+                .findFirst();
+
+        if (optOrganisationalUnit.isPresent()) {
+            PatchCivilServantDto patch = PatchCivilServantDto.builder().organisationalUnit(optOrganisationalUnit.get()).build();
             User user = patchCivilServant(patch, uid);
             updateReportingData(user);
         }

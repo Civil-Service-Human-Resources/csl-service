@@ -13,6 +13,7 @@ public class PatchCivilServantDto {
     private final String fullName;
     private final Grade grade;
     private final AreaOfWork profession;
+    private final OrganisationalUnit organisationalUnit;
 
     public Map<String, Object> getAsApiParams() {
         Map<String, Object> apiParams = new HashMap<>();
@@ -27,6 +28,9 @@ public class PatchCivilServantDto {
         }
         if (profession != null) {
             apiParams.put("profession", String.format("/profession/%s", profession.getId()));
+        }
+        if (organisationalUnit != null) {
+            apiParams.put("organisationalUnit", String.format("/organisationalUnit/%s", organisationalUnit.getId()));
         }
         return apiParams;
     }

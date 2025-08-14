@@ -52,10 +52,8 @@ public class CSRSClient implements ICSRSClient {
         log.info("Getting all organisational units " + (fetchChildren ? "with children" : "without children"));
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(allOrganisationalUnits);
         uriBuilder.queryParam("fetchChildren", fetchChildren);
-        List<OrganisationalUnit> organisationalUnits = httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
+        return httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
                 .stream().toList();
-
-        return organisationalUnits;
     }
 
     @Override
@@ -89,5 +87,4 @@ public class CSRSClient implements ICSRSClient {
         String url = String.format("%s/me", civilServants);
         httpClient.executeRequest(RequestEntity.patch(url).body(patch.getAsApiParams()), Void.class);
     }
-
 }
