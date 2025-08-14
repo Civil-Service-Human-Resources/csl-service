@@ -10,6 +10,7 @@ import uk.gov.cabinetoffice.csl.service.chart.ChartWithBreakdowns;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
 import uk.gov.cabinetoffice.csl.service.chart.builder.CourseCompletionChartBuilderParams;
 import uk.gov.cabinetoffice.csl.service.chart.builder.CourseCompletionsChartBuilder;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 
 @Slf4j
 @Component
@@ -17,9 +18,9 @@ public class CourseCompletionByCourseChartFactory extends CourseCompletionChartF
 
     protected final CourseCompletionsChartBuilder<CourseCompletionAggregation> chartBuilder;
 
-    public CourseCompletionByCourseChartFactory(IReportServiceClient reportServiceClient,
-                                                CourseCompletionsChartBuilder<CourseCompletionAggregation> chartBuilder) {
-        super(reportServiceClient, chartBuilder);
+    protected CourseCompletionByCourseChartFactory(OrganisationalUnitListService organisationalUnitListService,
+                                                   IReportServiceClient reportServiceClient, CourseCompletionsChartBuilder<CourseCompletionAggregation> chartBuilder) {
+        super(organisationalUnitListService, reportServiceClient, chartBuilder);
         this.chartBuilder = chartBuilder;
     }
 
@@ -33,13 +34,13 @@ public class CourseCompletionByCourseChartFactory extends CourseCompletionChartF
         return reportServiceClient.getCourseCompletionAggregationsByCourse(params);
     }
 
-    protected CourseCompletionChartBuilderParams getChartBuilderParams(OrganisationIdsCourseCompletionsParams params) {
-        return new CourseCompletionChartBuilderParams(params, getAggregations(params).getResults(), "Course Breakdown");
+    protected CourseCompletionChartBuilderParams<CourseCompletionAggregation> getChartBuilderParams(OrganisationIdsCourseCompletionsParams params) {
+        return new CourseCompletionChartBuilderParams<>(params, getAggregations(params).getResults(), "Course breakdown");
     }
 
     @Override
     protected ChartWithBreakdowns getAggregationsAndBuildCharts(OrganisationIdsCourseCompletionsParams params) {
-        CourseCompletionChartBuilderParams chartParams = getChartBuilderParams(params);
+        CourseCompletionChartBuilderParams<CourseCompletionAggregation> chartParams = getChartBuilderParams(params);
         return chartBuilder.buildCourseCompletionCharts(chartParams);
     }
 

@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class CourseCompletionsChartBuilder<T extends CourseCompletionAggregation> extends ChartBuilder<T> {
+public class CourseCompletionsChartBuilder<A extends CourseCompletionAggregation> extends ChartBuilder<A> {
 
     protected final LearningCatalogueService learningCatalogueService;
 
@@ -25,12 +25,13 @@ public class CourseCompletionsChartBuilder<T extends CourseCompletionAggregation
         return new CourseBreakdown(new LinkedHashMap<>(courseTitles.stream().collect(Collectors.toMap(o -> o, o -> 0))), title);
     }
 
-    public ChartWithBreakdowns buildCourseCompletionCharts(CourseCompletionChartBuilderParams params, Map<String, String> courseIdToTitleMap) {
-        return buildCourseCompletionCharts(params.getChartTitle(), params.getParams(), params.getAggregations(), courseIdToTitleMap);
+    public ChartWithBreakdowns buildCourseCompletionCharts(CourseCompletionChartBuilderParams<CourseCompletionAggregation> chartBuilderParams) {
+        return this.buildCourseCompletionCharts(chartBuilderParams.getChartTitle(), chartBuilderParams.getParams(), chartBuilderParams.getAggregations());
     }
 
     public ChartWithBreakdowns buildCourseCompletionCharts(String title, OrganisationIdsCourseCompletionsParams params,
-                                                           List<CourseCompletionAggregation> aggregations, Map<String, String> courseIdToTitleMap) {
+                                                           List<CourseCompletionAggregation> aggregations) {
+        Map<String, String> courseIdToTitleMap = learningCatalogueService.getCourseIdToTitleMap(params.getCourseIds());
         AggregationChart chart = buildBasicChart(params);
         CourseBreakdown courseBreakdown = buildCourseBreakdown(title, new ArrayList<>(courseIdToTitleMap.values()));
         for (CourseCompletionAggregation result : aggregations) {
@@ -45,21 +46,6 @@ public class CourseCompletionsChartBuilder<T extends CourseCompletionAggregation
             chart.putAndAggregate(stringedDateTime, total);
         }
         return new ChartWithBreakdowns(chart, courseBreakdown);
-    }
-
-    public ChartWithBreakdowns buildCourseCompletionCharts(CourseCompletionChartBuilderParams params) {
-        Map<String, String> courseIdToTitleMap = learningCatalogueService.getCourseIdToTitleMap(params.getParams().getCourseIds());
-        return buildCourseCompletionCharts(params, courseIdToTitleMap);
-    }
-
-    public ChartWithBreakdowns buildCourseCompletionCharts(Collection<CourseCompletionChartBuilderParams> params) {
-        Map<String, String> courseIdToTitleMap = learningCatalogueService.getCourseIdToTitleMap(params.stream()
-                .flatMap(tChartBuilderParams -> tChartBuilderParams.getParams().getCourseIds().stream()).toList());
-        ChartWithBreakdowns defaultChart = new ChartWithBreakdowns(new AggregationChart());
-        return params.stream().map(chartBuilderParams -> buildCourseCompletionCharts(chartBuilderParams, courseIdToTitleMap.entrySet().stream()
-                .filter(x -> chartBuilderParams.getParams().getCourseIds().contains(x.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
-        ).reduce(defaultChart, (chartWithBreakdowns, chartWithBreakdowns2) -> chartWithBreakdowns2.merge(chartWithBreakdowns));
     }
 
 }

@@ -9,10 +9,10 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
-public class CourseCompletionChartBuilderParams {
+public class CourseCompletionChartBuilderParams<A extends CourseCompletionAggregation> {
 
     private final OrganisationIdsCourseCompletionsParams params;
-    private final List<CourseCompletionAggregation> aggregations;
+    private final List<A> aggregations;
     private final String chartTitle;
 
 }

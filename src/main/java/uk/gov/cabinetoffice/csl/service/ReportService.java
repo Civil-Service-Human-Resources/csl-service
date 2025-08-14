@@ -11,7 +11,6 @@ import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithOrganisationIdsParams;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithSelectedOrganisationIdsParams;
-import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.controller.model.SelectedOrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.error.ForbiddenException;
@@ -51,17 +50,7 @@ public class ReportService {
             }
         }
         CourseCompletionChartFactoryBase<? extends IAggregation> factory = chartFactoryService.getFactory(type);
-
-        OrganisationIdsCourseCompletionsParams organisationIdsCourseCompletionsParams = new OrganisationIdsCourseCompletionsParams();
-        organisationIdsCourseCompletionsParams.setStartDate(params.getStartDate());
-        organisationIdsCourseCompletionsParams.setEndDate(params.getEndDate());
-        organisationIdsCourseCompletionsParams.setTimezone(ZoneId.of(params.getTimezone()));
-        organisationIdsCourseCompletionsParams.setCourseIds(params.getCourseIds());
-        organisationIdsCourseCompletionsParams.setProfessionIds(params.getProfessionIds());
-        organisationIdsCourseCompletionsParams.setGradeIds(params.getGradeIds());
-        organisationIdsCourseCompletionsParams.setOrganisationIds(params.getSelectedOrganisationIds());
-
-        return factory.buildCourseCompletionsChart(organisationIdsCourseCompletionsParams, user);
+        return factory.buildCourseCompletionsChart(params, user);
     }
 
     @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")

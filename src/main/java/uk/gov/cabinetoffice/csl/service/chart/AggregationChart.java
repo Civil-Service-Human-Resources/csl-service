@@ -18,6 +18,11 @@ public class AggregationChart {
         this.total = total + value;
     }
 
+    public AggregationChart merge(AggregationChart other) {
+        other.getRows().forEach(this::putAndAggregate);
+        return this;
+    }
+
     public AggregationChart() {
         this.total = 0;
     }
