@@ -235,7 +235,7 @@ public class ReportTest extends IntegrationTestBase {
 
     @Test
     public void testGetAggregationsByCourseAndOrganisation() throws Exception {
-        String response = """
+        String org3Response = """
                 {
                   "timezone": "+01:00",
                   "delimiter": "hour",
@@ -243,19 +243,66 @@ public class ReportTest extends IntegrationTestBase {
                     {
                       "courseId": "course1",
                       "total": 10,
-                      "organisationId": "3",
                       "dateBin": "2024-01-01T10:00:00"
                     },
                     {
                       "courseId": "course1",
                       "total": 7,
-                      "organisationId": "4",
                       "dateBin": "2024-01-01T10:00:00"
                     },
                     {
                       "courseId": "course2",
                       "total": 14,
-                      "organisationId": "3",
+                      "dateBin": "2024-01-01T10:00:00"
+                    },
+                    {
+                      "courseId": "course1",
+                      "total": 50,
+                      "dateBin": "2024-01-01T11:00:00"
+                    },
+                    {
+                      "courseId": "course2",
+                      "total": 20,
+                      "dateBin": "2024-01-01T11:00:00"
+                    },
+                    {
+                      "courseId": "course1",
+                      "total": 13,
+                      "dateBin": "2024-01-01T12:00:00"
+                    },
+                    {
+                      "courseId": "course1",
+                      "total": 6,
+                      "dateBin": "2024-01-01T12:00:00"
+                    },
+                    {
+                      "courseId": "course2",
+                      "total": 90,
+                      "dateBin": "2024-01-01T12:00:00"
+                    },
+                    {
+                      "courseId": "course1",
+                      "total": 12,
+                      "dateBin": "2024-01-01T13:00:00"
+                    },
+                    {
+                      "courseId": "course2",
+                      "total": 9,
+                      "dateBin": "2024-01-01T13:00:00"
+                    }
+                  ]
+                }
+                """;
+
+        String org4Response = """
+                {
+                  "timezone": "+01:00",
+                  "delimiter": "hour",
+                  "results": [
+                    {
+                      "courseId": "course1",
+                      "total": 7,
+                      "organisationId": "4",
                       "dateBin": "2024-01-01T10:00:00"
                     },
                     {
@@ -272,20 +319,8 @@ public class ReportTest extends IntegrationTestBase {
                     },
                     {
                       "courseId": "course1",
-                      "total": 13,
-                      "organisationId": "3",
-                      "dateBin": "2024-01-01T12:00:00"
-                    },
-                    {
-                      "courseId": "course1",
                       "total": 6,
                       "organisationId": "4",
-                      "dateBin": "2024-01-01T12:00:00"
-                    },
-                    {
-                      "courseId": "course2",
-                      "total": 90,
-                      "organisationId": "3",
                       "dateBin": "2024-01-01T12:00:00"
                     },
                     {
@@ -293,23 +328,27 @@ public class ReportTest extends IntegrationTestBase {
                       "total": 12,
                       "organisationId": "4",
                       "dateBin": "2024-01-01T13:00:00"
-                    },
-                    {
-                      "courseId": "course2",
-                      "total": 9,
-                      "organisationId": "3",
-                      "dateBin": "2024-01-01T13:00:00"
                     }
                   ]
                 }
                 """;
 
-        String expectedInputForCompletionAggregations = """
+        String expectedInputForCompletionAggregationsOrg4 = """
                 {
                     "startDate":"2023-12-31T23:00:00",
                     "endDate":"2024-01-01T12:00:00",
                     "timezone": "+01:00",
-                    "organisationIds":["3","4"],
+                    "organisationIds":[4],
+                    "courseIds":["course1", "course2"]
+                }
+                """;
+
+        String expectedInputForCompletionAggregationsOrg3 = """
+                {
+                    "startDate":"2023-12-31T23:00:00",
+                    "endDate":"2024-01-01T12:00:00",
+                    "timezone": "+01:00",
+                    "organisationIds":[3, 4],
                     "courseIds":["course1", "course2"]
                 }
                 """;
@@ -336,8 +375,12 @@ public class ReportTest extends IntegrationTestBase {
         course2.setTitle("Course 2 title");
         cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course2"), List.of(course1, course2));
 
-        cslStubService.getReportServiceStubService().getCourseCompletionAggregationsByCourseAndOrganisation(
-                expectedInputForCompletionAggregations, response
+        cslStubService.getReportServiceStubService().getCourseCompletionAggregationsByCourse(
+                expectedInputForCompletionAggregationsOrg4, org4Response
+        );
+
+        cslStubService.getReportServiceStubService().getCourseCompletionAggregationsByCourse(
+                expectedInputForCompletionAggregationsOrg3, org3Response
         );
         mockMvc.perform(post("/admin/reporting/course-completions/generate-graph")
                         .contentType(MediaType.APPLICATION_JSON)

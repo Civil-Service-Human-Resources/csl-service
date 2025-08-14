@@ -26,9 +26,13 @@ public abstract class CourseCompletionChartFactoryBase<A extends IAggregation> {
 
     abstract AggregationResponse<A> getAggregations(OrganisationIdsCourseCompletionsParams params);
 
-    public CourseCompletionChart buildCourseCompletionsChart(OrganisationIdsCourseCompletionsParams params, IdentityDto user) {
+    protected ChartWithBreakdowns getAggregationsAndBuildCharts(OrganisationIdsCourseCompletionsParams params) {
         AggregationResponse<A> aggregations = getAggregations(params);
-        ChartWithBreakdowns charts = chartBuilder.buildCourseCompletionCharts(params, aggregations.getResults());
+        return chartBuilder.buildCourseCompletionCharts(params, aggregations.getResults());
+    }
+
+    public CourseCompletionChart buildCourseCompletionsChart(OrganisationIdsCourseCompletionsParams params, IdentityDto user) {
+        ChartWithBreakdowns charts = getAggregationsAndBuildCharts(params);
         boolean hasRequests = this.getHasRequests(user);
         return new CourseCompletionChart(charts.getChart(), charts.getCourseBreakdowns(), params, hasRequests);
     }

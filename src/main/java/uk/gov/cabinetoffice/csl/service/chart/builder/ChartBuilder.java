@@ -16,6 +16,10 @@ import java.util.List;
 @Component
 public class ChartBuilder<T extends IAggregation> {
 
+    public AggregationChart buildBasicChart(OrganisationIdsCourseCompletionsParams params) {
+        return buildBasicChart(params.getStartDateZoned(), params.getEndDateZoned(), params.getBinDelimiterVal().getChronoUnit());
+    }
+
     public AggregationChart buildBasicChart(ZonedDateTime startDate, ZonedDateTime endDate,
                                             ChronoUnit interval) {
         AggregationChart chart = new AggregationChart();
@@ -29,9 +33,12 @@ public class ChartBuilder<T extends IAggregation> {
         return chart;
     }
 
-    public ChartWithBreakdowns buildCourseCompletionCharts(ZonedDateTime startDate, ZonedDateTime endDate,
-                                                           ChronoUnit interval, List<T> aggregations) {
-        AggregationChart chart = this.buildBasicChart(startDate, endDate, interval);
+    public ChartWithBreakdowns buildCourseCompletionCharts(OrganisationIdsCourseCompletionsParams params, List<T> aggregations) {
+        AggregationChart chart = this.buildBasicChart(params);
+        return buildCourseCompletionCharts(chart, aggregations);
+    }
+
+    public ChartWithBreakdowns buildCourseCompletionCharts(AggregationChart chart, List<T> aggregations) {
         for (IAggregation result : aggregations) {
             String stringedDateTime = result.getDateBin().format(DateTimeFormatter.ISO_DATE_TIME);
             chart.putAndAggregate(stringedDateTime, result.getTotal());
@@ -39,8 +46,8 @@ public class ChartBuilder<T extends IAggregation> {
         return new ChartWithBreakdowns(chart);
     }
 
-    public ChartWithBreakdowns buildCourseCompletionCharts(OrganisationIdsCourseCompletionsParams params, List<T> aggregations) {
-        return buildCourseCompletionCharts(params.getStartDateZoned(), params.getEndDateZoned(), params.getBinDelimiterVal().getChronoUnit(), aggregations);
+    public ChartWithBreakdowns buildCourseCompletionCharts(ZonedDateTime startDate, ZonedDateTime endDate, ChronoUnit unit, List<T> aggregations) {
+        AggregationChart chart = this.buildBasicChart(startDate, endDate, unit);
+        return buildCourseCompletionCharts(chart, aggregations);
     }
-
 }

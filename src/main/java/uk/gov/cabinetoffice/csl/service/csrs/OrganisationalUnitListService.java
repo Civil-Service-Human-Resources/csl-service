@@ -8,10 +8,7 @@ import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.azure.core.util.CoreUtils.isNullOrEmpty;
 
@@ -61,6 +58,13 @@ public class OrganisationalUnitListService {
     public List<OrganisationalUnit> getOrganisationsWithChildrenAsFlatList(List<Long> organisationIds) {
         return civilServantRegistryClient.getAllOrganisationalUnits()
                 .getMultiple(organisationIds, true);
+    }
+
+    public Map<Long, List<OrganisationalUnit>> getOrganisationsWithChildrenAsFlatListMap(List<Long> organisationIds) {
+        Map<Long, List<OrganisationalUnit>> response = new HashMap<>();
+        OrganisationalUnitMap organisationalUnitMap = civilServantRegistryClient.getAllOrganisationalUnits();
+        organisationIds.forEach(id -> response.put(id, organisationalUnitMap.getMultiple(List.of(id), true)));
+        return response;
     }
 
     @CacheEvict(value = "organisations", allEntries = true)

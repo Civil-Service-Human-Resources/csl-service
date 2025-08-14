@@ -14,7 +14,6 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.GetCourseCompletionReportRequestsResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.Aggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
-import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionWithOrganisationAggregation;
 
 import java.util.List;
 
@@ -42,14 +41,6 @@ public class ReportServiceClient implements IReportServiceClient {
     public AggregationResponse<CourseCompletionAggregation> getCourseCompletionAggregationsByCourse(OrganisationIdsCourseCompletionsParams body) {
         log.debug("Getting course completion aggregation report by course with body '{}'", body);
         RequestEntity<OrganisationIdsCourseCompletionsParams> request = RequestEntity.post(config.getCourseCompletionsAggregationsByCourseUrl()).body(body);
-        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
-        });
-    }
-
-    @Override
-    public AggregationResponse<CourseCompletionWithOrganisationAggregation> getCourseCompletionAggregationsByCourseAndOrganisation(OrganisationIdsCourseCompletionsParams body) {
-        log.debug("Getting course completion aggregation report by course and organisation with body '{}'", body);
-        RequestEntity<OrganisationIdsCourseCompletionsParams> request = RequestEntity.post(config.getCourseCompletionsAggregationsByOrganisationUrl()).body(body);
         return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
         });
     }

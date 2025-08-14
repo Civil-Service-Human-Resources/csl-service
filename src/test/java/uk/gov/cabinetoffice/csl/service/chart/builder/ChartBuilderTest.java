@@ -1,11 +1,10 @@
-package uk.gov.cabinetoffice.csl.service;
+package uk.gov.cabinetoffice.csl.service.chart.builder;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.Aggregation;
 import uk.gov.cabinetoffice.csl.service.chart.AggregationChart;
-import uk.gov.cabinetoffice.csl.service.chart.builder.ChartBuilder;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

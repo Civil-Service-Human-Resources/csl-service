@@ -59,10 +59,7 @@ public class ReportService {
         organisationIdsCourseCompletionsParams.setCourseIds(params.getCourseIds());
         organisationIdsCourseCompletionsParams.setProfessionIds(params.getProfessionIds());
         organisationIdsCourseCompletionsParams.setGradeIds(params.getGradeIds());
-        if (params.getSelectedOrganisationIds() != null) {
-            List<OrganisationalUnit> organisations = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(params.getSelectedOrganisationIds());
-            organisationIdsCourseCompletionsParams.setOrganisations(organisations);
-        }
+        organisationIdsCourseCompletionsParams.setOrganisationIds(params.getSelectedOrganisationIds());
 
         return factory.buildCourseCompletionsChart(organisationIdsCourseCompletionsParams, user);
     }
@@ -82,7 +79,7 @@ public class ReportService {
         createReportServiceReportRequestParams.setFullName(params.getFullName());
         if (params.getSelectedOrganisationIds() != null) {
             List<OrganisationalUnit> organisations = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(params.getSelectedOrganisationIds());
-            createReportServiceReportRequestParams.setOrganisations(organisations);
+            createReportServiceReportRequestParams.setOrganisationIds(organisations.stream().map(OrganisationalUnit::getId).toList());
         }
 
         return reportServiceClient.postCourseCompletionsExportRequest(createReportServiceReportRequestParams);

@@ -10,6 +10,7 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletio
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseBreakdown;
 import uk.gov.cabinetoffice.csl.service.chart.AggregationChart;
 import uk.gov.cabinetoffice.csl.service.chart.ChartWithBreakdowns;
+import uk.gov.cabinetoffice.csl.service.chart.builder.CourseCompletionChartBuilderParams;
 import uk.gov.cabinetoffice.csl.service.chart.builder.CourseCompletionsChartBuilder;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
@@ -56,7 +57,9 @@ class CourseCompletionsChartBuilderTest {
 
         when(learningCatalogueService.getCourseIdToTitleMap(List.of("course1", "course2", "course3", "course4"))).thenReturn(courseMap);
 
-        ChartWithBreakdowns charts = chartBuilder.buildCourseCompletionCharts(params, aggregations);
+        CourseCompletionChartBuilderParams chartParams = new CourseCompletionChartBuilderParams(params, aggregations, "Test tile");
+
+        ChartWithBreakdowns charts = chartBuilder.buildCourseCompletionCharts(chartParams);
         AggregationChart aggregationChart = charts.getChart();
         List<CourseBreakdown> courseBreakdowns = new ArrayList<>(charts.getCourseBreakdowns());
 
