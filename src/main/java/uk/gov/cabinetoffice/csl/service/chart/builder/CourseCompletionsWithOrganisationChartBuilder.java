@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class CourseCompletionsWithOrganisationChartBuilder extends CourseCompletionsChartBuilder<CourseCompletionWithOrganisationAggregation> {
@@ -22,7 +23,7 @@ public class CourseCompletionsWithOrganisationChartBuilder extends CourseComplet
 
     public ChartWithBreakdowns buildCourseCompletionCharts(Collection<CourseCompletionChartBuilderParams<CourseCompletionWithOrganisationAggregation>> params) {
         Map<String, String> courseIdToTitleMap = learningCatalogueService.getCourseIdToTitleMap(params.stream()
-                .flatMap(tChartBuilderParams -> tChartBuilderParams.getParams().getCourseIds().stream()).toList());
+                .flatMap(tChartBuilderParams -> tChartBuilderParams.getParams().getCourseIds().stream()).collect(Collectors.toSet()));
         List<String> orgIdsCounted = new ArrayList<>();
         Collection<AggregationChart> charts = new ArrayList<>();
         Collection<CourseBreakdown> courseBreakdowns = new ArrayList<>();
