@@ -30,6 +30,9 @@ public class CSRSClient implements ICSRSClient {
     @Value("${csrs.professions}")
     private String professionsTree;
 
+    @Value("${csrs.grades}")
+    private String grades;
+
     private final IHttpClient httpClient;
     private final OrganisationalUnitFactory organisationalUnitFactory;
 
@@ -64,6 +67,17 @@ public class CSRSClient implements ICSRSClient {
                 new ParameterizedTypeReference<>() {
                 }
         );
+    }
+
+    @Override
+    @Cacheable("grades")
+    public List<Grade> getGrades() {
+        GetGradesResponse response = httpClient.executeTypeReferenceRequest(
+                RequestEntity.get(grades).build(),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        return response.getGrades();
     }
 
     @Override
