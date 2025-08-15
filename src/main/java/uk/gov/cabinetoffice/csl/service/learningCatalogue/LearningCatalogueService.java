@@ -14,9 +14,8 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -87,17 +86,41 @@ public class LearningCatalogueService {
         }
     }
 
-    public List<String> getRequiredLearningIdsForDepartments(Collection<String> departmentCodes) {
+    private RequiredLearningMap getRequiredLearningMap() {
         RequiredLearningMap map = requiredLearningMapCache.get();
         if (map == null) {
             map = client.getRequiredLearningIdMap();
             requiredLearningMapCache.put(map);
         }
-        return map.getRequiredLearningWithDepartmentCodes(departmentCodes).stream().toList();
+        return map;
+    }
+
+    public List<String> getRequiredLearningIdsForDepartments(Collection<String> departmentCodes) {
+        return getRequiredLearningMap().getRequiredLearningWithDepartmentCodes(departmentCodes).stream().toList();
     }
 
     public List<Course> getRequiredLearningForDepartments(Collection<String> departmentCodes) {
         return this.getCourses(getRequiredLearningIdsForDepartments(departmentCodes));
+    }
+
+    public Map<String, List<Course>> getRequiredLearningForDepartmentsMap(Collection<String> departmentCodes) {
+        Map<String, ArrayList<String>> map = getRequiredLearningMap().getPartialMap(departmentCodes);
+        Map<String, List<Course>> result = new HashMap<>();
+        Map<String, Course> courseMap = getCourses(
+                new HashSet<>(map.entrySet().stream().flatMap(entry -> entry.getValue().stream()).collect(Collectors.toSet()))
+        ).stream().collect(Collectors.toMap(Course::getId, Function.identity()));
+        departmentCodes.forEach(departmentCode -> {
+            List<String> courseIdsForDep = map.get(departmentCode);
+            if (courseIdsForDep != null) {
+                courseIdsForDep.forEach(courseId -> {
+                    Course course = courseMap.get(courseId);
+                    List<Course> courses = result.getOrDefault(departmentCode, new ArrayList<>());
+                    courses.add(course);
+                    result.put(departmentCode, courses);
+                });
+            }
+        });
+        return result;
     }
 
     public void removeCourseFromCache(String courseId) {

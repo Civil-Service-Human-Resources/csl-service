@@ -12,4 +12,6 @@ import java.io.Serializable;
 public class FormattedOrganisationalUnitName implements Serializable {
     private Long id;
     private String name;
+    private String code;
+    private String abbreviation;
 }

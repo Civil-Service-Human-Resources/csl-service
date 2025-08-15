@@ -9,28 +9,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
-import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithSelectedOrganisationIdsParams;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithOrganisationIdsParams;
+import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithSelectedOrganisationIdsParams;
 import uk.gov.cabinetoffice.csl.controller.model.SelectedOrganisationIdsCourseCompletionsParams;
-import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.error.ForbiddenException;
 import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
 import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
+import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.IAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
 import uk.gov.cabinetoffice.csl.service.chart.ChartFactoryService;
-import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartFactoryBase;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
-import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
+import uk.gov.cabinetoffice.csl.service.chart.factory.CourseCompletionChartFactoryBase;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 
 import java.time.ZoneId;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -44,21 +39,18 @@ public class ReportService {
     private final OrganisationalUnitListService organisationalUnitService;
 
     public CourseCompletionChart getCourseCompletionsChart(SelectedOrganisationIdsCourseCompletionsParams params, IdentityDto user) {
-        CourseCompletionChartType type = isEmpty(params.getCourseIds()) ? CourseCompletionChartType.BASIC : CourseCompletionChartType.BY_COURSE;
-        CourseCompletionChartFactoryBase factory = chartFactoryService.getFactory(type);
-
-        OrganisationIdsCourseCompletionsParams organisationIdsCourseCompletionsParams = new OrganisationIdsCourseCompletionsParams();
-        organisationIdsCourseCompletionsParams.setStartDate(params.getStartDate());
-        organisationIdsCourseCompletionsParams.setEndDate(params.getEndDate());
-        organisationIdsCourseCompletionsParams.setTimezone(ZoneId.of(params.getTimezone()));
-        organisationIdsCourseCompletionsParams.setCourseIds(params.getCourseIds());
-        organisationIdsCourseCompletionsParams.setProfessionIds(params.getProfessionIds());
-        organisationIdsCourseCompletionsParams.setGradeIds(params.getGradeIds());
-        if(params.getSelectedOrganisationIds() != null) {
-            organisationIdsCourseCompletionsParams.setOrganisationIds(getOrganisationIdsWithChildrenAsFlatList(params.getSelectedOrganisationIds()));
+        CourseCompletionChartType type;
+        if (isEmpty(params.getCourseIds())) {
+            type = CourseCompletionChartType.BASIC;
+        } else {
+            if (params.getSelectedOrganisationIds().size() <= 1) {
+                type = CourseCompletionChartType.BY_COURSE;
+            } else {
+                type = CourseCompletionChartType.BY_ORGANISATION;
+            }
         }
-
-        return factory.buildCourseCompletionsChart(organisationIdsCourseCompletionsParams, user);
+        CourseCompletionChartFactoryBase<? extends IAggregation> factory = chartFactoryService.getFactory(type);
+        return factory.buildCourseCompletionsChart(params, user);
     }
 
     @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")
@@ -74,8 +66,9 @@ public class ReportService {
         createReportServiceReportRequestParams.setUserEmail(params.getUserEmail());
         createReportServiceReportRequestParams.setDownloadBaseUrl(params.getDownloadBaseUrl());
         createReportServiceReportRequestParams.setFullName(params.getFullName());
-        if(params.getSelectedOrganisationIds() != null) {
-            createReportServiceReportRequestParams.setOrganisationIds(getOrganisationIdsWithChildrenAsFlatList(params.getSelectedOrganisationIds()));
+        if (params.getSelectedOrganisationIds() != null) {
+            List<OrganisationalUnit> organisations = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(params.getSelectedOrganisationIds());
+            createReportServiceReportRequestParams.setOrganisationIds(organisations.stream().map(OrganisationalUnit::getId).toList());
         }
 
         return reportServiceClient.postCourseCompletionsExportRequest(createReportServiceReportRequestParams);
@@ -96,32 +89,4 @@ public class ReportService {
         }
     }
 
-    public List<String> getOrganisationIdsWithChildrenAsFlatList(List<String> organisationIds) {
-        List<OrganisationalUnit> organisationalUnits = organisationalUnitService
-                .getAllOrganisationalUnitsWithChildren().getOrganisationalUnits()
-                .stream()
-                .filter(organisationalUnit -> organisationIds.contains(organisationalUnit.getId().toString()))
-                .toList();
-
-        List<OrganisationalUnit> orgUnitsWithChildren = getOrganisationsWithChildrenAsFlatList(organisationalUnits);
-        List<String> orgIds = orgUnitsWithChildren.stream().map(o -> Long.toString(o.getId())).toList();
-        return orgIds;
-    }
-
-    public List<OrganisationalUnit> getOrganisationsWithChildrenAsFlatList(List<OrganisationalUnit> organisations) {
-        List<OrganisationalUnit> result = organisations.stream()
-                .flatMap(org -> flatten(org).stream())
-                .distinct().toList();
-
-        return result;
-    }
-
-    public List<OrganisationalUnit> flatten(OrganisationalUnit organisationalUnit) {
-        return Stream.concat(
-                Stream.of(organisationalUnit),
-                Optional.ofNullable(organisationalUnit.getChildren())
-                        .orElse(Collections.emptyList()).stream()
-                        .flatMap(child -> flatten(child).stream())
-        ).collect(Collectors.toList());
-    }
 }

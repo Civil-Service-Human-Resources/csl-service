@@ -38,33 +38,82 @@ public class OrganisationTest extends IntegrationTestBase {
                     "formattedOrganisationalUnitNames": [
                          {
                              "id": 1,
-                             "name": "OrgName1 (OName1)"
+                             "name": "OrgName1 (OName1)",
+                             "code": "ON1",
+                             "abbreviation": "OName1"
                          },
                          {
                              "id": 2,
-                             "name": "OrgName1 (OName1) | OrgName2"
+                             "name": "OrgName1 (OName1) | OrgName2",
+                             "code": "ON2",
+                             "abbreviation": null
                          },
                          {
                              "id": 3,
-                             "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)"
+                             "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)",
+                             "code": "ON3",
+                             "abbreviation":  "OName3"
                          },
                          {
                              "id": 4,
-                             "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)"
+                             "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)",
+                             "code": "ON4",
+                             "abbreviation":  "OName4"
                          },
                          {
                              "id": 5,
-                             "name": "OrgName1 (OName1) | OrgName5 (OName5)"
+                             "name": "OrgName1 (OName1) | OrgName5 (OName5)",
+                             "code": "ON5",
+                             "abbreviation":  "OName5"
                          },
                          {
                              "id": 6,
-                             "name": "OrgName6 (OName6)"
+                             "name": "OrgName6 (OName6)",
+                             "code": "ON6",
+                             "abbreviation":  "OName6"
                          }
                     ]
                 }
                 """;
 
         mockMvc.perform(get("/organisations/formatted_list")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedFormattedOrganisations, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void testFormattedOrganisationsListWithFilter() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        String expectedFormattedOrganisations = """
+                {
+                    "formattedOrganisationalUnitNames": [
+                         {
+                             "id": 1,
+                             "name": "OrgName1 (OName1)",
+                             "code": "ON1",
+                             "abbreviation": "OName1"
+                         },
+                         {
+                             "id": 2,
+                             "name": "OrgName1 (OName1) | OrgName2",
+                             "code": "ON2",
+                             "abbreviation": null
+                         },
+                         {
+                             "id": 6,
+                             "name": "OrgName6 (OName6)",
+                             "code": "ON6",
+                             "abbreviation": "OName6"
+                         }
+                    ]
+                }
+                """;
+
+        mockMvc.perform(get("/organisations/formatted_list")
+                        .param("domain", "domain2.com")
+                        .param("tierOne", "true")
+                        .param("organisationId", "6")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedFormattedOrganisations, true))
                 .andExpect(status().is2xxSuccessful());
@@ -82,10 +131,8 @@ public class OrganisationTest extends IntegrationTestBase {
                              "code": "ON1",
                              "abbreviation": "OName1",
                              "formattedName": "OrgName1 (OName1)",
-                             "href": "https://hostname/organisationalUnits/1",
                              "parentId": null,
                              "parent": null,
-                             "children": null,
                              "domains": null,
                              "agencyToken": null
                          },
@@ -93,13 +140,17 @@ public class OrganisationTest extends IntegrationTestBase {
                              "id": 2,
                              "name": "OrgName2",
                              "code": "ON2",
-                             "abbreviation": "",
+                             "abbreviation": null,
                              "formattedName": "OrgName1 (OName1) | OrgName2",
-                             "href": "https://hostname/organisationalUnits/2",
                              "parentId": 1,
                              "parent": null,
-                             "children": null,
-                             "domains": null,
+                             "domains": [
+                                  {
+                                    "id": 1,
+                                    "domain": "domain2.com",
+                                    "createdTimestamp": "2025-01-01T10:00:00"
+                                  }
+                             ],
                              "agencyToken": null
                          },
                          {
@@ -108,10 +159,8 @@ public class OrganisationTest extends IntegrationTestBase {
                              "code": "ON3",
                              "abbreviation": "OName3",
                              "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)",
-                             "href": "https://hostname/organisationalUnits/3",
                              "parentId": 2,
                              "parent": null,
-                             "children": null,
                              "domains": null,
                              "agencyToken": null
                          },
@@ -121,10 +170,8 @@ public class OrganisationTest extends IntegrationTestBase {
                              "code": "ON4",
                              "abbreviation": "OName4",
                              "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)",
-                             "href": "https://hostname/organisationalUnits/4",
                              "parentId": 3,
                              "parent": null,
-                             "children": null,
                              "domains": null,
                              "agencyToken": null
                          },
@@ -134,10 +181,8 @@ public class OrganisationTest extends IntegrationTestBase {
                              "code": "ON5",
                              "abbreviation": "OName5",
                              "formattedName": "OrgName1 (OName1) | OrgName5 (OName5)",
-                             "href": "https://hostname/organisationalUnits/5",
                              "parentId": 1,
                              "parent": null,
-                             "children": null,
                              "domains": null,
                              "agencyToken": null
                          },
@@ -147,10 +192,8 @@ public class OrganisationTest extends IntegrationTestBase {
                              "code": "ON6",
                              "abbreviation": "OName6",
                              "formattedName": "OrgName6 (OName6)",
-                             "href": "https://hostname/organisationalUnits/6",
                              "parentId": null,
                              "parent": null,
-                             "children": null,
                              "domains": null,
                              "agencyToken": null
                          }

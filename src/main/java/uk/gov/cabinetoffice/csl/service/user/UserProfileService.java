@@ -2,12 +2,13 @@ package uk.gov.cabinetoffice.csl.service.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
 import uk.gov.cabinetoffice.csl.domain.csrs.Grade;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
+import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.CompleteProfileMessage;
@@ -19,22 +20,26 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class UserProfileService {
-
-    private final MessageMetadataFactory messageMetadataFactory;
     private final UserDetailsService userDetailsService;
-    private final ICSRSClient client;
+    private final OrganisationalUnitListService organisationalUnitListService;
+    private final CivilServantRegistryService civilServantRegistryService;
+    private final MessageMetadataFactory messageMetadataFactory;
     private final IMessagingClient messagingClient;
 
-    public UserProfileService(MessageMetadataFactory messageMetadataFactory, UserDetailsService userDetailsService,
-                              ICSRSClient client, IMessagingClient messagingClient) {
-        this.messageMetadataFactory = messageMetadataFactory;
+    public UserProfileService(UserDetailsService userDetailsService,
+                              OrganisationalUnitListService organisationalUnitListService,
+                              CivilServantRegistryService civilServantRegistryService,
+                              MessageMetadataFactory messageMetadataFactory,
+                              IMessagingClient messagingClient) {
         this.userDetailsService = userDetailsService;
-        this.client = client;
+        this.organisationalUnitListService = organisationalUnitListService;
+        this.civilServantRegistryService = civilServantRegistryService;
+        this.messageMetadataFactory = messageMetadataFactory;
         this.messagingClient = messagingClient;
     }
 
     public void setOtherAreasOfWork(String uid, List<Long> otherAreasOfWorkIds, boolean newProfile) {
-        List<AreaOfWork> areasOfWork = client.getAreasOfWork()
+        List<AreaOfWork> areasOfWork = civilServantRegistryService.getAreasOfWork()
                 .stream().flatMap(p -> p.getFlat().stream())
                 .filter(p -> otherAreasOfWorkIds.contains(p.getId())).toList();
         if (!areasOfWork.isEmpty()) {
@@ -53,7 +58,7 @@ public class UserProfileService {
     }
 
     public void setGrade(String uid, Long gradeId) {
-        Optional<Grade> optGrade = client.getGrades()
+        Optional<Grade> optGrade = civilServantRegistryService.getGrades()
                 .stream()
                 .filter(g -> g.getId().equals(gradeId))
                 .findFirst();
@@ -65,7 +70,7 @@ public class UserProfileService {
     }
 
     public void setProfession(String uid, Long professionId) {
-        Optional<AreaOfWork> optAreaOfWork = client.getAreasOfWork()
+        Optional<AreaOfWork> optAreaOfWork = civilServantRegistryService.getAreasOfWork()
                 .stream()
                 .filter(g -> g.getId().equals(professionId))
                 .findFirst();
@@ -77,7 +82,9 @@ public class UserProfileService {
     }
 
     public void setOrganisationalUnit(String uid, Long organisationalUnitId) {
-        Optional<OrganisationalUnit> optOrganisationalUnit = client.getAllOrganisationalUnits()
+        Optional<OrganisationalUnit> optOrganisationalUnit = organisationalUnitListService
+                .getAllOrganisationalUnits()
+                .getOrganisationalUnits()
                 .stream()
                 .filter(g -> g.getId().equals(organisationalUnitId))
                 .findFirst();
@@ -90,7 +97,7 @@ public class UserProfileService {
     }
 
     private User patchCivilServant(PatchCivilServantDto patch, String uid) {
-        client.patchCivilServant(patch);
+        civilServantRegistryService.patchCivilServant(patch);
         userDetailsService.removeUserFromCache(uid);
         return userDetailsService.getUserWithUid(uid);
     }

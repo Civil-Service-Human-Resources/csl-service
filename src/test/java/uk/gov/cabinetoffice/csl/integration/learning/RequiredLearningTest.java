@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventQuery;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
@@ -604,6 +605,45 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.courses[0].moduleCount").value(3))
                 .andExpect(jsonPath("$.courses[0].status").value("IN_PROGRESS"))
                 .andExpect(jsonPath("$.courses[0].dueBy").value("2024-07-01"));
+    }
+
+    @Test
+    public void testGetRequiredLearningMapForOrganisations() throws Exception {
+        Course course1 = testDataService.generateCourse(false, false);
+        course1.setTitle("course 1");
+        course1.setId("course1");
+        Course course2 = testDataService.generateCourse(false, false);
+        course2.setTitle("course 2");
+        course2.setId("course2");
+        Course course3 = testDataService.generateCourse(false, false);
+        course3.setTitle("course 3");
+        course3.setId("course3");
+        cslStubService.getCsrsStubService().getOrganisations(testDataService.generateOrganisationalUnitsPagedResponse());
+        cslStubService.getLearningCatalogue().getMandatoryLearningMap("""
+                {
+                    "departmentCodeMap": {
+                        "ON1": ["course1", "course2"],
+                        "ON5": ["course3"]
+                    }
+                }
+                """);
+        cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course2", "course3"),
+                List.of(course1, course2, course3));
+        mockMvc.perform(get("/learning/required/for-departments")
+                        .param("organisationIds", "1")
+                        .param("organisationIds", "5")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.departmentMap.1[0].id").value("course1"))
+                .andExpect(jsonPath("$.departmentMap.1[0].title").value("course 1"))
+                .andExpect(jsonPath("$.departmentMap.1[1].id").value("course2"))
+                .andExpect(jsonPath("$.departmentMap.1[1].title").value("course 2"))
+                .andExpect(jsonPath("$.departmentMap.5[0].id").value("course3"))
+                .andExpect(jsonPath("$.departmentMap.5[0].title").value("course 3"))
+                .andExpect(jsonPath("$.departmentMap.5[1].id").value("course1"))
+                .andExpect(jsonPath("$.departmentMap.5[1].title").value("course 1"))
+                .andExpect(jsonPath("$.departmentMap.5[2].id").value("course2"))
+                .andExpect(jsonPath("$.departmentMap.5[2].title").value("course 2"));
     }
 
 }

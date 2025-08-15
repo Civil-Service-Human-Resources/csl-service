@@ -22,4 +22,9 @@ public class RequiredLearningMap implements Serializable {
         return depCodes.stream().flatMap(code -> departmentCodeMap.getOrDefault(code, new ArrayList<>()).stream()).collect(Collectors.toSet());
     }
 
+    public Map<String, ArrayList<String>> getPartialMap(Collection<String> departmentCodes) {
+        return departmentCodeMap.entrySet().stream()
+                .filter(e -> departmentCodes.contains(e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
 }
