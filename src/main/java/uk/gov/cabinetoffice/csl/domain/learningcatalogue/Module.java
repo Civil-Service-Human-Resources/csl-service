@@ -59,6 +59,10 @@ public class Module implements IChildLearningResource, IParentLearningResource<E
         }
     }
 
+    public BigDecimal getCost() {
+        return cost == null ? BigDecimal.ZERO : cost;
+    }
+
     @JsonIgnore
     public boolean isFree() {
         return this.cost.signum() == 0;
