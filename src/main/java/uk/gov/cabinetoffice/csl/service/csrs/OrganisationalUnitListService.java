@@ -37,12 +37,13 @@ public class OrganisationalUnitListService {
                 } else if (!isNullOrEmpty(params.getDomain()) && organisationalUnit.hasDomain(params.getDomain())) {
                     if (params.isTierOne()) {
                         Long currentParentId = organisationalUnit.getParentId();
-                        if (currentParentId != null && !organisationIds.contains(currentParentId)) {
-                            while (currentParentId != null) {
-                                OrganisationalUnit currentParent = allOrgs.get(currentParentId);
+                        while (currentParentId != null) {
+                            OrganisationalUnit currentParent = allOrgs.get(currentParentId);
+                            if (!organisationIds.contains(currentParentId)) {
                                 filtered.add(currentParent);
-                                currentParentId = currentParent.getParentId();
+                                organisationIds.add(currentParentId);
                             }
+                            currentParentId = currentParent.getParentId();
                         }
                     }
                     add = true;
