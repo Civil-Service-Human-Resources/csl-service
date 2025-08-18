@@ -194,7 +194,7 @@ public class LearningPlanTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.bookedCourses[0].title").value("Course 5"))
                 .andExpect(jsonPath("$.bookedCourses[0].shortDescription").value("Course 5 short description"))
                 .andExpect(jsonPath("$.bookedCourses[0].type").value("face-to-face"))
-                .andExpect(jsonPath("$.bookedCourses[0].duration").value("240"))
+                .andExpect(jsonPath("$.bookedCourses[0].duration").value("14400"))
                 .andExpect(jsonPath("$.bookedCourses[0].moduleCount").value("1"))
                 .andExpect(jsonPath("$.bookedCourses[0].costInPounds").value("0"))
                 .andExpect(jsonPath("$.bookedCourses[0].status").value("NULL"))

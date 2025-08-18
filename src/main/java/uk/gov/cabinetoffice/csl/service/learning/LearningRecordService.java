@@ -40,7 +40,7 @@ public class LearningRecordService {
                 .forEach(course -> {
                     LocalDateTime completionDate = completionDates.get(course.getId());
                     if (completionDate != null) {
-                        LearningRecordCourse learningRecordCourse = new LearningRecordCourse(course.getId(), course.getTitle(), course.getCourseType(), course.getDurationInMinutes(), completionDate);
+                        LearningRecordCourse learningRecordCourse = new LearningRecordCourse(course.getId(), course.getTitle(), course.getCourseType(), course.getDurationInSeconds(), completionDate);
                         course.getLearningPeriodForUser(user)
                                 .ifPresentOrElse(learningPeriod -> {
                                     if (completionDate.isAfter(learningPeriod.getStartDateAsDateTime())) {

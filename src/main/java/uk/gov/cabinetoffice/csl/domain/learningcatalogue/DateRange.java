@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 @Data
 @AllArgsConstructor
@@ -38,8 +38,8 @@ public class DateRange implements Serializable {
     @JsonDeserialize(using = LocalTimeDeserializer.class)
     LocalTime endTime;
 
-    public Integer getDurationInMinutes() {
-        return Math.toIntExact(MINUTES.between(startTime, endTime));
+    public Integer getDurationInSeconds() {
+        return Math.toIntExact(SECONDS.between(startTime, endTime));
     }
 
 }

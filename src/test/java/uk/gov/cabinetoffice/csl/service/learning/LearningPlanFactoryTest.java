@@ -88,7 +88,7 @@ class LearningPlanFactoryTest {
         assertEquals("Course 1", bookedLearningPlanCourse.getTitle());
         assertEquals("Short Description 1", bookedLearningPlanCourse.getShortDescription());
         assertEquals("blended", bookedLearningPlanCourse.getType());
-        assertEquals(140, bookedLearningPlanCourse.getDuration());
+        assertEquals(7220, bookedLearningPlanCourse.getDuration());
         assertEquals(2, bookedLearningPlanCourse.getModuleCount());
         assertEquals(10, bookedLearningPlanCourse.getCostInPounds());
         assertEquals(State.NULL, bookedLearningPlanCourse.getStatus());
@@ -118,7 +118,7 @@ class LearningPlanFactoryTest {
         assertEquals("Course 1", bookedLearningPlanCourse.getTitle());
         assertEquals("Short Description 1", bookedLearningPlanCourse.getShortDescription());
         assertEquals("face-to-face", bookedLearningPlanCourse.getType());
-        assertEquals(120, bookedLearningPlanCourse.getDuration());
+        assertEquals(7200, bookedLearningPlanCourse.getDuration());
         assertEquals(1, bookedLearningPlanCourse.getModuleCount());
         assertEquals(10, bookedLearningPlanCourse.getCostInPounds());
         assertEquals(State.NULL, bookedLearningPlanCourse.getStatus());

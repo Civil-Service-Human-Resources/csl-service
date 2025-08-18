@@ -46,8 +46,8 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     }
 
     @JsonIgnore
-    public Integer getDurationInMinutes() {
-        return modules.stream().mapToInt(Module::getDurationInMinutes).sum();
+    public Integer getDurationInSeconds() {
+        return modules.stream().mapToInt(Module::getDurationInSeconds).sum();
     }
 
     @JsonIgnore

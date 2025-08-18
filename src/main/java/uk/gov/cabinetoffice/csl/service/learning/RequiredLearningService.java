@@ -63,7 +63,7 @@ public class RequiredLearningService {
                     if (completionDate == null || lp.getStartDateAsDateTime().isAfter(completionDate)) {
                         RequiredLearningCourse requiredLearningCourse = new RequiredLearningCourse(
                                 course.getId(), course.getTitle(), course.getShortDescription(),
-                                course.getCourseType(), course.getDurationInMinutes(), course.getModules().size(),
+                                course.getCourseType(), course.getDurationInSeconds(), course.getModules().size(),
                                 course.getCost(), State.NULL, lp);
                         requiredLearningCourses.add(requiredLearningCourse);
                         moduleRecordIdsToFetch.addAll(course.getRequiredModuleIdsForCompletion().stream()

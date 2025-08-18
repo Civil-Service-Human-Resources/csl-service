@@ -33,8 +33,8 @@ public class Event implements IChildLearningResource, Cacheable {
         return dateRanges.get(0).getDate();
     }
 
-    public Integer getDurationInMinutes() {
-        return dateRanges.stream().mapToInt(DateRange::getDurationInMinutes).sum();
+    public Integer getDurationInSeconds() {
+        return dateRanges.stream().mapToInt(DateRange::getDurationInSeconds).sum();
     }
 
     @JsonIgnore

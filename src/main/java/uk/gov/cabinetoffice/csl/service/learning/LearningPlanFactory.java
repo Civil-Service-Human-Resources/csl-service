@@ -49,7 +49,7 @@ public class LearningPlanFactory {
                 boolean canBeMovedToLearningPlan = utilService.getNowDateTime().isAfter(moduleRecord.getEventDate().atTime(LocalTime.MIN)) &&
                         (course.getCourseType().equals("face-to-face") || otherModulesCompleted == requiredModuleRecords.size() - 1);
                 bookedCourse = new BookedLearningPlanCourse(course.getId(), course.getTitle(),
-                        course.getShortDescription(), course.getCourseType(), course.getDurationInMinutes(),
+                        course.getShortDescription(), course.getCourseType(), course.getDurationInSeconds(),
                         course.getModules().size(), course.getCost(), State.NULL, eventModule, canBeMovedToLearningPlan);
             }
         }
@@ -58,7 +58,7 @@ public class LearningPlanFactory {
 
     public LearningPlanCourse getLearningPlanCourse(Course course, State state) {
         return new LearningPlanCourse(course.getId(), course.getTitle(),
-                course.getShortDescription(), course.getCourseType(), course.getDurationInMinutes(),
+                course.getShortDescription(), course.getCourseType(), course.getDurationInSeconds(),
                 course.getModules().size(), course.getCost(), state);
     }
 }
