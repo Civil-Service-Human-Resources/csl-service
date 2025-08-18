@@ -17,7 +17,6 @@ import uk.gov.cabinetoffice.csl.util.Cacheable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus.ARCHIVED;
 import static uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus.PUBLISHED;
 
 @Data
@@ -167,7 +166,7 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
 
     @JsonIgnore
     public boolean ShouldBeDisplayed() {
-        return (!List.of(ARCHIVED, PUBLISHED).contains(getStatus()) && !getModules().isEmpty());
+        return (Objects.equals(PUBLISHED, getStatus()) && !getModules().isEmpty());
     }
 
     @JsonIgnore

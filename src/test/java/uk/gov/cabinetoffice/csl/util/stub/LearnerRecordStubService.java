@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
@@ -75,11 +76,19 @@ public class LearnerRecordStubService {
 
     public StubMapping getLearnerRecords(LearnerRecordQuery query, Integer page, String response) {
         MappingBuilder mappingBuilder = WireMock.get(urlPathEqualTo("/learner_record_api/learner_records"))
-                .withQueryParam("learnerIds", equalTo(learnerIds))
                 .withQueryParam("size", equalTo("50"))
                 .withQueryParam("page", equalTo(page.toString()));
-        if (resourceIds != null) {
-            mappingBuilder.withQueryParam("resourceIds", equalTo(resourceIds));
+        if (query.getLearnerIds() != null) {
+            mappingBuilder.withQueryParam("learnerIds", including(query.getLearnerIds().toArray(String[]::new)));
+        }
+        if (query.getResourceIds() != null) {
+            mappingBuilder.withQueryParam("resourceIds", including(query.getResourceIds().toArray(String[]::new)));
+        }
+        if (query.getLearnerRecordTypes() != null) {
+            mappingBuilder.withQueryParam("learnerRecordTypes", including(query.getLearnerRecordTypes().toArray(String[]::new)));
+        }
+        if (query.getNotEventTypes() != null) {
+            mappingBuilder.withQueryParam("notEventTypes", including(query.getNotEventTypes().toArray(String[]::new)));
         }
         return stubFor(
                 mappingBuilder
@@ -88,6 +97,20 @@ public class LearnerRecordStubService {
                                 .withHeader("Content-Type", "application/json")
                                 .withBody(response))
         );
+    }
+
+    public StubMapping getLearnerRecords(String userId, int page, String response) {
+        LearnerRecordQuery query = LearnerRecordQuery.builder()
+                .learnerIds(Set.of(userId))
+                .build();
+        return getLearnerRecords(query, page, response);
+    }
+
+    public StubMapping getLearnerRecords(String userId, String courseId, int page, String response) {
+        LearnerRecordQuery query = LearnerRecordQuery.builder()
+                .learnerIds(Set.of(userId)).resourceIds(Set.of(courseId))
+                .build();
+        return getLearnerRecords(query, page, response);
     }
 
     public StubMapping createLearnerRecords(String expectedEventPOST, String response) {
@@ -186,4 +209,5 @@ public class LearnerRecordStubService {
                                 .withBody(response))
         );
     }
+
 }

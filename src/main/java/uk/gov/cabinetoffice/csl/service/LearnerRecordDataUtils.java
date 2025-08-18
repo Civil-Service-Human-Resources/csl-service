@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.service;
 
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.domain.LearningResourceType;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
@@ -26,6 +27,7 @@ public class LearnerRecordDataUtils {
     public List<LearnerRecord> getNonCompleteCourseRecords(String userId) {
         LearnerRecordQuery query = LearnerRecordQuery.builder()
                 .notEventTypes(List.of(COMPLETE_COURSE.getName()))
+                .learnerRecordTypes(List.of(LearningResourceType.COURSE.name()))
                 .learnerIds(Set.of(userId)).build();
         return learnerRecordService.getLearnerRecords(query);
     }

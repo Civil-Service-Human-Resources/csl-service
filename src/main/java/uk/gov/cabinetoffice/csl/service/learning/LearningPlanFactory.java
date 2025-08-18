@@ -7,7 +7,6 @@ import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.BookedLearningPlanC
 import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.EventModule;
 import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlanCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.DateRange;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
@@ -23,6 +22,11 @@ public class LearningPlanFactory {
 
     public LearningPlanFactory(IUtilService utilService) {
         this.utilService = utilService;
+    }
+
+    private EventModule buildEventModule(Module module, Event event, ModuleRecord moduleRecord) {
+        return new EventModule(module.getId(), module.getTitle(), event.getId(), moduleRecord.getEventDate(),
+                event.getDateRangesAsDates(), moduleRecord.getState());
     }
 
     public Optional<BookedLearningPlanCourse> getBookedLearningPlanCourse(Course course, List<ModuleRecord> requiredModuleRecords) {
@@ -41,10 +45,7 @@ public class LearningPlanFactory {
             Module module = course.getModule(moduleRecord.getModuleId());
             Event event = module.getEvent(moduleRecord.getEventId());
             if (event != null) {
-                EventModule eventModule = new EventModule(
-                        module.getId(), module.getTitle(), event.getId(), moduleRecord.getEventDate(),
-                        event.getDateRanges().stream().map(DateRange::getDate).toList(), moduleRecord.getState()
-                );
+                EventModule eventModule = buildEventModule(module, event, moduleRecord);
                 boolean canBeMovedToLearningPlan = utilService.getNowDateTime().isAfter(moduleRecord.getEventDate().atTime(LocalTime.MIN)) &&
                         (course.getCourseType().equals("face-to-face") || otherModulesCompleted == requiredModuleRecords.size() - 1);
                 bookedCourse = new BookedLearningPlanCourse(course.getId(), course.getTitle(),

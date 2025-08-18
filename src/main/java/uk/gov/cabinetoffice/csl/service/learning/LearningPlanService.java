@@ -60,11 +60,13 @@ public class LearningPlanService {
         learnerRecordDataUtils.getModuleRecordsForCourses(courseIds, moduleRecordIds)
                 .forEach((courseId, requiredModuleRecords) -> {
                     Course course = courses.get(courseId);
-                    learningPlanFactory.getBookedLearningPlanCourse(course, requiredModuleRecords)
-                            .ifPresentOrElse(bookedLearningPlanCourses::add, () -> {
-                                State state = requiredModuleRecords.isEmpty() ? State.NULL : State.IN_PROGRESS;
-                                learningPlanCourses.add(learningPlanFactory.getLearningPlanCourse(course, state));
-                            });
+                    if (course != null) {
+                        learningPlanFactory.getBookedLearningPlanCourse(course, requiredModuleRecords)
+                                .ifPresentOrElse(bookedLearningPlanCourses::add, () -> {
+                                    State state = requiredModuleRecords.isEmpty() ? State.NULL : State.IN_PROGRESS;
+                                    learningPlanCourses.add(learningPlanFactory.getLearningPlanCourse(course, state));
+                                });
+                    }
                 });
         LearningPlan learningPlan = new LearningPlan(uid, bookedLearningPlanCourses, learningPlanCourses);
         learningPlan.sortCourses();

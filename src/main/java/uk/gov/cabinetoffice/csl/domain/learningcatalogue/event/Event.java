@@ -38,6 +38,11 @@ public class Event implements IChildLearningResource, Cacheable {
     }
 
     @JsonIgnore
+    public List<LocalDate> getDateRangesAsDates() {
+        return getDateRanges().stream().map(DateRange::getDate).sorted(LocalDate::compareTo).toList();
+    }
+
+    @JsonIgnore
     public String getStartTimeAsString() {
         return this.getStartTime().format(DateTimeFormatter.ofPattern("dd MMM uuuu"));
     }
