@@ -29,6 +29,7 @@ public class OrganisationalUnitListService {
         if (params.shouldGetAll()) {
             filtered.addAll(allOrgs.values());
         } else {
+            List<Long> organisationIds = new ArrayList<>();
             for (OrganisationalUnit organisationalUnit : allOrgs.values()) {
                 boolean add = false;
                 if (params.hasOrganisationIds(organisationalUnit.getId())) {
@@ -44,8 +45,9 @@ public class OrganisationalUnitListService {
                     }
                     add = true;
                 }
-                if (add) {
+                if (add && !organisationIds.contains(organisationalUnit.getId())) {
                     filtered.add(organisationalUnit);
+                    organisationIds.add(organisationalUnit.getId());
                 }
             }
         }
