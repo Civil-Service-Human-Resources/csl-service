@@ -1,13 +1,11 @@
 package uk.gov.cabinetoffice.csl.controller.model;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)

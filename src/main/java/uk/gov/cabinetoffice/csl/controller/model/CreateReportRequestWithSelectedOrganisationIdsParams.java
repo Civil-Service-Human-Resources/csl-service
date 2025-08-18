@@ -2,11 +2,13 @@ package uk.gov.cabinetoffice.csl.controller.model;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateReportRequestWithSelectedOrganisationIdsParams extends SelectedOrganisationIdsCourseCompletionsParams {
