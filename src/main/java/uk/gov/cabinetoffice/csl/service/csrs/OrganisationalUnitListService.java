@@ -25,11 +25,10 @@ public class OrganisationalUnitListService {
 
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(OrganisationalUnitsParams params) {
         OrganisationalUnitMap allOrgs = civilServantRegistryClient.getAllOrganisationalUnits();
-        List<OrganisationalUnit> filtered = new ArrayList<>();
+        Set<OrganisationalUnit> filtered = new HashSet<>();
         if (params.shouldGetAll()) {
             filtered.addAll(allOrgs.values());
         } else {
-            List<Long> organisationIds = new ArrayList<>();
             for (OrganisationalUnit organisationalUnit : allOrgs.values()) {
                 boolean add = false;
                 if (params.hasOrganisationIds(organisationalUnit.getId())) {
@@ -39,18 +38,14 @@ public class OrganisationalUnitListService {
                         Long currentParentId = organisationalUnit.getParentId();
                         while (currentParentId != null) {
                             OrganisationalUnit currentParent = allOrgs.get(currentParentId);
-                            if (!organisationIds.contains(currentParentId)) {
-                                filtered.add(currentParent);
-                                organisationIds.add(currentParentId);
-                            }
+                            filtered.add(currentParent);
                             currentParentId = currentParent.getParentId();
                         }
                     }
                     add = true;
                 }
-                if (add && !organisationIds.contains(organisationalUnit.getId())) {
+                if (add) {
                     filtered.add(organisationalUnit);
-                    organisationIds.add(organisationalUnit.getId());
                 }
             }
         }
