@@ -1,9 +1,5 @@
 package uk.gov.cabinetoffice.csl.client.csrs;
-
-import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
-import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
-import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
+import uk.gov.cabinetoffice.csl.domain.csrs.*;
 
 import java.util.List;
 
@@ -11,9 +7,11 @@ public interface ICSRSClient {
 
     CivilServant getCivilServantProfileWithUid(String uid);
 
-    List<OrganisationalUnit> getAllOrganisationalUnits();
+    OrganisationalUnitMap getAllOrganisationalUnits();
 
     List<AreaOfWork> getAreasOfWork();
+
+    List<Grade> getGrades();
 
     void patchCivilServant(PatchCivilServantDto patch);
 }

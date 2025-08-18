@@ -5,10 +5,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.cabinetoffice.csl.controller.model.GetCourseCompletionsParams;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
+import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseBreakdown;
 import uk.gov.cabinetoffice.csl.service.chart.AggregationChart;
-import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionsChartBuilder;
+import uk.gov.cabinetoffice.csl.service.chart.ChartWithBreakdowns;
+import uk.gov.cabinetoffice.csl.service.chart.builder.CourseCompletionChartBuilderParams;
+import uk.gov.cabinetoffice.csl.service.chart.builder.CourseCompletionsChartBuilder;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
 import java.time.LocalDateTime;
@@ -27,7 +30,7 @@ class CourseCompletionsChartBuilderTest {
     private LearningCatalogueService learningCatalogueService;
 
     @InjectMocks
-    CourseCompletionsChartBuilder chartBuilder;
+    CourseCompletionsChartBuilder<CourseCompletionAggregation> chartBuilder;
 
     @Test
     void buildCourseCompletionsChart() {
@@ -45,7 +48,8 @@ class CourseCompletionsChartBuilderTest {
         aggregations.add(new CourseCompletionAggregation(date1, 42, "course3"));
         aggregations.add(new CourseCompletionAggregation(date2, 100, "course1"));
         aggregations.add(new CourseCompletionAggregation(date2, 21, "course2"));
-        GetCourseCompletionsParams params = new GetCourseCompletionsParams();
+
+        OrganisationIdsCourseCompletionsParams params = new OrganisationIdsCourseCompletionsParams();
         params.setStartDate(LocalDateTime.of(2024, 1, 1, 0, 0, 0));
         params.setEndDate(LocalDateTime.of(2024, 1, 2, 0, 0, 0));
         params.setTimezone(ZoneId.of("Europe/London"));
@@ -53,17 +57,19 @@ class CourseCompletionsChartBuilderTest {
 
         when(learningCatalogueService.getCourseIdToTitleMap(List.of("course1", "course2", "course3", "course4"))).thenReturn(courseMap);
 
-        List<AggregationChart> charts = chartBuilder.buildCourseCompletionCharts(params, aggregations);
-        AggregationChart aggregationChart = charts.get(0);
-        AggregationChart courseBreakdown = charts.get(1);
+        CourseCompletionChartBuilderParams chartParams = new CourseCompletionChartBuilderParams(params, aggregations, "Test tile");
+
+        ChartWithBreakdowns charts = chartBuilder.buildCourseCompletionCharts(chartParams);
+        AggregationChart aggregationChart = charts.getChart();
+        List<CourseBreakdown> courseBreakdowns = new ArrayList<>(charts.getCourseBreakdowns());
 
         assertEquals(190, aggregationChart.getTotal());
         assertEquals(69, aggregationChart.get("2024-01-01T10:00:00"));
         assertEquals(121, aggregationChart.get("2024-01-01T15:00:00"));
-        
-        assertEquals(110, courseBreakdown.get("Course 1 title"));
-        assertEquals(38, courseBreakdown.get("Course 2 title"));
-        assertEquals(42, courseBreakdown.get("Course 3 title"));
-        assertEquals(0, courseBreakdown.get("Course 4 title"));
+
+        assertEquals(110, courseBreakdowns.get(0).get("Course 1 title"));
+        assertEquals(38, courseBreakdowns.get(0).get("Course 2 title"));
+        assertEquals(42, courseBreakdowns.get(0).get("Course 3 title"));
+        assertEquals(0, courseBreakdowns.get(0).get("Course 4 title"));
     }
 }

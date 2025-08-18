@@ -10,13 +10,24 @@ import java.util.Map;
 public class PatchCivilServantDto {
 
     private final List<AreaOfWork> otherAreasOfWork;
+    private final String fullName;
+    private final Grade grade;
+    private final AreaOfWork profession;
 
     public Map<String, Object> getAsApiParams() {
         Map<String, Object> apiParams = new HashMap<>();
         if (otherAreasOfWork != null) {
             apiParams.put("otherAreasOfWork", otherAreasOfWork.stream().map(p -> String.format("/professions/%s", p.getId())));
         }
+        if (fullName != null) {
+            apiParams.put("fullName", fullName);
+        }
+        if (grade != null) {
+            apiParams.put("grade", String.format("/grades/%s", grade.getId()));
+        }
+        if (profession != null) {
+            apiParams.put("profession", String.format("/profession/%s", profession.getId()));
+        }
         return apiParams;
     }
-
 }

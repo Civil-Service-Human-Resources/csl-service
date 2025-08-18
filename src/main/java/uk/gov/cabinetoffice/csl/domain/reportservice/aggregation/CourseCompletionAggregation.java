@@ -1,15 +1,15 @@
 package uk.gov.cabinetoffice.csl.domain.reportservice.aggregation;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class CourseCompletionAggregation extends Aggregation implements IAggregation {
 

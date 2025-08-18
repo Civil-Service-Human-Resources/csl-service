@@ -3,7 +3,11 @@ package uk.gov.cabinetoffice.csl.service.learning;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.controller.model.CourseWithTitle;
+import uk.gov.cabinetoffice.csl.controller.model.GetRequiredLearningForDepartmentsParams;
+import uk.gov.cabinetoffice.csl.controller.model.RequiredLearningMapResponse;
 import uk.gov.cabinetoffice.csl.domain.User;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
@@ -13,12 +17,14 @@ import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearnin
 import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearningCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.learningResources.course.CourseRecordService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,6 +37,7 @@ public class RequiredLearningService {
     private final CourseRecordService courseRecordService;
     private final LearnerRecordDataUtils learnerRecordDataUtils;
     private final LearningCatalogueService learningCatalogueService;
+    private final OrganisationalUnitListService organisationalUnitListService;
     private final UserDetailsService userDetailsService;
     private final LearningFactory<RequiredLearningDisplayCourseFactory> requiredLearningFactory;
 
@@ -72,5 +79,22 @@ public class RequiredLearningService {
         RequiredLearning requiredLearningResponse = new RequiredLearning(uid, requiredLearningCourses);
         requiredLearningResponse.sortCourses();
         return requiredLearningResponse;
+    }
+
+    public RequiredLearningMapResponse getRequiredLearningMapForOrganisations(GetRequiredLearningForDepartmentsParams params) {
+        Map<Long, List<CourseWithTitle>> result = new HashMap<>();
+        Map<Long, List<OrganisationalUnit>> orgHierarchies = organisationalUnitListService.getHierarchies(params.getOrganisationIds());
+        Map<String, List<Course>> courseMap = learningCatalogueService.getRequiredLearningForDepartmentsMap(orgHierarchies.values().stream().flatMap(organisationalUnits -> organisationalUnits.stream().map(OrganisationalUnit::getCode)).collect(Collectors.toSet()));
+        orgHierarchies.forEach((key, value) -> {
+            List<CourseWithTitle> courses = new ArrayList<>();
+            value.forEach(organisationalUnit -> {
+                List<Course> coursesForOrgCode = courseMap.get(organisationalUnit.getCode());
+                if (coursesForOrgCode != null) {
+                    courses.addAll(coursesForOrgCode.stream().map(c -> new CourseWithTitle(c.getId(), c.getTitle())).toList());
+                }
+            });
+            result.put(key, courses);
+        });
+        return new RequiredLearningMapResponse(result);
     }
 }

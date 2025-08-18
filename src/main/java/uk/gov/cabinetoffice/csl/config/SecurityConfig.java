@@ -65,6 +65,7 @@ public class SecurityConfig {
         httpSecurity.securityMatcher(
                         "/organisations/**",
                         "/areas-of-work/**",
+                        "/grades/**",
                         "/learning/**",
                         "/courses/**",
                         "/course_records/**",

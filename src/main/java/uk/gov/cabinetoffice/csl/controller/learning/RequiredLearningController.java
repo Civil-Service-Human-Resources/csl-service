@@ -1,7 +1,10 @@
 package uk.gov.cabinetoffice.csl.controller.learning;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.controller.model.GetRequiredLearningForDepartmentsParams;
+import uk.gov.cabinetoffice.csl.controller.model.RequiredLearningMapResponse;
 import uk.gov.cabinetoffice.csl.domain.learning.Learning;
 import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearning;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
@@ -18,6 +21,11 @@ public class RequiredLearningController {
     public RequiredLearningController(RequiredLearningService requiredLearningService, IUserAuthService userAuthService) {
         this.requiredLearningService = requiredLearningService;
         this.userAuthService = userAuthService;
+    }
+
+    @GetMapping("/for-departments")
+    public RequiredLearningMapResponse getRequiredLearningForOrganisations(@Valid GetRequiredLearningForDepartmentsParams params) {
+        return requiredLearningService.getRequiredLearningMapForOrganisations(params);
     }
 
     @GetMapping

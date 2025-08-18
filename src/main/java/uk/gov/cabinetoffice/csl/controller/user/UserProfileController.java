@@ -29,4 +29,30 @@ public class UserProfileController {
         userProfileService.setOtherAreasOfWork(uid, otherAreasOfWorkIds, newProfile);
     }
 
+    @PostMapping(path = "/full-name")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void updateFullName(@RequestBody FullNameUpdateRequest fullNameUpdateRequest) {
+        log.debug("UserProfileController: fullNameUpdateRequest: {}", fullNameUpdateRequest);
+        String uid = userAuthService.getUsername();
+        userProfileService.setFullName(uid, fullNameUpdateRequest.getFullName());
+    }
+
+    @PostMapping(path = "/grade")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void updateGrade(@RequestBody GradeUpdateRequest gradeUpdateRequest) {
+        log.debug("UserProfileController: gradeUpdateRequest: {}", gradeUpdateRequest);
+        String uid = userAuthService.getUsername();
+        userProfileService.setGrade(uid, gradeUpdateRequest.getGradeId());
+    }
+
+    @PostMapping(path = "/profession")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void updateProfession(@RequestBody ProfessionUpdateRequest professionUpdateRequest) {
+        log.debug("UserProfileController: professionUpdateRequest: {}", professionUpdateRequest);
+        String uid = userAuthService.getUsername();
+        userProfileService.setProfession(uid, professionUpdateRequest.getProfessionId());
+    }
 }

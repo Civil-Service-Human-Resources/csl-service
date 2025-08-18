@@ -9,10 +9,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
-import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
-import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
-import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
+import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
 import java.util.List;
@@ -33,10 +30,15 @@ public class CSRSClient implements ICSRSClient {
     @Value("${csrs.professions}")
     private String professionsTree;
 
-    private final IHttpClient httpClient;
+    @Value("${csrs.grades}")
+    private String grades;
 
-    public CSRSClient(@Qualifier("csrsHttpClient") IHttpClient httpClient) {
+    private final IHttpClient httpClient;
+    private final OrganisationalUnitFactory organisationalUnitFactory;
+
+    public CSRSClient(@Qualifier("csrsHttpClient") IHttpClient httpClient, OrganisationalUnitFactory organisationalUnitFactory) {
         this.httpClient = httpClient;
+        this.organisationalUnitFactory = organisationalUnitFactory;
     }
 
     @Override
@@ -48,11 +50,13 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public List<OrganisationalUnit> getAllOrganisationalUnits() {
+    @Cacheable("organisations")
+    public OrganisationalUnitMap getAllOrganisationalUnits() {
         log.info("Getting all organisational units");
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(allOrganisationalUnits);
-        return httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
+        List<OrganisationalUnit> organisationalUnits = httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
                 .stream().toList();
+        return organisationalUnitFactory.buildOrganisationalUnits(organisationalUnits);
     }
 
     @Override
@@ -63,6 +67,17 @@ public class CSRSClient implements ICSRSClient {
                 new ParameterizedTypeReference<>() {
                 }
         );
+    }
+
+    @Override
+    @Cacheable("grades")
+    public List<Grade> getGrades() {
+        GetGradesResponse response = httpClient.executeTypeReferenceRequest(
+                RequestEntity.get(grades).build(),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        return response.getGrades();
     }
 
     @Override

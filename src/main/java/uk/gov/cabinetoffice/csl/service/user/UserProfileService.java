@@ -1,16 +1,21 @@
 package uk.gov.cabinetoffice.csl.service.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
+import uk.gov.cabinetoffice.csl.domain.csrs.Grade;
 import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.CompleteProfileMessage;
+import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.UpdateProfileMessage;
 
 import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 @Service
 public class UserProfileService {
 
@@ -33,12 +38,58 @@ public class UserProfileService {
                 .filter(p -> otherAreasOfWorkIds.contains(p.getId())).toList();
         if (!areasOfWork.isEmpty()) {
             PatchCivilServantDto patch = PatchCivilServantDto.builder().otherAreasOfWork(areasOfWork).build();
-            client.patchCivilServant(patch);
+            User user = patchCivilServant(patch, uid);
             if (newProfile) {
-                User user = userDetailsService.getUserWithUid(uid);
-                CompleteProfileMessage message = messageMetadataFactory.generateCompleteProfileMessage(user);
-                messagingClient.sendMessages(List.of(message));
+                createReportingData(user);
             }
         }
+    }
+
+    public void setFullName(String uid, String fullName) {
+        PatchCivilServantDto patch = PatchCivilServantDto.builder().fullName(fullName).build();
+        User user = patchCivilServant(patch, uid);
+        updateReportingData(user);
+    }
+
+    public void setGrade(String uid, Long gradeId) {
+        Optional<Grade> optGrade = client.getGrades()
+                .stream()
+                .filter(g -> g.getId().equals(gradeId))
+                .findFirst();
+        if (optGrade.isPresent()) {
+            PatchCivilServantDto patch = PatchCivilServantDto.builder().grade(optGrade.get()).build();
+            User user = patchCivilServant(patch, uid);
+            updateReportingData(user);
+        }
+    }
+
+    public void setProfession(String uid, Long professionId) {
+        Optional<AreaOfWork> optAreaOfWork = client.getAreasOfWork()
+                .stream()
+                .filter(g -> g.getId().equals(professionId))
+                .findFirst();
+        if (optAreaOfWork.isPresent()) {
+            PatchCivilServantDto patch = PatchCivilServantDto.builder().profession(optAreaOfWork.get()).build();
+            User user = patchCivilServant(patch, uid);
+            updateReportingData(user);
+        }
+    }
+
+    private User patchCivilServant(PatchCivilServantDto patch, String uid) {
+        client.patchCivilServant(patch);
+        userDetailsService.removeUserFromCache(uid);
+        return userDetailsService.getUserWithUid(uid);
+    }
+
+    private void createReportingData(User user) {
+        log.debug("createReportingData:user: {}", user);
+        CompleteProfileMessage message = messageMetadataFactory.generateCompleteProfileMessage(user);
+        messagingClient.sendMessages(List.of(message));
+    }
+
+    private void updateReportingData(User user) {
+        log.debug("updateReportingData:user: {}", user);
+        UpdateProfileMessage message = messageMetadataFactory.generateUpdateProfileMessage(user);
+        messagingClient.sendMessages(List.of(message));
     }
 }
