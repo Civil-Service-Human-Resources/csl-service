@@ -25,7 +25,7 @@ public class OrganisationalUnitListService {
 
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(OrganisationalUnitsParams params) {
         OrganisationalUnitMap allOrgs = civilServantRegistryClient.getAllOrganisationalUnits();
-        List<OrganisationalUnit> filtered = new ArrayList<>();
+        Set<OrganisationalUnit> filtered = new HashSet<>();
         if (params.shouldGetAll()) {
             filtered.addAll(allOrgs.values());
         } else {
