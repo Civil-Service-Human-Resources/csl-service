@@ -50,6 +50,7 @@ class RequiredLearningServiceTest {
 
     {
         when(course1.getId()).thenReturn("course1");
+        when(course1.shouldBeDisplayed()).thenReturn(true);
         when(course1.getLearningPeriodForUser(user)).thenReturn(Optional.of(new LearningPeriod(
                 LocalDate.of(2024, 6, 1), LocalDate.of(2025, 6, 1)
         )));
@@ -66,6 +67,7 @@ class RequiredLearningServiceTest {
         when(course2.getShortDescription()).thenReturn("short description for course 2");
         when(course2.getCourseType()).thenReturn("blended");
         when(course2.getDurationInSeconds()).thenReturn(3600);
+        when(course2.shouldBeDisplayed()).thenReturn(true);
         when(course2.getLearningPeriodForUser(user)).thenReturn(Optional.of(new LearningPeriod(
                 LocalDate.of(2025, 1, 1), LocalDate.of(2025, 6, 1)
         )));

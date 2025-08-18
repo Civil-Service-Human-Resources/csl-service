@@ -48,7 +48,7 @@ public class LearningPlanService {
         List<ModuleRecordResourceId> moduleRecordIds = new ArrayList<>();
         learningCatalogueService.getCourses(courseIds)
                 .forEach(course -> {
-                    if (course.ShouldBeDisplayed()) {
+                    if (course.shouldBeDisplayed()) {
                         courses.put(course.getId(), course);
                         List<ModuleRecordResourceId> courseModuleRecordIds = course.getRequiredModuleIdsForCompletion()
                                 .stream().map(mId -> new ModuleRecordResourceId(uid, mId)).toList();

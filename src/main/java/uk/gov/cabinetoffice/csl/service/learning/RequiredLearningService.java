@@ -52,7 +52,8 @@ public class RequiredLearningService {
 
     public RequiredLearning getRequiredLearning(String uid) {
         User user = userDetailsService.getUserWithUid(uid);
-        List<Course> requiredLearning = learningCatalogueService.getRequiredLearningForDepartments(user.getDepartmentCodes());
+        List<Course> requiredLearning = learningCatalogueService.getRequiredLearningForDepartments(user.getDepartmentCodes())
+                .stream().filter(Course::shouldBeDisplayed).toList();
         Map<String, LocalDateTime> completionDates = learnerRecordDataUtils
                 .getCompletionDatesForCourses(uid, requiredLearning.stream().map(Course::getId).toList());
         List<RequiredLearningCourse> requiredLearningCourses = new ArrayList<>();

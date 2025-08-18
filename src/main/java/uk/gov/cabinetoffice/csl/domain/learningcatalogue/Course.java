@@ -165,7 +165,7 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     }
 
     @JsonIgnore
-    public boolean ShouldBeDisplayed() {
+    public boolean shouldBeDisplayed() {
         return (Objects.equals(PUBLISHED, getStatus()) && !getModules().isEmpty());
     }
 
