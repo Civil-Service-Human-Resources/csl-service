@@ -27,7 +27,7 @@ public class User implements Serializable {
     private String gradeName;
     private String lineManagerName;
     private String lineManagerEmail;
-    private ArrayList<BasicOrganisationalUnit> departmentHierarchy = new ArrayList<>();
+    private ArrayList<BasicOrganisationalUnit> departmentHierarchy;
 
     public static User fromUserDetails(String uid, UserDetailsDto userDetailsDto) {
         return new User(uid, userDetailsDto.getLearnerEmail(), userDetailsDto.getLearnerName(), userDetailsDto.getProfessionId(),
@@ -37,16 +37,25 @@ public class User implements Serializable {
     }
 
     public String getFormattedOrganisationName() {
+        if(departmentHierarchy == null) {
+            return null;
+        }
         return IntStream.range(0, departmentHierarchy.size())
                 .mapToObj(i -> departmentHierarchy.get(departmentHierarchy.size() - 1 - i))
                 .map(BasicOrganisationalUnit::getName).collect(Collectors.joining(" | "));
     }
 
     public List<String> getDepartmentCodes() {
+        if(departmentHierarchy == null) {
+            return null;
+        }
         return departmentHierarchy.stream().map(BasicOrganisationalUnit::getCode).collect(Collectors.toList());
     }
 
     public Integer getOrganisationId() {
+        if(departmentHierarchy == null) {
+            return null;
+        }
         return departmentHierarchy.stream().findFirst().map(BasicOrganisationalUnit::getId).orElse(0);
     }
 
