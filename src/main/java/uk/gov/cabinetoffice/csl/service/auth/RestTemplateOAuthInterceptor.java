@@ -19,8 +19,10 @@ public class RestTemplateOAuthInterceptor implements ClientHttpRequestIntercepto
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-        String token = bearerTokenService.getBearerToken();
-        request.getHeaders().setBearerAuth(token);
+        if (!request.getHeaders().containsKey("Authorization")) {
+            String token = bearerTokenService.getBearerToken();
+            request.getHeaders().setBearerAuth(token);
+        }
         return execution.execute(request, body);
     }
 }
