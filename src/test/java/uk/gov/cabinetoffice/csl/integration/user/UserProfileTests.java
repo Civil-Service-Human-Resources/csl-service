@@ -29,7 +29,7 @@ public class UserProfileTests extends IntegrationTestBase {
     private CSLStubService cslStubService;
 
     @Test
-    public void testSetOtherAreasOfWorkNewProfile() throws Exception {
+    public void testSetOtherAreasOfWork() throws Exception {
         CivilServant civilServant = testDataService.generateCivilServant();
         cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
         cslStubService.getCsrsStubService().getAreasOfWork("""
@@ -49,8 +49,28 @@ public class UserProfileTests extends IntegrationTestBase {
                     "otherAreasOfWork": ["/professions/1", "/professions/2"]
                 }
                 """);
-        mockMvc.perform(post("/user/profile/other-areas-of-work?newProfile=true")
+        mockMvc.perform(post("/user/profile/other-areas-of-work")
                         .content("[1,2,3]")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful());
+        verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
+    }
+
+    @Test
+    public void testUpdateFullNameNewProfile() throws Exception {
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
+        cslStubService.getCsrsStubService().patchCivilServant("""
+                {
+                    "fullName": "test full Name"
+                }
+                """);
+        mockMvc.perform(post("/user/profile/full-name?newProfile=true")
+                        .content("""
+                            {
+                                "fullName": "test full Name"
+                            }
+                            """)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
         verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
@@ -65,7 +85,7 @@ public class UserProfileTests extends IntegrationTestBase {
                     "fullName": "test full Name"
                 }
                 """);
-        mockMvc.perform(post("/user/profile/full-name")
+        mockMvc.perform(post("/user/profile/full-name?newProfile=false")
                         .content("""
                             {
                                 "fullName": "test full Name"

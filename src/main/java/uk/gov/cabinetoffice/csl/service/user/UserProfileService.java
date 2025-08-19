@@ -38,23 +38,25 @@ public class UserProfileService {
         this.messagingClient = messagingClient;
     }
 
-    public void setOtherAreasOfWork(String uid, List<Long> otherAreasOfWorkIds, boolean newProfile) {
+    public void setOtherAreasOfWork(String uid, List<Long> otherAreasOfWorkIds) {
         List<AreaOfWork> areasOfWork = civilServantRegistryService.getAreasOfWork()
                 .stream().flatMap(p -> p.getFlat().stream())
                 .filter(p -> otherAreasOfWorkIds.contains(p.getId())).toList();
         if (!areasOfWork.isEmpty()) {
             PatchCivilServantDto patch = PatchCivilServantDto.builder().otherAreasOfWork(areasOfWork).build();
             User user = patchCivilServant(patch, uid);
-            if (newProfile) {
-                createReportingData(user);
-            }
+            updateReportingData(user);
         }
     }
 
-    public void setFullName(String uid, String fullName) {
+    public void setFullName(String uid, String fullName, boolean newProfile) {
         PatchCivilServantDto patch = PatchCivilServantDto.builder().fullName(fullName).build();
         User user = patchCivilServant(patch, uid);
-        updateReportingData(user);
+        if (newProfile) {
+            createReportingData(user);
+        } else {
+            updateReportingData(user);
+        }
     }
 
     public void setGrade(String uid, Long gradeId) {
