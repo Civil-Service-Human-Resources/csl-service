@@ -197,7 +197,7 @@ public class UserProfileTests extends IntegrationTestBase {
                 """);
         cslStubService.getCsrsStubService().patchCivilServant("""
                 {
-                    "profession": "/profession/2"
+                    "profession": "/professions/2"
                 }
                 """);
         mockMvc.perform(post("/user/profile/profession")
@@ -286,7 +286,7 @@ public class UserProfileTests extends IntegrationTestBase {
                 """);
         cslStubService.getCsrsStubService().patchCivilServant("""
                 {
-                    "organisationalUnit": "/organisationalUnit/1"
+                    "organisationalUnit": "/organisationalUnits/1"
                 }
                 """);
         mockMvc.perform(post("/user/profile/organisationalUnit")
