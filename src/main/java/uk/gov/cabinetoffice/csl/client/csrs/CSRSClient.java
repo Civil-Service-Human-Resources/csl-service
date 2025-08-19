@@ -9,6 +9,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
+import uk.gov.cabinetoffice.csl.client.ParallelHttpClient;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
@@ -36,7 +37,7 @@ public class CSRSClient implements ICSRSClient {
     private final IHttpClient httpClient;
     private final OrganisationalUnitFactory organisationalUnitFactory;
 
-    public CSRSClient(@Qualifier("csrsHttpClient") IHttpClient httpClient, OrganisationalUnitFactory organisationalUnitFactory) {
+    public CSRSClient(@Qualifier("csrsHttpClient") ParallelHttpClient httpClient, OrganisationalUnitFactory organisationalUnitFactory) {
         this.httpClient = httpClient;
         this.organisationalUnitFactory = organisationalUnitFactory;
     }
