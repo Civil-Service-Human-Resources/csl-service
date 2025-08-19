@@ -289,10 +289,10 @@ public class UserProfileTests extends IntegrationTestBase {
                     "organisationalUnit": "/organisationalUnits/1"
                 }
                 """);
-        mockMvc.perform(post("/user/profile/organisationalUnit")
+        mockMvc.perform(post("/user/profile/organisationUnit")
                         .content("""
                             {
-                                "organisationalUnitId": "1"
+                                "organisationUnitId": "1"
                             }
                             """)
                         .contentType(MediaType.APPLICATION_JSON))

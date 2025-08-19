@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrganisationalUnitUpdateRequest {
-    private Long organisationalUnitId;
+public class OrganisationUnitUpdateRequest {
+    private Long organisationUnitId;
 }

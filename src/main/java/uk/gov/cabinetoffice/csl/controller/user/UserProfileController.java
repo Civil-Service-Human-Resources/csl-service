@@ -56,12 +56,12 @@ public class UserProfileController {
         userProfileService.setProfession(uid, professionUpdateRequest.getProfessionId());
     }
 
-    @PostMapping(path = "/organisationalUnit")
+    @PostMapping(path = "/organisationUnit")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public void updateOrganisationalUnit(@RequestBody OrganisationalUnitUpdateRequest organisationalUnitUpdateRequest) {
-        log.debug("UserProfileController: organisationalUnitUpdateRequest: {}", organisationalUnitUpdateRequest);
+    public void updateOrganisationUnit(@RequestBody OrganisationUnitUpdateRequest organisationUnitUpdateRequest) {
+        log.debug("UserProfileController: organisationUnitUpdateRequest: {}", organisationUnitUpdateRequest);
         String uid = userAuthService.getUsername();
-        userProfileService.setOrganisationalUnit(uid, organisationalUnitUpdateRequest.getOrganisationalUnitId());
+        userProfileService.setOrganisationalUnit(uid, organisationUnitUpdateRequest.getOrganisationUnitId());
     }
 }
