@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.client;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
@@ -9,13 +10,17 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
+import uk.gov.cabinetoffice.csl.client.model.PagedResponse;
 import uk.gov.cabinetoffice.csl.domain.error.GenericServerException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @AllArgsConstructor
+@Getter
 public class HttpClient implements IHttpClient {
 
     private final RestTemplate restTemplate;
@@ -31,6 +36,21 @@ public class HttpClient implements IHttpClient {
         }
         String fileName = contentDisposition.get(0).replaceFirst("(?i)^.*filename=\"?([^\"]+)\"?.*$", "$1");
         return new DownloadableFile(fileName, response.getBody());
+    }
+
+    @Override
+    public <T, R extends PagedResponse<T>> List<T> getPaginatedRequest(Class<R> pagedResponseClass, UriComponentsBuilder url, Integer maxPageSize) {
+        List<T> results = new ArrayList<>();
+        int totalPages = 1;
+        url.queryParam("size", maxPageSize).queryParam("page", 0);
+        for (int i = 0; i < totalPages; i++) {
+            RequestEntity<Void> request = RequestEntity.get(url.build().toUriString()).build();
+            R response = executeRequest(request, pagedResponseClass);
+            results.addAll(response.getContent());
+            totalPages = response.getTotalPages();
+            url.replaceQueryParam("page", i + 1);
+        }
+        return results;
     }
 
     private <T, R> ResponseEntity<T> executeRawRequest(RequestEntity<R> request, Class<T> responseClass) {
