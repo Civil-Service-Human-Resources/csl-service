@@ -3,10 +3,7 @@ package uk.gov.cabinetoffice.csl.service.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
-import uk.gov.cabinetoffice.csl.domain.csrs.Grade;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
-import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
+import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
@@ -92,10 +89,15 @@ public class UserProfileService {
                 .findFirst();
 
         if (optOrganisationalUnit.isPresent()) {
-            PatchCivilServantDto patch = PatchCivilServantDto.builder().organisationalUnit(optOrganisationalUnit.get()).build();
-            User user = patchCivilServant(patch, uid);
+            User user = patchCivilServantOrganisation(uid, organisationalUnitId);
             updateReportingData(user);
         }
+    }
+
+    private User patchCivilServantOrganisation(String uid, Long organisationalUnitId) {
+        civilServantRegistryService.patchCivilServantOrganisation(new UpdateOrganisationDTO(organisationalUnitId));
+        userDetailsService.removeUserFromCache(uid);
+        return userDetailsService.getUserWithUid(uid);
     }
 
     private User patchCivilServant(PatchCivilServantDto patch, String uid) {

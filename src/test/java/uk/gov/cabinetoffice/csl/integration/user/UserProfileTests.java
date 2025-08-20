@@ -284,9 +284,9 @@ public class UserProfileTests extends IntegrationTestBase {
                        "number": 0
                    }
                 """);
-        cslStubService.getCsrsStubService().patchCivilServant("""
+        cslStubService.getCsrsStubService().patchCivilServantOrganisation("""
                 {
-                    "organisationalUnit": "/organisationalUnit/1"
+                    "organisationalUnitId": 1
                 }
                 """);
         mockMvc.perform(post("/user/profile/organisationUnit")
