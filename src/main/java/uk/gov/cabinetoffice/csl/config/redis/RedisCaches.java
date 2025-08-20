@@ -43,7 +43,6 @@ public class RedisCaches {
 
     @Bean
     public ObjectCache<LearnerRecord> learnerRecordCache(CacheManager cacheManager) {
-        Cache cache2 = cacheManager.getCache("organisations");
         Cache cache = cacheManager.getCache("learner-record");
         return new ObjectCache<>(cache, LearnerRecord.class);
     }

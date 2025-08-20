@@ -21,13 +21,14 @@ public class ObjectCache<T extends Cacheable> {
     }
 
     public T get(String id) {
+        log.debug("{} cache get object with ID : {}", cache.getName(), id);
         return cache.get(id, clazz);
     }
 
     public CacheGetMultipleOp<T> getMultiple(Collection<String> ids) {
         List<String> missingIds = new ArrayList<>();
         ArrayList<T> hits = new ArrayList<>();
-        ids.forEach(id -> {
+        ids.parallelStream().forEach(id -> {
             T object = get(id);
             if (object == null) {
                 missingIds.add(id);
@@ -35,10 +36,12 @@ public class ObjectCache<T extends Cacheable> {
                 hits.add(object);
             }
         });
+        log.debug("{} cache getMultiple cache misses: {}", cache.getName(), String.join(", ", missingIds));
         return new CacheGetMultipleOp<>(missingIds, hits);
     }
 
     public void put(T object) {
+        log.debug("{} cache put object: {} with id {}", cache.getName(), object.getCacheableId(), object);
         cache.put(object.getCacheableId(), object);
     }
 
