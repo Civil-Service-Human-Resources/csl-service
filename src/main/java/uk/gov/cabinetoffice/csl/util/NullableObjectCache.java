@@ -19,14 +19,14 @@ public abstract class NullableObjectCache<R extends Cacheable, T extends Nullabl
         super(cache, clazz);
     }
 
-    T createNullCacheObject() {
-        return createCacheObject(null);
+    T createNullCacheObject(String id) {
+        return createCacheObject(id, null);
     }
 
-    abstract T createCacheObject(R value);
+    abstract T createCacheObject(String id, R value);
 
     public void putValue(R value) {
-        put(createCacheObject(value));
+        put(createCacheObject(value.getCacheableId(), value));
     }
 
     public CacheGetMultipleOp<R> getMultipleValues(Collection<String> ids) {
@@ -36,7 +36,7 @@ public abstract class NullableObjectCache<R extends Cacheable, T extends Nullabl
             T object = get(id);
             if (object == null) {
                 missingIds.add(id);
-                put(createNullCacheObject());
+                put(createNullCacheObject(id));
             } else {
                 object.getCacheable().ifPresent(hits::add);
             }

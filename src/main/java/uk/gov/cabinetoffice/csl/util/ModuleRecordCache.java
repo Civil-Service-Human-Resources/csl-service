@@ -11,7 +11,8 @@ public class ModuleRecordCache extends NullableObjectCache<ModuleRecord, Nullabl
     }
 
     @Override
-    NullableModuleRecord createCacheObject(ModuleRecord value) {
-        return new NullableModuleRecord(value);
+    NullableModuleRecord createCacheObject(String id, ModuleRecord value) {
+        return new NullableModuleRecord(id, value);
     }
+
 }

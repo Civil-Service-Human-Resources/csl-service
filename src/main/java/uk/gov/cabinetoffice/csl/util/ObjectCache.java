@@ -25,7 +25,7 @@ public class ObjectCache<T extends Cacheable> {
     public CacheGetMultipleOp<T> getMultiple(Collection<String> ids) {
         List<String> missingIds = new ArrayList<>();
         ArrayList<T> hits = new ArrayList<>();
-        ids.parallelStream().forEach(id -> {
+        ids.forEach(id -> {
             T object = get(id);
             if (object == null) {
                 missingIds.add(id);

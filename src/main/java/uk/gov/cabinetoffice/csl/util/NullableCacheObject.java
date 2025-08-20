@@ -4,9 +4,11 @@ import java.util.Optional;
 
 public class NullableCacheObject<T extends Cacheable> implements NullableCacheable<T> {
 
+    private final String cacheableId;
     private final T object;
 
-    public NullableCacheObject(T object) {
+    public NullableCacheObject(String cacheableId, T object) {
+        this.cacheableId = cacheableId;
         this.object = object;
     }
 
@@ -17,6 +19,6 @@ public class NullableCacheObject<T extends Cacheable> implements NullableCacheab
 
     @Override
     public String getCacheableId() {
-        return object.toString();
+        return cacheableId;
     }
 }
