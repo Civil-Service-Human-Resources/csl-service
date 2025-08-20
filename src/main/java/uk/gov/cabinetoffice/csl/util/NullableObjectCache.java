@@ -36,8 +36,9 @@ public abstract class NullableObjectCache<R extends Cacheable, T extends Nullabl
             T object = get(id);
             if (object == null) {
                 missingIds.add(id);
+                put(createNullCacheObject());
             } else {
-                object.getCacheable().ifPresentOrElse(hits::add, () -> put(createNullCacheObject()));
+                object.getCacheable().ifPresent(hits::add);
             }
         });
         log.debug("{} cache getMultiple cache misses: {}", getCacheName(), String.join(", ", missingIds));
