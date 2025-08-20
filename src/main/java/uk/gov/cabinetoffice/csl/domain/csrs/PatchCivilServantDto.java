@@ -27,10 +27,10 @@ public class PatchCivilServantDto {
             apiParams.put("grade", String.format("/grades/%s", grade.getId()));
         }
         if (profession != null) {
-            apiParams.put("profession", String.format("/professions/%s", profession.getId()));
+            apiParams.put("profession", String.format("/profession/%s", profession.getId()));
         }
         if (organisationalUnit != null) {
-            apiParams.put("organisationalUnit", String.format("/organisationalUnits/%s", organisationalUnit.getId()));
+            apiParams.put("organisationalUnit", String.format("/organisationalUnit/%s", organisationalUnit.getId()));
         }
         return apiParams;
     }
