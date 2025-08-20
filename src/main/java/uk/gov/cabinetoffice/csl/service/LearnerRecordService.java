@@ -11,8 +11,10 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ITypedLearnerRecordResou
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.NullableModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
+import uk.gov.cabinetoffice.csl.util.NullableObjectCache;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
 import java.util.*;
@@ -25,7 +27,7 @@ public class LearnerRecordService {
 
     private final LearnerRecordDtoFactory learnerRecordFactory;
     private final ObjectCache<LearnerRecord> learnerRecordCache;
-    private final ObjectCache<ModuleRecord> moduleRecordCache;
+    private final NullableObjectCache<ModuleRecord, NullableModuleRecord> moduleRecordCache;
     private final LearnerRecordParameterFactory learnerRecordQueryFactory;
     private final ILearnerRecordClient client;
 
@@ -53,7 +55,7 @@ public class LearnerRecordService {
     public List<ModuleRecord> getModuleRecords(List<ModuleRecordResourceId> moduleRecordIds) {
         try {
             List<String> ids = moduleRecordIds.stream().map(LearnerRecordResourceId::getAsString).toList();
-            CacheGetMultipleOp<ModuleRecord> result = moduleRecordCache.getMultiple(ids);
+            CacheGetMultipleOp<ModuleRecord> result = moduleRecordCache.getMultipleValues(ids);
             List<ModuleRecord> moduleRecords = result.getCacheHits();
             if (!result.getCacheMisses().isEmpty()) {
                 List<ModuleRecordResourceId> missingModuleRecordIds = new ArrayList<>();
@@ -64,7 +66,7 @@ public class LearnerRecordService {
                 GetModuleRecordParams query = learnerRecordQueryFactory.getModuleRecordParams(missingModuleRecordIds);
                 client.getModuleRecords(query).forEach(moduleRecord -> {
                     moduleRecords.add(moduleRecord);
-                    moduleRecordCache.put(moduleRecord);
+                    moduleRecordCache.putValue(moduleRecord);
                 });
             }
             return moduleRecords;
@@ -178,7 +180,7 @@ public class LearnerRecordService {
         return client.updateModuleRecords(updatedRecords)
                 .stream().peek(mr -> {
                     log.debug(String.format("Updated module record %s ", mr));
-                    moduleRecordCache.put(mr);
+                    moduleRecordCache.putValue(mr);
                 }).toList();
     }
 
