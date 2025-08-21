@@ -23,7 +23,7 @@ public class CivilServant {
 
     public List<OrganisationalUnit> getDepartmentHierarchy() {
         if (organisationalUnit == null) {
-            return null;
+            return new ArrayList<>();
         }
         ArrayList<OrganisationalUnit> orgs = new ArrayList<>(Collections.singletonList(organisationalUnit));
         OrganisationalUnit parent = organisationalUnit.getParent();

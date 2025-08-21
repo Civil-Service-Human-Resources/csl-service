@@ -26,13 +26,10 @@ public class UserDetailsService {
     public User getUserWithUid(String uid) {
         CivilServant civilServant = csrsClient.getCivilServantProfileWithUid(uid);
         List<OrganisationalUnit> departmentHierarchy = civilServant.getDepartmentHierarchy();
-        ArrayList<BasicOrganisationalUnit> orgs = null;
-        if (departmentHierarchy != null && !departmentHierarchy.isEmpty()) {
-            orgs = departmentHierarchy
+        ArrayList<BasicOrganisationalUnit> orgs = departmentHierarchy
                     .stream()
                     .map(o -> new BasicOrganisationalUnit(o.getId().intValue(), o.getCode(), o.getName()))
                     .collect(Collectors.toCollection(ArrayList::new));
-        }
         return new User(uid,
                 civilServant.getEmail(),
                 civilServant.getFullName(),
