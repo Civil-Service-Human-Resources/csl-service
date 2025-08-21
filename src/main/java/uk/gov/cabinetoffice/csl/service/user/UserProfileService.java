@@ -3,7 +3,10 @@ package uk.gov.cabinetoffice.csl.service.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.domain.csrs.*;
+import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
+import uk.gov.cabinetoffice.csl.domain.csrs.Grade;
+import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
+import uk.gov.cabinetoffice.csl.domain.csrs.UpdateOrganisationDTO;
 import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
@@ -19,15 +22,15 @@ public class UserProfileService {
 
     private final MessageMetadataFactory messageMetadataFactory;
     private final UserDetailsService userDetailsService;
-    private final IMessagingClient messagingClient;
     private final CivilServantRegistryService civilServantRegistryService;
+    private final IMessagingClient messagingClient;
 
     public UserProfileService(MessageMetadataFactory messageMetadataFactory, UserDetailsService userDetailsService,
-                              IMessagingClient messagingClient, CivilServantRegistryService civilServantRegistryService) {
+                              CivilServantRegistryService civilServantRegistryService, IMessagingClient messagingClient) {
         this.messageMetadataFactory = messageMetadataFactory;
         this.userDetailsService = userDetailsService;
-        this.messagingClient = messagingClient;
         this.civilServantRegistryService = civilServantRegistryService;
+        this.messagingClient = messagingClient;
     }
 
     public void setOtherAreasOfWork(String uid, List<Long> otherAreasOfWorkIds) {
