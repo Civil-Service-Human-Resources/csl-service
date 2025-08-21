@@ -47,7 +47,7 @@ public class User implements Serializable {
     }
 
     public Integer getOrganisationId() {
-        return departmentHierarchy.stream().findFirst().map(BasicOrganisationalUnit::getId).orElse(0);
+        return departmentHierarchy.stream().findFirst().map(BasicOrganisationalUnit::getId).orElse(null);
     }
 
     public boolean hasLineManager() {
