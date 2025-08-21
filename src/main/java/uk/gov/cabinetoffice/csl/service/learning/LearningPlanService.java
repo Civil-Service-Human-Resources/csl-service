@@ -5,6 +5,7 @@ import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.BookedLearningPlanCourse;
 import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlan;
 import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlanCourse;
@@ -13,10 +14,13 @@ import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction.REMOVE_FROM_LEARNING_PLAN;
 
 @Service
 public class LearningPlanService {
@@ -33,17 +37,15 @@ public class LearningPlanService {
         this.learningPlanFactory = learningPlanFactory;
     }
 
-    private List<String> getCourseIdsForLearningPlan(User user) {
-        List<String> requiredLearning = learningCatalogueService.getRequiredLearningIdsForDepartments(user.getDepartmentCodes());
-        return learnerRecordDataUtils.getNonCompleteCourseRecords(user.getId())
-                .stream().map(LearnerRecord::getResourceId)
-                .filter(courseId -> !requiredLearning.contains(courseId))
-                .toList();
-    }
-
     public LearningPlan getLearningPlan(String uid) {
         User user = userDetailsService.getUserWithUid(uid);
-        List<String> courseIds = getCourseIdsForLearningPlan(user);
+        List<String> requiredLearning = learningCatalogueService.getRequiredLearningIdsForDepartments(user.getDepartmentCodes());
+        Map<String, LearnerRecordEvent> latestEventForCourseMap = new HashMap<>();
+        List<String> courseIds = learnerRecordDataUtils.getNonCompleteCourseRecords(user.getId())
+                .stream().filter(lr -> !requiredLearning.contains(lr.getResourceId()))
+                .peek(lr -> latestEventForCourseMap.put(lr.getResourceId(), lr.getLatestEvent()))
+                .map(LearnerRecord::getResourceId)
+                .toList();
         Map<String, Course> courses = new HashMap<>();
         List<ModuleRecordResourceId> moduleRecordIds = new ArrayList<>();
         learningCatalogueService.getCourses(courseIds)
@@ -61,11 +63,17 @@ public class LearningPlanService {
                 .forEach((courseId, requiredModuleRecords) -> {
                     Course course = courses.get(courseId);
                     if (course != null) {
-                        learningPlanFactory.getBookedLearningPlanCourse(course, requiredModuleRecords)
-                                .ifPresentOrElse(bookedLearningPlanCourses::add, () -> {
-                                    State state = requiredModuleRecords.isEmpty() ? State.NULL : State.IN_PROGRESS;
-                                    learningPlanCourses.add(learningPlanFactory.getLearningPlanCourse(course, state));
-                                });
+                        LearnerRecordEvent latestEvent = latestEventForCourseMap.get(courseId);
+                        if (!(latestEvent != null && latestEvent.getActionType().equals(REMOVE_FROM_LEARNING_PLAN)
+                                && latestEvent.getEventTimestamp().isAfter(requiredModuleRecords.stream()
+                                .map(mr -> mr.getUpdatedAt() == null ? LocalDateTime.MIN : mr.getUpdatedAt())
+                                .max(LocalDateTime::compareTo).orElse(LocalDateTime.MIN)))) {
+                            learningPlanFactory.getBookedLearningPlanCourse(course, requiredModuleRecords)
+                                    .ifPresentOrElse(bookedLearningPlanCourses::add, () -> {
+                                        State state = requiredModuleRecords.isEmpty() ? State.NULL : State.IN_PROGRESS;
+                                        learningPlanCourses.add(learningPlanFactory.getLearningPlanCourse(course, state));
+                                    });
+                        }
                     }
                 });
         LearningPlan learningPlan = new LearningPlan(uid, bookedLearningPlanCourses, learningPlanCourses);
