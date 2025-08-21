@@ -59,6 +59,11 @@ public class UserProfileTests extends IntegrationTestBase {
     @Test
     public void testUpdateFullNameNewProfile() throws Exception {
         CivilServant civilServant = testDataService.generateCivilServant();
+        civilServant.setGrade(null);
+        civilServant.setProfession(null);
+        civilServant.setLineManagerEmail(null);
+        civilServant.setLineManagerName(null);
+        civilServant.setOrganisationalUnit(null);
         cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
         cslStubService.getCsrsStubService().patchCivilServant("""
                 {
