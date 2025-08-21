@@ -14,4 +14,6 @@ public interface ICSRSClient {
     List<Grade> getGrades();
 
     void patchCivilServant(PatchCivilServantDto patch);
+
+    void patchCivilServantOrganisation(UpdateOrganisationDTO updateOrganisationDTO);
 }

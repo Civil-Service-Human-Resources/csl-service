@@ -24,18 +24,18 @@ public class UserProfileController {
     @PostMapping(path = "/other-areas-of-work")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public void completeProfile(@RequestParam(required = false, defaultValue = "false") boolean newProfile, @RequestBody List<Long> otherAreasOfWorkIds) {
+    public void updateOtherAreasOfWork(@RequestBody List<Long> otherAreasOfWorkIds) {
         String uid = userAuthService.getUsername();
-        userProfileService.setOtherAreasOfWork(uid, otherAreasOfWorkIds, newProfile);
+        userProfileService.setOtherAreasOfWork(uid, otherAreasOfWorkIds);
     }
 
     @PostMapping(path = "/full-name")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public void updateFullName(@RequestBody FullNameUpdateRequest fullNameUpdateRequest) {
+    public void updateFullName(@RequestParam(required = false, defaultValue = "false") boolean newProfile, @RequestBody FullNameUpdateRequest fullNameUpdateRequest) {
         log.debug("UserProfileController: fullNameUpdateRequest: {}", fullNameUpdateRequest);
         String uid = userAuthService.getUsername();
-        userProfileService.setFullName(uid, fullNameUpdateRequest.getFullName());
+        userProfileService.setFullName(uid, fullNameUpdateRequest.getFullName(), newProfile);
     }
 
     @PostMapping(path = "/grade")
@@ -54,5 +54,14 @@ public class UserProfileController {
         log.debug("UserProfileController: professionUpdateRequest: {}", professionUpdateRequest);
         String uid = userAuthService.getUsername();
         userProfileService.setProfession(uid, professionUpdateRequest.getProfessionId());
+    }
+
+    @PostMapping(path = "/organisationUnit")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void updateOrganisationUnit(@RequestBody OrganisationUnitUpdateRequest organisationUnitUpdateRequest) {
+        log.debug("UserProfileController: organisationUnitUpdateRequest: {}", organisationUnitUpdateRequest);
+        String uid = userAuthService.getUsername();
+        userProfileService.setOrganisationalUnit(uid, organisationUnitUpdateRequest.getOrganisationUnitId());
     }
 }

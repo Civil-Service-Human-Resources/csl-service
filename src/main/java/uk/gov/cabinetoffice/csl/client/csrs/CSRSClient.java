@@ -87,4 +87,9 @@ public class CSRSClient implements ICSRSClient {
         httpClient.executeRequest(RequestEntity.patch(url).body(patch.getAsApiParams()), Void.class);
     }
 
+    @Override
+    public void patchCivilServantOrganisation(UpdateOrganisationDTO updateOrganisationDTO) {
+        String url = String.format("%s/me/organisationalUnit", civilServants);
+        httpClient.executeRequest(RequestEntity.patch(url).body(updateOrganisationDTO), Void.class);
+    }
 }

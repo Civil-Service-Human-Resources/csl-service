@@ -22,6 +22,9 @@ public class CivilServant {
     private String lineManagerName;
 
     public List<OrganisationalUnit> getDepartmentHierarchy() {
+        if (organisationalUnit == null) {
+            return new ArrayList<>();
+        }
         ArrayList<OrganisationalUnit> orgs = new ArrayList<>(Collections.singletonList(organisationalUnit));
         OrganisationalUnit parent = organisationalUnit.getParent();
         while (parent != null) {

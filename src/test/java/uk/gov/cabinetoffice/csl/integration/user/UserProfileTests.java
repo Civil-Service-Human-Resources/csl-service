@@ -29,7 +29,7 @@ public class UserProfileTests extends IntegrationTestBase {
     private CSLStubService cslStubService;
 
     @Test
-    public void testSetOtherAreasOfWorkNewProfile() throws Exception {
+    public void testSetOtherAreasOfWork() throws Exception {
         CivilServant civilServant = testDataService.generateCivilServant();
         cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
         cslStubService.getCsrsStubService().getAreasOfWork("""
@@ -49,8 +49,33 @@ public class UserProfileTests extends IntegrationTestBase {
                     "otherAreasOfWork": ["/professions/1", "/professions/2"]
                 }
                 """);
-        mockMvc.perform(post("/user/profile/other-areas-of-work?newProfile=true")
+        mockMvc.perform(post("/user/profile/other-areas-of-work")
                         .content("[1,2,3]")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful());
+        verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
+    }
+
+    @Test
+    public void testUpdateFullNameNewProfile() throws Exception {
+        CivilServant civilServant = testDataService.generateCivilServant();
+        civilServant.setGrade(null);
+        civilServant.setProfession(null);
+        civilServant.setLineManagerEmail(null);
+        civilServant.setLineManagerName(null);
+        civilServant.setOrganisationalUnit(null);
+        cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
+        cslStubService.getCsrsStubService().patchCivilServant("""
+                {
+                    "fullName": "test full Name"
+                }
+                """);
+        mockMvc.perform(post("/user/profile/full-name?newProfile=true")
+                        .content("""
+                            {
+                                "fullName": "test full Name"
+                            }
+                            """)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
         verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
@@ -65,7 +90,7 @@ public class UserProfileTests extends IntegrationTestBase {
                     "fullName": "test full Name"
                 }
                 """);
-        mockMvc.perform(post("/user/profile/full-name")
+        mockMvc.perform(post("/user/profile/full-name?newProfile=false")
                         .content("""
                             {
                                 "fullName": "test full Name"
@@ -184,6 +209,95 @@ public class UserProfileTests extends IntegrationTestBase {
                         .content("""
                             {
                                 "professionId": "2"
+                            }
+                            """)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful());
+        verify(jmsTemplate, atLeast(1)).convertAndSend(anyString(), any(Message.class));
+    }
+
+    @Test
+    public void testUpdateOrganisationalUnit() throws Exception {
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.stubGetUserDetails(testDataService.getUserId(), civilServant);
+        cslStubService.getCsrsStubService().getOrganisations("""
+                {
+                       "content": [
+                           {
+                               "name": "Cabinet Office",
+                               "id": 1,
+                               "href": "https://hostname/organisationalUnits/1",
+                               "abbreviation": "CO",
+                               "formattedName": null,
+                               "parentId": null,
+                               "parent": null,
+                               "code": "10211",
+                               "agencyToken": null,
+                               "children": null,
+                               "domains": [
+                                   {
+                                       "id": 79,
+                                       "domain": "cabinetoffice.gov.uk",
+                                       "createdTimestamp": [
+                                           2023,
+                                           10,
+                                           23,
+                                           7,
+                                           44,
+                                           42
+                                       ]
+                                   }
+                               ]
+                           },
+                           {
+                               "name": "Department of Health & Social Care",
+                               "id": 2,
+                               "href": "https://hostname/organisationalUnits/2",
+                               "abbreviation": "DHSC",
+                               "formattedName": null,
+                               "parentId": null,
+                               "parent": null,
+                               "code": "10427",
+                               "agencyToken": null,
+                               "children": null,
+                               "domains": []
+                           }
+                       ],
+                       "pageable": {
+                           "sort": {
+                               "unsorted": true,
+                               "sorted": false
+                           },
+                           "pageNumber": 0,
+                           "pageSize": 2,
+                           "offset": 0,
+                           "paged": true,
+                           "unpaged": false
+                       },
+                       "sortList": [],
+                       "page": 0,
+                       "last": false,
+                       "totalElements": 2,
+                       "totalPages": 1,
+                       "first": true,
+                       "numberOfElements": 2,
+                       "sort": {
+                           "unsorted": true,
+                           "sorted": false
+                       },
+                       "size": 2,
+                       "number": 0
+                   }
+                """);
+        cslStubService.getCsrsStubService().patchCivilServantOrganisation("""
+                {
+                    "organisationalUnitId": 1
+                }
+                """);
+        mockMvc.perform(post("/user/profile/organisationUnit")
+                        .content("""
+                            {
+                                "organisationUnitId": "1"
                             }
                             """)
                         .contentType(MediaType.APPLICATION_JSON))
