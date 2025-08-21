@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.CompleteProfileMessage;
@@ -18,18 +17,15 @@ import java.util.Optional;
 @Service
 public class UserProfileService {
     private final UserDetailsService userDetailsService;
-    private final OrganisationalUnitListService organisationalUnitListService;
     private final CivilServantRegistryService civilServantRegistryService;
     private final MessageMetadataFactory messageMetadataFactory;
     private final IMessagingClient messagingClient;
 
     public UserProfileService(UserDetailsService userDetailsService,
-                              OrganisationalUnitListService organisationalUnitListService,
                               CivilServantRegistryService civilServantRegistryService,
                               MessageMetadataFactory messageMetadataFactory,
                               IMessagingClient messagingClient) {
         this.userDetailsService = userDetailsService;
-        this.organisationalUnitListService = organisationalUnitListService;
         this.civilServantRegistryService = civilServantRegistryService;
         this.messageMetadataFactory = messageMetadataFactory;
         this.messagingClient = messagingClient;
@@ -81,17 +77,8 @@ public class UserProfileService {
     }
 
     public void setOrganisationalUnit(String uid, Long organisationalUnitId) {
-        Optional<OrganisationalUnit> optOrganisationalUnit = organisationalUnitListService
-                .getAllOrganisationalUnits()
-                .getOrganisationalUnits()
-                .stream()
-                .filter(g -> g.getId().equals(organisationalUnitId))
-                .findFirst();
-
-        if (optOrganisationalUnit.isPresent()) {
-            User user = patchCivilServantOrganisation(uid, organisationalUnitId);
-            updateReportingData(user);
-        }
+        User user = patchCivilServantOrganisation(uid, organisationalUnitId);
+        updateReportingData(user);
     }
 
     private User patchCivilServantOrganisation(String uid, Long organisationalUnitId) {
