@@ -17,19 +17,17 @@ import java.util.Optional;
 @Service
 public class UserProfileService {
 
-    private final UserDetailsService userDetailsService;
-    private final CivilServantRegistryService civilServantRegistryService;
     private final MessageMetadataFactory messageMetadataFactory;
+    private final UserDetailsService userDetailsService;
     private final IMessagingClient messagingClient;
+    private final CivilServantRegistryService civilServantRegistryService;
 
-    public UserProfileService(UserDetailsService userDetailsService,
-                              CivilServantRegistryService civilServantRegistryService,
-                              MessageMetadataFactory messageMetadataFactory,
-                              IMessagingClient messagingClient) {
-        this.userDetailsService = userDetailsService;
-        this.civilServantRegistryService = civilServantRegistryService;
+    public UserProfileService(MessageMetadataFactory messageMetadataFactory, UserDetailsService userDetailsService,
+                              IMessagingClient messagingClient, CivilServantRegistryService civilServantRegistryService) {
         this.messageMetadataFactory = messageMetadataFactory;
+        this.userDetailsService = userDetailsService;
         this.messagingClient = messagingClient;
+        this.civilServantRegistryService = civilServantRegistryService;
     }
 
     public void setOtherAreasOfWork(String uid, List<Long> otherAreasOfWorkIds) {

@@ -23,10 +23,7 @@ public class UserDetailsService {
     @Cacheable(value = "user", key = "#uid", unless = "#result == null")
     public User getUserWithUid(String uid) {
         CivilServant civilServant = csrsClient.getCivilServantProfileWithUid(uid);
-        ArrayList<BasicOrganisationalUnit> orgs = civilServant.getDepartmentHierarchy()
-                    .stream()
-                    .map(o -> new BasicOrganisationalUnit(o.getId().intValue(), o.getCode(), o.getName()))
-                    .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<BasicOrganisationalUnit> orgs = civilServant.getDepartmentHierarchy().stream().map(o -> new BasicOrganisationalUnit(o.getId().intValue(), o.getCode(), o.getName())).collect(Collectors.toCollection(ArrayList::new));
         return new User(uid,
                 civilServant.getEmail(),
                 civilServant.getFullName(),
