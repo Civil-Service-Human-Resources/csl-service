@@ -9,10 +9,8 @@ import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.BasicOrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,8 +23,7 @@ public class UserDetailsService {
     @Cacheable(value = "user", key = "#uid", unless = "#result == null")
     public User getUserWithUid(String uid) {
         CivilServant civilServant = csrsClient.getCivilServantProfileWithUid(uid);
-        List<OrganisationalUnit> departmentHierarchy = civilServant.getDepartmentHierarchy();
-        ArrayList<BasicOrganisationalUnit> orgs = departmentHierarchy
+        ArrayList<BasicOrganisationalUnit> orgs = civilServant.getDepartmentHierarchy()
                     .stream()
                     .map(o -> new BasicOrganisationalUnit(o.getId().intValue(), o.getCode(), o.getName()))
                     .collect(Collectors.toCollection(ArrayList::new));

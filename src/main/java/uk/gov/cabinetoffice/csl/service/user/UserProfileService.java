@@ -16,6 +16,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class UserProfileService {
+
     private final UserDetailsService userDetailsService;
     private final CivilServantRegistryService civilServantRegistryService;
     private final MessageMetadataFactory messageMetadataFactory;
