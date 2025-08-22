@@ -100,7 +100,8 @@ public class AdminCancelBookingTest extends IntegrationTestBase {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(inputJson))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.message").value("Successfully applied action 'Cancel a booking' to course record"));
+                .andExpect(jsonPath("$.bookingId").value("1"))
+                .andExpect(jsonPath("$.learner").value("userId"));
 
     }
 
