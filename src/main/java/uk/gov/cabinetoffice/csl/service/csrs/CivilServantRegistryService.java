@@ -14,7 +14,6 @@ import java.util.List;
 public class CivilServantRegistryService {
 
     private final ICSRSClient civilServantRegistryClient;
-    private final OrganisationalUnitListService organisationalUnitListService;
 
     public List<AreaOfWork> getAreasOfWork() {
         return civilServantRegistryClient.getAreasOfWork();
@@ -22,5 +21,13 @@ public class CivilServantRegistryService {
 
     public List<Grade> getGrades() {
         return civilServantRegistryClient.getGrades();
+    }
+
+    public void patchCivilServant(PatchCivilServantDto patch) {
+        civilServantRegistryClient.patchCivilServant(patch);
+    }
+
+    public void patchCivilServantOrganisation(UpdateOrganisationDTO updateOrganisationDTO) {
+        civilServantRegistryClient.patchCivilServantOrganisation(updateOrganisationDTO);
     }
 }
