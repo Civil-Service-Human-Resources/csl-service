@@ -157,7 +157,8 @@ public class LearnerRecordService {
     }
 
     public List<ModuleRecord> createModuleRecords(List<ModuleRecord> newRecords) {
-        return client.createModuleRecords(newRecords);
+        return client.createModuleRecords(newRecords)
+                .stream().peek(moduleRecordCache::putValue).toList();
     }
 
     public List<LearnerRecord> createLearnerRecords(List<LearnerRecordDto> newLearnerRecords) {
