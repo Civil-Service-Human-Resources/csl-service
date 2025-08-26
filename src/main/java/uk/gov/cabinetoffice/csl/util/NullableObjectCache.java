@@ -40,8 +40,9 @@ public abstract class NullableObjectCache<R extends Cacheable, T extends Nullabl
         List<String> missingIds = new ArrayList<>();
         List<R> hits = new ArrayList<>();
         results.forEach(r -> {
-            missingIds.add(r.getId());
-            if (r.getCacheHit() != null && r.getCacheHit().getCacheable().isPresent()) {
+            if (r.getCacheHit() == null) {
+                missingIds.add(r.getId());
+            } else if (r.getCacheHit().getCacheable().isPresent()) {
                 hits.add(r.getCacheHit().getCacheable().get());
             }
         });
