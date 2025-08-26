@@ -30,15 +30,22 @@ public abstract class NullableObjectCache<R extends Cacheable, T extends Nullabl
     }
 
     public CacheGetMultipleOp<R> getMultipleValues(Collection<String> ids) {
-        List<String> missingIds = new ArrayList<>();
-        ArrayList<R> hits = new ArrayList<>();
-        ids.parallelStream().forEach(id -> {
-            T object = get(id);
-            if (object == null) {
-                missingIds.add(id);
+        List<CacheGetMultipleResult<R>> results = ids.parallelStream().map(id -> {
+            R object = null;
+            T nullableCacheEntry = get(id);
+            if (nullableCacheEntry == null) {
                 put(createNullCacheObject(id));
             } else {
-                object.getCacheable().ifPresent(hits::add);
+                object = nullableCacheEntry.getCacheable().orElse(null);
+            }
+            return new CacheGetMultipleResult<>(id, object);
+        }).toList();
+        List<String> missingIds = new ArrayList<>();
+        List<R> hits = new ArrayList<>();
+        results.forEach(r -> {
+            missingIds.add(r.getId());
+            if (r.getCacheHit() != null) {
+                hits.add(r.getCacheHit());
             }
         });
         log.debug("{} cache getMultiple cache misses: {}", getCacheName(), String.join(", ", missingIds));
