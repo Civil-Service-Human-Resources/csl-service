@@ -82,7 +82,7 @@ public class OrganisationalUnitService {
     }
 
     public void deleteOrganisationalUnit(Long organisationalUnitId) {
-        civilServantRegistryClient.deleteOrganisationalUnit(new OrganisationDTO(organisationalUnitId));
+        civilServantRegistryClient.deleteOrganisationalUnit(organisationalUnitId);
         removeOrganisationsFromCache();
         updateReportingData(organisationalUnitId);
     }

@@ -17,5 +17,5 @@ public interface ICSRSClient {
 
     void patchCivilServantOrganisation(OrganisationDTO organisationDTO);
 
-    void deleteOrganisationalUnit(OrganisationDTO organisationDTO);
+    void deleteOrganisationalUnit(Long organisationalUnitId);
 }

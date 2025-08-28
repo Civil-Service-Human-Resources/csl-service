@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationDTO;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
@@ -38,6 +39,10 @@ public class CSLStubService {
 
     public StubMapping stubGetOrganisations(OrganisationalUnitsPagedResponse organisationalUnitsPagedResponse) {
         return getCsrsStubService().getOrganisations(organisationalUnitsPagedResponse);
+    }
+
+    public StubMapping stubDeleteOrganisationalUnit(Long organisationalUnitId) {
+        return getCsrsStubService().deleteOrganisationalUnit(organisationalUnitId);
     }
 
     public List<StubMapping> stubCreateModuleRecords(String courseId, String moduleId, Course course, String userId,

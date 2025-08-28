@@ -97,8 +97,8 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public void deleteOrganisationalUnit(OrganisationDTO organisationDTO) {
-        String url = String.format("%s/%s", organisationalUnits, organisationDTO.getOrganisationalUnitId());
+    public void deleteOrganisationalUnit(Long organisationalUnitId) {
+        String url = String.format("%s/%s", organisationalUnits, organisationalUnitId);
         httpClient.executeRequest(RequestEntity.delete(url).build(), Void.class);
     }
 }
