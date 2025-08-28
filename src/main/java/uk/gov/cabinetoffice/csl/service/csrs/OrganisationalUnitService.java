@@ -15,7 +15,7 @@ import static com.azure.core.util.CoreUtils.isNullOrEmpty;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class OrganisationalUnitListService {
+public class OrganisationalUnitService {
     private final ICSRSClient civilServantRegistryClient;
 
     public OrganisationalUnits getAllOrganisationalUnits() {
@@ -74,5 +74,11 @@ public class OrganisationalUnitListService {
 
     public Map<Long, List<OrganisationalUnit>> getHierarchies(List<Long> organisationIds) {
         return civilServantRegistryClient.getAllOrganisationalUnits().getHierarchies(organisationIds);
+    }
+
+    public void deleteOrganisationalUnit(Long organisationUnitId) {
+        civilServantRegistryClient.deleteOrganisationalUnit(new OrganisationDTO(organisationUnitId));
+        removeOrganisationsFromCache();
+        //TODO: Send message to reporting-service to remove OrganisationalUnit from learners-records
     }
 }

@@ -10,7 +10,7 @@ import uk.gov.cabinetoffice.csl.service.chart.ChartWithBreakdowns;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
 import uk.gov.cabinetoffice.csl.service.chart.builder.CourseCompletionChartBuilderParams;
 import uk.gov.cabinetoffice.csl.service.chart.builder.CourseCompletionsChartBuilder;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 
 @Slf4j
 @Component
@@ -18,9 +18,9 @@ public class CourseCompletionByCourseChartFactory extends CourseCompletionChartF
 
     protected final CourseCompletionsChartBuilder<CourseCompletionAggregation> chartBuilder;
 
-    protected CourseCompletionByCourseChartFactory(OrganisationalUnitListService organisationalUnitListService,
+    protected CourseCompletionByCourseChartFactory(OrganisationalUnitService organisationalUnitService,
                                                    IReportServiceClient reportServiceClient, CourseCompletionsChartBuilder<CourseCompletionAggregation> chartBuilder) {
-        super(organisationalUnitListService, reportServiceClient, chartBuilder);
+        super(organisationalUnitService, reportServiceClient, chartBuilder);
         this.chartBuilder = chartBuilder;
     }
 

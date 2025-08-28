@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitParam;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnits;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 
 @Slf4j
 @RestController
@@ -15,7 +16,7 @@ import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 @AllArgsConstructor
 public class OrganisationalUnitController {
 
-    private final OrganisationalUnitListService organisationalUnitService;
+    private final OrganisationalUnitService organisationalUnitService;
 
     @GetMapping(path = "/full", produces = "application/json")
     @ResponseBody
@@ -32,5 +33,12 @@ public class OrganisationalUnitController {
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(OrganisationalUnitsParams formattedOrganisationalUnitsParams) {
         log.info("Getting formatted organisational unit names");
         return organisationalUnitService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams);
+    }
+
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteOrganisationalUnit(@RequestBody OrganisationalUnitParam organisationalUnit) {
+        log.info("Deleting organisational unit id: {}", organisationalUnit.getOrganisationUnitId());
+        organisationalUnitService.deleteOrganisationalUnit(organisationalUnit.getOrganisationUnitId());
     }
 }

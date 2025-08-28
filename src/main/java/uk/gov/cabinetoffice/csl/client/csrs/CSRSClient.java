@@ -28,6 +28,9 @@ public class CSRSClient implements ICSRSClient {
     @Value("${csrs.allOrganisationalUnits}")
     private String allOrganisationalUnits;
 
+    @Value("${csrs.organisationalUnits}")
+    private String organisationalUnits;
+
     @Value("${csrs.professions}")
     private String professionsTree;
 
@@ -88,8 +91,14 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public void patchCivilServantOrganisation(UpdateOrganisationDTO updateOrganisationDTO) {
+    public void patchCivilServantOrganisation(OrganisationDTO organisationDTO) {
         String url = String.format("%s/me/organisationalUnit", civilServants);
-        httpClient.executeRequest(RequestEntity.patch(url).body(updateOrganisationDTO), Void.class);
+        httpClient.executeRequest(RequestEntity.patch(url).body(organisationDTO), Void.class);
+    }
+
+    @Override
+    public void deleteOrganisationalUnit(OrganisationDTO organisationDTO) {
+        String url = String.format("%s/%s", organisationalUnits, organisationDTO.getOrganisationalUnitId());
+        httpClient.executeRequest(RequestEntity.delete(url).build(), Void.class);
     }
 }

@@ -25,13 +25,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class OrganisationalUnitListServiceTest {
+class OrganisationalUnitServiceTest {
 
     @Mock
     private ICSRSClient csrs;
 
     @InjectMocks
-    private OrganisationalUnitListService organisationalUnitListService;
+    private OrganisationalUnitService organisationalUnitService;
 
     @BeforeEach
     public void setUp() {
@@ -45,7 +45,7 @@ class OrganisationalUnitListServiceTest {
         formattedOrganisationalUnitsParams.setOrganisationId(null);
         formattedOrganisationalUnitsParams.setDomain(null);
 
-        Map<Long, FormattedOrganisationalUnitName> orgMap = organisationalUnitListService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams)
+        Map<Long, FormattedOrganisationalUnitName> orgMap = organisationalUnitService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams)
                 .getFormattedOrganisationalUnitNames().stream().collect(Collectors.toMap(FormattedOrganisationalUnitName::getId, Function.identity()));
 
         assertEquals(orgMap.size(), 6);
@@ -63,7 +63,7 @@ class OrganisationalUnitListServiceTest {
         formattedOrganisationalUnitsParams.setOrganisationId(Arrays.asList(1L, 2L, 3L));
         formattedOrganisationalUnitsParams.setDomain("domain1.com");
 
-        Map<Long, FormattedOrganisationalUnitName> orgMap = organisationalUnitListService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams)
+        Map<Long, FormattedOrganisationalUnitName> orgMap = organisationalUnitService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams)
                 .getFormattedOrganisationalUnitNames().stream().collect(Collectors.toMap(FormattedOrganisationalUnitName::getId, Function.identity()));
 
         assertEquals(orgMap.size(), 4);
