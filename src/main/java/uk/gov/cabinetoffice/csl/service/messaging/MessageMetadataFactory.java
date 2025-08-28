@@ -36,4 +36,8 @@ public class MessageMetadataFactory {
     public RegisteredLearnerEmailUpdateMessage generateRegisteredLearnerEmailUpdateMessage(String uid, String email) {
         return new RegisteredLearnerEmailUpdateMessage(new RegisteredLearnerEmailUpdate(uid, email));
     }
+
+    public RegisteredLearnersOrganisationDeleteMessage generateRegisteredLearnersOrganisationDeleteMessage(Long organisationalUnitId) {
+        return new RegisteredLearnersOrganisationDeleteMessage(new RegisteredLearnersOrganisationDelete(organisationalUnitId));
+    }
 }

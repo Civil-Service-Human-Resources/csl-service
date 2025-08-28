@@ -4,4 +4,5 @@ public enum RegisteredLearnerDataType {
     LEARNER_PROFILE,
     ACCOUNT_ACTIVATE,
     EMAIL_UPDATE,
+    ORGANISATION,
 }
