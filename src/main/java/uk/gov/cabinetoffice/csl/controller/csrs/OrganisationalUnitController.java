@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitParam;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnits;
@@ -35,10 +34,10 @@ public class OrganisationalUnitController {
         return organisationalUnitService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{organisationUnitId}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteOrganisationalUnit(@RequestBody OrganisationalUnitParam organisationalUnit) {
-        log.info("Deleting organisational unit id: {}", organisationalUnit.getOrganisationUnitId());
-        organisationalUnitService.deleteOrganisationalUnit(organisationalUnit.getOrganisationUnitId());
+    public void deleteOrganisationalUnit(@PathVariable("organisationUnitId") Long organisationUnitId) {
+        log.info("Deleting organisational unit id: {}", organisationUnitId);
+        organisationalUnitService.deleteOrganisationalUnit(organisationUnitId);
     }
 }

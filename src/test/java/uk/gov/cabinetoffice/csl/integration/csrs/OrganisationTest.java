@@ -229,12 +229,8 @@ public class OrganisationTest extends IntegrationTestBase {
     @Test
     public void testDeleteOrganisationalUnit() throws Exception {
         cslStubService.stubDeleteOrganisationalUnit(1L);
-        String inputJson = """
-                {"organisationUnitId": 1}
-                """;
-        mockMvc.perform(delete("/organisations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(inputJson))
+        mockMvc.perform(delete("/organisations/1")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
     }
 }
