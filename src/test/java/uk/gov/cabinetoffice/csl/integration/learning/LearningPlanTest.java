@@ -111,12 +111,12 @@ public class LearningPlanTest extends IntegrationTestBase {
                           {
                             "startTime": "12:00",
                             "endTime": "14:00",
-                            "date": "2025-01-02"
+                            "date": "2022-01-02"
                           },
                           {
                             "startTime": "09:00",
                             "endTime": "11:00",
-                            "date": "2025-01-01"
+                            "date": "2022-01-01"
                           }
                         ]
                       }
@@ -162,6 +162,54 @@ public class LearningPlanTest extends IntegrationTestBase {
                     "id": "module6",
                     "title": "Module 6",
                     "description": "Module 6 description",
+                    "optional": false,
+                    "moduleType": "elearning",
+                    "cost": 0.0
+                  }
+                ],
+                "audiences": [],
+                "visibility": "PUBLIC",
+                "status": "Published",
+                "cost": 0.0
+              },
+              {
+                "id": "course8",
+                "title": "Course 8",
+                "shortDescription": "Course 8 short description",
+                "description": "Course 8 description",
+                "modules": [
+                  {
+                    "type": "face-to-face",
+                    "id": "module7",
+                    "title": "Module 7",
+                    "description": "Module 7 description",
+                    "optional": false,
+                    "moduleType": "face-to-face",
+                    "cost": 0.0,
+                    "events": [
+                      {
+                        "id": "event2",
+                        "dateRanges": [
+                          {
+                            "startTime": "12:00",
+                            "endTime": "14:00",
+                            "date": "2025-01-02"
+                          },
+                          {
+                            "startTime": "09:00",
+                            "endTime": "11:00",
+                            "date": "2025-01-01"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "elearning",
+                    "url": "https://www.gov.uk/",
+                    "id": "module8",
+                    "title": "Module 8",
+                    "description": "Module 8 description",
                     "optional": false,
                     "moduleType": "elearning",
                     "cost": 0.0
@@ -288,6 +336,14 @@ public class LearningPlanTest extends IntegrationTestBase {
                             },
                             "latestEvent": null
                         }
+                        ,
+                        {
+                            "resourceId": "course8",
+                            "recordType": {
+                                "type": "COURSE"
+                            },
+                            "latestEvent": null
+                        }
                     ],
                     "totalPages": 1
                 }
@@ -304,10 +360,10 @@ public class LearningPlanTest extends IntegrationTestBase {
                         },
                         {
                             "moduleId": "module4",
-                            "state": "REGISTERED",
-                            "eventDate": "2025-01-01T09:00:00",
+                            "state": "APPROVED",
+                            "eventDate": "2022-01-02T09:00:00",
                             "eventId": "event1",
-                            "updatedAt": "2025-01-01T09:00:00",
+                            "updatedAt": "2022-01-02T09:00:00",
                             "courseId": "course5"
                         },
                         {
@@ -321,21 +377,47 @@ public class LearningPlanTest extends IntegrationTestBase {
                             "state": "IN_PROGRESS",
                             "updatedAt": "2025-01-01T09:00:00",
                             "courseId": "course7"
+                        },
+                        {
+                            "moduleId": "module7",
+                            "state": "APPROVED",
+                            "eventDate": "2025-01-01T09:00:00",
+                            "eventId": "event2",
+                            "updatedAt": "2025-01-01T09:00:00",
+                            "courseId": "course8"
                         }
                     ]
-                }
-                """;
+                }""";
 
         cslStubService.getLearningCatalogue().getMandatoryLearningMap(requiredLearningMap);
-        cslStubService.getLearningCatalogue().getCourses(List.of("course3", "course4", "course5", "course6", "course7"), courses);
+        cslStubService.getLearningCatalogue().getCourses(List.of("course3", "course4", "course5", "course6", "course7", "course8"), courses);
         cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
-        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2", "module3", "module5", "module6"), moduleRecordResponse);
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2", "module3", "module5", "module6", "module7", "module8"), moduleRecordResponse);
         cslStubService.getLearnerRecord().getLearnerRecords(LearnerRecordQuery.builder().notEventTypes(List.of("COMPLETE_COURSE")).learnerRecordTypes(List.of("COURSE")).build(), 0, recordResponse);
 
         String expectedJson = """
                 {
                   "userId": "userId",
                   "bookedCourses": [
+                  {
+                       "id": "course8",
+                       "title": "Course 8",
+                       "shortDescription": "Course 8 short description",
+                       "type": "blended",
+                       "duration": 14400,
+                       "moduleCount": 2,
+                       "costInPounds": 0,
+                       "status": "NULL",
+                       "eventModule": {
+                         "id": "module7",
+                         "title": "Module 7",
+                         "eventId": "event2",
+                         "bookedDate": "2025-01-01",
+                         "dates": ["2025-01-01", "2025-01-02"],
+                         "state": "APPROVED"
+                       },
+                       "canBeMovedToLearningRecord": false
+                     },
                     {
                       "id": "course5",
                       "title": "Course 5",
@@ -349,11 +431,11 @@ public class LearningPlanTest extends IntegrationTestBase {
                         "id": "module4",
                         "title": "Module 4",
                         "eventId": "event1",
-                        "bookedDate": "2025-01-01",
-                        "dates": ["2025-01-01", "2025-01-02"],
-                        "state": "REGISTERED"
+                        "bookedDate": "2022-01-02",
+                        "dates": ["2022-01-01", "2022-01-02"],
+                        "state": "APPROVED"
                       },
-                      "canBeMovedToLearningRecord": false
+                      "canBeMovedToLearningRecord": true
                     }
                   ],
                   "learningPlanCourses": [

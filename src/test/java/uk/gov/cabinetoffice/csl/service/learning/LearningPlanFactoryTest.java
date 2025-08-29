@@ -76,7 +76,7 @@ class LearningPlanFactoryTest {
         moduleRecord.setModuleId("module1");
         moduleRecord.setEventDate(LocalDate.of(2025, 1, 1));
         moduleRecord.setEventId("event1");
-        moduleRecord.setState(State.REGISTERED);
+        moduleRecord.setState(State.APPROVED);
 
         Optional<BookedLearningPlanCourse> result = learningPlanFactory.getBookedLearningPlanCourse(course, moduleRecord, true);
         assertTrue(result.isPresent());
@@ -96,7 +96,7 @@ class LearningPlanFactoryTest {
         assertEquals("event1", bookedLearningPlanCourse.getEventModule().getEventId());
         assertEquals(LocalDate.of(2025, 1, 1), bookedLearningPlanCourse.getEventModule().getBookedDate());
         assertEquals(LocalDate.of(2025, 1, 1), bookedLearningPlanCourse.getEventModule().getDates().get(0));
-        assertEquals(State.REGISTERED, bookedLearningPlanCourse.getEventModule().getState());
+        assertEquals(State.APPROVED, bookedLearningPlanCourse.getEventModule().getState());
     }
 
     @Test

@@ -35,7 +35,8 @@ public class LearningPlanFactory {
         if (event != null) {
             EventModule eventModule = buildEventModule(module, event, moduleRecord);
             boolean canBeMovedToLearningPlan = utilService.getNowDateTime().isAfter(moduleRecord.getEventDate().atTime(LocalTime.MIN)) &&
-                    (course.getCourseType().equals("face-to-face") || moduleReadyToComplete);
+                    (course.getCourseType().equals("face-to-face") || moduleReadyToComplete) &&
+                    moduleRecord.equalsStates(State.APPROVED);
             bookedCourse = new BookedLearningPlanCourse(course.getId(), course.getTitle(),
                     course.getShortDescription(), course.getCourseType(), course.getDurationInSeconds(),
                     course.getModules().size(), course.getCost(), State.NULL, eventModule, canBeMovedToLearningPlan);
