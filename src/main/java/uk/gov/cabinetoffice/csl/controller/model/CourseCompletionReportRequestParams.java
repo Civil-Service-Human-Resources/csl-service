@@ -9,7 +9,7 @@ import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
-public class CreateReportRequestWithOrganisationIdsParams extends OrganisationIdsCourseCompletionsParams {
+public class CourseCompletionReportRequestParams extends OrganisationIdsCourseCompletionsParams {
     @NotNull
     protected String userId;
 

@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetCourseCompletionReportRequestsResponse {
+public class GetReportRequestsResponse {
     private List<CourseCompletionReportRequest> requests;
 
     public boolean hasRequests() {

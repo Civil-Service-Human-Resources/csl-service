@@ -10,9 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithSelectedOrganisationIdsParams;
+import uk.gov.cabinetoffice.csl.controller.model.RegisteredLearnerReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.SelectedOrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
-import uk.gov.cabinetoffice.csl.domain.reportservice.AddCourseCompletionReportRequestResponse;
+import uk.gov.cabinetoffice.csl.domain.reportservice.AddReportRequestResponse;
+import uk.gov.cabinetoffice.csl.domain.reportservice.RegisteredLearnerOverview;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
 import uk.gov.cabinetoffice.csl.service.ReportService;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
@@ -35,7 +37,7 @@ public class AdminReportingController {
 
     @PostMapping(path = "/course-completions/request-source-data", produces = "application/json")
     @ResponseBody
-    public AddCourseCompletionReportRequestResponse requestSourceData(@Valid @RequestBody CreateReportRequestWithSelectedOrganisationIdsParams params) {
+    public AddReportRequestResponse requestCourseCompletionsSourceData(@Valid @RequestBody CreateReportRequestWithSelectedOrganisationIdsParams params) {
         return reportService.requestCourseCompletionsExport(params);
     }
 
@@ -48,6 +50,19 @@ public class AdminReportingController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .headers(headers)
                 .body(file.getData());
+    }
+
+    @GetMapping(path = "/registered-learners/overview", produces = "application/json")
+    @ResponseBody
+    public RegisteredLearnerOverview getRegisteredLearnerOverview() {
+        IdentityDto user = userAuthService.getIdentity();
+        return reportService.getRegisteredLearnerOverview(user);
+    }
+
+    @PostMapping(path = "/registered-learners/request-source-data", produces = "application/json")
+    @ResponseBody
+    public AddReportRequestResponse requestRegisteredLearnerSourceData(@Valid @RequestBody RegisteredLearnerReportRequestParams params) {
+        return reportService.requestRegisteredLearnerExport(params);
     }
 
 }
