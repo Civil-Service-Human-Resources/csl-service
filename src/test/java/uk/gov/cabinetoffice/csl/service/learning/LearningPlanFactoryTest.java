@@ -92,7 +92,7 @@ class LearningPlanFactoryTest {
         assertEquals(2, bookedLearningPlanCourse.getModuleCount());
         assertEquals(10, bookedLearningPlanCourse.getCostInPounds());
         assertEquals(State.NULL, bookedLearningPlanCourse.getStatus());
-        assertTrue(bookedLearningPlanCourse.isCanBeMovedToLearningPlan());
+        assertTrue(bookedLearningPlanCourse.isCanBeMovedToLearningRecord());
 
         assertEquals("module1", bookedLearningPlanCourse.getEventModule().getId());
         assertEquals("Module 1", bookedLearningPlanCourse.getEventModule().getTitle());
@@ -123,7 +123,7 @@ class LearningPlanFactoryTest {
         assertEquals(10, bookedLearningPlanCourse.getCostInPounds());
         assertEquals(State.NULL, bookedLearningPlanCourse.getStatus());
 
-        assertFalse(bookedLearningPlanCourse.isCanBeMovedToLearningPlan());
+        assertFalse(bookedLearningPlanCourse.isCanBeMovedToLearningRecord());
 
         assertEquals("module1", bookedLearningPlanCourse.getEventModule().getId());
         assertEquals("Module 1", bookedLearningPlanCourse.getEventModule().getTitle());

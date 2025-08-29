@@ -353,7 +353,7 @@ public class LearningPlanTest extends IntegrationTestBase {
                         "dates": ["2025-01-01", "2025-01-02"],
                         "state": "REGISTERED"
                       },
-                      "canBeMovedToLearningPlan": false
+                      "canBeMovedToLearningRecord": false
                     }
                   ],
                   "learningPlanCourses": [
