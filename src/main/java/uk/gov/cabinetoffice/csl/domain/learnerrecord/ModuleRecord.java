@@ -111,4 +111,9 @@ public class ModuleRecord implements Cacheable {
         return getLearnerRecordId().getAsString();
     }
 
+    @JsonIgnore
+    public boolean isEventModule() {
+        return getEventId() != null && getEventDate() != null;
+    }
+
 }

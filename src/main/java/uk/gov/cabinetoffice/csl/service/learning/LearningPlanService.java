@@ -14,7 +14,6 @@ import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,11 +64,14 @@ public class LearningPlanService {
                     if (course != null) {
                         LearnerRecordEvent latestEvent = latestEventForCourseMap.get(courseId);
                         if (!(latestEvent != null && latestEvent.getActionType().equals(REMOVE_FROM_LEARNING_PLAN)
-                                && latestEvent.getEventTimestamp().isAfter(requiredModuleRecords.stream()
-                                .map(mr -> mr.getUpdatedAt() == null ? LocalDateTime.MIN : mr.getUpdatedAt())
-                                .max(LocalDateTime::compareTo).orElse(LocalDateTime.MIN)))) {
-                            learningPlanFactory.getBookedLearningPlanCourse(course, requiredModuleRecords)
-                                    .ifPresentOrElse(bookedLearningPlanCourses::add, () -> {
+                                && latestEvent.getEventTimestamp().isAfter(requiredModuleRecords.getLatestUpdatedDate()))) {
+                            requiredModuleRecords.getBookedEventModule()
+                                    .ifPresentOrElse(moduleRecord -> {
+                                        if (!moduleRecord.equalsStates(State.SKIPPED, State.COMPLETED)) {
+                                            learningPlanFactory.getBookedLearningPlanCourse(course, moduleRecord, requiredModuleRecords.isLastModuleToComplete(moduleRecord.getModuleId()))
+                                                    .ifPresent(bookedLearningPlanCourses::add);
+                                        }
+                                    }, () -> {
                                         State state = requiredModuleRecords.isEmpty() ? State.NULL : State.IN_PROGRESS;
                                         learningPlanCourses.add(learningPlanFactory.getLearningPlanCourse(course, state));
                                     });

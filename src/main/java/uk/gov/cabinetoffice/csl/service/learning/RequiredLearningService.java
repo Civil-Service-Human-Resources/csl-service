@@ -10,7 +10,6 @@ import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learning.Learning;
 import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearning;
@@ -72,10 +71,14 @@ public class RequiredLearningService {
                     }
                 }));
         if (!moduleRecordIdsToFetch.isEmpty()) {
-            Map<String, List<ModuleRecord>> moduleRecords = learnerRecordDataUtils.getModuleRecordsForCourses(
+            Map<String, ModuleRecordCollection> moduleRecords = learnerRecordDataUtils.getModuleRecordsForCourses(
                     requiredLearningCourses.stream().map(RequiredLearningCourse::getId).toList(), moduleRecordIdsToFetch);
             requiredLearningCourses
-                    .forEach(course -> course.setStatusForModules(moduleRecords.get(course.getId())));
+                    .forEach(course -> {
+                        if (moduleRecords.get(course.getId()).getLatestUpdatedDate().isAfter(course.getLearningPeriod().getStartDateAsDateTime())) {
+                            course.setStatus(State.IN_PROGRESS);
+                        }
+                    });
         }
         RequiredLearning requiredLearningResponse = new RequiredLearning(uid, requiredLearningCourses);
         requiredLearningResponse.sortCourses();

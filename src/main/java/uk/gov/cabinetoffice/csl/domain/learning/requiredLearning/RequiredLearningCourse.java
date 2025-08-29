@@ -5,13 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlanCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,11 +30,4 @@ public class RequiredLearningCourse extends LearningPlanCourse {
         return learningPeriod.getEndDate();
     }
 
-    @JsonIgnore
-    public void setStatusForModules(List<ModuleRecord> moduleRecords) {
-        if (moduleRecords.stream().anyMatch(mr -> mr.getUpdatedAt()
-                .isAfter(getLearningPeriod().getStartDateAsDateTime()))) {
-            setStatus(State.IN_PROGRESS);
-        }
-    }
 }

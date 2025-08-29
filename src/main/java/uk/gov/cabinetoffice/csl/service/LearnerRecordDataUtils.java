@@ -3,14 +3,18 @@ package uk.gov.cabinetoffice.csl.service;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.LearningResourceType;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventQuery;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
+import uk.gov.cabinetoffice.csl.service.learning.ModuleRecordCollection;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction.COMPLETE_COURSE;
@@ -59,12 +63,26 @@ public class LearnerRecordDataUtils {
         return eventMap;
     }
 
-    public Map<String, List<ModuleRecord>> getModuleRecordsForCourses(List<String> courseIds, List<ModuleRecordResourceId> moduleRecordIds) {
-        Map<String, List<ModuleRecord>> map = courseIds.stream().collect(Collectors.toMap(s -> s, s -> new ArrayList<>()));
+    public Map<String, ModuleRecordCollection> getModuleRecordsForCourses(List<String> courseIds, List<ModuleRecordResourceId> moduleRecordIds) {
+        Map<String, ModuleRecordCollection> map = courseIds.stream().collect(Collectors.toMap(s -> s, s -> new ModuleRecordCollection()));
         learnerRecordService.getModuleRecords(moduleRecordIds)
                 .forEach(mr -> {
-                    List<ModuleRecord> mrs = map.get(mr.getCourseId());
+                    ModuleRecordCollection mrs = map.get(mr.getCourseId());
                     mrs.add(mr);
+                    if (mr.getUpdatedAt() != null && mr.getUpdatedAt().isAfter(mrs.getLatestUpdatedDate())) {
+                        mrs.setLatestUpdatedDate(mr.getUpdatedAt());
+                    }
+                    if (mr.getCompletionDate() != null && mr.getCompletionDate().isAfter(mrs.getLatestCompletionDate())) {
+                        mrs.setLatestCompletionDate(mr.getCompletionDate());
+                    }
+                    if (mr.getState().equals(State.COMPLETED)) {
+                        mrs.getCompletedModules().add(mr.getModuleId());
+                    } else {
+                        mrs.getIncompleteModules().add(mr.getModuleId());
+                    }
+                    if (mr.isEventModule() && mrs.getBookedEventModule().isEmpty()) {
+                        mrs.setBookedEventModule(mr);
+                    }
                     map.put(mr.getCourseId(), mrs);
                 });
         return map;

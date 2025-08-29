@@ -78,10 +78,7 @@ class LearningPlanFactoryTest {
         moduleRecord.setEventId("event1");
         moduleRecord.setState(State.REGISTERED);
 
-        ModuleRecord moduleRecord2 = new ModuleRecord();
-        moduleRecord2.setState(State.COMPLETED);
-
-        Optional<BookedLearningPlanCourse> result = learningPlanFactory.getBookedLearningPlanCourse(course, List.of(moduleRecord, moduleRecord2));
+        Optional<BookedLearningPlanCourse> result = learningPlanFactory.getBookedLearningPlanCourse(course, moduleRecord, true);
         assertTrue(result.isPresent());
         BookedLearningPlanCourse bookedLearningPlanCourse = result.get();
         assertEquals("course1", bookedLearningPlanCourse.getId());
@@ -111,7 +108,7 @@ class LearningPlanFactoryTest {
         moduleRecord.setEventId("event1");
         moduleRecord.setState(State.REGISTERED);
 
-        Optional<BookedLearningPlanCourse> result = learningPlanFactory.getBookedLearningPlanCourse(course, List.of(moduleRecord));
+        Optional<BookedLearningPlanCourse> result = learningPlanFactory.getBookedLearningPlanCourse(course, moduleRecord, false);
         assertTrue(result.isPresent());
         BookedLearningPlanCourse bookedLearningPlanCourse = result.get();
         assertEquals("course1", bookedLearningPlanCourse.getId());
