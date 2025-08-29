@@ -68,7 +68,7 @@ public class LearningPlanService {
                             requiredModuleRecords.getBookedEventModule()
                                     .ifPresentOrElse(moduleRecord -> {
                                         if (!moduleRecord.equalsStates(State.SKIPPED, State.COMPLETED)) {
-                                            learningPlanFactory.getBookedLearningPlanCourse(course, moduleRecord, requiredModuleRecords.isLastModuleToComplete(moduleRecord.getModuleId()))
+                                            learningPlanFactory.getBookedLearningPlanCourse(course, requiredModuleRecords)
                                                     .ifPresent(bookedLearningPlanCourses::add);
                                         }
                                     }, () -> {

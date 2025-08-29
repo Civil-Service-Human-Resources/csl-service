@@ -57,12 +57,14 @@ class LearningPlanFactoryTest {
         module1.setModuleType(ModuleType.facetoface);
         module1.setCost(BigDecimal.TEN);
         module1.setEvents(List.of(event));
+        module1.setRequiredForCompletion(true);
 
         module2.setId("module2");
         module2.setTitle("Module 2");
         module2.setModuleType(ModuleType.link);
         module2.setDuration(20L);
         module2.setCost(BigDecimal.ZERO);
+        module2.setRequiredForCompletion(true);
 
         course.setId("course1");
         course.setTitle("Course 1");
@@ -78,7 +80,14 @@ class LearningPlanFactoryTest {
         moduleRecord.setEventId("event1");
         moduleRecord.setState(State.APPROVED);
 
-        Optional<BookedLearningPlanCourse> result = learningPlanFactory.getBookedLearningPlanCourse(course, moduleRecord, true);
+        ModuleRecord moduleRecord2 = new ModuleRecord();
+        moduleRecord2.setModuleId("module2");
+        moduleRecord2.setState(State.COMPLETED);
+        ModuleRecordCollection collection = new ModuleRecordCollection();
+        collection.add(moduleRecord);
+        collection.add(moduleRecord2);
+
+        Optional<BookedLearningPlanCourse> result = learningPlanFactory.getBookedLearningPlanCourse(course, collection);
         assertTrue(result.isPresent());
         BookedLearningPlanCourse bookedLearningPlanCourse = result.get();
         assertEquals("course1", bookedLearningPlanCourse.getId());
@@ -107,8 +116,10 @@ class LearningPlanFactoryTest {
         moduleRecord.setEventDate(LocalDate.of(2025, 3, 1));
         moduleRecord.setEventId("event1");
         moduleRecord.setState(State.REGISTERED);
+        ModuleRecordCollection collection = new ModuleRecordCollection();
+        collection.add(moduleRecord);
 
-        Optional<BookedLearningPlanCourse> result = learningPlanFactory.getBookedLearningPlanCourse(course, moduleRecord, false);
+        Optional<BookedLearningPlanCourse> result = learningPlanFactory.getBookedLearningPlanCourse(course, collection);
         assertTrue(result.isPresent());
         BookedLearningPlanCourse bookedLearningPlanCourse = result.get();
         assertEquals("course1", bookedLearningPlanCourse.getId());
