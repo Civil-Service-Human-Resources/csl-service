@@ -16,12 +16,11 @@ public class ModuleRecordCollection extends ArrayList<ModuleRecord> {
 
     private ModuleRecord bookedEventModule = null;
     private List<String> completedModules = new ArrayList<>();
-    private List<String> incompleteModules = new ArrayList<>();
     private LocalDateTime latestCompletionDate = LocalDateTime.MIN;
     private LocalDateTime latestUpdatedDate = LocalDateTime.MIN;
 
     public List<String> getRequiredIdsLeftForCompletion(List<String> moduleIdsRequiredForCourseCompletion) {
-        return moduleIdsRequiredForCourseCompletion.stream().filter(incompleteModules::contains).toList();
+        return moduleIdsRequiredForCourseCompletion.stream().filter(id -> !completedModules.contains(id)).toList();
     }
 
     public Optional<ModuleRecord> getBookedEventModule() {
@@ -37,8 +36,6 @@ public class ModuleRecordCollection extends ArrayList<ModuleRecord> {
         }
         if (moduleRecord.getState().equals(State.COMPLETED)) {
             getCompletedModules().add(moduleRecord.getModuleId());
-        } else {
-            getIncompleteModules().add(moduleRecord.getModuleId());
         }
         if (moduleRecord.isEventModule() && getBookedEventModule().isEmpty()) {
             setBookedEventModule(moduleRecord);

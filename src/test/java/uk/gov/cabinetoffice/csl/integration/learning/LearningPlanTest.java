@@ -193,12 +193,12 @@ public class LearningPlanTest extends IntegrationTestBase {
                           {
                             "startTime": "12:00",
                             "endTime": "14:00",
-                            "date": "2025-01-02"
+                            "date": "2022-01-02"
                           },
                           {
                             "startTime": "09:00",
                             "endTime": "11:00",
-                            "date": "2025-01-01"
+                            "date": "2022-01-01"
                           }
                         ]
                       }
@@ -381,9 +381,9 @@ public class LearningPlanTest extends IntegrationTestBase {
                         {
                             "moduleId": "module7",
                             "state": "APPROVED",
-                            "eventDate": "2025-01-01T09:00:00",
+                            "eventDate": "2022-01-01T09:00:00",
                             "eventId": "event2",
-                            "updatedAt": "2025-01-01T09:00:00",
+                            "updatedAt": "2022-01-01T09:00:00",
                             "courseId": "course8"
                         }
                     ]
@@ -400,25 +400,6 @@ public class LearningPlanTest extends IntegrationTestBase {
                   "userId": "userId",
                   "bookedCourses": [
                   {
-                       "id": "course8",
-                       "title": "Course 8",
-                       "shortDescription": "Course 8 short description",
-                       "type": "blended",
-                       "duration": 14400,
-                       "moduleCount": 2,
-                       "costInPounds": 0,
-                       "status": "NULL",
-                       "eventModule": {
-                         "id": "module7",
-                         "title": "Module 7",
-                         "eventId": "event2",
-                         "bookedDate": "2025-01-01",
-                         "dates": ["2025-01-01", "2025-01-02"],
-                         "state": "APPROVED"
-                       },
-                       "canBeMovedToLearningRecord": false
-                     },
-                    {
                       "id": "course5",
                       "title": "Course 5",
                       "shortDescription": "Course 5 short description",
@@ -436,7 +417,26 @@ public class LearningPlanTest extends IntegrationTestBase {
                         "state": "APPROVED"
                       },
                       "canBeMovedToLearningRecord": true
-                    }
+                    },
+                  {
+                       "id": "course8",
+                       "title": "Course 8",
+                       "shortDescription": "Course 8 short description",
+                       "type": "blended",
+                       "duration": 14400,
+                       "moduleCount": 2,
+                       "costInPounds": 0,
+                       "status": "NULL",
+                       "eventModule": {
+                         "id": "module7",
+                         "title": "Module 7",
+                         "eventId": "event2",
+                         "bookedDate": "2022-01-01",
+                         "dates": ["2022-01-01", "2022-01-02"],
+                         "state": "APPROVED"
+                       },
+                       "canBeMovedToLearningRecord": false
+                     }
                   ],
                   "learningPlanCourses": [
                     {
