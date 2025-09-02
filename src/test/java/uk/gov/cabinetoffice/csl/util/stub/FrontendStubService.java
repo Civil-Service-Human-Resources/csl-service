@@ -16,7 +16,7 @@ public class FrontendStubService {
     }
 
     public StubMapping clearLearningCache(String userId, String courseId) {
-        MappingBuilder mappingBuilder = WireMock.post(getBaseUrlPathPattern(String.format("caches/user/%s/clear-learning/%s", userId, courseId)));
+        MappingBuilder mappingBuilder = WireMock.post(getBaseUrlPathPattern(String.format("api/caches/user/%s/clear-learning/%s", userId, courseId)));
         return stubFor(
                 mappingBuilder
                         .withHeader("Authorization", equalTo("Bearer token"))
