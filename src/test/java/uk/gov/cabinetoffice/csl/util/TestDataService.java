@@ -48,7 +48,7 @@ public class TestDataService {
             new BasicOrganisationalUnit(4, "HMRC", "HMRC")
     ));
     private final Grade grade = new Grade(1L, "SEO", "Senior Executive Officer");
-    private final Profession profession = new Profession(3L, "DDaT");
+    private final AreaOfWork profession = new AreaOfWork(3L, "DDaT");
 
 
     public UserDetailsDto generateUserDetailsDto() {
@@ -182,51 +182,45 @@ public class TestDataService {
         organisationalUnits1.setParentId(null);
         organisationalUnits1.setAbbreviation("OName1");
         organisationalUnits1.setCode("ON1");
-        organisationalUnits1.setHref("https://hostname/organisationalUnits/1");
         organisationalUnits.add(organisationalUnits1);
 
         OrganisationalUnit organisationalUnits2 = new OrganisationalUnit();
         organisationalUnits2.setId(2L);
         organisationalUnits2.setName("OrgName2");
         organisationalUnits2.setParentId(1L);
-        organisationalUnits1.setAbbreviation("OName2");
-        organisationalUnits1.setCode("ON2");
-        organisationalUnits1.setHref("https://hostname/organisationalUnits/2");
+        organisationalUnits2.setCode("ON2");
+        organisationalUnits2.setDomains(List.of(new Domain(1L, "domain2.com", LocalDateTime.of(2025, 1, 1, 10, 0, 0))));
         organisationalUnits.add(organisationalUnits2);
 
         OrganisationalUnit organisationalUnits3 = new OrganisationalUnit();
         organisationalUnits3.setId(3L);
         organisationalUnits3.setName("OrgName3");
         organisationalUnits3.setParentId(2L);
-        organisationalUnits1.setAbbreviation("OName3");
-        organisationalUnits1.setCode("ON3");
-        organisationalUnits1.setHref("https://hostname/organisationalUnits/3");
+        organisationalUnits3.setAbbreviation("OName3");
+        organisationalUnits3.setCode("ON3");
         organisationalUnits.add(organisationalUnits3);
 
         OrganisationalUnit organisationalUnits4 = new OrganisationalUnit();
         organisationalUnits4.setId(4L);
         organisationalUnits4.setName("OrgName4");
         organisationalUnits4.setParentId(3L);
-        organisationalUnits1.setAbbreviation("OName4");
-        organisationalUnits1.setCode("ON4");
-        organisationalUnits1.setHref("https://hostname/organisationalUnits/4");
+        organisationalUnits4.setAbbreviation("OName4");
+        organisationalUnits4.setCode("ON4");
         organisationalUnits.add(organisationalUnits4);
 
         OrganisationalUnit organisationalUnits5 = new OrganisationalUnit();
         organisationalUnits5.setId(5L);
         organisationalUnits5.setName("OrgName5");
         organisationalUnits5.setParentId(1L);
-        organisationalUnits1.setAbbreviation("OName5");
-        organisationalUnits1.setCode("ON5");
-        organisationalUnits1.setHref("https://hostname/organisationalUnits/5");
+        organisationalUnits5.setAbbreviation("OName5");
+        organisationalUnits5.setCode("ON5");
         organisationalUnits.add(organisationalUnits5);
 
         OrganisationalUnit organisationalUnits6 = new OrganisationalUnit();
         organisationalUnits6.setId(6L);
         organisationalUnits6.setName("OrgName6");
-        organisationalUnits1.setAbbreviation("OName6");
-        organisationalUnits1.setCode("ON6");
-        organisationalUnits1.setHref("https://hostname/organisationalUnits/6");
+        organisationalUnits6.setAbbreviation("OName6");
+        organisationalUnits6.setCode("ON6");
         organisationalUnits.add(organisationalUnits6);
 
         return organisationalUnits;

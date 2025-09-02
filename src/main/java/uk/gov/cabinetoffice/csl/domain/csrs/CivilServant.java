@@ -17,11 +17,14 @@ public class CivilServant {
     private String uid;
     private Grade grade;
     private OrganisationalUnit organisationalUnit;
-    private Profession profession;
+    private AreaOfWork profession;
     private String lineManagerEmail;
     private String lineManagerName;
 
     public List<OrganisationalUnit> getDepartmentHierarchy() {
+        if (organisationalUnit == null) {
+            return new ArrayList<>();
+        }
         ArrayList<OrganisationalUnit> orgs = new ArrayList<>(Collections.singletonList(organisationalUnit));
         OrganisationalUnit parent = organisationalUnit.getParent();
         while (parent != null) {

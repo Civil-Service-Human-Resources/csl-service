@@ -5,12 +5,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import uk.gov.cabinetoffice.csl.domain.csrs.Domain;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -37,27 +42,39 @@ public class OrganisationTest extends IntegrationTestBase {
                     "formattedOrganisationalUnitNames": [
                          {
                              "id": 1,
-                             "name": "OrgName1"
+                             "name": "OrgName1 (OName1)",
+                             "code": "ON1",
+                             "abbreviation": "OName1"
                          },
                          {
                              "id": 2,
-                             "name": "OrgName1 | OrgName2"
+                             "name": "OrgName1 (OName1) | OrgName2",
+                             "code": "ON2",
+                             "abbreviation": null
                          },
                          {
                              "id": 3,
-                             "name": "OrgName1 | OrgName2 | OrgName3"
+                             "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)",
+                             "code": "ON3",
+                             "abbreviation":  "OName3"
                          },
                          {
                              "id": 4,
-                             "name": "OrgName1 | OrgName2 | OrgName3 | OrgName4"
+                             "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)",
+                             "code": "ON4",
+                             "abbreviation":  "OName4"
                          },
                          {
                              "id": 5,
-                             "name": "OrgName1 | OrgName5"
+                             "name": "OrgName1 (OName1) | OrgName5 (OName5)",
+                             "code": "ON5",
+                             "abbreviation":  "OName5"
                          },
                          {
                              "id": 6,
-                             "name": "OrgName6"
+                             "name": "OrgName6 (OName6)",
+                             "code": "ON6",
+                             "abbreviation":  "OName6"
                          }
                     ]
                 }
@@ -65,7 +82,58 @@ public class OrganisationTest extends IntegrationTestBase {
 
         mockMvc.perform(get("/organisations/formatted_list")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> utils.toJson(expectedFormattedOrganisations))
+                .andExpect(content().json(expectedFormattedOrganisations, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void testFormattedOrganisationsListWithFilter() throws Exception {
+        OrganisationalUnitsPagedResponse organisationalUnits = testDataService.generateOrganisationalUnitsPagedResponse();
+        organisationalUnits.getContent().get(3).setDomains(List.of(new Domain(1L, "domain2.com", LocalDateTime.of(2025, 1, 1, 10, 0, 0))));
+        cslStubService.stubGetOrganisations(organisationalUnits);
+        String expectedFormattedOrganisations = """
+                {
+                    "formattedOrganisationalUnitNames": [
+                        {
+                          "id": 1,
+                          "name": "OrgName1 (OName1)",
+                          "code": "ON1",
+                          "abbreviation": "OName1"
+                        },
+                        {
+                          "id": 2,
+                          "name": "OrgName1 (OName1) | OrgName2",
+                          "code": "ON2",
+                          "abbreviation": null
+                        },
+                        {
+                          "id": 3,
+                          "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)",
+                          "code": "ON3",
+                          "abbreviation": "OName3"
+                        },
+                        {
+                          "id": 4,
+                          "name": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)",
+                          "code": "ON4",
+                          "abbreviation": "OName4"
+                        },
+                        {
+                          "id": 6,
+                          "name": "OrgName6 (OName6)",
+                          "code": "ON6",
+                          "abbreviation": "OName6"
+                        }
+                    ]
+                }
+                """;
+
+        mockMvc.perform(get("/organisations/formatted_list")
+                        .param("domain", "domain2.com")
+                        .param("tierOne", "true")
+                        .param("organisationId", "6")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedFormattedOrganisations, true))
                 .andExpect(status().is2xxSuccessful());
     }
 
@@ -77,82 +145,74 @@ public class OrganisationTest extends IntegrationTestBase {
                     "organisationalUnits": [
                          {
                              "id": 1,
-                             "name": "OrgName1"
+                             "name": "OrgName1",
                              "code": "ON1",
-                             "abbreviation": "ON1",
-                             "formattedName": "OrgName1",
-                             "href": "https://hostname/organisationalUnits/1",
+                             "abbreviation": "OName1",
+                             "formattedName": "OrgName1 (OName1)",
                              "parentId": null,
                              "parent": null,
-                             "children": null,
-                             "domains":
-                             [],
+                             "domains": null,
                              "agencyToken": null
                          },
                          {
                              "id": 2,
-                             "name": "OrgName2"
+                             "name": "OrgName2",
                              "code": "ON2",
-                             "abbreviation": "ON2",
-                             "formattedName": "OrgName1 | OrgName2",
-                             "href": "https://hostname/organisationalUnits/2",
+                             "abbreviation": null,
+                             "formattedName": "OrgName1 (OName1) | OrgName2",
                              "parentId": 1,
                              "parent": null,
-                             "children": null,
-                             "domains":
-                             [],
+                             "domains": [
+                                  {
+                                    "id": 1,
+                                    "domain": "domain2.com",
+                                    "createdTimestamp": "2025-01-01T10:00:00"
+                                  }
+                             ],
                              "agencyToken": null
                          },
                          {
                              "id": 3,
-                             "name": "OrgName3"
+                             "name": "OrgName3",
                              "code": "ON3",
-                             "abbreviation": "ON3",
-                             "formattedName": "OrgName1 | OrgName2 | OrgName3",
-                             "href": "https://hostname/organisationalUnits/3",
+                             "abbreviation": "OName3",
+                             "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)",
                              "parentId": 2,
                              "parent": null,
-                             "children": null,
-                             "domains": [],
+                             "domains": null,
                              "agencyToken": null
                          },
                          {
                              "id": 4,
-                             "name": "OrgName4"
+                             "name": "OrgName4",
                              "code": "ON4",
-                             "abbreviation": "ON4",
-                             "formattedName": "OrgName1 | OrgName2 | OrgName3 | OrgName4",
-                             "href": "https://hostname/organisationalUnits/4",
+                             "abbreviation": "OName4",
+                             "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)",
                              "parentId": 3,
                              "parent": null,
-                             "children": null,
-                             "domains": [],
+                             "domains": null,
                              "agencyToken": null
                          },
                          {
                              "id": 5,
-                             "name": "OrgName5"
+                             "name": "OrgName5",
                              "code": "ON5",
-                             "abbreviation": "ON5",
-                             "formattedName": "OrgName1 | OrgName5",
-                             "href": "https://hostname/organisationalUnits/5",
+                             "abbreviation": "OName5",
+                             "formattedName": "OrgName1 (OName1) | OrgName5 (OName5)",
                              "parentId": 1,
                              "parent": null,
-                             "children": null,
-                             "domains": [],
+                             "domains": null,
                              "agencyToken": null
                          },
                          {
                              "id": 6,
                              "name": "OrgName6",
                              "code": "ON6",
-                             "abbreviation": "ON6",
-                             "formattedName": "OrgName6",
-                             "href": "https://hostname/organisationalUnits/6",
+                             "abbreviation": "OName6",
+                             "formattedName": "OrgName6 (OName6)",
                              "parentId": null,
                              "parent": null,
-                             "children": null,
-                             "domains": [],
+                             "domains": null,
                              "agencyToken": null
                          }
                     ]
@@ -161,7 +221,7 @@ public class OrganisationTest extends IntegrationTestBase {
 
         mockMvc.perform(get("/organisations/full")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> utils.toJson(expectedOrganisations))
+                .andExpect(content().json(expectedOrganisations, true))
                 .andExpect(status().is2xxSuccessful());
     }
 }

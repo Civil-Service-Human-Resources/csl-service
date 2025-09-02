@@ -2,25 +2,27 @@ package uk.gov.cabinetoffice.csl.controller.model;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateReportRequestParams extends GetCourseCompletionsParams {
+public class CreateReportRequestWithSelectedOrganisationIdsParams extends SelectedOrganisationIdsCourseCompletionsParams {
 
     @NotNull
-    private String userId;
+    protected String userId;
 
     @NotNull
-    private String userEmail;
+    protected String userEmail;
 
     @NotNull
     @ValidFrontendUrl
-    private String downloadBaseUrl;
+    protected String downloadBaseUrl;
 
-    private String fullName;
+    protected String fullName;
 
 }

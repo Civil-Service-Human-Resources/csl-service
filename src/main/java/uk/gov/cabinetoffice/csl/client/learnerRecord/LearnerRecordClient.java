@@ -99,6 +99,21 @@ public class LearnerRecordClient implements ILearnerRecordClient {
                 .stream().map(learnerRecordFactory::transformLearnerRecord).toList();
     }
 
+    @Override
+    public List<LearnerRecordEvent> getLearnerRecordEvents(LearnerRecordEventQuery query) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(configParams.getLearnerRecordEventsUrl());
+        if (!isEmpty(query.getEventTypes())) {
+            uriBuilder.queryParam("eventTypes", query.getEventTypes());
+        }
+        if (!isEmpty(query.getResourceIds())) {
+            uriBuilder.queryParam("resourceIds", query.getResourceIds());
+        }
+        if (!isEmpty(query.getUserId())) {
+            uriBuilder.queryParam("userId", query.getUserId());
+        }
+        return httpClient.getPaginatedRequest(LearnerRecordEventPagedResponse.class, uriBuilder, configParams.getLearnerRecordsMaxPageSize());
+    }
+
     private <Output, Input> List<Output> processBulkResourceOutput(BulkCreateOutput<Output, Input> response) {
         if (!response.getFailedResources().isEmpty()) {
             String message = response.getFailedResources().stream()

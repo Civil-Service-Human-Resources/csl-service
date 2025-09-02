@@ -32,6 +32,46 @@ public class CSRSStubService {
         );
     }
 
+    public StubMapping patchCivilServant(String expectedInput) {
+        return stubFor(
+                WireMock.patch(urlPathEqualTo("/csrs/civilServants/me"))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json"))
+        );
+    }
+
+    public StubMapping patchCivilServantOrganisation(String expectedInput) {
+        return stubFor(
+                WireMock.patch(urlPathEqualTo("/csrs/civilServants/me/organisationalUnit"))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json"))
+        );
+    }
+
+    public StubMapping getAreasOfWork(String response) {
+        return stubFor(
+                WireMock.get(urlPathEqualTo("/csrs/professions/tree"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
+    public StubMapping getGrades(String response) {
+        return stubFor(
+                WireMock.get(urlPathEqualTo("/csrs/grades"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
     public StubMapping getOrganisations(OrganisationalUnitsPagedResponse response) {
         return getOrganisations(utils.toJson(response));
     }

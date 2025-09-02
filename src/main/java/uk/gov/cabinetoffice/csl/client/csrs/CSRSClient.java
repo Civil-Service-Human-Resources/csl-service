@@ -3,12 +3,14 @@ package uk.gov.cabinetoffice.csl.client.csrs;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
-import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
+import uk.gov.cabinetoffice.csl.client.ParallelHttpClient;
+import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
 import java.util.List;
@@ -26,10 +28,18 @@ public class CSRSClient implements ICSRSClient {
     @Value("${csrs.allOrganisationalUnits}")
     private String allOrganisationalUnits;
 
-    private final IHttpClient httpClient;
+    @Value("${csrs.professions}")
+    private String professionsTree;
 
-    public CSRSClient(@Qualifier("csrsHttpClient") IHttpClient httpClient) {
+    @Value("${csrs.grades}")
+    private String grades;
+
+    private final IHttpClient httpClient;
+    private final OrganisationalUnitFactory organisationalUnitFactory;
+
+    public CSRSClient(@Qualifier("csrsHttpClient") ParallelHttpClient httpClient, OrganisationalUnitFactory organisationalUnitFactory) {
         this.httpClient = httpClient;
+        this.organisationalUnitFactory = organisationalUnitFactory;
     }
 
     @Override
@@ -41,11 +51,45 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public List<OrganisationalUnit> getAllOrganisationalUnits() {
+    @Cacheable("organisations")
+    public OrganisationalUnitMap getAllOrganisationalUnits() {
         log.info("Getting all organisational units");
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(allOrganisationalUnits);
-        return httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
+        List<OrganisationalUnit> organisationalUnits = httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
                 .stream().toList();
+        return organisationalUnitFactory.buildOrganisationalUnits(organisationalUnits);
     }
 
+    @Override
+    @Cacheable("areas-of-work")
+    public List<AreaOfWork> getAreasOfWork() {
+        return httpClient.executeTypeReferenceRequest(
+                RequestEntity.get(professionsTree).build(),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+    }
+
+    @Override
+    @Cacheable("grades")
+    public List<Grade> getGrades() {
+        GetGradesResponse response = httpClient.executeTypeReferenceRequest(
+                RequestEntity.get(grades).build(),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        return response.getGrades();
+    }
+
+    @Override
+    public void patchCivilServant(PatchCivilServantDto patch) {
+        String url = String.format("%s/me", civilServants);
+        httpClient.executeRequest(RequestEntity.patch(url).body(patch.getAsApiParams()), Void.class);
+    }
+
+    @Override
+    public void patchCivilServantOrganisation(UpdateOrganisationDTO updateOrganisationDTO) {
+        String url = String.format("%s/me/organisationalUnit", civilServants);
+        httpClient.executeRequest(RequestEntity.patch(url).body(updateOrganisationDTO), Void.class);
+    }
 }

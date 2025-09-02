@@ -22,6 +22,8 @@ public interface ILearnerRecordClient {
 
     List<LearnerRecord> getLearnerRecords(LearnerRecordQuery query);
 
+    List<LearnerRecordEvent> getLearnerRecordEvents(LearnerRecordEventQuery query);
+
     List<LearnerRecord> createLearnerRecords(List<LearnerRecordDto> newLearnerRecords);
 
     List<LearnerRecordEvent> createLearnerRecordEvents(List<LearnerRecordEventDto> newLearnerRecordEvents);
