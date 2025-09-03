@@ -50,6 +50,7 @@ class RequiredLearningServiceTest {
 
     {
         when(course1.getId()).thenReturn("course1");
+        when(course1.shouldBeDisplayed()).thenReturn(true);
         when(course1.getLearningPeriodForUser(user)).thenReturn(Optional.of(new LearningPeriod(
                 LocalDate.of(2024, 6, 1), LocalDate.of(2025, 6, 1)
         )));
@@ -65,7 +66,8 @@ class RequiredLearningServiceTest {
         when(course2.getTitle()).thenReturn("course 2");
         when(course2.getShortDescription()).thenReturn("short description for course 2");
         when(course2.getCourseType()).thenReturn("blended");
-        when(course2.getDurationInMinutes()).thenReturn(3600);
+        when(course2.getDurationInSeconds()).thenReturn(3600);
+        when(course2.shouldBeDisplayed()).thenReturn(true);
         when(course2.getLearningPeriodForUser(user)).thenReturn(Optional.of(new LearningPeriod(
                 LocalDate.of(2025, 1, 1), LocalDate.of(2025, 6, 1)
         )));
@@ -95,10 +97,13 @@ class RequiredLearningServiceTest {
         when(learnerRecordDataUtils.getCompletionDatesForCourses("userId", List.of("course1", "course2"))).thenReturn(
                 Map.of("course1", courseCompletion1, "course2", courseCompletion2)
         );
+        ModuleRecordCollection moduleRecords = new ModuleRecordCollection();
+        moduleRecords.addAll(List.of(moduleRecord1, moduleRecord2));
+        moduleRecords.setLatestUpdatedDate(LocalDateTime.of(2025, 2, 1, 10, 0, 0, 0));
         when(learnerRecordDataUtils.getModuleRecordsForCourses(List.of("course2"), List.of(
                 new ModuleRecordResourceId("userId", "m1"),
                 new ModuleRecordResourceId("userId", "m2")
-        ))).thenReturn(Map.of("course2", List.of(moduleRecord1, moduleRecord2)));
+        ))).thenReturn(Map.of("course2", moduleRecords));
         RequiredLearning result = requiredLearningService.getRequiredLearning("userId");
         assertEquals(1, result.getCourses().size());
         assertEquals("course2", result.getCourses().get(0).getId());

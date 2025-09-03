@@ -14,7 +14,7 @@ class LearningPeriodFactoryTest {
     Clock clock = Clock.fixed(Instant.parse("2023-01-01T10:00:00.000Z"), ZoneId.of("Europe/London"));
     LearningPeriodFactory learningPeriodFactory = new LearningPeriodFactory(clock);
     private final Audience audience = new Audience();
-
+    
     @Test
     public void testGenerateLearningPeriodWithYearFrequency() {
         audience.setFrequency("P1Y");

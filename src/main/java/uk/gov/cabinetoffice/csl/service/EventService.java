@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.learnerRecord.ILearnerRecordClient;
-import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
-import uk.gov.cabinetoffice.csl.controller.model.CancelBookingDto;
-import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
-import uk.gov.cabinetoffice.csl.controller.model.EventResponse;
+import uk.gov.cabinetoffice.csl.controller.model.*;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.IModuleAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ModuleRecordActionFactory;
@@ -63,16 +60,18 @@ public class EventService {
         return processCourseRecordActionWithResponse(courseId, moduleId, eventId, action);
     }
 
-    public EventResponse cancelBookingWithBookingId(String courseId, String moduleId, String eventId, String bookingId, CancelBookingDto cancelBookingDto) {
+    public BookingResponse cancelBookingWithBookingId(String courseId, String moduleId, String eventId, String bookingId, CancelBookingDto cancelBookingDto) {
         BookingDto dto = bookingService.cancelBookingWithId(eventId, bookingId, cancelBookingDto.getReason());
-        return cancelBooking(dto.getLearner(), courseId, moduleId, eventId);
+        cancelBooking(dto.getLearner(), courseId, moduleId, eventId);
+        return new BookingResponse(bookingId, dto.getLearner());
     }
 
-    public EventResponse approveBookingWithBookingId(String courseId, String moduleId, String eventId, String bookingId) {
+    public BookingResponse approveBookingWithBookingId(String courseId, String moduleId, String eventId, String bookingId) {
         CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
         BookingDto dto = bookingService.approveBookingWithId(eventId, bookingId);
         UserToModuleAction action = new UserToModuleAction(dto.getLearner(), moduleRecordActionFactory.getApproveBookingAction(courseWithModuleWithEvent.getEvent()));
-        return processCourseRecordActionWithResponse(courseWithModuleWithEvent, action);
+        processCourseRecordActionWithResponse(courseWithModuleWithEvent, action);
+        return new BookingResponse(bookingId, dto.getLearner());
     }
 
     private EventResponse processCourseRecordActionWithResponse(CourseWithModuleWithEvent courseWithModuleWithEvent, UserToModuleAction action) {
@@ -96,7 +95,7 @@ public class EventService {
         moduleActionService.processModuleActions(courseWithModuleWithEvent, actions);
     }
 
-    public void cancelEvent(String courseId, String moduleId, String eventId, CancelEventDto cancelEventDto) {
+    public CancelEventResponse cancelEvent(String courseId, String moduleId, String eventId, CancelEventDto cancelEventDto) {
         CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
         List<BookingDto> activeBookings = bookingService.getBookings(eventId)
                 .stream().filter(b -> !b.getStatus().equals(BookingStatus.CANCELLED)).toList();
@@ -105,5 +104,6 @@ public class EventService {
         cancelBookings(activeBookings, courseWithModuleWithEvent);
         List<IEmail> emails = notificationFactory.getNotifyUserOfCancelledEventMessage(courseWithModuleWithEvent, activeBookings, cancelEventDto.getReason());
         notificationService.sendEmails(emails);
+        return new CancelEventResponse(courseId, moduleId, eventId, activeBookings.stream().map(BookingDto::getLearner).toList());
     }
 }
