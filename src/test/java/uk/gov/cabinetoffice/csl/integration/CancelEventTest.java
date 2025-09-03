@@ -16,6 +16,7 @@ import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -172,7 +173,9 @@ public class CancelEventTest extends IntegrationTestBase {
                         .content("""
                                 {"reason": "VENUE"}
                                 """))
-                .andExpect(status().is2xxSuccessful());
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {"courseId":"courseId","moduleId":"moduleId","eventId":"eventId","learners":["userId","userId2"]}"""));
         cslStubService.getNotificationServiceStubService().validateSentEmails("NOTIFY_LEARNER_CANCELLED_EVENT", 2);
     }
 

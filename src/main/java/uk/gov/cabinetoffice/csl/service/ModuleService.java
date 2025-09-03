@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.client.frontend.IFrontendClient;
 import uk.gov.cabinetoffice.csl.controller.model.ModuleResponse;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
@@ -20,6 +21,7 @@ import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 public class ModuleService {
 
     private final ModuleActionService moduleActionService;
+    private final IFrontendClient frontendClient;
     private final LearningCatalogueService learningCatalogueService;
     private final RusticiService rusticiService;
     private final UserDetailsService userDetailsService;
@@ -53,6 +55,7 @@ public class ModuleService {
             User user = userDetailsService.getUserWithUid(properties.getLearnerId());
             CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(properties.getCourseId(), properties.getModuleId());
             moduleActionService.rollUpModule(courseWithModule, user, properties);
+            frontendClient.clearLearningCaches(user.getId(), properties.getCourseId());
         }
     }
 

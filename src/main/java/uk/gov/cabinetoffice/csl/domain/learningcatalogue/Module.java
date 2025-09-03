@@ -35,10 +35,10 @@ public class Module implements IChildLearningResource, IParentLearningResource<E
 
     private boolean requiredForCompletion;
 
-    public Integer getDurationInMinutes() {
+    public Integer getDurationInSeconds() {
         if (this.moduleType.equals(ModuleType.facetoface) && !this.events.isEmpty()) {
             Event e = this.events.stream().findFirst().get();
-            return e.getDurationInMinutes();
+            return e.getDurationInSeconds();
         } else {
             return this.duration == null ? 0 : this.duration.intValue();
         }
@@ -57,6 +57,10 @@ public class Module implements IChildLearningResource, IParentLearningResource<E
         } else {
             return events.get(0);
         }
+    }
+
+    public BigDecimal getCost() {
+        return cost == null ? BigDecimal.ZERO : cost;
     }
 
     @JsonIgnore

@@ -11,12 +11,12 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ILearnerRecordActio
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
+import uk.gov.cabinetoffice.csl.service.learning.ModuleRecordCollection;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class CourseRecordFactory {
@@ -34,11 +34,14 @@ public class CourseRecordFactory {
             courseIds.add(courseWithRecord.getCourseId());
             moduleRecordResourceIds.addAll(courseWithRecord.getModuleResourceIds());
         });
-        Map<String, List<ModuleRecord>> courseToModuleRecords = learnerRecordDataUtils.getModuleRecordsForCourses(courseIds, moduleRecordResourceIds);
-        return coursesWithRecord.stream().map(c -> transformToCourseRecord(c, courseToModuleRecords.get(c.getCourseId()))).toList();
+        Map<String, ModuleRecordCollection> courseToModuleRecords = learnerRecordDataUtils.getModuleRecordsForCourses(courseIds, moduleRecordResourceIds);
+        return coursesWithRecord.stream().map(c -> {
+            ModuleRecordCollection moduleRecordCollection = courseToModuleRecords.get(c.getCourseId());
+            return transformToCourseRecord(c, moduleRecordCollection, moduleRecordCollection.getLatestUpdatedDate());
+        }).toList();
     }
 
-    public CourseRecord transformToCourseRecord(CourseWithRecord courseWithRecord, List<ModuleRecord> moduleRecords) {
+    public CourseRecord transformToCourseRecord(CourseWithRecord courseWithRecord, List<ModuleRecord> moduleRecords, LocalDateTime latestModuleUpdatedDate) {
         LocalDateTime lastUpdated = null;
         LearnerRecordEvent latestEvent = courseWithRecord.getLatestEvent();
         CourseRecord courseRecord = new CourseRecord();
@@ -60,22 +63,10 @@ public class CourseRecordFactory {
             lastUpdated = latestEvent.getEventTimestamp();
         }
         courseRecord.setModuleRecords(moduleRecords);
-        if (moduleRecords.size() > 0) {
-            LocalDateTime moduleRecordLastUpdated = moduleRecords.stream()
-                    .peek(mr -> {
-                        if (mr.getState().equals(State.SKIPPED)) {
-                            courseRecord.setState(State.SKIPPED);
-                        }
-                    })
-                    .map(ModuleRecord::getUpdatedAt)
-                    .filter(Objects::nonNull)
-                    .max(LocalDateTime::compareTo)
-                    .orElse(null);
-            if (moduleRecordLastUpdated != null && lastUpdated != null && moduleRecordLastUpdated.isAfter(lastUpdated)) {
-                lastUpdated = moduleRecordLastUpdated;
-                if (!courseRecord.equalsAnyState(State.COMPLETED)) {
-                    courseRecord.setState(State.IN_PROGRESS);
-                }
+        if (latestModuleUpdatedDate != LocalDateTime.MIN && lastUpdated != null && latestModuleUpdatedDate.isAfter(lastUpdated)) {
+            lastUpdated = latestModuleUpdatedDate;
+            if (!courseRecord.equalsAnyState(State.COMPLETED)) {
+                courseRecord.setState(State.IN_PROGRESS);
             }
         }
         courseRecord.setLastUpdated(lastUpdated);

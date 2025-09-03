@@ -199,7 +199,7 @@ public class LearningRecordTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.otherLearning[0].id").value("course3"))
                 .andExpect(jsonPath("$.otherLearning[0].title").value("Course 3"))
                 .andExpect(jsonPath("$.otherLearning[0].type").value("face-to-face"))
-                .andExpect(jsonPath("$.otherLearning[0].duration").value(120))
+                .andExpect(jsonPath("$.otherLearning[0].duration").value(7200))
                 .andExpect(jsonPath("$.otherLearning[0].completionDate").value("2025-01-01T00:00:00"));
 
     }

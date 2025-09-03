@@ -59,7 +59,7 @@ class CourseRecordFactoryTest {
     @Test
     public void testCourseRecordMovedToLP() {
         CourseWithRecord courseWithRecord = generateCourseWithRecord(CourseRecordAction.MOVE_TO_LEARNING_PLAN);
-        CourseRecord result = courseRecordFactory.transformToCourseRecord(courseWithRecord, List.of());
+        CourseRecord result = courseRecordFactory.transformToCourseRecord(courseWithRecord, List.of(), LocalDateTime.MIN);
         assertEquals(Preference.LIKED, result.getPreference());
         assertEquals(State.NULL, result.getState());
         assertEquals(
@@ -76,7 +76,7 @@ class CourseRecordFactoryTest {
         CourseWithRecord courseWithRecord = generateCourseWithRecord(CourseRecordAction.MOVE_TO_LEARNING_PLAN);
         CourseRecord result = courseRecordFactory.transformToCourseRecord(courseWithRecord, List.of(
                 generateSimpleModuleRecord(State.IN_PROGRESS, LocalDateTime.of(2025, 2, 1, 10, 0, 0))
-        ));
+        ), LocalDateTime.of(2025, 2, 1, 10, 0, 0));
         assertEquals(State.IN_PROGRESS, result.getState());
         assertEquals(
                 LocalDateTime.of(2025, 2, 1, 10, 0, 0),
@@ -89,7 +89,7 @@ class CourseRecordFactoryTest {
         CourseWithRecord courseWithRecord = generateCourseWithRecord(CourseRecordAction.COMPLETE_COURSE);
         CourseRecord result = courseRecordFactory.transformToCourseRecord(courseWithRecord, List.of(
                 generateSimpleModuleRecord(State.IN_PROGRESS, LocalDateTime.of(2025, 2, 1, 10, 0, 0))
-        ));
+        ), LocalDateTime.of(2025, 2, 1, 10, 0, 0));
         assertEquals(State.COMPLETED, result.getState());
         assertEquals(
                 LocalDateTime.of(2025, 2, 1, 10, 0, 0),
@@ -102,27 +102,12 @@ class CourseRecordFactoryTest {
         CourseWithRecord courseWithRecord = generateCourseWithRecord(CourseRecordAction.REMOVE_FROM_LEARNING_PLAN);
         CourseRecord result = courseRecordFactory.transformToCourseRecord(courseWithRecord, List.of(
                 generateSimpleModuleRecord(State.IN_PROGRESS, LocalDateTime.of(2024, 1, 1, 10, 0, 0))
-        ));
+        ), LocalDateTime.of(2024, 1, 1, 10, 0, 0));
         assertEquals(State.ARCHIVED, result.getState());
         assertEquals(
                 LocalDateTime.of(2025, 1, 1, 10, 0, 0),
                 result.getLastUpdated()
         );
     }
-
-    @Test
-    public void testCourseRecordSkipped() {
-        CourseWithRecord courseWithRecord = generateCourseWithRecord(CourseRecordAction.MOVE_TO_LEARNING_PLAN);
-        CourseRecord result = courseRecordFactory.transformToCourseRecord(courseWithRecord, List.of(
-                generateSimpleModuleRecord(State.SKIPPED, LocalDateTime.of(2024, 1, 1, 10, 0, 0)),
-                generateSimpleModuleRecord(State.IN_PROGRESS, LocalDateTime.of(2024, 1, 1, 10, 0, 0))
-        ));
-        assertEquals(State.SKIPPED, result.getState());
-        assertEquals(
-                LocalDateTime.of(2025, 1, 1, 10, 0, 0),
-                result.getLastUpdated()
-        );
-    }
-
 
 }
