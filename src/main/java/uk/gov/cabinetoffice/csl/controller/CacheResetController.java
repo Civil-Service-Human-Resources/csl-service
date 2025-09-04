@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.service.IdentityService;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
@@ -24,7 +24,7 @@ public class CacheResetController {
     private final LearnerRecordService learnerRecordService;
     private final IdentityService identityService;
     private final LearningCatalogueService learningCatalogueService;
-    private final OrganisationalUnitListService organisationalUnitService;
+    private final OrganisationalUnitService organisationalUnitService;
     private final UserDetailsService userDetailsService;
 
     @GetMapping(path = "/service-token", produces = "application/json")

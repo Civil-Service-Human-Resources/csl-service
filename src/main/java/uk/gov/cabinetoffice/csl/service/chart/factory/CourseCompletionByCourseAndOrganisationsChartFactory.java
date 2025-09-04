@@ -12,7 +12,7 @@ import uk.gov.cabinetoffice.csl.service.chart.ChartWithBreakdowns;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
 import uk.gov.cabinetoffice.csl.service.chart.builder.CourseCompletionChartBuilderParams;
 import uk.gov.cabinetoffice.csl.service.chart.builder.CourseCompletionsWithOrganisationChartBuilder;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 
 import java.time.ZoneId;
 import java.util.List;
@@ -25,9 +25,9 @@ public class CourseCompletionByCourseAndOrganisationsChartFactory extends Course
 
     private final CourseCompletionsWithOrganisationChartBuilder chartBuilder;
 
-    protected CourseCompletionByCourseAndOrganisationsChartFactory(OrganisationalUnitListService organisationalUnitListService,
+    protected CourseCompletionByCourseAndOrganisationsChartFactory(OrganisationalUnitService organisationalUnitService,
                                                                    IReportServiceClient reportServiceClient, CourseCompletionsWithOrganisationChartBuilder chartBuilder) {
-        super(organisationalUnitListService, reportServiceClient, chartBuilder);
+        super(organisationalUnitService, reportServiceClient, chartBuilder);
         this.chartBuilder = chartBuilder;
     }
 
@@ -56,7 +56,7 @@ public class CourseCompletionByCourseAndOrganisationsChartFactory extends Course
 
     @Override
     protected ChartWithBreakdowns getAggregationsAndBuildCharts(OrganisationIdsCourseCompletionsParams params) {
-        Map<Long, List<OrganisationalUnit>> organisationalMap = organisationalUnitListService.getOrganisationsWithChildrenAsFlatListMap(params.getOrganisationIds());
+        Map<Long, List<OrganisationalUnit>> organisationalMap = organisationalUnitService.getOrganisationsWithChildrenAsFlatListMap(params.getOrganisationIds());
         List<CourseCompletionChartBuilderParams<CourseCompletionWithOrganisationAggregation>> chartBuilderParams = params.getOrganisationIds().stream().map(id -> {
                     List<OrganisationalUnit> organisationalUnits = organisationalMap.get(id);
                     if (organisationalUnits != null) {

@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum CourseStatus {
 
+    DRAFT("Draft"),
     PUBLISHED("Published"),
     ARCHIVED("Archived");
 

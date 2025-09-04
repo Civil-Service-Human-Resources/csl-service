@@ -16,7 +16,7 @@ import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearnin
 import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearningCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.learningResources.course.CourseRecordService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
@@ -36,7 +36,7 @@ public class RequiredLearningService {
     private final CourseRecordService courseRecordService;
     private final LearnerRecordDataUtils learnerRecordDataUtils;
     private final LearningCatalogueService learningCatalogueService;
-    private final OrganisationalUnitListService organisationalUnitListService;
+    private final OrganisationalUnitService organisationalUnitService;
     private final UserDetailsService userDetailsService;
     private final LearningFactory<RequiredLearningDisplayCourseFactory> requiredLearningFactory;
 
@@ -87,7 +87,7 @@ public class RequiredLearningService {
 
     public RequiredLearningMapResponse getRequiredLearningMapForOrganisations(GetRequiredLearningForDepartmentsParams params) {
         Map<Long, List<CourseWithTitle>> result = new HashMap<>();
-        Map<Long, List<OrganisationalUnit>> orgHierarchies = organisationalUnitListService.getHierarchies(params.getOrganisationIds());
+        Map<Long, List<OrganisationalUnit>> orgHierarchies = organisationalUnitService.getHierarchies(params.getOrganisationIds());
         Map<String, List<Course>> courseMap = learningCatalogueService.getRequiredLearningForDepartmentsMap(orgHierarchies.values().stream().flatMap(organisationalUnits -> organisationalUnits.stream().map(OrganisationalUnit::getCode)).collect(Collectors.toSet()));
         orgHierarchies.forEach((key, value) -> {
             List<CourseWithTitle> courses = new ArrayList<>();

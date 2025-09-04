@@ -11,20 +11,20 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart
 import uk.gov.cabinetoffice.csl.service.chart.ChartWithBreakdowns;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
 import uk.gov.cabinetoffice.csl.service.chart.builder.ChartBuilder;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 
 import java.time.ZoneId;
 import java.util.List;
 
 public abstract class CourseCompletionChartFactoryBase<A extends IAggregation> {
 
-    protected final OrganisationalUnitListService organisationalUnitListService;
+    protected final OrganisationalUnitService organisationalUnitService;
     protected final IReportServiceClient reportServiceClient;
     protected final ChartBuilder<A> chartBuilder;
 
-    protected CourseCompletionChartFactoryBase(OrganisationalUnitListService organisationalUnitListService,
+    protected CourseCompletionChartFactoryBase(OrganisationalUnitService organisationalUnitService,
                                                IReportServiceClient reportServiceClient, ChartBuilder<A> chartBuilder) {
-        this.organisationalUnitListService = organisationalUnitListService;
+        this.organisationalUnitService = organisationalUnitService;
         this.reportServiceClient = reportServiceClient;
         this.chartBuilder = chartBuilder;
     }
@@ -42,7 +42,7 @@ public abstract class CourseCompletionChartFactoryBase<A extends IAggregation> {
         params.setProfessionIds(apiParams.getProfessionIds());
         params.setGradeIds(apiParams.getGradeIds());
         if (apiParams.getSelectedOrganisationIds() != null) {
-            params.setOrganisationIds(organisationalUnitListService.getOrganisationsWithChildrenAsFlatList(apiParams.getSelectedOrganisationIds())
+            params.setOrganisationIds(organisationalUnitService.getOrganisationsWithChildrenAsFlatList(apiParams.getSelectedOrganisationIds())
                     .stream().map(OrganisationalUnit::getId).toList());
         }
         return params;

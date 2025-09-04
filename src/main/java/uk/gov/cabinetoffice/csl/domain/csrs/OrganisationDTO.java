@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UpdateOrganisationDTO {
+public class OrganisationDTO {
     private Long organisationalUnitId;
 }

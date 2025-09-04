@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
+import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
+import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
+import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnersOrganisationDeleteMessage;
 
 import java.util.*;
 
@@ -15,8 +18,10 @@ import static com.azure.core.util.CoreUtils.isNullOrEmpty;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class OrganisationalUnitListService {
+public class OrganisationalUnitService {
     private final ICSRSClient civilServantRegistryClient;
+    private final MessageMetadataFactory messageMetadataFactory;
+    private final IMessagingClient messagingClient;
 
     public OrganisationalUnits getAllOrganisationalUnits() {
         log.info("Getting all organisational units");
@@ -74,5 +79,17 @@ public class OrganisationalUnitListService {
 
     public Map<Long, List<OrganisationalUnit>> getHierarchies(List<Long> organisationIds) {
         return civilServantRegistryClient.getAllOrganisationalUnits().getHierarchies(organisationIds);
+    }
+
+    public void deleteOrganisationalUnit(Long organisationalUnitId) {
+        civilServantRegistryClient.deleteOrganisationalUnit(organisationalUnitId);
+        removeOrganisationsFromCache();
+        updateReportingData(organisationalUnitId);
+    }
+
+    private void updateReportingData(Long organisationalUnitId) {
+        log.debug("updateReportingData:organisationalUnitId: {}", organisationalUnitId);
+        RegisteredLearnersOrganisationDeleteMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage(organisationalUnitId);
+        messagingClient.sendMessages(List.of(message));
     }
 }
