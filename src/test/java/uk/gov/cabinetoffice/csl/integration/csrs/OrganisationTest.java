@@ -2,7 +2,6 @@ package uk.gov.cabinetoffice.csl.integration.csrs;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -224,15 +222,6 @@ public class OrganisationTest extends IntegrationTestBase {
         mockMvc.perform(get("/organisations/full")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedOrganisations, true))
-                .andExpect(status().is2xxSuccessful());
-    }
-
-    @Disabled
-    @Test
-    public void testDeleteOrganisationalUnit() throws Exception {
-        cslStubService.stubDeleteOrganisationalUnit(1L);
-        mockMvc.perform(delete("/organisations/1")
-                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
     }
 }
