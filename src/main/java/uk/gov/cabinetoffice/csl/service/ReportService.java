@@ -84,7 +84,7 @@ public class ReportService {
             List<OrganisationalUnit> organisations = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(params.getOrganisationIds());
             params.setOrganisationIds(organisations.stream().map(OrganisationalUnit::getId).toList());
         }
-        return reportServiceClient.postReportExportRequest(ReportType.COURSE_COMPLETIONS, params);
+        return reportServiceClient.postReportExportRequest(ReportType.REGISTERED_LEARNER, params);
     }
 
     @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")
