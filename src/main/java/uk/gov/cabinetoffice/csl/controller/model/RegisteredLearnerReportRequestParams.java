@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class RegisteredLearnerReportRequestParams {
     @Size(min = 1)
-    protected List<Long> organisationIds;
+    protected List<Long> selectedOrganisationIds;
 
     @NotNull
     protected String userId;
@@ -32,6 +32,6 @@ public class RegisteredLearnerReportRequestParams {
     protected String fullName;
 
     public List<Long> getSelectedOrganisationIds() {
-        return this.organisationIds == null ? new ArrayList<>() : this.organisationIds;
+        return this.selectedOrganisationIds == null ? new ArrayList<>() : this.selectedOrganisationIds;
     }
 }
