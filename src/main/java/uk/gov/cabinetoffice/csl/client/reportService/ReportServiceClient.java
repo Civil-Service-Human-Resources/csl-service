@@ -15,6 +15,7 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.ReportType;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.Aggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionWithOrganisationAggregation;
+import uk.gov.cabinetoffice.csl.domain.reportservice.reportRequest.ReportRequest;
 
 import java.util.List;
 
@@ -62,10 +63,11 @@ public class ReportServiceClient implements IReportServiceClient {
     }
 
     @Override
-    public GetReportRequestsResponse getReportExportRequest(ReportType reportType, String userId, List<String> statuses) {
+    public <T extends ReportRequest> GetReportRequestsResponse<T> getReportExportRequest(ReportType reportType, String userId, List<String> statuses) {
         String url = String.format("%s?userId=%s&status=%s", config.getReportRequestUrl(reportType), userId, String.join(",", statuses));
         RequestEntity<Void> request = RequestEntity.get(url).build();
-        return httpClient.executeRequest(request, GetReportRequestsResponse.class);
+        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
+        });
     }
 
     @Override

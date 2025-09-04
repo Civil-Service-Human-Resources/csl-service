@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -29,4 +30,8 @@ public class RegisteredLearnerReportRequestParams {
     protected String downloadBaseUrl;
 
     protected String fullName;
+
+    public List<Long> getSelectedOrganisationIds() {
+        return this.organisationIds == null ? new ArrayList<>() : this.organisationIds;
+    }
 }

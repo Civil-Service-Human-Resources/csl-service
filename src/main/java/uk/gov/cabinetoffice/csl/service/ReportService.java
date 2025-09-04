@@ -23,6 +23,7 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.RegisteredLearnerOverview;
 import uk.gov.cabinetoffice.csl.domain.reportservice.ReportType;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.IAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
+import uk.gov.cabinetoffice.csl.domain.reportservice.reportRequest.RegisteredLearnerReportRequest;
 import uk.gov.cabinetoffice.csl.service.chart.ChartFactoryService;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
 import uk.gov.cabinetoffice.csl.service.chart.factory.CourseCompletionChartFactoryBase;
@@ -80,7 +81,7 @@ public class ReportService {
 
     @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")
     public AddReportRequestResponse requestRegisteredLearnerExport(RegisteredLearnerReportRequestParams params) {
-        if (params.getOrganisationIds() != null) {
+        if (params.getSelectedOrganisationIds() != null) {
             List<OrganisationalUnit> organisations = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(params.getOrganisationIds());
             params.setOrganisationIds(organisations.stream().map(OrganisationalUnit::getId).toList());
         }
@@ -103,7 +104,7 @@ public class ReportService {
     }
 
     public RegisteredLearnerOverview getRegisteredLearnerOverview(IdentityDto user) {
-        GetReportRequestsResponse reportExportRequest = reportServiceClient.getReportExportRequest(ReportType.REGISTERED_LEARNER, user.getUid(), List.of("REQUESTED", "PROCESSING"));
+        GetReportRequestsResponse<RegisteredLearnerReportRequest> reportExportRequest = reportServiceClient.getReportExportRequest(ReportType.REGISTERED_LEARNER, user.getUid(), List.of("REQUESTED", "PROCESSING"));
         return new RegisteredLearnerOverview(reportExportRequest.hasRequests());
     }
 }
