@@ -19,6 +19,7 @@ import uk.gov.cabinetoffice.csl.util.Cacheable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Objects;
 
 @Data
@@ -79,6 +80,10 @@ public class ModuleRecord implements Cacheable {
         return Objects.requireNonNullElse(this.state, State.NULL);
     }
 
+    public boolean equalsStates(State... states) {
+        return Arrays.asList(states).contains(getState());
+    }
+
     @JsonIgnore
     public State getStateForLearningPeriod(@Nullable LearningPeriod learningPeriod) {
         State state = getState();
@@ -104,6 +109,11 @@ public class ModuleRecord implements Cacheable {
     @JsonIgnore
     public String getLearnerRecordIdAsString() {
         return getLearnerRecordId().getAsString();
+    }
+
+    @JsonIgnore
+    public boolean isEventModule() {
+        return getEventId() != null && getEventDate() != null;
     }
 
 }

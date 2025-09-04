@@ -116,6 +116,7 @@ public class RusticiRollUpTest extends IntegrationTestBase {
         cslStubService.stubUpdateModuleRecord(course, testDataService.getModuleId(), testDataService.getUserId(),
                 getModuleRecordsResponse, expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
         cslStubService.getLearnerRecord().createLearnerRecords(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
+        cslStubService.getFrontend().clearLearningCache(testDataService.getUserId(), course.getId());
         mockMvc.perform(post("/rustici/rollup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(utils.toJson(rollupData)))
@@ -234,6 +235,7 @@ public class RusticiRollUpTest extends IntegrationTestBase {
         stubs.add(cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("moduleId0", "moduleId1"), expectedModuleRecordGET));
         stubs.add(cslStubService.getLearnerRecord().updateModuleRecords(expectedModuleRecordPUT, expectedModuleRecordPUTResponse));
         stubs.add(cslStubService.getLearnerRecord().createLearnerRecordEvent(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse));
+        stubs.add(cslStubService.getFrontend().clearLearningCache(testDataService.getUserId(), testCourse.getId()));
         mockMvc.perform(post("/rustici/rollup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(utils.toJson(blendedRollup)))
@@ -283,6 +285,7 @@ public class RusticiRollUpTest extends IntegrationTestBase {
                 """;
         cslStubService.stubUpdateModuleRecord(course, testDataService.getModuleId(), testDataService.getUserId(),
                 getModuleRecordsResponse, expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
+        cslStubService.getFrontend().clearLearningCache(testDataService.getUserId(), course.getId());
         mockMvc.perform(post("/rustici/rollup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(utils.toJson(failedRollUpData)))

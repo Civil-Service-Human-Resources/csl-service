@@ -9,6 +9,7 @@ import java.util.Set;
 @Builder
 @Data
 public class LearnerRecordQuery {
+    private List<String> notEventTypes;
     private List<String> learnerRecordTypes;
     private Set<String> resourceIds;
     private Set<String> learnerIds;

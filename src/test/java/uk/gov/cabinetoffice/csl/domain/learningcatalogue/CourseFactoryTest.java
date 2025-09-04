@@ -35,6 +35,7 @@ class CourseFactoryTest {
         when(learningPeriodFactory.buildLearningPeriod(any())).thenReturn(genericLearningPeriod);
     }
 
+
     @Test
     public void testGetRequiredModules() {
         Module mod1 = generateModule("mod1", false);
