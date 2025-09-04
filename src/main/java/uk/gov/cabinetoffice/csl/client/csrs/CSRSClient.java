@@ -54,7 +54,6 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    @Cacheable("organisations")
     public OrganisationalUnitMap getAllOrganisationalUnits() {
         log.info("Getting all organisational units");
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(allOrganisationalUnits);

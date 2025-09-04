@@ -28,6 +28,9 @@ import static org.mockito.Mockito.when;
 class OrganisationalUnitServiceTest {
 
     @Mock
+    OrganisationalUnitMapCache organisationalUnitMapCache;
+
+    @Mock
     private ICSRSClient csrs;
 
     @InjectMocks
@@ -35,7 +38,7 @@ class OrganisationalUnitServiceTest {
 
     @BeforeEach
     public void setUp() {
-        OrganisationalUnitMap map = OrganisationalUnitMap.buildFromList(getAllOrgs());
+        OrganisationalUnitMap map = OrganisationalUnitMap.buildFromList(getAllOrganisationalUnits());
         when(csrs.getAllOrganisationalUnits()).thenReturn(map);
     }
 
@@ -73,7 +76,7 @@ class OrganisationalUnitServiceTest {
         assertEquals("OrgName1 (OName1) | OrgName5 (OName5)", orgMap.get(5L).getName());
     }
 
-    private List<OrganisationalUnit> getAllOrgs() {
+    private List<OrganisationalUnit> getAllOrganisationalUnits() {
 
         Domain domain1 = new Domain(1L, "domain1.com", LocalDateTime.now());
         Domain domain2 = new Domain(2L, "domain2.com", LocalDateTime.now());

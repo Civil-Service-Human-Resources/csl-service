@@ -1,8 +1,7 @@
 package uk.gov.cabinetoffice.csl.service.csrs;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
@@ -15,26 +14,37 @@ import java.util.*;
 
 import static com.azure.core.util.CoreUtils.isNullOrEmpty;
 
-@Service
 @Slf4j
-@AllArgsConstructor
+@Service
+@RequiredArgsConstructor
 public class OrganisationalUnitService {
+
+    private final OrganisationalUnitMapCache organisationalUnitMapCache;
     private final ICSRSClient civilServantRegistryClient;
     private final MessageMetadataFactory messageMetadataFactory;
     private final IMessagingClient messagingClient;
 
+    public OrganisationalUnitMap getOrganisationalUnitMap() {
+        OrganisationalUnitMap map = organisationalUnitMapCache.get();
+        if (map == null) {
+            map = civilServantRegistryClient.getAllOrganisationalUnits();
+            organisationalUnitMapCache.put(map);
+        }
+        return map;
+    }
+
     public OrganisationalUnits getAllOrganisationalUnits() {
         log.info("Getting all organisational units");
-        return new OrganisationalUnits(civilServantRegistryClient.getAllOrganisationalUnits().values().stream().toList());
+        return new OrganisationalUnits(getOrganisationalUnitMap().values().stream().toList());
     }
 
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(OrganisationalUnitsParams params) {
-        OrganisationalUnitMap allOrgs = civilServantRegistryClient.getAllOrganisationalUnits();
+        OrganisationalUnitMap allOrganisationalUnits = getOrganisationalUnitMap();
         Set<OrganisationalUnit> filtered = new HashSet<>();
         if (params.shouldGetAll()) {
-            filtered.addAll(allOrgs.values());
+            filtered.addAll(allOrganisationalUnits.values());
         } else {
-            for (OrganisationalUnit organisationalUnit : allOrgs.values()) {
+            for (OrganisationalUnit organisationalUnit : allOrganisationalUnits.values()) {
                 boolean add = false;
                 if (params.hasOrganisationIds(organisationalUnit.getId())) {
                     add = true;
@@ -42,7 +52,7 @@ public class OrganisationalUnitService {
                     if (params.isTierOne()) {
                         Long currentParentId = organisationalUnit.getParentId();
                         while (currentParentId != null) {
-                            OrganisationalUnit currentParent = allOrgs.get(currentParentId);
+                            OrganisationalUnit currentParent = allOrganisationalUnits.get(currentParentId);
                             filtered.add(currentParent);
                             currentParentId = currentParent.getParentId();
                         }
@@ -61,29 +71,35 @@ public class OrganisationalUnitService {
     }
 
     public List<OrganisationalUnit> getOrganisationsWithChildrenAsFlatList(List<Long> organisationIds) {
-        return civilServantRegistryClient.getAllOrganisationalUnits()
+        return getOrganisationalUnitMap()
                 .getMultiple(organisationIds, true);
     }
 
     public Map<Long, List<OrganisationalUnit>> getOrganisationsWithChildrenAsFlatListMap(List<Long> organisationIds) {
         Map<Long, List<OrganisationalUnit>> response = new HashMap<>();
-        OrganisationalUnitMap organisationalUnitMap = civilServantRegistryClient.getAllOrganisationalUnits();
+        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
         organisationIds.forEach(id -> response.put(id, organisationalUnitMap.getMultiple(List.of(id), true)));
         return response;
     }
 
-    @CacheEvict(value = "organisations", allEntries = true)
-    public void removeOrganisationsFromCache() {
+    public void removeAllOrganisationalUnitsFromCache() {
+        organisationalUnitMapCache.evict();
         log.info("Organisations are removed from the cache.");
     }
 
+    public void removeOrganisationalUnitFromCache(Long organisationalUnitId) {
+        log.info("removeCourseFromCache: OrganisationalUnitId is removed from the cache for the" +
+                " key: {}.", organisationalUnitId);
+        organisationalUnitMapCache.get().remove(organisationalUnitId);
+    }
+
     public Map<Long, List<OrganisationalUnit>> getHierarchies(List<Long> organisationIds) {
-        return civilServantRegistryClient.getAllOrganisationalUnits().getHierarchies(organisationIds);
+        return getOrganisationalUnitMap().getHierarchies(organisationIds);
     }
 
     public void deleteOrganisationalUnit(Long organisationalUnitId) {
         civilServantRegistryClient.deleteOrganisationalUnit(organisationalUnitId);
-        removeOrganisationsFromCache();
+        removeOrganisationalUnitFromCache(organisationalUnitId);
         updateReportingData(organisationalUnitId);
     }
 

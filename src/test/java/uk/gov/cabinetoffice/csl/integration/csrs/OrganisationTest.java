@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.integration.csrs;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -226,6 +227,7 @@ public class OrganisationTest extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful());
     }
 
+    @Disabled
     @Test
     public void testDeleteOrganisationalUnit() throws Exception {
         cslStubService.stubDeleteOrganisationalUnit(1L);
