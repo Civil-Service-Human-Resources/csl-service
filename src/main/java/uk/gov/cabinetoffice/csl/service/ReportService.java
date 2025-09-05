@@ -22,7 +22,7 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart
 import uk.gov.cabinetoffice.csl.service.chart.ChartFactoryService;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
 import uk.gov.cabinetoffice.csl.service.chart.factory.CourseCompletionChartFactoryBase;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 
 import java.time.ZoneId;
 import java.util.List;
@@ -36,7 +36,7 @@ public class ReportService {
 
     private final IReportServiceClient reportServiceClient;
     private final ChartFactoryService chartFactoryService;
-    private final OrganisationalUnitListService organisationalUnitService;
+    private final OrganisationalUnitService organisationalUnitService;
 
     public CourseCompletionChart getCourseCompletionsChart(SelectedOrganisationIdsCourseCompletionsParams params, IdentityDto user) {
         CourseCompletionChartType type;

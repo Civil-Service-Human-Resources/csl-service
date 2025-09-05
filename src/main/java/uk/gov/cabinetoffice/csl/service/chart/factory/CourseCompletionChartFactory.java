@@ -7,14 +7,14 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.Aggregation;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
 import uk.gov.cabinetoffice.csl.service.chart.builder.ChartBuilder;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 
 @Component
 public class CourseCompletionChartFactory extends CourseCompletionChartFactoryBase<Aggregation> {
 
-    protected CourseCompletionChartFactory(OrganisationalUnitListService organisationalUnitListService,
+    protected CourseCompletionChartFactory(OrganisationalUnitService organisationalUnitService,
                                            IReportServiceClient reportServiceClient, ChartBuilder<Aggregation> chartBuilder) {
-        super(organisationalUnitListService, reportServiceClient, chartBuilder);
+        super(organisationalUnitService, reportServiceClient, chartBuilder);
     }
 
     @Override
