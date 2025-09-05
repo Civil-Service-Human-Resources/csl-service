@@ -7,9 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -29,6 +27,10 @@ public class OrganisationalUnit implements Serializable {
 
     // Custom data
     private String formattedName;
+
+    @JsonIgnore
+    private AgencyToken inheritedAgencyToken;
+
     @JsonIgnore
     private Set<Long> childIds = new HashSet<>();
 
@@ -42,13 +44,16 @@ public class OrganisationalUnit implements Serializable {
 
     @JsonIgnore
     public boolean hasDomain(String domain) {
-        if (this.domains == null) {
-            return false;
+        boolean hasDomain = Objects.requireNonNullElse(this.domains, new ArrayList<Domain>()).stream().anyMatch(d -> d.getDomain().equals(domain));
+        if (!hasDomain) {
+            hasDomain = getAgencyTokenOrInherited().map(a -> a.hasDomain(domain)).orElse(false);
         }
+        return hasDomain;
+    }
 
-        return this.domains.stream().map(d -> d.domain)
-                .toList()
-                .contains(domain);
+    @JsonIgnore
+    public Optional<AgencyToken> getAgencyTokenOrInherited() {
+        return this.agencyToken == null ? Optional.ofNullable(this.inheritedAgencyToken) : Optional.of(this.agencyToken);
     }
 
     @JsonIgnore
