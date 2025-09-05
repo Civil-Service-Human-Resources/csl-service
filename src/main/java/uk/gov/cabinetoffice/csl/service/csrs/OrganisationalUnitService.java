@@ -82,17 +82,6 @@ public class OrganisationalUnitService {
         return response;
     }
 
-    public void removeAllOrganisationalUnitsFromCache() {
-        organisationalUnitMapCache.evict();
-        log.info("Organisations are removed from the cache.");
-    }
-
-    public void removeOrganisationalUnitFromCache(Long organisationalUnitId) {
-        log.info("removeCourseFromCache: OrganisationalUnitId is removed from the cache for the" +
-                " key: {}.", organisationalUnitId);
-        organisationalUnitMapCache.get().remove(organisationalUnitId);
-    }
-
     public Map<Long, List<OrganisationalUnit>> getHierarchies(List<Long> organisationIds) {
         return getOrganisationalUnitMap().getHierarchies(organisationIds);
     }
@@ -107,5 +96,20 @@ public class OrganisationalUnitService {
         log.debug("updateReportingData:organisationalUnitId: {}", organisationalUnitId);
         RegisteredLearnersOrganisationDeleteMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage(organisationalUnitId);
         messagingClient.sendMessages(List.of(message));
+    }
+
+    public void removeAllOrganisationalUnitsFromCache() {
+        organisationalUnitMapCache.evict();
+        log.info("Organisations are removed from the cache.");
+    }
+
+    public void removeOrganisationalUnitsFromCache(Long... organisationalUnitIds) {
+        Arrays.stream(organisationalUnitIds).forEach(this::removeOrganisationalUnitFromCache);
+    }
+
+    public void removeOrganisationalUnitFromCache(Long organisationalUnitId) {
+        log.info("removeCourseFromCache: OrganisationalUnitId is removed from the cache for the" +
+                " key: {}.", organisationalUnitId);
+        organisationalUnitMapCache.get().remove(organisationalUnitId);
     }
 }
