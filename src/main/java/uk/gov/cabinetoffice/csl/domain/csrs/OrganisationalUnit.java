@@ -27,6 +27,8 @@ public class OrganisationalUnit implements Serializable {
 
     // Custom data
     private String formattedName;
+
+    @JsonIgnore
     private AgencyToken inheritedAgencyToken;
 
     @JsonIgnore
