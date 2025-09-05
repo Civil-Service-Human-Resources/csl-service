@@ -89,6 +89,7 @@ public class OrganisationalUnitService {
     public void deleteOrganisationalUnit(Long organisationalUnitId) {
         civilServantRegistryClient.deleteOrganisationalUnit(organisationalUnitId);
         removeOrganisationalUnitAndChildrenFromCache(organisationalUnitId);
+        //TODO: Get the list of organisationalUnitId including parent and its children
         updateReportingData(organisationalUnitId);
     }
 
