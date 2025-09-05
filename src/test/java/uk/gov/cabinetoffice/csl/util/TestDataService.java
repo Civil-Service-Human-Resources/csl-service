@@ -240,6 +240,15 @@ public class TestDataService {
         organisationalUnits8.setCode("ON8");
         organisationalUnits.add(organisationalUnits8);
 
+        OrganisationalUnit organisationalUnits9 = new OrganisationalUnit();
+        organisationalUnits9.setId(9L);
+        organisationalUnits9.setParentId(7L);
+        organisationalUnits9.setName("OrgName9");
+        organisationalUnits9.setAbbreviation("OName9");
+        organisationalUnits9.setCode("ON9");
+        organisationalUnits9.setAgencyToken(new AgencyToken(2L, "token", "uid", 1, Set.of(new AgencyDomain(2L, "agency2.com"))));
+        organisationalUnits.add(organisationalUnits9);
+
         return organisationalUnits;
     }
 }

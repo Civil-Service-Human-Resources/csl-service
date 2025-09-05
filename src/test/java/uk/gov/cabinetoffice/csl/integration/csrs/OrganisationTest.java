@@ -87,6 +87,12 @@ public class OrganisationTest extends IntegrationTestBase {
                           "name": "OrgName7 (OName7) | OrgName8 (OName8)",
                           "code": "ON8",
                           "abbreviation": "OName8"
+                        },
+                        {
+                          "id": 9,
+                          "name": "OrgName7 (OName7) | OrgName9 (OName9)",
+                          "code": "ON9",
+                          "abbreviation": "OName9"
                         }
                     ]
                 }
@@ -289,6 +295,28 @@ public class OrganisationTest extends IntegrationTestBase {
                              "parent": null,
                              "domains": null,
                              "agencyToken": null
+                         },
+                         {
+                             "id": 9,
+                             "name": "OrgName9",
+                             "code": "ON9",
+                             "abbreviation": "OName9",
+                             "formattedName": "OrgName7 (OName7) | OrgName9 (OName9)",
+                             "parentId": 7,
+                             "parent": null,
+                             "domains": null,
+                             "agencyToken": {
+                                "id": 2,
+                                "token": "token",
+                                "uid": "uid",
+                                "capacity": 1,
+                                "agencyDomains": [
+                                  {
+                                    "id": 2,
+                                    "domain": "agency2.com"
+                                  }
+                                ]
+                             }
                          }
                     ]
                 }

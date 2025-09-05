@@ -20,7 +20,7 @@ public class OrganisationalUnitFactory {
                             parentOrganisationalUnit.addChildId(o.getId());
                             parents++;
                         }
-                        if (parentOrganisationalUnit.getAgencyToken() != null && o.getInheritedAgencyToken() == null) {
+                        if (parentOrganisationalUnit.getAgencyToken() != null && o.getAgencyTokenOrInherited().isEmpty()) {
                             o.setInheritedAgencyToken(parentOrganisationalUnit.getAgencyToken());
                         }
                         formattedName.insert(0, parentOrganisationalUnit.getNameWithAbbreviation() + " | ");
