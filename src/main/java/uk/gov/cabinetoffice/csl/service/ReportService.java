@@ -9,11 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
-import uk.gov.cabinetoffice.csl.controller.model.CourseCompletionReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithSelectedOrganisationIdsParams;
 import uk.gov.cabinetoffice.csl.controller.model.RegisteredLearnerReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.SelectedOrganisationIdsCourseCompletionsParams;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.error.ForbiddenException;
 import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
 import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
@@ -27,9 +25,9 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.reportRequest.RegisteredLea
 import uk.gov.cabinetoffice.csl.service.chart.ChartFactoryService;
 import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
 import uk.gov.cabinetoffice.csl.service.chart.factory.CourseCompletionChartFactoryBase;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
+import uk.gov.cabinetoffice.csl.service.report.params.CourseCompletionReportRequestParams;
+import uk.gov.cabinetoffice.csl.service.report.params.CreateRegisteredLearnerReportRequestParams;
 
-import java.time.ZoneId;
 import java.util.List;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -40,8 +38,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class ReportService {
 
     private final IReportServiceClient reportServiceClient;
+    private final ReportRequestParamFactory reportRequestParamFactory;
     private final ChartFactoryService chartFactoryService;
-    private final OrganisationalUnitListService organisationalUnitService;
 
     public CourseCompletionChart getCourseCompletionsChart(SelectedOrganisationIdsCourseCompletionsParams params, IdentityDto user) {
         CourseCompletionChartType type;
@@ -60,32 +58,14 @@ public class ReportService {
 
     @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")
     public AddReportRequestResponse requestCourseCompletionsExport(CreateReportRequestWithSelectedOrganisationIdsParams params) {
-        CourseCompletionReportRequestParams createReportServiceReportRequestParams = new CourseCompletionReportRequestParams();
-        createReportServiceReportRequestParams.setStartDate(params.getStartDate());
-        createReportServiceReportRequestParams.setEndDate(params.getEndDate());
-        createReportServiceReportRequestParams.setTimezone(ZoneId.of(params.getTimezone()));
-        createReportServiceReportRequestParams.setCourseIds(params.getCourseIds());
-        createReportServiceReportRequestParams.setProfessionIds(params.getProfessionIds());
-        createReportServiceReportRequestParams.setGradeIds(params.getGradeIds());
-        createReportServiceReportRequestParams.setUserId(params.getUserId());
-        createReportServiceReportRequestParams.setUserEmail(params.getUserEmail());
-        createReportServiceReportRequestParams.setDownloadBaseUrl(params.getDownloadBaseUrl());
-        createReportServiceReportRequestParams.setFullName(params.getFullName());
-        if (params.getSelectedOrganisationIds() != null) {
-            List<OrganisationalUnit> organisations = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(params.getSelectedOrganisationIds());
-            createReportServiceReportRequestParams.setOrganisationIds(organisations.stream().map(OrganisationalUnit::getId).toList());
-        }
-
-        return reportServiceClient.postReportExportRequest(ReportType.COURSE_COMPLETIONS, createReportServiceReportRequestParams);
+        CourseCompletionReportRequestParams requestParams = reportRequestParamFactory.getCourseCompletionReportRequestParams(params);
+        return reportServiceClient.postReportExportRequest(ReportType.COURSE_COMPLETIONS, requestParams);
     }
 
     @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")
     public AddReportRequestResponse requestRegisteredLearnerExport(RegisteredLearnerReportRequestParams params) {
-        if (params.getSelectedOrganisationIds() != null) {
-            List<OrganisationalUnit> organisations = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(params.getSelectedOrganisationIds());
-            params.setSelectedOrganisationIds(organisations.stream().map(OrganisationalUnit::getId).toList());
-        }
-        return reportServiceClient.postReportExportRequest(ReportType.REGISTERED_LEARNER, params);
+        CreateRegisteredLearnerReportRequestParams requestParams = reportRequestParamFactory.getRegisteredLearnerReportRequestParams(params);
+        return reportServiceClient.postReportExportRequest(ReportType.REGISTERED_LEARNER, requestParams);
     }
 
     @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")

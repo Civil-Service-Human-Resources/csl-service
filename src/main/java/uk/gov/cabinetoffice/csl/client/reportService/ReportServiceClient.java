@@ -16,6 +16,7 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.Aggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionWithOrganisationAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.reportRequest.ReportRequest;
+import uk.gov.cabinetoffice.csl.service.report.params.IOrganisationalReportRequestParams;
 
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class ReportServiceClient implements IReportServiceClient {
     }
 
     @Override
-    public <T> AddReportRequestResponse postReportExportRequest(ReportType reportType, T body) {
+    public <T extends IOrganisationalReportRequestParams> AddReportRequestResponse postReportExportRequest(ReportType reportType, T body) {
         log.debug("Submitting course completion export request '{}'", body);
         RequestEntity<T> request = RequestEntity.post(config.getReportRequestUrl(reportType)).body(body);
         return httpClient.executeRequest(request, AddReportRequestResponse.class);

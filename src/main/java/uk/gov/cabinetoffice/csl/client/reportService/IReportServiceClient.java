@@ -10,6 +10,7 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.Aggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionWithOrganisationAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.reportRequest.ReportRequest;
+import uk.gov.cabinetoffice.csl.service.report.params.IOrganisationalReportRequestParams;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface IReportServiceClient {
 
     AggregationResponse<CourseCompletionWithOrganisationAggregation> getCourseCompletionAggregationsByCourseAndOrganisation(OrganisationIdsCourseCompletionsParams body);
 
-    <T> AddReportRequestResponse postReportExportRequest(ReportType reportType, T params);
+    <T extends IOrganisationalReportRequestParams> AddReportRequestResponse postReportExportRequest(ReportType reportType, T params);
 
     <T extends ReportRequest> GetReportRequestsResponse<T> getReportExportRequest(ReportType reportType, String userId, List<String> statuses);
 

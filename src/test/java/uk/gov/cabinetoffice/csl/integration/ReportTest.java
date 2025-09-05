@@ -426,7 +426,7 @@ public class ReportTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testRequestReport() throws Exception {
+    public void testRequestCourseCompletionsReport() throws Exception {
         String reportRequestsResponse = """
                 {
                     "addedSuccessfully": true,
@@ -442,6 +442,7 @@ public class ReportTest extends IntegrationTestBase {
                     "organisationIds":[1, 2],
                     "userEmail": "email",
                     "userId": "id",
+                    "fullName": "Test Name",
                     "downloadBaseUrl": "http://localhost:3005/download"
                 }
                 """;
@@ -455,6 +456,7 @@ public class ReportTest extends IntegrationTestBase {
                     "selectedOrganisationIds":[1, 2],
                     "userEmail": "email",
                     "userId": "id",
+                    "fullName": "Test Name",
                     "downloadBaseUrl": "http://localhost:3005/download"
                 }
                 """;
@@ -476,8 +478,63 @@ public class ReportTest extends IntegrationTestBase {
         organisationalUnitsPagedResponse.setSize(2);
 
         cslStubService.getCsrsStubService().getOrganisations(organisationalUnitsPagedResponse);
-        cslStubService.getReportServiceStubService().postReportRequest(inputForReportRequest, reportRequestsResponse);
+        cslStubService.getReportServiceStubService().postReportRequest("course-completions", inputForReportRequest, reportRequestsResponse);
         mockMvc.perform(post("/admin/reporting/course-completions/request-source-data")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("REPORT_EXPORT")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(inputForRequestSourceData))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.addedSuccessfully").value(true))
+                .andExpect(jsonPath("$.details").value("addedSuccessfully"));
+    }
+
+    @Test
+    public void testRequestRegisteredLearnersReport() throws Exception {
+        String reportRequestsResponse = """
+                {
+                    "addedSuccessfully": true,
+                    "details": "addedSuccessfully"
+                }
+                """;
+        String inputForReportRequest = """
+                {
+                    "organisationIds":[1, 2],
+                    "userEmail": "email",
+                    "userId": "id",
+                    "fullName": "Test Name",
+                    "downloadBaseUrl": "http://localhost:3005/download"
+                }
+                """;
+
+        String inputForRequestSourceData = """
+                {
+                    "selectedOrganisationIds":[1, 2],
+                    "userEmail": "email",
+                    "userId": "id",
+                    "fullName": "Test Name",
+                    "downloadBaseUrl": "http://localhost:3005/download"
+                }
+                """;
+
+        OrganisationalUnit org1 = new OrganisationalUnit();
+        org1.setId(1L);
+        org1.setName("Org1");
+        OrganisationalUnit org2 = new OrganisationalUnit();
+        org2.setId(2L);
+        org2.setName("Org2");
+        List<OrganisationalUnit> orgs = new ArrayList<>();
+        orgs.add(org1);
+        orgs.add(org2);
+
+        OrganisationalUnitsPagedResponse organisationalUnitsPagedResponse = new OrganisationalUnitsPagedResponse();
+        organisationalUnitsPagedResponse.setContent(orgs);
+        organisationalUnitsPagedResponse.setTotalPages(1);
+        organisationalUnitsPagedResponse.setTotalElements(2);
+        organisationalUnitsPagedResponse.setSize(2);
+
+        cslStubService.getCsrsStubService().getOrganisations(organisationalUnitsPagedResponse);
+        cslStubService.getReportServiceStubService().postReportRequest("registered-learners", inputForReportRequest, reportRequestsResponse);
+        mockMvc.perform(post("/admin/reporting/registered-learners/request-source-data")
                         .with(jwt().authorities(new SimpleGrantedAuthority("REPORT_EXPORT")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(inputForRequestSourceData))

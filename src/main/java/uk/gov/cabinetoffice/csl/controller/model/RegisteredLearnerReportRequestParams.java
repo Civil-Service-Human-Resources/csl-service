@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.gov.cabinetoffice.csl.service.report.params.ISelectedOrganisationalReportRequestParams;
 import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisteredLearnerReportRequestParams {
+public class RegisteredLearnerReportRequestParams implements ISelectedOrganisationalReportRequestParams {
     @Size(min = 1)
     protected List<Long> selectedOrganisationIds;
 
@@ -29,6 +30,7 @@ public class RegisteredLearnerReportRequestParams {
     @ValidFrontendUrl
     protected String downloadBaseUrl;
 
+    @NotNull
     protected String fullName;
 
     public List<Long> getSelectedOrganisationIds() {
