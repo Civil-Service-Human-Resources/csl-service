@@ -87,6 +87,36 @@ public class OrganisationTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testFormattedOrganisationsListForAgency() throws Exception {
+        OrganisationalUnitsPagedResponse organisationalUnits = testDataService.generateOrganisationalUnitsPagedResponse();
+        cslStubService.stubGetOrganisations(organisationalUnits);
+        String expectedFormattedOrganisations = """
+                {
+                    "formattedOrganisationalUnitNames": [
+                        {
+                          "id": 7,
+                          "name": "OrgName7 (OName7)",
+                          "code": "ON7",
+                          "abbreviation": "OName7"
+                        },
+                        {
+                          "id": 8,
+                          "name": "OrgName7 (OName7) | OrgName8 (OName8)",
+                          "code": "ON8",
+                          "abbreviation": "OName8"
+                        }
+                    ]
+                }
+                """;
+
+        mockMvc.perform(get("/organisations/formatted_list")
+                        .param("domain", "agency.com")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedFormattedOrganisations, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
     public void testFormattedOrganisationsListWithFilter() throws Exception {
         OrganisationalUnitsPagedResponse organisationalUnits = testDataService.generateOrganisationalUnitsPagedResponse();
         organisationalUnits.getContent().get(3).setDomains(List.of(new Domain(1L, "domain2.com", LocalDateTime.of(2025, 1, 1, 10, 0, 0))));

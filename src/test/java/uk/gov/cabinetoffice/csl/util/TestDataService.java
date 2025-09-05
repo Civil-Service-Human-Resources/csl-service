@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Getter
@@ -222,6 +223,22 @@ public class TestDataService {
         organisationalUnits6.setAbbreviation("OName6");
         organisationalUnits6.setCode("ON6");
         organisationalUnits.add(organisationalUnits6);
+
+        OrganisationalUnit organisationalUnits7 = new OrganisationalUnit();
+        organisationalUnits7.setId(7L);
+        organisationalUnits7.setName("OrgName7");
+        organisationalUnits7.setAbbreviation("OName7");
+        organisationalUnits7.setCode("ON7");
+        organisationalUnits7.setAgencyToken(new AgencyToken(1L, "token", "uid", 1, Set.of(new AgencyDomain(1L, "agency.com"))));
+        organisationalUnits.add(organisationalUnits7);
+
+        OrganisationalUnit organisationalUnits8 = new OrganisationalUnit();
+        organisationalUnits8.setId(8L);
+        organisationalUnits8.setParentId(7L);
+        organisationalUnits8.setName("OrgName8");
+        organisationalUnits8.setAbbreviation("OName8");
+        organisationalUnits8.setCode("ON8");
+        organisationalUnits.add(organisationalUnits8);
 
         return organisationalUnits;
     }
