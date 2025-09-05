@@ -88,7 +88,7 @@ public class OrganisationalUnitService {
 
     public void deleteOrganisationalUnit(Long organisationalUnitId) {
         civilServantRegistryClient.deleteOrganisationalUnit(organisationalUnitId);
-        removeOrganisationalUnitFromCache(organisationalUnitId);
+        removeOrganisationalUnitAndChildrenFromCache(organisationalUnitId);
         updateReportingData(organisationalUnitId);
     }
 
@@ -103,13 +103,13 @@ public class OrganisationalUnitService {
         log.info("Organisations are removed from the cache.");
     }
 
-    public void removeOrganisationalUnitsFromCache(Long... organisationalUnitIds) {
-        Arrays.stream(organisationalUnitIds).forEach(this::removeOrganisationalUnitFromCache);
+    public void removeOrganisationalUnitsFromCache(Collection<Long> organisationalUnitIds) {
+        organisationalUnitIds.forEach(organisationalUnitId -> organisationalUnitMapCache.get().remove(organisationalUnitId));
     }
 
-    public void removeOrganisationalUnitFromCache(Long organisationalUnitId) {
-        log.info("removeCourseFromCache: OrganisationalUnitId is removed from the cache for the" +
-                " key: {}.", organisationalUnitId);
-        organisationalUnitMapCache.get().remove(organisationalUnitId);
+    public void removeOrganisationalUnitAndChildrenFromCache(Long organisationalUnitId) {
+        log.info("Removing organisationalUnit and its children FromCache for the organisationalUnitId: {}.", organisationalUnitId);
+        //TODO: Get the list of organisationalUnitId including parent and its children
+        removeOrganisationalUnitsFromCache(List.of(organisationalUnitId));
     }
 }
