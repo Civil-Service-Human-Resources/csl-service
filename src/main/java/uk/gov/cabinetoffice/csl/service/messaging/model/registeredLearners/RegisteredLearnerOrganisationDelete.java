@@ -7,6 +7,6 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
-public class RegisteredLearnersOrganisationDelete {
+public class RegisteredLearnerOrganisationDelete {
     private final List<Long> organisationIds;
 }

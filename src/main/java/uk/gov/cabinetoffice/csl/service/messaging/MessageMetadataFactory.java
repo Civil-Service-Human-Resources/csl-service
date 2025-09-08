@@ -38,7 +38,7 @@ public class MessageMetadataFactory {
         return new RegisteredLearnerEmailUpdateMessage(new RegisteredLearnerEmailUpdate(uid, email));
     }
 
-    public RegisteredLearnersOrganisationDeleteMessage generateRegisteredLearnersOrganisationDeleteMessage(List<Long> organisationIds) {
-        return new RegisteredLearnersOrganisationDeleteMessage(new RegisteredLearnersOrganisationDelete(organisationIds));
+    public RegisteredLearnerOrganisationDeleteMessage generateRegisteredLearnersOrganisationDeleteMessage(List<Long> organisationIds) {
+        return new RegisteredLearnerOrganisationDeleteMessage(new RegisteredLearnerOrganisationDelete(organisationIds));
     }
 }

@@ -8,7 +8,7 @@ import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
-import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnersOrganisationDeleteMessage;
+import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerOrganisationDeleteMessage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -100,7 +100,7 @@ public class OrganisationalUnitService {
 
     private void updateReportingData(List<Long> organisationIds) {
         log.debug("updateReportingData:organisationalUnitIds: {}", organisationIds);
-        RegisteredLearnersOrganisationDeleteMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage(organisationIds);
+        RegisteredLearnerOrganisationDeleteMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage(organisationIds);
         messagingClient.sendMessages(List.of(message));
     }
 
