@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnersOrganisationDeleteMessage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.azure.core.util.CoreUtils.isNullOrEmpty;
 
@@ -75,6 +76,11 @@ public class OrganisationalUnitService {
                 .getMultiple(organisationIds, true);
     }
 
+    public List<Long> getOrganisationsIdsIncludingParentAndChildren(List<Long> organisationIds) {
+        return getOrganisationsWithChildrenAsFlatList(organisationIds)
+                .stream().map(OrganisationalUnit::getId).collect(Collectors.toList());
+    }
+
     public Map<Long, List<OrganisationalUnit>> getOrganisationsWithChildrenAsFlatListMap(List<Long> organisationIds) {
         Map<Long, List<OrganisationalUnit>> response = new HashMap<>();
         OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
@@ -89,13 +95,13 @@ public class OrganisationalUnitService {
     public void deleteOrganisationalUnit(Long organisationalUnitId) {
         civilServantRegistryClient.deleteOrganisationalUnit(organisationalUnitId);
         removeOrganisationalUnitAndChildrenFromCache(organisationalUnitId);
-        //TODO: Get the list of organisationalUnitId including parent and its children
-        updateReportingData(organisationalUnitId);
+        updateReportingData(getOrganisationsIdsIncludingParentAndChildren(List.of(organisationalUnitId)));
     }
 
-    private void updateReportingData(Long organisationalUnitId) {
-        log.debug("updateReportingData:organisationalUnitId: {}", organisationalUnitId);
-        RegisteredLearnersOrganisationDeleteMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage(organisationalUnitId);
+    private void updateReportingData(List<Long> organisationIds) {
+        log.debug("updateReportingData:organisationalUnitIds: {}", organisationIds);
+        //TODO: update the signature of messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage to receive list of organisationIds
+        RegisteredLearnersOrganisationDeleteMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage(organisationIds.get(0));
         messagingClient.sendMessages(List.of(message));
     }
 
@@ -104,13 +110,12 @@ public class OrganisationalUnitService {
         log.info("Organisations are removed from the cache.");
     }
 
-    public void removeOrganisationalUnitsFromCache(Collection<Long> organisationalUnitIds) {
-        organisationalUnitIds.forEach(organisationalUnitId -> organisationalUnitMapCache.get().remove(organisationalUnitId));
+    public void removeOrganisationalUnitsFromCache(List<Long> organisationIds) {
+        organisationIds.forEach(organisationalUnitId -> organisationalUnitMapCache.get().remove(organisationalUnitId));
     }
 
     public void removeOrganisationalUnitAndChildrenFromCache(Long organisationalUnitId) {
         log.info("Removing organisationalUnit and its children FromCache for the organisationalUnitId: {}.", organisationalUnitId);
-        //TODO: Get the list of organisationalUnitId including parent and its children
-        removeOrganisationalUnitsFromCache(List.of(organisationalUnitId));
+        removeOrganisationalUnitsFromCache(getOrganisationsIdsIncludingParentAndChildren(List.of(organisationalUnitId)));
     }
 }

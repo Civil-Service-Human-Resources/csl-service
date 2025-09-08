@@ -43,7 +43,7 @@ class OrganisationalUnitServiceTest {
     @Test
     public void shouldReturnAllOrganisationalUnits() {
         OrganisationalUnitMap organisationalUnitMap = organisationalUnitService.getOrganisationalUnitMap();
-        log.debug("organisationalUnitMap:"  + organisationalUnitMap);
+        log.debug("organisationalUnitMap: " + organisationalUnitMap);
         Set<Long> actualOrgIds = organisationalUnitMap.keySet();
         Set<Long> expectedOrgIds = Set.of(1L, 2L, 3L, 4L, 5L, 6L);
         assertEquals(expectedOrgIds, actualOrgIds);
@@ -52,81 +52,108 @@ class OrganisationalUnitServiceTest {
     @Test
     public void shouldReturnOrganisationsWithChildrenAsFlatList() {
         List<OrganisationalUnit> organisationsWithChildrenAsFlatList1 = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(List.of(1L));
-        log.debug("organisationsWithChildrenAsFlatList for id=1:"  + organisationsWithChildrenAsFlatList1);
+        log.debug("organisationsWithChildrenAsFlatList for id=1: " + organisationsWithChildrenAsFlatList1);
         assertEquals(5, organisationsWithChildrenAsFlatList1.size());
 
         List<OrganisationalUnit> organisationsWithChildrenAsFlatList2 = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(List.of(2L));
-        log.debug("organisationsWithChildrenAsFlatList for id=2:"  + organisationsWithChildrenAsFlatList2);
+        log.debug("organisationsWithChildrenAsFlatList for id=2: " + organisationsWithChildrenAsFlatList2);
         assertEquals(3, organisationsWithChildrenAsFlatList2.size());
 
         List<OrganisationalUnit> organisationsWithChildrenAsFlatList3 = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(List.of(3L));
-        log.debug("organisationsWithChildrenAsFlatList for id=3:"  + organisationsWithChildrenAsFlatList3);
+        log.debug("organisationsWithChildrenAsFlatList for id=3: " + organisationsWithChildrenAsFlatList3);
         assertEquals(2, organisationsWithChildrenAsFlatList3.size());
 
         List<OrganisationalUnit> organisationsWithChildrenAsFlatList4 = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(List.of(4L));
-        log.debug("organisationsWithChildrenAsFlatList for id=4:"  + organisationsWithChildrenAsFlatList4);
+        log.debug("organisationsWithChildrenAsFlatList for id=4: " + organisationsWithChildrenAsFlatList4);
         assertEquals(1, organisationsWithChildrenAsFlatList4.size());
 
         List<OrganisationalUnit> organisationsWithChildrenAsFlatList5 = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(List.of(5L));
-        log.debug("organisationsWithChildrenAsFlatList for id=5:"  + organisationsWithChildrenAsFlatList5);
+        log.debug("organisationsWithChildrenAsFlatList for id=5: " + organisationsWithChildrenAsFlatList5);
         assertEquals(1, organisationsWithChildrenAsFlatList5.size());
 
         List<OrganisationalUnit> organisationsWithChildrenAsFlatList6 = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(List.of(6L));
-        log.debug("organisationsWithChildrenAsFlatList for id=6:"  + organisationsWithChildrenAsFlatList6);
+        log.debug("organisationsWithChildrenAsFlatList for id=6: " + organisationsWithChildrenAsFlatList6);
         assertEquals(1, organisationsWithChildrenAsFlatList6.size());
+    }
+
+    @Test
+    public void shouldReturnOrganisationsIdsIncludingParentAndChildren() {
+        List<Long> organisationsIdsIncludingParentAndChildren1 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(1L));
+        log.debug("organisationsWithChildrenAsFlatList for id=1: "  + organisationsIdsIncludingParentAndChildren1);
+        assertEquals(5, organisationsIdsIncludingParentAndChildren1.size());
+
+        List<Long> organisationsIdsIncludingParentAndChildren2 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(2L));
+        log.debug("organisationsWithChildrenAsFlatList for id=2: "  + organisationsIdsIncludingParentAndChildren2);
+        assertEquals(3, organisationsIdsIncludingParentAndChildren2.size());
+
+        List<Long> organisationsIdsIncludingParentAndChildren3 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(3L));
+        log.debug("organisationsWithChildrenAsFlatList for id=3: "  + organisationsIdsIncludingParentAndChildren3);
+        assertEquals(2, organisationsIdsIncludingParentAndChildren3.size());
+
+        List<Long> organisationsIdsIncludingParentAndChildren4 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(4L));
+        log.debug("organisationsWithChildrenAsFlatList for id=4: "  + organisationsIdsIncludingParentAndChildren4);
+        assertEquals(1, organisationsIdsIncludingParentAndChildren4.size());
+
+        List<Long> organisationsIdsIncludingParentAndChildren5 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(5L));
+        log.debug("organisationsWithChildrenAsFlatList for id=5: "  + organisationsIdsIncludingParentAndChildren5);
+        assertEquals(1, organisationsIdsIncludingParentAndChildren5.size());
+
+        List<Long> organisationsIdsIncludingParentAndChildren6 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(6L));
+        log.debug("organisationsWithChildrenAsFlatList for id=6: "  + organisationsIdsIncludingParentAndChildren6);
+        assertEquals(1, organisationsIdsIncludingParentAndChildren6.size());
     }
 
     @Test
     public void shouldReturnOrganisationsWithChildrenAsFlatListMap() {
         Map<Long, List<OrganisationalUnit>> organisationsWithChildrenAsFlatListMap1 = organisationalUnitService.getOrganisationsWithChildrenAsFlatListMap(List.of(1L));
-        log.debug("organisationsWithChildrenAsFlatListMap1 for id=1:"  + organisationsWithChildrenAsFlatListMap1);
+        log.debug("organisationsWithChildrenAsFlatListMap1 for id=1: " + organisationsWithChildrenAsFlatListMap1);
         assertEquals(5, organisationsWithChildrenAsFlatListMap1.get(1L).size());
 
         Map<Long, List<OrganisationalUnit>> organisationsWithChildrenAsFlatListMap2 = organisationalUnitService.getOrganisationsWithChildrenAsFlatListMap(List.of(2L));
-        log.debug("organisationsWithChildrenAsFlatListMap1 for id=2:"  + organisationsWithChildrenAsFlatListMap2);
+        log.debug("organisationsWithChildrenAsFlatListMap1 for id=2: " + organisationsWithChildrenAsFlatListMap2);
         assertEquals(3, organisationsWithChildrenAsFlatListMap2.get(2L).size());
 
         Map<Long, List<OrganisationalUnit>> organisationsWithChildrenAsFlatListMap3 = organisationalUnitService.getOrganisationsWithChildrenAsFlatListMap(List.of(3L));
-        log.debug("organisationsWithChildrenAsFlatListMap1 for id=3:"  + organisationsWithChildrenAsFlatListMap3);
+        log.debug("organisationsWithChildrenAsFlatListMap1 for id=3: " + organisationsWithChildrenAsFlatListMap3);
         assertEquals(2, organisationsWithChildrenAsFlatListMap3.get(3L).size());
 
         Map<Long, List<OrganisationalUnit>> organisationsWithChildrenAsFlatListMap4 = organisationalUnitService.getOrganisationsWithChildrenAsFlatListMap(List.of(4L));
-        log.debug("organisationsWithChildrenAsFlatListMap1 for id=4:"  + organisationsWithChildrenAsFlatListMap4);
+        log.debug("organisationsWithChildrenAsFlatListMap1 for id=4: " + organisationsWithChildrenAsFlatListMap4);
         assertEquals(1, organisationsWithChildrenAsFlatListMap4.get(4L).size());
 
         Map<Long, List<OrganisationalUnit>> organisationsWithChildrenAsFlatListMap5 = organisationalUnitService.getOrganisationsWithChildrenAsFlatListMap(List.of(5L));
-        log.debug("organisationsWithChildrenAsFlatListMap5 for id=5:"  + organisationsWithChildrenAsFlatListMap5);
+        log.debug("organisationsWithChildrenAsFlatListMap5 for id=5: " + organisationsWithChildrenAsFlatListMap5);
         assertEquals(1, organisationsWithChildrenAsFlatListMap5.get(5L).size());
 
         Map<Long, List<OrganisationalUnit>> organisationsWithChildrenAsFlatListMap6 = organisationalUnitService.getOrganisationsWithChildrenAsFlatListMap(List.of(6L));
-        log.debug("organisationsWithChildrenAsFlatListMap1 for id=6:"  + organisationsWithChildrenAsFlatListMap6);
+        log.debug("organisationsWithChildrenAsFlatListMap1 for id=6: " + organisationsWithChildrenAsFlatListMap6);
         assertEquals(1, organisationsWithChildrenAsFlatListMap6.get(6L).size());
     }
 
     @Test
-    public void shouldReturnHierarchies() {
+    public void shouldReturnOrganisationHierarchies() {
         Map<Long, List<OrganisationalUnit>> hierarchies1 = organisationalUnitService.getHierarchies(List.of(1L));
-        log.debug("hierarchies1 for id=1:"  + hierarchies1);
+        log.debug("hierarchies1 for id=1: " + hierarchies1);
         assertEquals(1, hierarchies1.get(1L).size());
 
         Map<Long, List<OrganisationalUnit>> hierarchies2 = organisationalUnitService.getHierarchies(List.of(2L));
-        log.debug("hierarchies1 for id=2:"  + hierarchies2);
+        log.debug("hierarchies1 for id=2: " + hierarchies2);
         assertEquals(2, hierarchies2.get(2L).size());
 
         Map<Long, List<OrganisationalUnit>> hierarchies3 = organisationalUnitService.getHierarchies(List.of(3L));
-        log.debug("hierarchies1 for id=3:"  + hierarchies3);
+        log.debug("hierarchies1 for id=3: " + hierarchies3);
         assertEquals(3, hierarchies3.get(3L).size());
 
         Map<Long, List<OrganisationalUnit>> hierarchies4 = organisationalUnitService.getHierarchies(List.of(4L));
-        log.debug("hierarchies1 for id=4:"  + hierarchies4);
+        log.debug("hierarchies1 for id=4: " + hierarchies4);
         assertEquals(4, hierarchies4.get(4L).size());
 
         Map<Long, List<OrganisationalUnit>> hierarchies5 = organisationalUnitService.getHierarchies(List.of(5L));
-        log.debug("hierarchies5 for id=5:"  + hierarchies5);
+        log.debug("hierarchies5 for id=5: " + hierarchies5);
         assertEquals(2, hierarchies5.get(5L).size());
 
         Map<Long, List<OrganisationalUnit>> hierarchies6 = organisationalUnitService.getHierarchies(List.of(6L));
-        log.debug("hierarchies1 for id=6:"  + hierarchies6);
+        log.debug("hierarchies1 for id=6: " + hierarchies6);
         assertEquals(1, hierarchies6.get(6L).size());
     }
 
