@@ -100,8 +100,7 @@ public class OrganisationalUnitService {
 
     private void updateReportingData(List<Long> organisationIds) {
         log.debug("updateReportingData:organisationalUnitIds: {}", organisationIds);
-        //TODO: update the signature of messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage to receive list of organisationIds
-        RegisteredLearnersOrganisationDeleteMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage(organisationIds.get(0));
+        RegisteredLearnersOrganisationDeleteMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage(organisationIds);
         messagingClient.sendMessages(List.of(message));
     }
 
