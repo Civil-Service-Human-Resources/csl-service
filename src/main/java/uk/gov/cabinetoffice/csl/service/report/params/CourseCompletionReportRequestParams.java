@@ -1,7 +1,8 @@
-package uk.gov.cabinetoffice.csl.controller.model;
+package uk.gov.cabinetoffice.csl.service.report.params;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 
 @Getter
@@ -9,7 +10,7 @@ import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
-public class CreateReportRequestWithOrganisationIdsParams extends OrganisationIdsCourseCompletionsParams {
+public class CourseCompletionReportRequestParams extends OrganisationIdsCourseCompletionsParams implements IOrganisationalReportRequestParams {
     @NotNull
     protected String userId;
 
