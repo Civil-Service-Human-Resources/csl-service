@@ -75,12 +75,60 @@ public class OrganisationTest extends IntegrationTestBase {
                              "name": "OrgName6 (OName6)",
                              "code": "ON6",
                              "abbreviation":  "OName6"
-                         }
+                         },
+                         {
+                          "id": 7,
+                          "name": "OrgName7 (OName7)",
+                          "code": "ON7",
+                          "abbreviation": "OName7"
+                        },
+                        {
+                          "id": 8,
+                          "name": "OrgName7 (OName7) | OrgName8 (OName8)",
+                          "code": "ON8",
+                          "abbreviation": "OName8"
+                        },
+                        {
+                          "id": 9,
+                          "name": "OrgName7 (OName7) | OrgName9 (OName9)",
+                          "code": "ON9",
+                          "abbreviation": "OName9"
+                        }
                     ]
                 }
                 """;
 
         mockMvc.perform(get("/organisations/formatted_list")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedFormattedOrganisations, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void testFormattedOrganisationsListForAgency() throws Exception {
+        OrganisationalUnitsPagedResponse organisationalUnits = testDataService.generateOrganisationalUnitsPagedResponse();
+        cslStubService.stubGetOrganisations(organisationalUnits);
+        String expectedFormattedOrganisations = """
+                {
+                    "formattedOrganisationalUnitNames": [
+                        {
+                          "id": 7,
+                          "name": "OrgName7 (OName7)",
+                          "code": "ON7",
+                          "abbreviation": "OName7"
+                        },
+                        {
+                          "id": 8,
+                          "name": "OrgName7 (OName7) | OrgName8 (OName8)",
+                          "code": "ON8",
+                          "abbreviation": "OName8"
+                        }
+                    ]
+                }
+                """;
+
+        mockMvc.perform(get("/organisations/formatted_list")
+                        .param("domain", "agency.com")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedFormattedOrganisations, true))
                 .andExpect(status().is2xxSuccessful());
@@ -214,6 +262,61 @@ public class OrganisationTest extends IntegrationTestBase {
                              "parent": null,
                              "domains": null,
                              "agencyToken": null
+                         },
+                         {
+                             "id": 7,
+                             "name": "OrgName7",
+                             "code": "ON7",
+                             "abbreviation": "OName7",
+                             "formattedName": "OrgName7 (OName7)",
+                             "parentId": null,
+                             "parent": null,
+                             "domains": null,
+                             "agencyToken": {
+                                "id": 1,
+                                "token": "token",
+                                "uid": "uid",
+                                "capacity": 1,
+                                "agencyDomains": [
+                                  {
+                                    "id": 1,
+                                    "domain": "agency.com"
+                                  }
+                                ]
+                             }
+                         },
+                         {
+                             "id": 8,
+                             "name": "OrgName8",
+                             "code": "ON8",
+                             "abbreviation": "OName8",
+                             "formattedName": "OrgName7 (OName7) | OrgName8 (OName8)",
+                             "parentId": 7,
+                             "parent": null,
+                             "domains": null,
+                             "agencyToken": null
+                         },
+                         {
+                             "id": 9,
+                             "name": "OrgName9",
+                             "code": "ON9",
+                             "abbreviation": "OName9",
+                             "formattedName": "OrgName7 (OName7) | OrgName9 (OName9)",
+                             "parentId": 7,
+                             "parent": null,
+                             "domains": null,
+                             "agencyToken": {
+                                "id": 2,
+                                "token": "token",
+                                "uid": "uid",
+                                "capacity": 1,
+                                "agencyDomains": [
+                                  {
+                                    "id": 2,
+                                    "domain": "agency2.com"
+                                  }
+                                ]
+                             }
                          }
                     ]
                 }
