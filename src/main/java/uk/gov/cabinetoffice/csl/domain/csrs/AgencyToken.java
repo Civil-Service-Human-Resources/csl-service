@@ -18,4 +18,8 @@ public class AgencyToken implements Serializable {
     private String uid;
     private int capacity;
     private Set<AgencyDomain> agencyDomains;
+
+    public boolean hasDomain(String domain) {
+        return this.agencyDomains.stream().anyMatch(a -> a.getDomain().equals(domain));
+    }
 }
