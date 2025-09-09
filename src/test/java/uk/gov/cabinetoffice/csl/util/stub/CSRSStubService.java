@@ -76,6 +76,15 @@ public class CSRSStubService {
         return getOrganisations(utils.toJson(response));
     }
 
+    public StubMapping deleteOrganisationalUnit(Long organisationalUnitId) {
+        return stubFor(
+                WireMock.delete(urlPathEqualTo("/csrs/organisationalUnits/" + organisationalUnitId))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json"))
+        );
+    }
+
     public StubMapping getOrganisations(String response) {
         return stubFor(
                 WireMock.get(urlPathEqualTo("/csrs/v2/organisationalUnits"))

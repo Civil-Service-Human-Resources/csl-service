@@ -6,7 +6,7 @@ import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
 import uk.gov.cabinetoffice.csl.domain.csrs.Grade;
 import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
-import uk.gov.cabinetoffice.csl.domain.csrs.UpdateOrganisationDTO;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationDTO;
 import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
@@ -84,7 +84,7 @@ public class UserProfileService {
     }
 
     private User patchCivilServantOrganisation(String uid, Long organisationalUnitId) {
-        civilServantRegistryService.patchCivilServantOrganisation(new UpdateOrganisationDTO(organisationalUnitId));
+        civilServantRegistryService.patchCivilServantOrganisation(new OrganisationDTO(organisationalUnitId));
         userDetailsService.removeUserFromCache(uid);
         return userDetailsService.getUserWithUid(uid);
     }

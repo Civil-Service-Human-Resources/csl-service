@@ -2,16 +2,18 @@ package uk.gov.cabinetoffice.csl.domain.csrs;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
 import java.util.*;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -69,4 +71,32 @@ public class OrganisationalUnit implements Serializable {
         childIds.add(childId);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OrganisationalUnit that = (OrganisationalUnit) o;
+
+        return new EqualsBuilder().append(id, that.id).append(name, that.name).append(code, that.code).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(id).append(name).append(code).toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("name", name)
+                .append("code", code)
+                .append("abbreviation", abbreviation)
+                .append("parentId", parentId)
+                .append("domains", domains)
+                .append("agencyToken", agencyToken)
+                .toString();
+    }
 }

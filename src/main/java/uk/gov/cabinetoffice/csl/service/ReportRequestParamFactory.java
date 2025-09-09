@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithSelectedOrganisationIdsParams;
 import uk.gov.cabinetoffice.csl.controller.model.RegisteredLearnerReportRequestParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 import uk.gov.cabinetoffice.csl.service.report.params.CourseCompletionReportRequestParams;
 import uk.gov.cabinetoffice.csl.service.report.params.CreateRegisteredLearnerReportRequestParams;
 import uk.gov.cabinetoffice.csl.service.report.params.IOrganisationalReportRequestParams;
@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 public class ReportRequestParamFactory {
 
-    private final OrganisationalUnitListService organisationalUnitService;
+    private final OrganisationalUnitService organisationalUnitService;
 
     private <T extends IOrganisationalReportRequestParams> T fillParams(ISelectedOrganisationalReportRequestParams input, T output) {
         output.setUserId(input.getUserId());

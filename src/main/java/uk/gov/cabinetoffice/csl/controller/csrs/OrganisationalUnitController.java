@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnits;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 
 @Slf4j
 @RestController
@@ -15,7 +15,7 @@ import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
 @AllArgsConstructor
 public class OrganisationalUnitController {
 
-    private final OrganisationalUnitListService organisationalUnitService;
+    private final OrganisationalUnitService organisationalUnitService;
 
     @GetMapping(path = "/full", produces = "application/json")
     @ResponseBody
@@ -32,5 +32,12 @@ public class OrganisationalUnitController {
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(OrganisationalUnitsParams formattedOrganisationalUnitsParams) {
         log.info("Getting formatted organisational unit names");
         return organisationalUnitService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams);
+    }
+
+    @DeleteMapping("/{organisationUnitId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteOrganisationalUnit(@PathVariable("organisationUnitId") Long organisationUnitId) {
+        log.info("Deleting organisational unit id: {}", organisationUnitId);
+        organisationalUnitService.deleteOrganisationalUnit(organisationUnitId);
     }
 }
