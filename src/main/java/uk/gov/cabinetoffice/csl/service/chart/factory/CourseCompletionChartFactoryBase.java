@@ -6,6 +6,7 @@ import uk.gov.cabinetoffice.csl.controller.model.SelectedOrganisationIdsCourseCo
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
+import uk.gov.cabinetoffice.csl.domain.reportservice.ReportType;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.IAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
 import uk.gov.cabinetoffice.csl.service.chart.ChartWithBreakdowns;
@@ -63,7 +64,7 @@ public abstract class CourseCompletionChartFactoryBase<A extends IAggregation> {
     protected boolean getHasRequests(IdentityDto user) {
         boolean hasRequests = false;
         if (user.hasRole("REPORT_EXPORT")) {
-            hasRequests = reportServiceClient.getCourseCompletionsExportRequest(user.getUid(), List.of("REQUESTED", "PROCESSING")).hasRequests();
+            hasRequests = reportServiceClient.getReportExportRequest(ReportType.COURSE_COMPLETIONS, user.getUid(), List.of("REQUESTED", "PROCESSING")).hasRequests();
         }
         return hasRequests;
     }

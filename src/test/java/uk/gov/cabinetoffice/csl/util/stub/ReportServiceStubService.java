@@ -67,9 +67,9 @@ public class ReportServiceStubService {
                         .willReturn(status(404)));
     }
 
-    public void postReportRequest(String expectedInput, String response) {
+    public void postReportRequest(String reportUrlPart, String expectedInput, String response) {
         stubFor(
-                WireMock.post(urlPathEqualTo("/report-service/course-completions/report-requests"))
+                WireMock.post(urlPathEqualTo(String.format("/report-service/%s/report-requests", reportUrlPart)))
                         .withRequestBody(equalToJson(expectedInput, true, true))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
