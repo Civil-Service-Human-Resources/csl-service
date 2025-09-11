@@ -1,4 +1,5 @@
 package uk.gov.cabinetoffice.csl.client.csrs;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 
 import java.util.List;
@@ -15,7 +16,9 @@ public interface ICSRSClient {
 
     void patchCivilServant(PatchCivilServantDto patch);
 
-    void patchCivilServantOrganisation(OrganisationDTO organisationDTO);
+    void patchCivilServantOrganisation(OrganisationalUnitIdDto organisationalUnitIdDTO);
 
     void deleteOrganisationalUnit(Long organisationalUnitId);
+
+    void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto);
 }

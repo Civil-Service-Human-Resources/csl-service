@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.ParallelHttpClient;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
@@ -90,14 +91,20 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public void patchCivilServantOrganisation(OrganisationDTO organisationDTO) {
+    public void patchCivilServantOrganisation(OrganisationalUnitIdDto organisationalUnitIdDTO) {
         String url = String.format("%s/me/organisationalUnit", civilServants);
-        httpClient.executeRequest(RequestEntity.patch(url).body(organisationDTO), Void.class);
+        httpClient.executeRequest(RequestEntity.patch(url).body(organisationalUnitIdDTO), Void.class);
     }
 
     @Override
     public void deleteOrganisationalUnit(Long organisationalUnitId) {
         String url = String.format("%s/%s", organisationalUnits, organisationalUnitId);
         httpClient.executeRequest(RequestEntity.delete(url).build(), Void.class);
+    }
+
+    @Override
+    public void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
+        String url = String.format("%s/%s", organisationalUnits, organisationalUnitId);
+        httpClient.executeRequest(RequestEntity.patch(url).body(organisationalUnitDto), Void.class);
     }
 }

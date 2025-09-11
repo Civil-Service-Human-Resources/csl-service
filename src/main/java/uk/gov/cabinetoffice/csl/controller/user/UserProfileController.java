@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.FullNameParam;
 import uk.gov.cabinetoffice.csl.controller.model.GradeParam;
-import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitParam;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitIdParam;
 import uk.gov.cabinetoffice.csl.controller.model.ProfessionParam;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 import uk.gov.cabinetoffice.csl.service.user.UserProfileService;
@@ -63,7 +63,7 @@ public class UserProfileController {
     @PostMapping(path = "/organisationUnit")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public void updateOrganisationUnit(@RequestBody OrganisationalUnitParam organisationUnitUpdateRequest) {
+    public void updateOrganisationUnit(@RequestBody OrganisationalUnitIdParam organisationUnitUpdateRequest) {
         log.debug("UserProfileController: organisationUnitUpdateRequest: {}", organisationUnitUpdateRequest);
         String uid = userAuthService.getUsername();
         userProfileService.setOrganisationalUnit(uid, organisationUnitUpdateRequest.getOrganisationUnitId());

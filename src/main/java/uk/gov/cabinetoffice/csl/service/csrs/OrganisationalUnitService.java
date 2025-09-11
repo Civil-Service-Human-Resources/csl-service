@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
@@ -96,6 +97,11 @@ public class OrganisationalUnitService {
         civilServantRegistryClient.deleteOrganisationalUnit(organisationalUnitId);
         removeOrganisationalUnitAndChildrenFromCache(organisationalUnitId);
         updateReportingData(getOrganisationsIdsIncludingParentAndChildren(List.of(organisationalUnitId)));
+    }
+
+    public void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
+        civilServantRegistryClient.patchOrganisationalUnit(organisationalUnitId, organisationalUnitDto);
+        //TODO: i. update cache, ii. update reporting data
     }
 
     private void updateReportingData(List<Long> organisationIds) {
