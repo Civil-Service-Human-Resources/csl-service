@@ -2,18 +2,18 @@ package uk.gov.cabinetoffice.csl.domain.csrs;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,6 +29,10 @@ public class OrganisationalUnit implements Serializable {
 
     // Custom data
     private String formattedName;
+
+    @JsonIgnore
+    private AgencyToken inheritedAgencyToken;
+
     @JsonIgnore
     private Set<Long> childIds = new HashSet<>();
 
@@ -42,13 +46,16 @@ public class OrganisationalUnit implements Serializable {
 
     @JsonIgnore
     public boolean hasDomain(String domain) {
-        if (this.domains == null) {
-            return false;
+        boolean hasDomain = Objects.requireNonNullElse(this.domains, new ArrayList<Domain>()).stream().anyMatch(d -> d.getDomain().equals(domain));
+        if (!hasDomain) {
+            hasDomain = getAgencyTokenOrInherited().map(a -> a.hasDomain(domain)).orElse(false);
         }
+        return hasDomain;
+    }
 
-        return this.domains.stream().map(d -> d.domain)
-                .toList()
-                .contains(domain);
+    @JsonIgnore
+    public Optional<AgencyToken> getAgencyTokenOrInherited() {
+        return this.agencyToken == null ? Optional.ofNullable(this.inheritedAgencyToken) : Optional.of(this.agencyToken);
     }
 
     @JsonIgnore
@@ -64,4 +71,32 @@ public class OrganisationalUnit implements Serializable {
         childIds.add(childId);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OrganisationalUnit that = (OrganisationalUnit) o;
+
+        return new EqualsBuilder().append(id, that.id).append(name, that.name).append(code, that.code).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(id).append(name).append(code).toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("name", name)
+                .append("code", code)
+                .append("abbreviation", abbreviation)
+                .append("parentId", parentId)
+                .append("domains", domains)
+                .append("agencyToken", agencyToken)
+                .toString();
+    }
 }

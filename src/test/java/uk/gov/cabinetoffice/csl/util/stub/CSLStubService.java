@@ -41,6 +41,10 @@ public class CSLStubService {
         return getCsrsStubService().getOrganisations(organisationalUnitsPagedResponse);
     }
 
+    public StubMapping stubDeleteOrganisationalUnit(Long organisationalUnitId) {
+        return getCsrsStubService().deleteOrganisationalUnit(organisationalUnitId);
+    }
+
     public List<StubMapping> stubCreateModuleRecords(String courseId, String moduleId, Course course, String userId,
                                                      String expectedUpdateInput, String moduleRecordResponse) {
         return List.of(

@@ -9,6 +9,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.NullableModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitMapCache;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.RequiredLearningMapCache;
 import uk.gov.cabinetoffice.csl.util.ModuleRecordCache;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
@@ -46,6 +47,12 @@ public class RedisCaches {
     public ObjectCache<LearnerRecord> learnerRecordCache(CacheManager cacheManager) {
         Cache cache = cacheManager.getCache("learner-record");
         return new ObjectCache<>(cache, LearnerRecord.class);
+    }
+
+    @Bean
+    public OrganisationalUnitMapCache organisationalUnitMapCache(CacheManager cacheManager) {
+        Cache cache = cacheManager.getCache("organisations");
+        return new OrganisationalUnitMapCache(cache);
     }
 
     @Bean

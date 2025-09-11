@@ -7,6 +7,7 @@ import uk.gov.cabinetoffice.csl.service.messaging.model.CourseCompletionMessage;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class MessageMetadataFactory {
@@ -35,5 +36,9 @@ public class MessageMetadataFactory {
 
     public RegisteredLearnerEmailUpdateMessage generateRegisteredLearnerEmailUpdateMessage(String uid, String email) {
         return new RegisteredLearnerEmailUpdateMessage(new RegisteredLearnerEmailUpdate(uid, email));
+    }
+
+    public RegisteredLearnerOrganisationDeleteMessage generateRegisteredLearnersOrganisationDeleteMessage(List<Long> organisationIds) {
+        return new RegisteredLearnerOrganisationDeleteMessage(new RegisteredLearnerOrganisationDelete(organisationIds));
     }
 }

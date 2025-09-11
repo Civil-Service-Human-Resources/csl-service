@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.controller.user;
+package uk.gov.cabinetoffice.csl.controller.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProfessionUpdateRequest {
+public class ProfessionParam {
     private Long professionId;
 }
