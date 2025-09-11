@@ -72,8 +72,8 @@ public class ReportServiceClient implements IReportServiceClient {
     }
 
     @Override
-    public DownloadableFile downloadCourseCompletionsReport(String slug) {
-        String url = String.format("%s/downloads/%s", config.getRequestCourseCompletionReportUrl(), slug);
+    public DownloadableFile downloadExportReport(ReportType reportType, String slug) {
+        String url = String.format("%s/downloads/%s", config.getReportRequestUrl(reportType), slug);
         RequestEntity<Void> request = RequestEntity.get(url).build();
         return httpClient.executeFileDownloadRequest(request);
     }

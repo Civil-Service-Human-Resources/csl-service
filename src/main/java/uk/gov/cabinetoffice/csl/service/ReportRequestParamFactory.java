@@ -25,6 +25,7 @@ public class ReportRequestParamFactory {
         output.setUserEmail(input.getUserEmail());
         output.setDownloadBaseUrl(input.getDownloadBaseUrl());
         output.setFullName(input.getFullName());
+        output.setTimezone(ZoneId.of(input.getTimezone()));
         if (input.getSelectedOrganisationIds() != null) {
             List<OrganisationalUnit> organisations = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(input.getSelectedOrganisationIds());
             output.setOrganisationIds(organisations.stream().map(OrganisationalUnit::getId).toList());
@@ -36,7 +37,6 @@ public class ReportRequestParamFactory {
         CourseCompletionReportRequestParams createReportServiceReportRequestParams = new CourseCompletionReportRequestParams();
         createReportServiceReportRequestParams.setStartDate(params.getStartDate());
         createReportServiceReportRequestParams.setEndDate(params.getEndDate());
-        createReportServiceReportRequestParams.setTimezone(ZoneId.of(params.getTimezone()));
         createReportServiceReportRequestParams.setCourseIds(params.getCourseIds());
         createReportServiceReportRequestParams.setProfessionIds(params.getProfessionIds());
         createReportServiceReportRequestParams.setGradeIds(params.getGradeIds());

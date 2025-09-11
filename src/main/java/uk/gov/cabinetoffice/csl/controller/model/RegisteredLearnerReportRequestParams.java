@@ -9,6 +9,7 @@ import lombok.Setter;
 import uk.gov.cabinetoffice.csl.service.report.params.ISelectedOrganisationalReportRequestParams;
 import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,13 @@ public class RegisteredLearnerReportRequestParams implements ISelectedOrganisati
 
     @NotNull
     protected String fullName;
+
+    @NotNull
+    protected ZoneId timezone;
+
+    public String getTimezone() {
+        return timezone.toString();
+    }
 
     public List<Long> getSelectedOrganisationIds() {
         return this.selectedOrganisationIds == null ? new ArrayList<>() : this.selectedOrganisationIds;

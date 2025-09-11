@@ -502,6 +502,7 @@ public class ReportTest extends IntegrationTestBase {
                     "userEmail": "email",
                     "userId": "id",
                     "fullName": "Test Name",
+                    "timezone": "Europe/London",
                     "downloadBaseUrl": "http://localhost:3005/download"
                 }
                 """;
@@ -512,6 +513,7 @@ public class ReportTest extends IntegrationTestBase {
                     "userEmail": "email",
                     "userId": "id",
                     "fullName": "Test Name",
+                    "timezone": "Europe/London",
                     "downloadBaseUrl": "http://localhost:3005/download"
                 }
                 """;
