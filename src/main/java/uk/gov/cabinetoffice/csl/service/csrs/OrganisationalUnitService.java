@@ -7,6 +7,8 @@ import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
+import uk.gov.cabinetoffice.csl.domain.error.IncorrectStateException;
+import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerOrganisationDeleteMessage;
@@ -15,6 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.azure.core.util.CoreUtils.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Slf4j
 @Service
@@ -101,7 +104,8 @@ public class OrganisationalUnitService {
 
     public void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
         civilServantRegistryClient.patchOrganisationalUnit(organisationalUnitId, organisationalUnitDto);
-        //TODO: i. update cache, ii. update reporting data
+        updateOrganisationalUnitsInCache(organisationalUnitId, organisationalUnitDto);
+        //TODO: update reporting data
     }
 
     private void updateReportingData(List<Long> organisationIds) {
@@ -116,11 +120,38 @@ public class OrganisationalUnitService {
     }
 
     public void removeOrganisationalUnitsFromCache(List<Long> organisationIds) {
-        organisationIds.forEach(organisationalUnitId -> organisationalUnitMapCache.get().remove(organisationalUnitId));
+        organisationIds.forEach(organisationalUnitId -> getOrganisationalUnitMap().remove(organisationalUnitId));
     }
 
     public void removeOrganisationalUnitAndChildrenFromCache(Long organisationalUnitId) {
         log.info("Removing organisationalUnit and its children FromCache for the organisationalUnitId: {}.", organisationalUnitId);
         removeOrganisationalUnitsFromCache(getOrganisationsIdsIncludingParentAndChildren(List.of(organisationalUnitId)));
+    }
+
+    public void updateOrganisationalUnitsInCache(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
+        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
+        OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
+        if (organisationalUnit == null) {
+            throw new NotFoundException("OrganisationalUnit not found for id: " + organisationalUnitId);
+        }
+
+        organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
+        organisationalUnit.setCode(organisationalUnitDto.getCode());
+        organisationalUnit.setName(organisationalUnitDto.getName());
+
+        OrganisationalUnit newParentOrganisationalUnit = null;
+        String newParent = organisationalUnitDto.getParent();
+        if (isNotBlank(newParent)) {
+            try {
+                Long newParentId = Long.parseLong(newParent.substring(newParent.lastIndexOf('/') + 1));
+                newParentOrganisationalUnit = organisationalUnitMap.get(newParentId);
+                if(newParentOrganisationalUnit == null) {
+                    throw new NotFoundException("Parent OrganisationalUnit not found for id: " + newParentId);
+                }
+            } catch (NumberFormatException e) {
+                throw new IncorrectStateException("Invalid parent reference: " + newParent);
+            }
+        }
+        organisationalUnit.setParent(newParentOrganisationalUnit);
     }
 }
