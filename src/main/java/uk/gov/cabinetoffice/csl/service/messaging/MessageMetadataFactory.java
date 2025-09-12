@@ -41,4 +41,8 @@ public class MessageMetadataFactory {
     public RegisteredLearnerOrganisationDeleteMessage generateRegisteredLearnersOrganisationDeleteMessage(List<Long> organisationIds) {
         return new RegisteredLearnerOrganisationDeleteMessage(new RegisteredLearnerOrganisationDelete(organisationIds));
     }
+
+    public RegisteredLearnerOrganisationUpdateMessage generateRegisteredLearnersOrganisationUpdateMessage(Long organisationId, String formattedOrganisationName) {
+        return new RegisteredLearnerOrganisationUpdateMessage(new RegisteredLearnerOrganisationUpdate(organisationId, formattedOrganisationName));
+    }
 }

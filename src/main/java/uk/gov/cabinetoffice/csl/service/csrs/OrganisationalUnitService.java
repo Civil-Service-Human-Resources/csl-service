@@ -12,6 +12,7 @@ import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerOrganisationDeleteMessage;
+import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerOrganisationUpdateMessage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -99,19 +100,25 @@ public class OrganisationalUnitService {
         log.info("Deleting organisational unit for id: {}", organisationalUnitId);
         civilServantRegistryClient.deleteOrganisationalUnit(organisationalUnitId);
         removeOrganisationalUnitAndChildrenFromCache(organisationalUnitId);
-        updateReportingData(getOrganisationsIdsIncludingParentAndChildren(List.of(organisationalUnitId)));
+        deleteFromReportingData(getOrganisationsIdsIncludingParentAndChildren(List.of(organisationalUnitId)));
+    }
+
+    private void deleteFromReportingData(List<Long> organisationIds) {
+        log.debug("deleteFromReportingData:organisationalUnitIds: {}", organisationIds);
+        RegisteredLearnerOrganisationDeleteMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage(organisationIds);
+        messagingClient.sendMessages(List.of(message));
     }
 
     public void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
         log.info("Updating organisational unit for id: {}", organisationalUnitId);
         civilServantRegistryClient.patchOrganisationalUnit(organisationalUnitId, organisationalUnitDto);
-        updateOrganisationalUnitsInCache(organisationalUnitId, organisationalUnitDto);
-        //TODO: update reporting data
+        OrganisationalUnit organisationalUnit = updateOrganisationalUnitsInCache(organisationalUnitId, organisationalUnitDto);
+        updateReportingData(organisationalUnitId, organisationalUnit.getFormattedName());
     }
 
-    private void updateReportingData(List<Long> organisationIds) {
-        log.debug("updateReportingData:organisationalUnitIds: {}", organisationIds);
-        RegisteredLearnerOrganisationDeleteMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage(organisationIds);
+    private void updateReportingData(Long organisationalUnitId, String formattedOrganisationName) {
+        log.debug("updatingReportingData: {} for organisationalUnitId: {}", formattedOrganisationName, organisationalUnitId);
+        RegisteredLearnerOrganisationUpdateMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationUpdateMessage(organisationalUnitId, formattedOrganisationName);
         messagingClient.sendMessages(List.of(message));
     }
 
@@ -129,7 +136,7 @@ public class OrganisationalUnitService {
         removeOrganisationalUnitsFromCache(getOrganisationsIdsIncludingParentAndChildren(List.of(organisationalUnitId)));
     }
 
-    public void updateOrganisationalUnitsInCache(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
+    public OrganisationalUnit updateOrganisationalUnitsInCache(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
         OrganisationalUnit organisationalUnit = getOrganisationalUnitMap().get(organisationalUnitId);
         if (organisationalUnit == null) {
             log.error("Parent OrganisationalUnit not found for id: {}", organisationalUnitId);
@@ -139,22 +146,29 @@ public class OrganisationalUnitService {
         organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
         organisationalUnit.setCode(organisationalUnitDto.getCode());
         organisationalUnit.setName(organisationalUnitDto.getName());
+        StringBuilder formattedName = new StringBuilder(organisationalUnit.getNameWithAbbreviation());
 
+        Long newParentId = null;
         OrganisationalUnit newParentOrganisationalUnit = null;
         String newParent = organisationalUnitDto.getParent();
+
         if (isNotBlank(newParent)) {
             try {
-                Long newParentId = Long.parseLong(newParent.substring(newParent.lastIndexOf('/') + 1));
+                newParentId = Long.parseLong(newParent.substring(newParent.lastIndexOf('/') + 1));
                 newParentOrganisationalUnit = getOrganisationalUnitMap().get(newParentId);
                 if(newParentOrganisationalUnit == null) {
                     log.error("Parent OrganisationalUnit not found for id: {}", newParentId);
                     throw new NotFoundException("Parent OrganisationalUnit not found for id: " + newParentId);
                 }
+                formattedName.insert(0, newParentOrganisationalUnit.getFormattedName() + " | ");
             } catch (NumberFormatException e) {
                 log.error("Invalid parent reference: {}", newParent);
                 throw new IncorrectStateException("Invalid parent reference: " + newParent);
             }
         }
+        organisationalUnit.setParentId(newParentId);
         organisationalUnit.setParent(newParentOrganisationalUnit);
+        organisationalUnit.setFormattedName(formattedName.toString());
+        return organisationalUnit;
     }
 }
