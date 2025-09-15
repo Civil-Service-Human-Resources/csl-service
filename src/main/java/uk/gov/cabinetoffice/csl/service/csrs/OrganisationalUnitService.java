@@ -169,7 +169,7 @@ public class OrganisationalUnitService {
         organisationalUnit.setParent(newParentOrganisationalUnit);
         organisationalUnitMap.replace(organisationalUnitId, organisationalUnit);
         buildOrganisationalUnits(organisationalUnitMap);
-        return organisationalUnit;
+        return organisationalUnitMap.get(organisationalUnitId);
     }
 
     private void buildOrganisationalUnits(OrganisationalUnitMap organisationalUnitMap) {
