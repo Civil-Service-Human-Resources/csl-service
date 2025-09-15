@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 
@@ -17,6 +18,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -24,6 +28,10 @@ import static org.mockito.Mockito.when;
 class OrganisationalUnitServiceTest {
 
     private final OrganisationalUnitFactory organisationalUnitFactory = new OrganisationalUnitFactory();
+    private OrganisationalUnitMap organisationalUnitMap;
+    private OrganisationalUnit grandParent;
+    private OrganisationalUnit parent;
+    private OrganisationalUnit child;
 
     @Mock
     OrganisationalUnitMapCache organisationalUnitMapCache;
@@ -36,8 +44,8 @@ class OrganisationalUnitServiceTest {
 
     @BeforeEach
     public void setUp() {
-        OrganisationalUnitMap map = organisationalUnitFactory.buildOrganisationalUnits(getAllOrganisationalUnits());
-        when(csrs.getAllOrganisationalUnits()).thenReturn(map);
+        organisationalUnitMap = organisationalUnitFactory.buildOrganisationalUnits(getAllOrganisationalUnits());
+        when(csrs.getAllOrganisationalUnits()).thenReturn(organisationalUnitMap);
     }
 
     @Test
@@ -262,5 +270,96 @@ class OrganisationalUnitServiceTest {
         organisationalUnits.add(organisationalUnits6);
 
         return organisationalUnits;
+    }
+
+    @Test
+    void scenario1_removeGrandParentFromParent() {
+        createOrgHierarchy();
+
+        OrganisationalUnitDto dto = new OrganisationalUnitDto();
+        dto.setName("Parent Org");
+        dto.setAbbreviation("PO");
+        dto.setCode("PO-CODE");
+        dto.setParent(null);
+
+        organisationalUnitService.updateOrganisationalUnitsInCache(2L, dto);
+
+        assertNull(parent.getParentId());
+        // parent should be top-level
+        assertNull(parent.getParent());
+
+        // formatted names
+        assertEquals("Parent Org (PO)", parent.getFormattedName());
+        assertEquals("Parent Org (PO) | Child Org (CO)", child.getFormattedName());
+
+        // child IDs
+        assertFalse(grandParent.getChildIds().contains(2L), "Grand Parent should no longer have Parent as child");
+        assertTrue(parent.getChildIds().contains(3L), "Parent should still have Child as child");
+    }
+
+    @Test
+    void scenario2_removeParentFromChild() {
+        createOrgHierarchy();
+
+        OrganisationalUnitDto dto = new OrganisationalUnitDto();
+        dto.setName("Child Org");
+        dto.setAbbreviation("CO");
+        dto.setCode("CO-CODE");
+        dto.setParent(null);
+
+        organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
+
+        // child should be top-level
+        assertNull(child.getParentId());
+        assertNull(child.getParent());
+
+        // formatted names
+        assertEquals("Child Org (CO)", child.getFormattedName());
+        assertEquals("Grand Parent Org (GPO) | Parent Org (PO)", parent.getFormattedName());
+
+        // child IDs
+        assertFalse(parent.getChildIds().contains(3L), "Parent should no longer track Child");
+        assertFalse(grandParent.getChildIds().contains(3L), "Grand Parent should not track Child");
+    }
+
+    @Test
+    void scenario3_makeGrandParentParentOfChild() {
+        createOrgHierarchy();
+
+        OrganisationalUnitDto dto = new OrganisationalUnitDto();
+        dto.setName("Child Org");
+        dto.setAbbreviation("CO");
+        dto.setCode("CO-CODE");
+        dto.setParent("/organisationalUnits/1"); // grandparent
+
+        organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
+
+        // child parent
+        assertEquals(1L, child.getParentId());
+        assertEquals(grandParent, child.getParent());
+
+        // formatted names
+        assertEquals("Grand Parent Org (GPO) | Child Org (CO)", child.getFormattedName());
+        assertEquals("Grand Parent Org (GPO) | Parent Org (PO)", parent.getFormattedName());
+
+        // child IDs
+        assertTrue(grandParent.getChildIds().contains(3L));
+        assertFalse(parent.getChildIds().contains(3L));
+    }
+
+    private void createOrgHierarchy() {
+        grandParent = new OrganisationalUnit(1L, "Grand Parent Org", "GPO-CODE", "GPO", null);
+
+        parent = new OrganisationalUnit(2L, "Parent Org", "PO-CODE", "PO", null);
+        parent.setParentId(1L);
+        parent.setParent(grandParent);
+
+        child = new OrganisationalUnit(3L, "Child Org", "CO-CODE", "CO", null);
+        child.setParentId(2L);
+        child.setParent(parent);
+
+        organisationalUnitMap.put(1L, grandParent);
+        organisationalUnitMap.put(2L, parent);
+        organisationalUnitMap.put(3L, child);
     }
 }
