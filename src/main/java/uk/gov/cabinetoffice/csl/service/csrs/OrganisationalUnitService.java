@@ -137,16 +137,16 @@ public class OrganisationalUnitService {
     }
 
     public OrganisationalUnit updateOrganisationalUnitsInCache(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
-        OrganisationalUnit organisationalUnit = getOrganisationalUnitMap().get(organisationalUnitId);
+        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
+        OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
         if (organisationalUnit == null) {
-            log.error("Parent OrganisationalUnit not found for id: {}", organisationalUnitId);
+            log.error("OrganisationalUnit not found for id: {}", organisationalUnitId);
             throw new NotFoundException("OrganisationalUnit not found for id: " + organisationalUnitId);
         }
 
         organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
         organisationalUnit.setCode(organisationalUnitDto.getCode());
         organisationalUnit.setName(organisationalUnitDto.getName());
-        StringBuilder formattedName = new StringBuilder(organisationalUnit.getNameWithAbbreviation());
 
         Long newParentId = null;
         OrganisationalUnit newParentOrganisationalUnit = null;
@@ -155,12 +155,11 @@ public class OrganisationalUnitService {
         if (isNotBlank(newParent)) {
             try {
                 newParentId = Long.parseLong(newParent.substring(newParent.lastIndexOf('/') + 1));
-                newParentOrganisationalUnit = getOrganisationalUnitMap().get(newParentId);
+                newParentOrganisationalUnit = organisationalUnitMap.get(newParentId);
                 if(newParentOrganisationalUnit == null) {
                     log.error("Parent OrganisationalUnit not found for id: {}", newParentId);
                     throw new NotFoundException("Parent OrganisationalUnit not found for id: " + newParentId);
                 }
-                formattedName.insert(0, newParentOrganisationalUnit.getFormattedName() + " | ");
             } catch (NumberFormatException e) {
                 log.error("Invalid parent reference: {}", newParent);
                 throw new IncorrectStateException("Invalid parent reference: " + newParent);
@@ -168,7 +167,35 @@ public class OrganisationalUnitService {
         }
         organisationalUnit.setParentId(newParentId);
         organisationalUnit.setParent(newParentOrganisationalUnit);
-        organisationalUnit.setFormattedName(formattedName.toString());
+        organisationalUnitMap.replace(organisationalUnitId, organisationalUnit);
+        buildOrganisationalUnits(organisationalUnitMap);
         return organisationalUnit;
+    }
+
+    private void buildOrganisationalUnits(OrganisationalUnitMap organisationalUnitMap) {
+        List<OrganisationalUnit> organisationalUnits = new ArrayList<>(organisationalUnitMap.values());
+
+        organisationalUnits.forEach(o -> {
+            StringBuilder formattedName = new StringBuilder(o.getNameWithAbbreviation());
+            Long parentId = o.getParentId();
+            int parents = 0;
+
+            while (parentId != null) {
+                OrganisationalUnit parentOrganisationalUnit = organisationalUnitMap.get(parentId);
+                if (parents == 0) {
+                    parentOrganisationalUnit.addChildId(o.getId());
+                    parents++;
+                }
+                if (parentOrganisationalUnit.getAgencyToken() != null
+                        && o.getAgencyTokenOrInherited().isEmpty()) {
+                    o.setInheritedAgencyToken(parentOrganisationalUnit.getAgencyToken());
+                }
+                formattedName.insert(0, parentOrganisationalUnit.getNameWithAbbreviation() + " | ");
+                parentId = parentOrganisationalUnit.getParentId();
+            }
+
+            o.setFormattedName(formattedName.toString());
+            organisationalUnitMap.replace(o.getId(), o);
+        });
     }
 }
