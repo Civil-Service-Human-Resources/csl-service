@@ -6,6 +6,7 @@ import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import uk.gov.cabinetoffice.csl.util.Cacheable;
 
 import java.io.Serializable;
 import java.util.*;
@@ -17,7 +18,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OrganisationalUnit implements Serializable {
+public class OrganisationalUnit implements Serializable, Cacheable {
     private Long id;
     private String name;
     private String code;
@@ -42,6 +43,12 @@ public class OrganisationalUnit implements Serializable {
         this.code = code;
         this.abbreviation = abbreviation;
         this.parent = parent;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getCacheableId() {
+        return Long.toString(id);
     }
 
     @JsonIgnore
