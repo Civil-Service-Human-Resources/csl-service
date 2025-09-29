@@ -1,7 +1,6 @@
 package uk.gov.cabinetoffice.csl.controller.model;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +17,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisteredLearnerReportRequestParams implements ISelectedOrganisationalReportRequestParams {
-    @Size(min = 1)
     protected List<Long> selectedOrganisationIds;
 
     @NotNull

@@ -22,7 +22,8 @@ public class JmsQueueClient implements IQueueClient<IMessageMetadata> {
         try {
             jmsTemplate.convertAndSend(message.getQueue(), message);
         } catch (Exception e) {
-            log.error(String.format("Message %s failed to send to queue %s", message, message.getQueue()));
+            log.error("Message {} failed to send to queue {}. Error: {}", message, message.getQueue(), e.toString());
+            throw e;
         }
     }
 
