@@ -546,6 +546,25 @@ public class ReportTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testGetRegisteredLearnersOverview() throws Exception {
+        String getReportRequestsJson = """
+                {
+                    "requests": [
+                        {
+                            "reportRequestId": 1
+                        }
+                    ]
+                }
+                """;
+
+        cslStubService.getReportServiceStubService().getReportRequests("userId", "REQUESTED,PROCESSING", getReportRequestsJson);
+        mockMvc.perform(get("/admin/reporting/registered-learners/overview")
+                        .with(getJwtPostProcessor(List.of("REPORT_EXPORT"))))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.hasRequests").value(true));
+    }
+
+    @Test
     public void testDownloadReport() throws Exception {
         String testContent = "content";
         String testSlug = "testSlug";
