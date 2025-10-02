@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.azure.core.util.CoreUtils.isNullOrEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
 @Service
@@ -29,6 +29,7 @@ public class OrganisationalUnitService {
     private final ICSRSClient civilServantRegistryClient;
     private final MessageMetadataFactory messageMetadataFactory;
     private final IMessagingClient messagingClient;
+    private final OrganisationalUnitFactory organisationalUnitFactory;
 
     public OrganisationalUnitMap getOrganisationalUnitMap() {
         OrganisationalUnitMap map = organisationalUnitMapCache.get();
@@ -144,58 +145,32 @@ public class OrganisationalUnitService {
             throw new NotFoundException("OrganisationalUnit not found for id: " + organisationalUnitId);
         }
 
+        OrganisationalUnit parent = parseParent(organisationalUnitDto.getParent(), organisationalUnitMap);
+        organisationalUnit.setParent(parent);
+        organisationalUnit.setParentId(parent != null ? parent.getId() : null);
         organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
         organisationalUnit.setCode(organisationalUnitDto.getCode());
         organisationalUnit.setName(organisationalUnitDto.getName());
 
-        Long newParentId = null;
-        OrganisationalUnit newParentOrganisationalUnit = null;
-        String newParent = organisationalUnitDto.getParent();
-
-        if (isNotBlank(newParent)) {
-            try {
-                newParentId = Long.parseLong(newParent.substring(newParent.lastIndexOf('/') + 1));
-                newParentOrganisationalUnit = organisationalUnitMap.get(newParentId);
-                if(newParentOrganisationalUnit == null) {
-                    log.error("Parent OrganisationalUnit not found for id: {}", newParentId);
-                    throw new NotFoundException("Parent OrganisationalUnit not found for id: " + newParentId);
-                }
-            } catch (NumberFormatException e) {
-                log.error("Invalid parent reference: {}", newParent);
-                throw new IncorrectStateException("Invalid parent reference: " + newParent);
-            }
-        }
-        organisationalUnit.setParentId(newParentId);
-        organisationalUnit.setParent(newParentOrganisationalUnit);
-        organisationalUnitMap.replace(organisationalUnitId, organisationalUnit);
-        buildOrganisationalUnits(organisationalUnitMap);
-        return organisationalUnitMap.get(organisationalUnitId);
+        List<OrganisationalUnit> organisationalUnits = new ArrayList<>(organisationalUnitMap.values());
+        OrganisationalUnitMap rebuiltOrgMap = organisationalUnitFactory.buildOrganisationalUnits(organisationalUnits);
+        organisationalUnitMapCache.put(rebuiltOrgMap);
+        return rebuiltOrgMap.get(organisationalUnitId);
     }
 
-    private void buildOrganisationalUnits(OrganisationalUnitMap organisationalUnitMap) {
-        List<OrganisationalUnit> organisationalUnits = new ArrayList<>(organisationalUnitMap.values());
-
-        organisationalUnits.forEach(o -> {
-            StringBuilder formattedName = new StringBuilder(o.getNameWithAbbreviation());
-            Long parentId = o.getParentId();
-            int parents = 0;
-
-            while (parentId != null) {
-                OrganisationalUnit parentOrganisationalUnit = organisationalUnitMap.get(parentId);
-                if (parents == 0) {
-                    parentOrganisationalUnit.addChildId(o.getId());
-                    parents++;
-                }
-                if (parentOrganisationalUnit.getAgencyToken() != null
-                        && o.getAgencyTokenOrInherited().isEmpty()) {
-                    o.setInheritedAgencyToken(parentOrganisationalUnit.getAgencyToken());
-                }
-                formattedName.insert(0, parentOrganisationalUnit.getNameWithAbbreviation() + " | ");
-                parentId = parentOrganisationalUnit.getParentId();
+    private OrganisationalUnit parseParent(String parentStr, OrganisationalUnitMap map) {
+        if (isBlank(parentStr)) return null;
+        try {
+            Long parentId = Long.parseLong(parentStr.substring(parentStr.lastIndexOf('/') + 1));
+            OrganisationalUnit parent = map.get(parentId);
+            if (parent == null) {
+                log.error("Parent OrganisationalUnit not found for id: {}", parentId);
+                throw new NotFoundException("Parent OrganisationalUnit not found for id: " + parentId);
             }
-
-            o.setFormattedName(formattedName.toString());
-            organisationalUnitMap.replace(o.getId(), o);
-        });
+            return parent;
+        } catch (NumberFormatException e) {
+            log.error("Invalid parent reference: {}", parentStr);
+            throw new IncorrectStateException("Invalid parent reference: " + parentStr);
+        }
     }
 }

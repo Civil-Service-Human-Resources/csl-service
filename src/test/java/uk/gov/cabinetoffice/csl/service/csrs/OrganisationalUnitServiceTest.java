@@ -4,13 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
+import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
+import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,13 +38,20 @@ class OrganisationalUnitServiceTest {
     OrganisationalUnitMapCache organisationalUnitMapCache;
 
     @Mock
+    private MessageMetadataFactory messageMetadataFactory;
+
+    @Mock
+    private IMessagingClient messagingClient;
+
+    @Mock
     private ICSRSClient csrs;
 
-    @InjectMocks
     private OrganisationalUnitService organisationalUnitService;
 
     @BeforeEach
     public void setUp() {
+        organisationalUnitService = new OrganisationalUnitService(organisationalUnitMapCache, csrs,
+                messageMetadataFactory, messagingClient, organisationalUnitFactory);
         organisationalUnitMap = organisationalUnitFactory.buildOrganisationalUnits(getAllOrganisationalUnits());
         when(csrs.getAllOrganisationalUnits()).thenReturn(organisationalUnitMap);
     }
