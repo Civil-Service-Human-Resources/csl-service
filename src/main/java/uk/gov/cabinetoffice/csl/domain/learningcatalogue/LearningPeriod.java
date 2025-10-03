@@ -20,7 +20,7 @@ public class LearningPeriod implements Serializable {
 
     @JsonIgnore
     public LocalDateTime getStartDateAsDateTime() {
-        return startDate == null ? LocalDateTime.MIN : startDate.atTime(LocalTime.MAX);
+        return startDate == null ? LocalDateTime.MIN : startDate.atTime(LocalTime.MIN);
     }
 
 }
