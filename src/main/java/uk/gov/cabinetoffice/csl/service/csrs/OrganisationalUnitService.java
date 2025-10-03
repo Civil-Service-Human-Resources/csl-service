@@ -111,16 +111,17 @@ public class OrganisationalUnitService {
     }
 
     public void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
-        log.info("Updating organisational unit data: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
+        log.info("Updating organisational unit data in csrs: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
         civilServantRegistryClient.patchOrganisationalUnit(organisationalUnitId, organisationalUnitDto);
+        log.info("Updating organisational unit data in cache: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
         OrganisationalUnit organisationalUnit = updateOrganisationalUnitsInCache(organisationalUnitId, organisationalUnitDto);
-        log.info("Sending organisational unit formatted name: {} to reporting for organisationalUnit: {}", organisationalUnit.getFormattedName(), organisationalUnit);
+        log.info("Updating organisational unit formatted name: {} in reporting for organisationalUnit: {}", organisationalUnit.getFormattedName(), organisationalUnit);
         updateReportingData(organisationalUnitId, organisationalUnit.getFormattedName());
     }
 
     private void updateReportingData(Long organisationalUnitId, String formattedOrganisationName) {
         RegisteredLearnerOrganisationUpdateMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationUpdateMessage(organisationalUnitId, formattedOrganisationName);
-        log.info("Sending message to reporting to update reporting data: {}", message);
+        log.info("Sending organisational unit message to update reporting data: {}", message);
         messagingClient.sendMessages(List.of(message));
     }
 
