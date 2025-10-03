@@ -3,9 +3,11 @@ package uk.gov.cabinetoffice.csl.service.csrs;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
@@ -22,10 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @Slf4j
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class OrganisationalUnitServiceTest {
 
     private final OrganisationalUnitFactory organisationalUnitFactory = new OrganisationalUnitFactory();
@@ -35,7 +37,7 @@ class OrganisationalUnitServiceTest {
     private OrganisationalUnit child;
 
     @Mock
-    OrganisationalUnitMapCache organisationalUnitMapCache;
+    private OrganisationalUnitMapCache organisationalUnitMapCache;
 
     @Mock
     private MessageMetadataFactory messageMetadataFactory;
@@ -46,12 +48,17 @@ class OrganisationalUnitServiceTest {
     @Mock
     private ICSRSClient csrs;
 
+    @MockBean
+    private RedissonClient redissonClient;
+
+    private static final String ORG_UNIT_CACHE_LOCK = "lock:organisationalUnitMap";
+
     private OrganisationalUnitService organisationalUnitService;
 
     @BeforeEach
     public void setUp() {
         organisationalUnitService = new OrganisationalUnitService(organisationalUnitMapCache, csrs,
-                messageMetadataFactory, messagingClient, organisationalUnitFactory);
+                messageMetadataFactory, messagingClient, organisationalUnitFactory, redissonClient);
         organisationalUnitMap = organisationalUnitFactory.buildOrganisationalUnits(getAllOrganisationalUnits());
         when(csrs.getAllOrganisationalUnits()).thenReturn(organisationalUnitMap);
     }
@@ -282,6 +289,11 @@ class OrganisationalUnitServiceTest {
 
     @Test
     void scenario1_removeGrandParentFromParent() {
+        RLock mockLock = mock(RLock.class);
+        when(redissonClient.getLock(ORG_UNIT_CACHE_LOCK)).thenReturn(mockLock);
+        doNothing().when(mockLock).lock();
+        doNothing().when(mockLock).unlock();
+
         createOrgHierarchy();
 
         OrganisationalUnitDto dto = new OrganisationalUnitDto();
@@ -303,10 +315,19 @@ class OrganisationalUnitServiceTest {
         // child IDs
         assertFalse(grandParent.getChildIds().contains(2L), "Grand Parent should no longer have Parent as child");
         assertTrue(parent.getChildIds().contains(3L), "Parent should still have Child as child");
+
+        // Verify that lock.lock() and lock.unlock() were invoked
+        verify(mockLock, times(1)).lock();
+        verify(mockLock, times(1)).unlock();
     }
 
     @Test
     void scenario2_removeParentFromChild() {
+        RLock mockLock = mock(RLock.class);
+        when(redissonClient.getLock(ORG_UNIT_CACHE_LOCK)).thenReturn(mockLock);
+        doNothing().when(mockLock).lock();
+        doNothing().when(mockLock).unlock();
+
         createOrgHierarchy();
 
         OrganisationalUnitDto dto = new OrganisationalUnitDto();
@@ -328,10 +349,19 @@ class OrganisationalUnitServiceTest {
         // child IDs
         assertFalse(parent.getChildIds().contains(3L), "Parent should no longer track Child");
         assertFalse(grandParent.getChildIds().contains(3L), "Grand Parent should not track Child");
+
+        // Verify that lock.lock() and lock.unlock() were invoked
+        verify(mockLock, times(1)).lock();
+        verify(mockLock, times(1)).unlock();
     }
 
     @Test
     void scenario3_makeGrandParentParentOfChild() {
+        RLock mockLock = mock(RLock.class);
+        when(redissonClient.getLock(ORG_UNIT_CACHE_LOCK)).thenReturn(mockLock);
+        doNothing().when(mockLock).lock();
+        doNothing().when(mockLock).unlock();
+
         createOrgHierarchy();
 
         OrganisationalUnitDto dto = new OrganisationalUnitDto();
@@ -353,6 +383,10 @@ class OrganisationalUnitServiceTest {
         // child IDs
         assertTrue(grandParent.getChildIds().contains(3L));
         assertFalse(parent.getChildIds().contains(3L));
+
+        // Verify that lock.lock() and lock.unlock() were invoked
+        verify(mockLock, times(1)).lock();
+        verify(mockLock, times(1)).unlock();
     }
 
     private void createOrgHierarchy() {

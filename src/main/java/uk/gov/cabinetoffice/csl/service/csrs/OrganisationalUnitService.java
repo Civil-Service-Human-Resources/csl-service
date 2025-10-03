@@ -2,6 +2,8 @@ package uk.gov.cabinetoffice.csl.service.csrs;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
@@ -30,6 +32,9 @@ public class OrganisationalUnitService {
     private final MessageMetadataFactory messageMetadataFactory;
     private final IMessagingClient messagingClient;
     private final OrganisationalUnitFactory organisationalUnitFactory;
+    private final RedissonClient redissonClient;
+
+    private static final String ORG_UNIT_CACHE_LOCK = "lock:organisationalUnitMap";
 
     public OrganisationalUnitMap getOrganisationalUnitMap() {
         OrganisationalUnitMap map = organisationalUnitMapCache.get();
@@ -134,6 +139,13 @@ public class OrganisationalUnitService {
     public void removeOrganisationalUnitsFromCache(List<Long> organisationIds) {
         log.info("Removing organisationalUnits from Cache for the organisationalUnitIds: {}", organisationIds);
         organisationIds.forEach(organisationalUnitId -> getOrganisationalUnitMap().remove(organisationalUnitId));
+        RLock lock = redissonClient.getLock(ORG_UNIT_CACHE_LOCK);
+        lock.lock(); // blocks until acquired
+        try {
+            organisationIds.forEach(organisationalUnitId -> getOrganisationalUnitMap().remove(organisationalUnitId));
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void removeOrganisationalUnitAndChildrenFromCache(Long organisationalUnitId) {
@@ -142,25 +154,31 @@ public class OrganisationalUnitService {
     }
 
     public OrganisationalUnitMap updateOrganisationalUnitsInCache(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
-        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
-        OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
-        if (organisationalUnit == null) {
-            log.error("OrganisationalUnit not found for id: {}", organisationalUnitId);
-            throw new NotFoundException("OrganisationalUnit not found for id: " + organisationalUnitId);
+        RLock lock = redissonClient.getLock(ORG_UNIT_CACHE_LOCK);
+        lock.lock(); // blocks until acquired
+        try {
+            OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
+            OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
+            if (organisationalUnit == null) {
+                log.error("OrganisationalUnit not found for id: {}", organisationalUnitId);
+                throw new NotFoundException("OrganisationalUnit not found for id: " + organisationalUnitId);
+            }
+
+            OrganisationalUnit parent = parseParent(organisationalUnitDto.getParent(), organisationalUnitMap);
+            organisationalUnit.setParent(parent);
+            organisationalUnit.setParentId(parent != null ? parent.getId() : null);
+            organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
+            organisationalUnit.setCode(organisationalUnitDto.getCode());
+            organisationalUnit.setName(organisationalUnitDto.getName());
+
+            List<OrganisationalUnit> organisationalUnits = new ArrayList<>(organisationalUnitMap.values());
+            OrganisationalUnitMap rebuiltOrgMap = organisationalUnitFactory.buildOrganisationalUnits(organisationalUnits);
+            organisationalUnitMapCache.put(rebuiltOrgMap);
+            log.info("Cache is updated for the organisational unit and its children: {}", rebuiltOrgMap.get(organisationalUnitId));
+            return rebuiltOrgMap;
+        } finally {
+            lock.unlock();
         }
-
-        OrganisationalUnit parent = parseParent(organisationalUnitDto.getParent(), organisationalUnitMap);
-        organisationalUnit.setParent(parent);
-        organisationalUnit.setParentId(parent != null ? parent.getId() : null);
-        organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
-        organisationalUnit.setCode(organisationalUnitDto.getCode());
-        organisationalUnit.setName(organisationalUnitDto.getName());
-
-        List<OrganisationalUnit> organisationalUnits = new ArrayList<>(organisationalUnitMap.values());
-        OrganisationalUnitMap rebuiltOrgMap = organisationalUnitFactory.buildOrganisationalUnits(organisationalUnits);
-        organisationalUnitMapCache.put(rebuiltOrgMap);
-        log.info("Cache is updated for the organisational unit and its children: {}", rebuiltOrgMap.get(organisationalUnitId));
-        return rebuiltOrgMap;
     }
 
     private OrganisationalUnit parseParent(String parentStr, OrganisationalUnitMap map) {

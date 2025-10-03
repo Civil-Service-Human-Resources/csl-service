@@ -1,8 +1,11 @@
 package uk.gov.cabinetoffice.csl.integration;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -19,6 +22,7 @@ import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 import java.time.Instant;
 import java.util.Map;
 
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -36,9 +40,16 @@ public class IntegrationTestBase extends CSLServiceWireMockServer {
     @Autowired
     protected WebApplicationContext context;
 
+    @MockBean
+    private RedissonClient redissonClient;
 
     @BeforeEach
     public void setup() {
+        RLock mockLock = mock(RLock.class);
+        when(redissonClient.getLock(anyString())).thenReturn(mockLock);
+        doNothing().when(mockLock).lock();
+        doNothing().when(mockLock).unlock();
+
         Jwt jwt = new Jwt("token", Instant.now(), Instant.MAX, Map.of("alg", "none"),
                 Map.of(
                         JwtClaimNames.SUB, "userId",
