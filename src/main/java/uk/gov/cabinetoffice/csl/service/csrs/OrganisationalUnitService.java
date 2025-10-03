@@ -114,13 +114,14 @@ public class OrganisationalUnitService {
         log.info("Updating organisational unit data in csrs: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
         civilServantRegistryClient.patchOrganisationalUnit(organisationalUnitId, organisationalUnitDto);
         log.info("Updating organisational unit data in cache: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
-        OrganisationalUnit organisationalUnit = updateOrganisationalUnitsInCache(organisationalUnitId, organisationalUnitDto);
-        log.info("Updating organisational unit formatted name: {} in reporting for organisationalUnit: {}", organisationalUnit.getFormattedName(), organisationalUnit);
-        updateReportingData(organisationalUnitId, organisationalUnit.getFormattedName());
+        OrganisationalUnitMap organisationalUnitMap = updateOrganisationalUnitsInCache(organisationalUnitId, organisationalUnitDto);
+        List<OrganisationalUnit> multipleOrgs = organisationalUnitMap.getMultiple(Collections.singleton(organisationalUnitId), true);
+        log.info("Updating organisational units formatted name in reporting for organisationalUnits: {}", multipleOrgs);
+        updateReportingData(multipleOrgs);
     }
 
-    private void updateReportingData(Long organisationalUnitId, String formattedOrganisationName) {
-        RegisteredLearnerOrganisationUpdateMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationUpdateMessage(organisationalUnitId, formattedOrganisationName);
+    private void updateReportingData(List<OrganisationalUnit> multipleOrgs) {
+        RegisteredLearnerOrganisationUpdateMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationUpdateMessage(multipleOrgs);
         log.info("Sending organisational unit message to update reporting data: {}", message);
         messagingClient.sendMessages(List.of(message));
     }
@@ -139,7 +140,7 @@ public class OrganisationalUnitService {
         removeOrganisationalUnitsFromCache(getOrganisationsIdsIncludingParentAndChildren(List.of(organisationalUnitId)));
     }
 
-    public OrganisationalUnit updateOrganisationalUnitsInCache(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
+    public OrganisationalUnitMap updateOrganisationalUnitsInCache(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
         OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
         OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
         if (organisationalUnit == null) {
@@ -158,8 +159,8 @@ public class OrganisationalUnitService {
         OrganisationalUnitMap rebuiltOrgMap = organisationalUnitFactory.buildOrganisationalUnits(organisationalUnits);
         organisationalUnitMapCache.put(rebuiltOrgMap);
         OrganisationalUnit updatedOrganisationalUnit = rebuiltOrgMap.get(organisationalUnitId);
-        log.info("Cache is updated for the organisational unit: {}", updatedOrganisationalUnit);
-        return updatedOrganisationalUnit;
+        log.info("Cache is updated for the organisational unit and its children: {}", updatedOrganisationalUnit);
+        return rebuiltOrgMap;
     }
 
     private OrganisationalUnit parseParent(String parentStr, OrganisationalUnitMap map) {
