@@ -114,8 +114,8 @@ public class OrganisationalUnitService {
         log.info("Updating organisational unit data in csrs: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
         civilServantRegistryClient.patchOrganisationalUnit(organisationalUnitId, organisationalUnitDto);
         log.info("Updating organisational unit data in cache: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
-        OrganisationalUnitMap organisationalUnitMap = updateOrganisationalUnitsInCache(organisationalUnitId, organisationalUnitDto);
-        List<OrganisationalUnit> multipleOrgs = organisationalUnitMap.getMultiple(Collections.singleton(organisationalUnitId), true);
+        updateOrganisationalUnitsInCache(organisationalUnitId, organisationalUnitDto);
+        List<OrganisationalUnit> multipleOrgs = getOrganisationsWithChildrenAsFlatList(Collections.singletonList(organisationalUnitId));
         log.info("Updating organisational units formatted name in reporting for organisationalUnits: {}", multipleOrgs);
         updateReportingData(multipleOrgs);
     }
@@ -132,11 +132,12 @@ public class OrganisationalUnitService {
     }
 
     public void removeOrganisationalUnitsFromCache(List<Long> organisationIds) {
-        log.info("Removing organisationalUnit and its children FromCache for the organisationalUnitIds: {}", organisationIds);
+        log.info("Removing organisationalUnits from Cache for the organisationalUnitIds: {}", organisationIds);
         organisationIds.forEach(organisationalUnitId -> getOrganisationalUnitMap().remove(organisationalUnitId));
     }
 
     public void removeOrganisationalUnitAndChildrenFromCache(Long organisationalUnitId) {
+        log.info("Removing organisationalUnit and its children from Cache for the organisationalUnitId: {}.", organisationalUnitId);
         removeOrganisationalUnitsFromCache(getOrganisationsIdsIncludingParentAndChildren(List.of(organisationalUnitId)));
     }
 
@@ -158,8 +159,7 @@ public class OrganisationalUnitService {
         List<OrganisationalUnit> organisationalUnits = new ArrayList<>(organisationalUnitMap.values());
         OrganisationalUnitMap rebuiltOrgMap = organisationalUnitFactory.buildOrganisationalUnits(organisationalUnits);
         organisationalUnitMapCache.put(rebuiltOrgMap);
-        OrganisationalUnit updatedOrganisationalUnit = rebuiltOrgMap.get(organisationalUnitId);
-        log.info("Cache is updated for the organisational unit and its children: {}", updatedOrganisationalUnit);
+        log.info("Cache is updated for the organisational unit and its children: {}", rebuiltOrgMap.get(organisationalUnitId));
         return rebuiltOrgMap;
     }
 
