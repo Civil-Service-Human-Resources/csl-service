@@ -7,5 +7,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class RegisteredLearnerOrganisationUpdate {
     private final Long organisationId;
-    private final String formattedOrganisationName;
+    private final String organisationName;
 }
