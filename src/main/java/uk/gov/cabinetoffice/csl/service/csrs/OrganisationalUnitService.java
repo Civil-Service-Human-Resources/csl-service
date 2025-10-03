@@ -111,15 +111,16 @@ public class OrganisationalUnitService {
     }
 
     public void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
-        log.info("Updating organisational unit for id: {}", organisationalUnitId);
+        log.info("Updating organisational unit data: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
         civilServantRegistryClient.patchOrganisationalUnit(organisationalUnitId, organisationalUnitDto);
         OrganisationalUnit organisationalUnit = updateOrganisationalUnitsInCache(organisationalUnitId, organisationalUnitDto);
+        log.info("Sending organisational unit formatted name: {} to reporting for organisationalUnit: {}", organisationalUnit.getFormattedName(), organisationalUnit);
         updateReportingData(organisationalUnitId, organisationalUnit.getFormattedName());
     }
 
     private void updateReportingData(Long organisationalUnitId, String formattedOrganisationName) {
-        log.debug("updatingReportingData: {} for organisationalUnitId: {}", formattedOrganisationName, organisationalUnitId);
         RegisteredLearnerOrganisationUpdateMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationUpdateMessage(organisationalUnitId, formattedOrganisationName);
+        log.info("Sending message to reporting to update reporting data: {}", message);
         messagingClient.sendMessages(List.of(message));
     }
 
@@ -155,7 +156,9 @@ public class OrganisationalUnitService {
         List<OrganisationalUnit> organisationalUnits = new ArrayList<>(organisationalUnitMap.values());
         OrganisationalUnitMap rebuiltOrgMap = organisationalUnitFactory.buildOrganisationalUnits(organisationalUnits);
         organisationalUnitMapCache.put(rebuiltOrgMap);
-        return rebuiltOrgMap.get(organisationalUnitId);
+        OrganisationalUnit updatedOrganisationalUnit = rebuiltOrgMap.get(organisationalUnitId);
+        log.info("Cache is updated for the organisational unit: {}", updatedOrganisationalUnit);
+        return updatedOrganisationalUnit;
     }
 
     private OrganisationalUnit parseParent(String parentStr, OrganisationalUnitMap map) {

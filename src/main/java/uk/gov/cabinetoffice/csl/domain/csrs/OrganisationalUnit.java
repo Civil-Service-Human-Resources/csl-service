@@ -99,6 +99,7 @@ public class OrganisationalUnit implements Serializable, Cacheable {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .append("name", name)
+                .append("formattedName", formattedName)
                 .append("code", code)
                 .append("abbreviation", abbreviation)
                 .append("parentId", parentId)
