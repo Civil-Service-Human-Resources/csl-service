@@ -106,7 +106,7 @@ public class OrganisationalUnitService {
     }
 
     private void deleteFromReportingData(List<Long> organisationIds) {
-        log.debug("deleteFromReportingData:organisationalUnitIds: {}", organisationIds);
+        log.info("deleteFromReportingData:organisationalUnitIds: {}", organisationIds);
         RegisteredLearnerOrganisationDeleteMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationDeleteMessage(organisationIds);
         messagingClient.sendMessages(List.of(message));
     }
