@@ -28,13 +28,13 @@ public class RedisCaches {
 
     @Bean
     public OrganisationalUnitMapCache organisationalUnitMapCache(CacheManager cacheManager) {
-        Cache cache = cacheManager.getCache("organisation");
+        Cache cache = cacheManager.getCache("organisations");
         return new OrganisationalUnitMapCache(cache);
     }
 
     @Bean
     public ObjectCache<OrganisationalUnit> organisationalUnitCache(CacheManager cacheManager) {
-        Cache cache = cacheManager.getCache("organisation");
+        Cache cache = cacheManager.getCache("organisations");
         return new ObjectCache<>(cache, OrganisationalUnit.class);
     }
 
