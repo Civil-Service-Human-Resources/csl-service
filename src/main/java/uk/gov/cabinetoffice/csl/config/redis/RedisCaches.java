@@ -27,18 +27,6 @@ public class RedisCaches {
     }
 
     @Bean
-    public OrganisationalUnitMapCache organisationalUnitMapCache(CacheManager cacheManager) {
-        Cache cache = cacheManager.getCache("organisations");
-        return new OrganisationalUnitMapCache(cache);
-    }
-
-    @Bean
-    public ObjectCache<OrganisationalUnit> organisationalUnitCache(CacheManager cacheManager) {
-        Cache cache = cacheManager.getCache("organisations");
-        return new ObjectCache<>(cache, OrganisationalUnit.class);
-    }
-
-    @Bean
     public RequiredLearningMapCache requiredLearningMapCache(CacheManager cacheManager) {
         Cache cache = cacheManager.getCache("catalogue-course");
         return new RequiredLearningMapCache(cache);
@@ -60,6 +48,18 @@ public class RedisCaches {
     public ObjectCache<LearnerRecord> learnerRecordCache(CacheManager cacheManager) {
         Cache cache = cacheManager.getCache("learner-record");
         return new ObjectCache<>(cache, LearnerRecord.class);
+    }
+
+    @Bean
+    public OrganisationalUnitMapCache organisationalUnitMapCache(CacheManager cacheManager) {
+        Cache cache = cacheManager.getCache("organisations");
+        return new OrganisationalUnitMapCache(cache);
+    }
+
+    @Bean
+    public ObjectCache<OrganisationalUnit> organisationalUnitCache(CacheManager cacheManager) {
+        Cache cache = cacheManager.getCache("organisations");
+        return new ObjectCache<>(cache, OrganisationalUnit.class);
     }
 
     @Bean
