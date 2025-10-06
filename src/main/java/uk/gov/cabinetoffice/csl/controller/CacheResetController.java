@@ -15,6 +15,8 @@ import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
+import static java.util.Collections.singletonList;
+
 @Slf4j
 @RestController
 @RequestMapping("/reset-cache")
@@ -61,7 +63,7 @@ public class CacheResetController {
 
     @GetMapping(path = "/organisations/{organisationalUnitId}", produces = "application/json")
     public ResponseEntity<?> removeOrganisationalUnitFromCache(@PathVariable Long organisationalUnitId) {
-        organisationalUnitService.removeOrganisationalUnitAndChildrenFromCache(organisationalUnitId);
+        organisationalUnitService.removeOrganisationalUnitAndChildrenFromCache(singletonList(organisationalUnitId));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 

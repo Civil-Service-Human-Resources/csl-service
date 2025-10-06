@@ -18,10 +18,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -30,9 +27,6 @@ class OrganisationalUnitServiceTest {
 
     private final OrganisationalUnitFactory organisationalUnitFactory = new OrganisationalUnitFactory();
     private OrganisationalUnitMap organisationalUnitMap;
-    private OrganisationalUnit grandParent;
-    private OrganisationalUnit parent;
-    private OrganisationalUnit child;
 
     @Mock
     OrganisationalUnitMapCache organisationalUnitMapCache;
@@ -51,7 +45,7 @@ class OrganisationalUnitServiceTest {
     @BeforeEach
     public void setUp() {
         organisationalUnitService = new OrganisationalUnitService(organisationalUnitMapCache, csrs,
-                messageMetadataFactory, messagingClient, organisationalUnitFactory);
+                messageMetadataFactory, messagingClient);
         organisationalUnitMap = organisationalUnitFactory.buildOrganisationalUnits(getAllOrganisationalUnits());
         when(csrs.getAllOrganisationalUnits()).thenReturn(organisationalUnitMap);
     }
@@ -282,92 +276,103 @@ class OrganisationalUnitServiceTest {
 
     @Test
     void scenario1_removeGrandParentFromParent() {
-        createOrgHierarchy();
-
         OrganisationalUnitDto dto = new OrganisationalUnitDto();
         dto.setName("Parent Org");
         dto.setAbbreviation("PO");
         dto.setCode("PO-CODE");
         dto.setParent(null);
 
-        organisationalUnitService.updateOrganisationalUnitsInCache(2L, dto);
+        OrganisationalUnit originalOrganisationalUnit = organisationalUnitMap.get(2L);
+        Long originalParentId = originalOrganisationalUnit.getParentId();
+        OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
+        assertTrue(originalParent.getChildIds().contains(2L));
 
-        assertNull(parent.getParentId());
+        OrganisationalUnitMap updateOrganisationalUnitMap = organisationalUnitService.updateOrganisationalUnitsInCache(2L, dto);
+        OrganisationalUnit updatedOrganisationalUnit = updateOrganisationalUnitMap.get(2L);
+
+        //Updated formatted name
+        assertEquals("Parent Org (PO)", updatedOrganisationalUnit.getFormattedName());
+
         // parent should be top-level
-        assertNull(parent.getParent());
-
-        // formatted names
-        assertEquals("Parent Org (PO)", parent.getFormattedName());
-        assertEquals("Parent Org (PO) | Child Org (CO)", child.getFormattedName());
+        assertNull(updatedOrganisationalUnit.getParentId());
+        assertNull(updatedOrganisationalUnit.getParent());
 
         // child IDs
-        assertFalse(grandParent.getChildIds().contains(2L), "Grand Parent should no longer have Parent as child");
-        assertTrue(parent.getChildIds().contains(3L), "Parent should still have Child as child");
+        Set<Long> childIds = updatedOrganisationalUnit.getChildIds();
+        assertTrue(childIds.contains(3L), "Parent should still have Child as child");
+        OrganisationalUnit childOrganisationalUnit = updateOrganisationalUnitMap.get(3L);
+        assertEquals("Parent Org (PO) | OrgName3 (OName3)", childOrganisationalUnit.getFormattedName());
+
+        // original parent should not track update child
+        OrganisationalUnit updatedParent = updateOrganisationalUnitMap.get(originalParentId);
+        assertFalse(updatedParent.getChildIds().contains(2L), "Grand Parent should no longer have Parent as child");
     }
 
     @Test
     void scenario2_removeParentFromChild() {
-        createOrgHierarchy();
-
         OrganisationalUnitDto dto = new OrganisationalUnitDto();
         dto.setName("Child Org");
         dto.setAbbreviation("CO");
         dto.setCode("CO-CODE");
         dto.setParent(null);
 
-        organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
+        OrganisationalUnit originalOrganisationalUnit = organisationalUnitMap.get(3L);
+        Long originalParentId = originalOrganisationalUnit.getParentId();
+        OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
+        assertTrue(originalParent.getChildIds().contains(3L));
 
-        // child should be top-level
-        assertNull(child.getParentId());
-        assertNull(child.getParent());
+        OrganisationalUnitMap updateOrganisationalUnitMap = organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
+        OrganisationalUnit updatedOrganisationalUnit = updateOrganisationalUnitMap.get(3L);
 
         // formatted names
-        assertEquals("Child Org (CO)", child.getFormattedName());
-        assertEquals("Grand Parent Org (GPO) | Parent Org (PO)", parent.getFormattedName());
+        assertEquals("Child Org (CO)", updatedOrganisationalUnit.getFormattedName());
+
+        // child should be top-level
+        assertNull(updatedOrganisationalUnit.getParentId());
+        assertNull(updatedOrganisationalUnit.getParent());
 
         // child IDs
-        assertFalse(parent.getChildIds().contains(3L), "Parent should no longer track Child");
-        assertFalse(grandParent.getChildIds().contains(3L), "Grand Parent should not track Child");
+        Set<Long> childIds = updatedOrganisationalUnit.getChildIds();
+        assertTrue(childIds.contains(4L), "Child should still have further Child as child");
+        OrganisationalUnit childOrganisationalUnit = updateOrganisationalUnitMap.get(4L);
+        assertEquals("Child Org (CO) | OrgName4 (OName4)", childOrganisationalUnit.getFormattedName());
+
+        // original parent should not track update child
+        OrganisationalUnit updatedParent = updateOrganisationalUnitMap.get(originalParentId);
+        assertFalse(updatedParent.getChildIds().contains(3L), "Grand Parent should no longer have Parent as child");
     }
 
     @Test
     void scenario3_makeGrandParentParentOfChild() {
-        createOrgHierarchy();
-
         OrganisationalUnitDto dto = new OrganisationalUnitDto();
         dto.setName("Child Org");
         dto.setAbbreviation("CO");
         dto.setCode("CO-CODE");
         dto.setParent("/organisationalUnits/1"); // grandparent
 
-        organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
+        OrganisationalUnit originalOrganisationalUnit = organisationalUnitMap.get(3L);
+        Long originalParentId = originalOrganisationalUnit.getParentId();
+        assertEquals(originalParentId, 2L);
+        OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
+        assertTrue(originalParent.getChildIds().contains(3L));
 
-        // child parent
-        assertEquals(1L, child.getParentId());
-        assertEquals(grandParent, child.getParent());
+        OrganisationalUnitMap updateOrganisationalUnitMap = organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
+        OrganisationalUnit updatedOrganisationalUnit = updateOrganisationalUnitMap.get(3L);
 
         // formatted names
-        assertEquals("Grand Parent Org (GPO) | Child Org (CO)", child.getFormattedName());
-        assertEquals("Grand Parent Org (GPO) | Parent Org (PO)", parent.getFormattedName());
+        assertEquals("OrgName1 (OName1) | Child Org (CO)", updatedOrganisationalUnit.getFormattedName());
+
+        // new parent
+        assertEquals(updatedOrganisationalUnit.getParentId(), 1L);
 
         // child IDs
-        assertTrue(grandParent.getChildIds().contains(3L));
-        assertFalse(parent.getChildIds().contains(3L));
-    }
+        Set<Long> childIds = updatedOrganisationalUnit.getChildIds();
+        assertTrue(childIds.contains(4L), "Child should still have further Child as child");
+        OrganisationalUnit childOrganisationalUnit = updateOrganisationalUnitMap.get(4L);
+        assertEquals("OrgName1 (OName1) | Child Org (CO) | OrgName4 (OName4)", childOrganisationalUnit.getFormattedName());
 
-    private void createOrgHierarchy() {
-        grandParent = new OrganisationalUnit(1L, "Grand Parent Org", "GPO-CODE", "GPO", null);
-
-        parent = new OrganisationalUnit(2L, "Parent Org", "PO-CODE", "PO", null);
-        parent.setParentId(1L);
-        parent.setParent(grandParent);
-
-        child = new OrganisationalUnit(3L, "Child Org", "CO-CODE", "CO", null);
-        child.setParentId(2L);
-        child.setParent(parent);
-
-        organisationalUnitMap.put(1L, grandParent);
-        organisationalUnitMap.put(2L, parent);
-        organisationalUnitMap.put(3L, child);
+        // original parent should not track update child
+        OrganisationalUnit updatedParent = updateOrganisationalUnitMap.get(originalParentId);
+        assertFalse(updatedParent.getChildIds().contains(3L), "Grand Parent should no longer have Parent as child");
     }
 }
