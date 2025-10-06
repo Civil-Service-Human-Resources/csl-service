@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 import static com.azure.core.util.CoreUtils.isNullOrEmpty;
 import static java.util.Collections.singletonList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
 @Service
