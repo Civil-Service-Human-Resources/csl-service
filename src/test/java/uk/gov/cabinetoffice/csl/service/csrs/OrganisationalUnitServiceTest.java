@@ -44,10 +44,10 @@ class OrganisationalUnitServiceTest {
 
     @BeforeEach
     public void setUp() {
-        organisationalUnitService = new OrganisationalUnitService(organisationalUnitMapCache, csrs,
-                messageMetadataFactory, messagingClient);
         organisationalUnitMap = organisationalUnitFactory.buildOrganisationalUnits(getAllOrganisationalUnits());
         when(csrs.getAllOrganisationalUnits()).thenReturn(organisationalUnitMap);
+        organisationalUnitService = new OrganisationalUnitService(organisationalUnitMapCache, csrs,
+                messageMetadataFactory, messagingClient);
     }
 
     @Test
