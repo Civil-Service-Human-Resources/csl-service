@@ -32,13 +32,11 @@ public class OrganisationalUnitService {
     private final OrganisationalUnitFactory organisationalUnitFactory;
 
     public OrganisationalUnitMap getOrganisationalUnitMap() {
-        OrganisationalUnitMap map = organisationalUnitMapCache.get();
-        if (map == null) {
-            map = civilServantRegistryClient.getAllOrganisationalUnits();
+        if (organisationalUnitMapCache.get() == null) {
             log.info("Setting organisational units cache");
-            organisationalUnitMapCache.put(map);
+            organisationalUnitMapCache.put(civilServantRegistryClient.getAllOrganisationalUnits());
         }
-        return map;
+        return organisationalUnitMapCache.get();
     }
 
     public OrganisationalUnits getAllOrganisationalUnits() {
