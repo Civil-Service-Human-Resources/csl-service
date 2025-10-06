@@ -56,7 +56,7 @@ public class CSRSClient implements ICSRSClient {
 
     @Override
     public OrganisationalUnitMap getAllOrganisationalUnits() {
-        log.info("Getting all organisational units");
+        log.info("Getting all organisational units from csrs");
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(allOrganisationalUnits);
         List<OrganisationalUnit> organisationalUnits = httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
                 .stream().toList();
