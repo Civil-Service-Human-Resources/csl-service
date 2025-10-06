@@ -7,7 +7,6 @@ import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
-import uk.gov.cabinetoffice.csl.domain.error.IncorrectStateException;
 import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
@@ -148,8 +147,8 @@ public class OrganisationalUnitService {
         }
 
         Long originalParentId = organisationalUnit.getParentId();
-
-        OrganisationalUnit newParent = parseParent(organisationalUnitDto.getParent(), organisationalUnitMap);
+        Long newParentId = organisationalUnitDto.getParent();
+        OrganisationalUnit newParent = organisationalUnitMap.get(newParentId);
         organisationalUnit.setParent(newParent);
         organisationalUnit.setParentId(newParent != null ? newParent.getId() : null);
         organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
@@ -168,21 +167,5 @@ public class OrganisationalUnitService {
         updatedOrganisationalUnits.forEach(u -> organisationalUnitMap.put(u.getId(), u));
         organisationalUnitMapCache.put(organisationalUnitMap);
         return updatedOrganisationalUnits;
-    }
-
-    private OrganisationalUnit parseParent(String parentStr, OrganisationalUnitMap map) {
-        if (isBlank(parentStr)) return null;
-        try {
-            Long parentId = Long.parseLong(parentStr.substring(parentStr.lastIndexOf('/') + 1));
-            OrganisationalUnit parent = map.get(parentId);
-            if (parent == null) {
-                log.error("Parent OrganisationalUnit not found for id: {}", parentId);
-                throw new NotFoundException("Parent OrganisationalUnit not found for id: " + parentId);
-            }
-            return parent;
-        } catch (NumberFormatException e) {
-            log.error("Invalid parent reference: {}", parentStr);
-            throw new IncorrectStateException("Invalid parent reference: " + parentStr);
-        }
     }
 }

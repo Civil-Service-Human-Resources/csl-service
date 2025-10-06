@@ -348,7 +348,7 @@ class OrganisationalUnitServiceTest {
         dto.setName("Child Org");
         dto.setAbbreviation("CO");
         dto.setCode("CO-CODE");
-        dto.setParent("/organisationalUnits/1"); // grandparent
+        dto.setParent(1L); // grandparent
 
         OrganisationalUnit originalOrganisationalUnit = organisationalUnitMap.get(3L);
         Long originalParentId = originalOrganisationalUnit.getParentId();

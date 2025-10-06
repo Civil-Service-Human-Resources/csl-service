@@ -11,5 +11,5 @@ public class OrganisationalUnitDto {
     private String code;
     private String name;
     private String abbreviation;
-    private String parent;
+    private Long parent;
 }
