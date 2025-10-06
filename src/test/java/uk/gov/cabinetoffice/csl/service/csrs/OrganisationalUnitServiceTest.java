@@ -287,8 +287,8 @@ class OrganisationalUnitServiceTest {
         OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
         assertTrue(originalParent.getChildIds().contains(2L));
 
-        OrganisationalUnitMap updateOrganisationalUnitMap = organisationalUnitService.updateOrganisationalUnitsInCache(2L, dto);
-        OrganisationalUnit updatedOrganisationalUnit = updateOrganisationalUnitMap.get(2L);
+        List<OrganisationalUnit> updatedOrganisationalUnits = organisationalUnitService.updateOrganisationalUnitsInCache(2L, dto);
+        OrganisationalUnit updatedOrganisationalUnit = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(2L)).findFirst().get();
 
         //Updated formatted name
         assertEquals("Parent Org (PO)", updatedOrganisationalUnit.getFormattedName());
@@ -300,11 +300,11 @@ class OrganisationalUnitServiceTest {
         // child IDs
         Set<Long> childIds = updatedOrganisationalUnit.getChildIds();
         assertTrue(childIds.contains(3L), "Parent should still have Child as child");
-        OrganisationalUnit childOrganisationalUnit = updateOrganisationalUnitMap.get(3L);
+        OrganisationalUnit childOrganisationalUnit = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(3L)).findFirst().get();
         assertEquals("Parent Org (PO) | OrgName3 (OName3)", childOrganisationalUnit.getFormattedName());
 
         // original parent should not track update child
-        OrganisationalUnit updatedParent = updateOrganisationalUnitMap.get(originalParentId);
+        OrganisationalUnit updatedParent = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(originalParentId)).findFirst().get();
         assertFalse(updatedParent.getChildIds().contains(2L), "Grand Parent should no longer have Parent as child");
     }
 
@@ -321,8 +321,8 @@ class OrganisationalUnitServiceTest {
         OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
         assertTrue(originalParent.getChildIds().contains(3L));
 
-        OrganisationalUnitMap updateOrganisationalUnitMap = organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
-        OrganisationalUnit updatedOrganisationalUnit = updateOrganisationalUnitMap.get(3L);
+        List<OrganisationalUnit> updatedOrganisationalUnits = organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
+        OrganisationalUnit updatedOrganisationalUnit = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(3L)).findFirst().get();
 
         // formatted names
         assertEquals("Child Org (CO)", updatedOrganisationalUnit.getFormattedName());
@@ -334,11 +334,11 @@ class OrganisationalUnitServiceTest {
         // child IDs
         Set<Long> childIds = updatedOrganisationalUnit.getChildIds();
         assertTrue(childIds.contains(4L), "Child should still have further Child as child");
-        OrganisationalUnit childOrganisationalUnit = updateOrganisationalUnitMap.get(4L);
+        OrganisationalUnit childOrganisationalUnit = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(4L)).findFirst().get();
         assertEquals("Child Org (CO) | OrgName4 (OName4)", childOrganisationalUnit.getFormattedName());
 
         // original parent should not track update child
-        OrganisationalUnit updatedParent = updateOrganisationalUnitMap.get(originalParentId);
+        OrganisationalUnit updatedParent = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(originalParentId)).findFirst().get();
         assertFalse(updatedParent.getChildIds().contains(3L), "Grand Parent should no longer have Parent as child");
     }
 
@@ -356,8 +356,8 @@ class OrganisationalUnitServiceTest {
         OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
         assertTrue(originalParent.getChildIds().contains(3L));
 
-        OrganisationalUnitMap updateOrganisationalUnitMap = organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
-        OrganisationalUnit updatedOrganisationalUnit = updateOrganisationalUnitMap.get(3L);
+        List<OrganisationalUnit> updateOrganisationalUnits = organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
+        OrganisationalUnit updatedOrganisationalUnit = updateOrganisationalUnits.stream().filter(o -> o.getId().equals(3L)).findFirst().get();
 
         // formatted names
         assertEquals("OrgName1 (OName1) | Child Org (CO)", updatedOrganisationalUnit.getFormattedName());
@@ -368,11 +368,11 @@ class OrganisationalUnitServiceTest {
         // child IDs
         Set<Long> childIds = updatedOrganisationalUnit.getChildIds();
         assertTrue(childIds.contains(4L), "Child should still have further Child as child");
-        OrganisationalUnit childOrganisationalUnit = updateOrganisationalUnitMap.get(4L);
+        OrganisationalUnit childOrganisationalUnit = updateOrganisationalUnits.stream().filter(o -> o.getId().equals(4L)).findFirst().get();
         assertEquals("OrgName1 (OName1) | Child Org (CO) | OrgName4 (OName4)", childOrganisationalUnit.getFormattedName());
 
         // original parent should not track update child
-        OrganisationalUnit updatedParent = updateOrganisationalUnitMap.get(originalParentId);
+        OrganisationalUnit updatedParent = updateOrganisationalUnits.stream().filter(o -> o.getId().equals(originalParentId)).findFirst().get();
         assertFalse(updatedParent.getChildIds().contains(3L), "Grand Parent should no longer have Parent as child");
     }
 }
