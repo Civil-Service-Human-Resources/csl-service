@@ -6,7 +6,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.NullableModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
@@ -55,12 +54,6 @@ public class RedisCaches {
         Cache cache = cacheManager.getCache("organisations");
         return new OrganisationalUnitMapCache(cache);
     }
-
-//    @Bean
-//    public ObjectCache<OrganisationalUnit> organisationalUnitCache(CacheManager cacheManager) {
-//        Cache cache = cacheManager.getCache("organisations");
-//        return new ObjectCache<>(cache, OrganisationalUnit.class);
-//    }
 
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
