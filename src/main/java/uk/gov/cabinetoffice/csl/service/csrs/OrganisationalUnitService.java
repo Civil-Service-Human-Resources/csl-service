@@ -35,6 +35,7 @@ public class OrganisationalUnitService {
         OrganisationalUnitMap map = organisationalUnitMapCache.get();
         if (map == null) {
             map = civilServantRegistryClient.getAllOrganisationalUnits();
+            log.info("Setting organisational units cache");
             organisationalUnitMapCache.put(map);
         }
         return map;
