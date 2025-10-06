@@ -78,7 +78,8 @@ public class OrganisationalUnitService {
     }
 
     public List<OrganisationalUnit> getOrganisationsWithChildrenAsFlatList(List<Long> organisationIds) {
-        return getOrganisationalUnitMap().getMultiple(organisationIds, true);
+        return getOrganisationalUnitMap()
+                .getMultiple(organisationIds, true);
     }
 
     public List<Long> getOrganisationsIdsIncludingParentAndChildren(List<Long> organisationIds) {
@@ -132,12 +133,11 @@ public class OrganisationalUnitService {
     }
 
     public void removeOrganisationalUnitsFromCache(List<Long> organisationIds) {
-        log.info("Removing organisationalUnits from Cache for the organisationalUnitIds: {}", organisationIds);
+        log.info("Removing organisationalUnits from cache for the organisationalUnitIds: {}", organisationIds);
         organisationIds.forEach(organisationalUnitId -> getOrganisationalUnitMap().remove(organisationalUnitId));
     }
 
     public void removeOrganisationalUnitAndChildrenFromCache(Long organisationalUnitId) {
-        log.info("Removing organisationalUnit and its children from Cache for the organisationalUnitId: {}.", organisationalUnitId);
         removeOrganisationalUnitsFromCache(getOrganisationsIdsIncludingParentAndChildren(List.of(organisationalUnitId)));
     }
 
