@@ -56,11 +56,11 @@ public class RedisCaches {
         return new OrganisationalUnitMapCache(cache);
     }
 
-    @Bean
-    public ObjectCache<OrganisationalUnit> organisationalUnitCache(CacheManager cacheManager) {
-        Cache cache = cacheManager.getCache("organisations");
-        return new ObjectCache<>(cache, OrganisationalUnit.class);
-    }
+//    @Bean
+//    public ObjectCache<OrganisationalUnit> organisationalUnitCache(CacheManager cacheManager) {
+//        Cache cache = cacheManager.getCache("organisations");
+//        return new ObjectCache<>(cache, OrganisationalUnit.class);
+//    }
 
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
