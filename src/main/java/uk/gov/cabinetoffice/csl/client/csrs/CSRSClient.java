@@ -114,6 +114,7 @@ public class CSRSClient implements ICSRSClient {
                 serviceUrl + "/organisationalUnits/" + organisationalUnitDto.getParent() : null;
         OrganisationalUnitDto request = new OrganisationalUnitDto(organisationalUnitDto.getCode(),
                 organisationalUnitDto.getName(), organisationalUnitDto.getAbbreviation(), parent);
+        log.info("Updating organisational unit data in csrs: {} for organisationalUnitId: {}", request, organisationalUnitId);
         httpClient.executeRequest(RequestEntity.patch(url).body(request), Void.class);
     }
 }
