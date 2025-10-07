@@ -112,9 +112,9 @@ public class OrganisationalUnitService {
 
     public void removeOrganisationalUnitAndChildrenFromCache(List<Long> organisationIds) {
         log.info("Removing organisationalUnits and its children from cache for the organisationalUnitIds: {}", organisationIds);
-        List<Long> organisationsIdsIncludingParentAndChildren = getOrganisationsIdsIncludingParentAndChildren(organisationIds);
         OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
-        organisationsIdsIncludingParentAndChildren.forEach(organisationalUnitMap::remove);
+        List<OrganisationalUnit> organisationsIdsIncludingParentAndChildren = organisationalUnitMap.getMultiple(organisationIds, true);
+        organisationsIdsIncludingParentAndChildren.forEach(o -> organisationalUnitMap.remove(o.getId()));
         organisationalUnitMapCache.put(organisationalUnitMap);
     }
 
