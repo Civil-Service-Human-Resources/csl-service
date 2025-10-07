@@ -304,8 +304,8 @@ class OrganisationalUnitServiceTest {
         assertEquals("Parent Org (PO) | OrgName3 (OName3)", childOrganisationalUnit.getFormattedName());
 
         // original parent should not track update child
-        OrganisationalUnit updatedParent = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(originalParentId)).findFirst().get();
-        assertFalse(updatedParent.getChildIds().contains(2L), "Grand Parent should no longer have Parent as child");
+        OrganisationalUnit updatedOriginalParent = organisationalUnitMap.get(originalParentId);
+        assertFalse(updatedOriginalParent.getChildIds().contains(2L), "Grand Parent should no longer have Parent as child");
     }
 
     @Test
@@ -338,8 +338,8 @@ class OrganisationalUnitServiceTest {
         assertEquals("Child Org (CO) | OrgName4 (OName4)", childOrganisationalUnit.getFormattedName());
 
         // original parent should not track update child
-        OrganisationalUnit updatedParent = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(originalParentId)).findFirst().get();
-        assertFalse(updatedParent.getChildIds().contains(3L), "Grand Parent should no longer have Parent as child");
+        OrganisationalUnit updatedOriginalParent = organisationalUnitMap.get(originalParentId);
+        assertFalse(updatedOriginalParent.getChildIds().contains(3L), "Grand Parent should no longer have Parent as child");
     }
 
     @Test
@@ -372,7 +372,7 @@ class OrganisationalUnitServiceTest {
         assertEquals("OrgName1 (OName1) | Child Org (CO) | OrgName4 (OName4)", childOrganisationalUnit.getFormattedName());
 
         // original parent should not track update child
-        OrganisationalUnit updatedParent = updateOrganisationalUnits.stream().filter(o -> o.getId().equals(originalParentId)).findFirst().get();
-        assertFalse(updatedParent.getChildIds().contains(3L), "Grand Parent should no longer have Parent as child");
+        OrganisationalUnit updatedOriginalParent = organisationalUnitMap.get(originalParentId);
+        assertFalse(updatedOriginalParent.getChildIds().contains(3L), "Grand Parent should no longer have Parent as child");
     }
 }

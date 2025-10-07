@@ -158,14 +158,12 @@ public class OrganisationalUnitService {
 
         List<OrganisationalUnit> multipleOrgs = organisationalUnitMap.getMultiple(singletonList(organisationalUnitId), true);
         List<OrganisationalUnit> updatedOrganisationalUnits = organisationalUnitMap.updateFormattedName(multipleOrgs);
-
+        updatedOrganisationalUnits.forEach(u -> organisationalUnitMap.put(u.getId(), u));
         if(originalParentId != null) {
             OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
             originalParent.getChildIds().remove(organisationalUnitId);
-            updatedOrganisationalUnits.add(originalParent);
+            organisationalUnitMap.put(originalParent.getId(), originalParent);
         }
-
-        updatedOrganisationalUnits.forEach(u -> organisationalUnitMap.put(u.getId(), u));
         organisationalUnitMapCache.put(organisationalUnitMap);
         return updatedOrganisationalUnits;
     }
