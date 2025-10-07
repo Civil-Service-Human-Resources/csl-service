@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import static com.azure.core.util.CoreUtils.isNullOrEmpty;
 import static java.util.Collections.singletonList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Slf4j
 @Service
@@ -146,7 +147,8 @@ public class OrganisationalUnitService {
         }
 
         Long originalParentId = organisationalUnit.getParentId();
-        Long newParentId = organisationalUnitDto.getParent();
+        String newParentIdStr = organisationalUnitDto.getParent();
+        Long newParentId = isNotBlank(newParentIdStr) ? Long.parseLong(newParentIdStr) : null;
         OrganisationalUnit newParent = organisationalUnitMap.get(newParentId);
         organisationalUnit.setParent(newParent);
         organisationalUnit.setParentId(newParent != null ? newParent.getId() : null);

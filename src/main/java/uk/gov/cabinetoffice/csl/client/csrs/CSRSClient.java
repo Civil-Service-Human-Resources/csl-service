@@ -16,6 +16,8 @@ import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedRespo
 
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 @Component
 @Slf4j
 public class CSRSClient implements ICSRSClient {
@@ -37,6 +39,9 @@ public class CSRSClient implements ICSRSClient {
 
     @Value("${csrs.grades}")
     private String grades;
+
+    @Value("${csrs.serviceUrl}")
+    private String serviceUrl;
 
     private final IHttpClient httpClient;
     private final OrganisationalUnitFactory organisationalUnitFactory;
@@ -105,6 +110,9 @@ public class CSRSClient implements ICSRSClient {
     @Override
     public void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
         String url = String.format("%s/%s", organisationalUnits, organisationalUnitId);
+        String parentId = organisationalUnitDto.getParent();
+        String parent = isNotBlank(parentId) ? serviceUrl + "/organisationalUnits/" + parentId : null;
+        organisationalUnitDto.setParent(parent);
         httpClient.executeRequest(RequestEntity.patch(url).body(organisationalUnitDto), Void.class);
     }
 }
