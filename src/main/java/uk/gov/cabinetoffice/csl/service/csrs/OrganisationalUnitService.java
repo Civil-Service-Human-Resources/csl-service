@@ -99,10 +99,12 @@ public class OrganisationalUnitService {
 
     public void deleteOrganisationalUnit(Long organisationalUnitId) {
         log.info("Deleting organisational unit for id: {}", organisationalUnitId);
+        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
+        List<OrganisationalUnit> organisationalUnitsToBeRemoved = organisationalUnitMap.getMultiple(Collections.singleton(organisationalUnitId), true);
+        List<Long> organisationalUnitIdsToBeRemoved = organisationalUnitsToBeRemoved.stream().map(OrganisationalUnit::getId).toList();
         civilServantRegistryClient.deleteOrganisationalUnit(organisationalUnitId);
-        List<OrganisationalUnit> removedOrganisationalUnits = removeOrganisationalUnitAndChildrenFromCache(singletonList(organisationalUnitId));
-        List<Long> removedOrganisationalUnitIds = removedOrganisationalUnits.stream().map(OrganisationalUnit::getId).toList();
-        deleteFromReportingData(removedOrganisationalUnitIds);
+        removeOrganisationalUnitAndChildrenFromCache(organisationalUnitIdsToBeRemoved);
+        deleteFromReportingData(organisationalUnitIdsToBeRemoved);
     }
 
     private void deleteFromReportingData(List<Long> organisationIds) {
@@ -111,13 +113,11 @@ public class OrganisationalUnitService {
         messagingClient.sendMessages(List.of(message));
     }
 
-    public List<OrganisationalUnit> removeOrganisationalUnitAndChildrenFromCache(List<Long> organisationIds) {
+    public void removeOrganisationalUnitAndChildrenFromCache(List<Long> organisationIds) {
         log.info("Removing organisationalUnits and its children from cache for the organisationalUnitIds: {}", organisationIds);
-        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
-        List<OrganisationalUnit> organisationsIdsIncludingParentAndChildren = organisationalUnitMap.getMultiple(organisationIds, true);
-        organisationsIdsIncludingParentAndChildren.forEach(o -> organisationalUnitMap.remove(o.getId()));
+        OrganisationalUnitMap organisationalUnitMap = organisationalUnitMapCache.get();
+        organisationIds.forEach(organisationalUnitMap::remove);
         organisationalUnitMapCache.put(organisationalUnitMap);
-        return organisationsIdsIncludingParentAndChildren;
     }
 
     public void removeAllOrganisationalUnitsFromCache() {

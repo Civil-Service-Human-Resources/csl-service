@@ -18,7 +18,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +45,7 @@ class OrganisationalUnitServiceTest {
     @BeforeEach
     public void setUp() {
         organisationalUnitMap = organisationalUnitFactory.buildOrganisationalUnits(getAllOrganisationalUnits());
-        when(csrs.getAllOrganisationalUnits()).thenReturn(organisationalUnitMap);
+        when(organisationalUnitMapCache.get()).thenReturn(organisationalUnitMap);
         organisationalUnitService = new OrganisationalUnitService(organisationalUnitMapCache, csrs,
                 messageMetadataFactory, messagingClient);
     }
@@ -380,22 +379,24 @@ class OrganisationalUnitServiceTest {
     @Test
     public void shouldRemoveParentAndChildren() {
         assertEquals(6, organisationalUnitMap.size());
-        assertTrue(organisationalUnitMap.containsKey(6L));
-
         assertTrue(organisationalUnitMap.containsKey(1L));
         assertTrue(organisationalUnitMap.containsKey(2L));
         assertTrue(organisationalUnitMap.containsKey(3L));
         assertTrue(organisationalUnitMap.containsKey(4L));
         assertTrue(organisationalUnitMap.containsKey(5L));
-
-        organisationalUnitService.removeOrganisationalUnitAndChildrenFromCache(singletonList(1L));
-        assertEquals(1, organisationalUnitMap.size());
         assertTrue(organisationalUnitMap.containsKey(6L));
 
+        List<OrganisationalUnit> organisationalUnitIdsToBeRemoved = organisationalUnitMap.getMultiple(Collections.singleton(1L), true);
+        List<Long> removedOrganisationalUnitIds = organisationalUnitIdsToBeRemoved.stream().map(OrganisationalUnit::getId).toList();
+
+        organisationalUnitService.removeOrganisationalUnitAndChildrenFromCache(removedOrganisationalUnitIds);
+
+        assertEquals(1, organisationalUnitMap.size());
         assertFalse(organisationalUnitMap.containsKey(1L));
         assertFalse(organisationalUnitMap.containsKey(2L));
         assertFalse(organisationalUnitMap.containsKey(3L));
         assertFalse(organisationalUnitMap.containsKey(4L));
         assertFalse(organisationalUnitMap.containsKey(5L));
+        assertTrue(organisationalUnitMap.containsKey(6L));
     }
 }
