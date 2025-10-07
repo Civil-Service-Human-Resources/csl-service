@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -374,5 +375,27 @@ class OrganisationalUnitServiceTest {
         // original parent should not track update child
         OrganisationalUnit updatedOriginalParent = organisationalUnitMap.get(originalParentId);
         assertFalse(updatedOriginalParent.getChildIds().contains(3L), "Grand Parent should no longer have Parent as child");
+    }
+
+    @Test
+    public void shouldRemoveParentAndChildren() {
+        assertEquals(6, organisationalUnitMap.size());
+        assertTrue(organisationalUnitMap.containsKey(6L));
+
+        assertTrue(organisationalUnitMap.containsKey(1L));
+        assertTrue(organisationalUnitMap.containsKey(2L));
+        assertTrue(organisationalUnitMap.containsKey(3L));
+        assertTrue(organisationalUnitMap.containsKey(4L));
+        assertTrue(organisationalUnitMap.containsKey(5L));
+
+        organisationalUnitService.removeOrganisationalUnitAndChildrenFromCache(singletonList(1L));
+        assertEquals(1, organisationalUnitMap.size());
+        assertTrue(organisationalUnitMap.containsKey(6L));
+
+        assertFalse(organisationalUnitMap.containsKey(1L));
+        assertFalse(organisationalUnitMap.containsKey(2L));
+        assertFalse(organisationalUnitMap.containsKey(3L));
+        assertFalse(organisationalUnitMap.containsKey(4L));
+        assertFalse(organisationalUnitMap.containsKey(5L));
     }
 }
