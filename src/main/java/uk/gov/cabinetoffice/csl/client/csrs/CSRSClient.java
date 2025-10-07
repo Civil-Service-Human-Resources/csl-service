@@ -110,9 +110,10 @@ public class CSRSClient implements ICSRSClient {
     @Override
     public void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
         String url = String.format("%s/%s", organisationalUnits, organisationalUnitId);
-        String parentId = organisationalUnitDto.getParent();
-        String parent = isNotBlank(parentId) ? serviceUrl + "/organisationalUnits/" + parentId : null;
-        organisationalUnitDto.setParent(parent);
-        httpClient.executeRequest(RequestEntity.patch(url).body(organisationalUnitDto), Void.class);
+        String parent = isNotBlank(organisationalUnitDto.getParent()) ?
+                serviceUrl + "/organisationalUnits/" + organisationalUnitDto.getParent() : null;
+        OrganisationalUnitDto request = new OrganisationalUnitDto(organisationalUnitDto.getCode(),
+                organisationalUnitDto.getName(), organisationalUnitDto.getAbbreviation(), parent);
+        httpClient.executeRequest(RequestEntity.patch(url).body(request), Void.class);
     }
 }
