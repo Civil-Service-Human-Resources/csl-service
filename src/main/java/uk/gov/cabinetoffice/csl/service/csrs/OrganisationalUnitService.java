@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
+import uk.gov.cabinetoffice.csl.controller.model.DomainResponse;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
@@ -109,12 +110,37 @@ public class OrganisationalUnitService {
         log.info("Organisations are removed from the cache.");
     }
 
-    public void removeOrganisationalUnitsFromCache(List<Long> organisationIds) {
-        organisationIds.forEach(organisationalUnitId -> organisationalUnitMapCache.get().remove(organisationalUnitId));
-    }
-
     public void removeOrganisationalUnitAndChildrenFromCache(Long organisationalUnitId) {
         log.info("Removing organisationalUnit and its children FromCache for the organisationalUnitId: {}.", organisationalUnitId);
-        removeOrganisationalUnitsFromCache(getOrganisationsIdsIncludingParentAndChildren(List.of(organisationalUnitId)));
+        List<Long> organisationIds = getOrganisationsIdsIncludingParentAndChildren(List.of(organisationalUnitId));
+        OrganisationalUnitMap map = getOrganisationalUnitMap();
+        map.remove(organisationIds);
+        organisationalUnitMapCache.put(map);
+    }
+
+    private void updateOrganisationalUnits(List<Long> ids, IOrganisationalUnitUpdate update) {
+        OrganisationalUnitMap map = getOrganisationalUnitMap();
+        ids.forEach(id -> update.apply(map.get(id)));
+        organisationalUnitMapCache.put(map);
+    }
+
+    public DomainResponse addDomainToOrganisationalUnit(Long organisationUnitId, String domain) {
+        UpdateDomainResponse response = civilServantRegistryClient.addDomainToOrganisation(organisationUnitId, domain);
+        List<Long> updatedIds = response.getUpdatedChildOrganisationIds();
+        updateOrganisationalUnits(updatedIds, organisationalUnit -> {
+            organisationalUnit.addDomainAndSort(response.getDomain());
+            return organisationalUnit;
+        });
+        return new DomainResponse(updatedIds);
+    }
+
+    public DomainResponse removeDomainFromOrganisationalUnit(Long organisationUnitId, Long domainId, boolean cascade) {
+        UpdateDomainResponse response = civilServantRegistryClient.deleteDomain(organisationUnitId, domainId, cascade);
+        List<Long> updatedIds = response.getUpdatedChildOrganisationIds();
+        updateOrganisationalUnits(updatedIds, organisationalUnit -> {
+            organisationalUnit.removeDomain(domainId);
+            return organisationalUnit;
+        });
+        return new DomainResponse(updatedIds);
     }
 }

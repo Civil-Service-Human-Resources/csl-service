@@ -2,7 +2,10 @@ package uk.gov.cabinetoffice.csl.domain.csrs;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -46,7 +49,7 @@ public class OrganisationalUnit implements Serializable {
 
     @JsonIgnore
     public boolean hasDomain(String domain) {
-        boolean hasDomain = Objects.requireNonNullElse(this.domains, new ArrayList<Domain>()).stream().anyMatch(d -> d.getDomain().equals(domain));
+        boolean hasDomain = domainExists(domain);
         if (!hasDomain) {
             hasDomain = getAgencyTokenOrInherited().map(a -> a.hasDomain(domain)).orElse(false);
         }
@@ -69,6 +72,28 @@ public class OrganisationalUnit implements Serializable {
     @JsonIgnore
     public void addChildId(Long childId) {
         childIds.add(childId);
+    }
+
+    public boolean domainExists(String domain) {
+        return Objects.requireNonNullElse(this.domains, new ArrayList<Domain>()).stream().anyMatch(d -> d.getDomain().equals(domain));
+    }
+
+    @JsonIgnore
+    public void addDomainAndSort(Domain domain) {
+        if (!domainExists(domain.domain)) {
+            domains.add(domain);
+            sortDomainsByName();
+        }
+    }
+
+    @JsonIgnore
+    private void sortDomainsByName() {
+        domains.sort(Comparator.comparing(Domain::getDomain));
+    }
+
+    @JsonIgnore
+    public void removeDomain(Long domainId) {
+        domains.removeIf(d -> d.getId().equals(domainId));
     }
 
     @Override
@@ -99,4 +124,5 @@ public class OrganisationalUnit implements Serializable {
                 .append("agencyToken", agencyToken)
                 .toString();
     }
+
 }

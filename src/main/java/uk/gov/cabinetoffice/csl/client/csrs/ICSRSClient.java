@@ -1,4 +1,5 @@
 package uk.gov.cabinetoffice.csl.client.csrs;
+
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 
 import java.util.List;
@@ -18,4 +19,8 @@ public interface ICSRSClient {
     void patchCivilServantOrganisation(OrganisationDTO organisationDTO);
 
     void deleteOrganisationalUnit(Long organisationalUnitId);
+
+    UpdateDomainResponse addDomainToOrganisation(Long organisationalUnitId, String domain);
+
+    UpdateDomainResponse deleteDomain(Long organisationUnitId, Long domainId, boolean includeSubOrganisations);
 }

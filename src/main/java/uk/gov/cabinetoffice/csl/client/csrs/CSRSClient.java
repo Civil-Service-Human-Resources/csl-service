@@ -100,4 +100,16 @@ public class CSRSClient implements ICSRSClient {
         String url = String.format("%s/%s", organisationalUnits, organisationalUnitId);
         httpClient.executeRequest(RequestEntity.delete(url).build(), Void.class);
     }
+
+    @Override
+    public UpdateDomainResponse addDomainToOrganisation(Long organisationalUnitId, String domain) {
+        String url = String.format("%s/%s/domains", organisationalUnits, organisationalUnitId);
+        return httpClient.executeRequest(RequestEntity.post(url).body(new Domain(domain)), UpdateDomainResponse.class);
+    }
+
+    @Override
+    public UpdateDomainResponse deleteDomain(Long organisationUnitId, Long domainId, boolean includeSubOrganisations) {
+        String url = String.format("%s/%s/domains/%s", organisationalUnits, organisationUnitId, domainId);
+        return httpClient.executeRequest(RequestEntity.post(url).body(new DeleteDomainModel(includeSubOrganisations)), UpdateDomainResponse.class);
+    }
 }
