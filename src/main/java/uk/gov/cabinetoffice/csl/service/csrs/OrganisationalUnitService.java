@@ -182,7 +182,7 @@ public class OrganisationalUnitService {
             organisationalUnit.addDomainAndSort(response.getDomain());
             return organisationalUnit;
         });
-        return new DomainResponse(updatedIds);
+        return new DomainResponse(response.getDomain(), updatedIds);
     }
 
     public DomainResponse removeDomainFromOrganisationalUnit(Long organisationUnitId, Long domainId, DeleteDomainDto body) {
@@ -192,6 +192,6 @@ public class OrganisationalUnitService {
             organisationalUnit.removeDomain(domainId);
             return organisationalUnit;
         });
-        return new DomainResponse(updatedIds);
+        return new DomainResponse(response.getDomain(), updatedIds);
     }
 }
