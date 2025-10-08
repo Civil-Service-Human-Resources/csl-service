@@ -4,19 +4,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
+import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
+import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -24,20 +26,28 @@ import static org.mockito.Mockito.when;
 class OrganisationalUnitServiceTest {
 
     private final OrganisationalUnitFactory organisationalUnitFactory = new OrganisationalUnitFactory();
+    private OrganisationalUnitMap organisationalUnitMap;
 
     @Mock
     OrganisationalUnitMapCache organisationalUnitMapCache;
 
     @Mock
+    private MessageMetadataFactory messageMetadataFactory;
+
+    @Mock
+    private IMessagingClient messagingClient;
+
+    @Mock
     private ICSRSClient csrs;
 
-    @InjectMocks
     private OrganisationalUnitService organisationalUnitService;
 
     @BeforeEach
     public void setUp() {
-        OrganisationalUnitMap map = organisationalUnitFactory.buildOrganisationalUnits(getAllOrganisationalUnits());
-        when(csrs.getAllOrganisationalUnits()).thenReturn(map);
+        organisationalUnitMap = organisationalUnitFactory.buildOrganisationalUnits(getAllOrganisationalUnits());
+        when(organisationalUnitMapCache.get()).thenReturn(organisationalUnitMap);
+        organisationalUnitService = new OrganisationalUnitService(organisationalUnitMapCache, csrs,
+                messageMetadataFactory, messagingClient);
     }
 
     @Test
@@ -262,5 +272,131 @@ class OrganisationalUnitServiceTest {
         organisationalUnits.add(organisationalUnits6);
 
         return organisationalUnits;
+    }
+
+    @Test
+    void scenario1_removeGrandParentFromParent() {
+        OrganisationalUnitDto dto = new OrganisationalUnitDto();
+        dto.setName("Parent Org");
+        dto.setAbbreviation("PO");
+        dto.setCode("PO-CODE");
+        dto.setParent(null);
+
+        OrganisationalUnit originalOrganisationalUnit = organisationalUnitMap.get(2L);
+        Long originalParentId = originalOrganisationalUnit.getParentId();
+        OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
+        assertTrue(originalParent.getChildIds().contains(2L));
+
+        List<OrganisationalUnit> updatedOrganisationalUnits = organisationalUnitService.updateOrganisationalUnitsInCache(2L, dto);
+        OrganisationalUnit updatedOrganisationalUnit = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(2L)).findFirst().get();
+
+        //Updated formatted name
+        assertEquals("Parent Org (PO)", updatedOrganisationalUnit.getFormattedName());
+
+        // parent should be top-level
+        assertNull(updatedOrganisationalUnit.getParentId());
+        assertNull(updatedOrganisationalUnit.getParent());
+
+        // child IDs
+        Set<Long> childIds = updatedOrganisationalUnit.getChildIds();
+        assertTrue(childIds.contains(3L), "Parent should still have Child as child");
+        OrganisationalUnit childOrganisationalUnit = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(3L)).findFirst().get();
+        assertEquals("Parent Org (PO) | OrgName3 (OName3)", childOrganisationalUnit.getFormattedName());
+
+        // original parent should not track update child
+        OrganisationalUnit updatedOriginalParent = organisationalUnitMap.get(originalParentId);
+        assertFalse(updatedOriginalParent.getChildIds().contains(2L), "Grand Parent should no longer have Parent as child");
+    }
+
+    @Test
+    void scenario2_removeParentFromChild() {
+        OrganisationalUnitDto dto = new OrganisationalUnitDto();
+        dto.setName("Child Org");
+        dto.setAbbreviation("CO");
+        dto.setCode("CO-CODE");
+        dto.setParent(null);
+
+        OrganisationalUnit originalOrganisationalUnit = organisationalUnitMap.get(3L);
+        Long originalParentId = originalOrganisationalUnit.getParentId();
+        OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
+        assertTrue(originalParent.getChildIds().contains(3L));
+
+        List<OrganisationalUnit> updatedOrganisationalUnits = organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
+        OrganisationalUnit updatedOrganisationalUnit = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(3L)).findFirst().get();
+
+        // formatted names
+        assertEquals("Child Org (CO)", updatedOrganisationalUnit.getFormattedName());
+
+        // child should be top-level
+        assertNull(updatedOrganisationalUnit.getParentId());
+        assertNull(updatedOrganisationalUnit.getParent());
+
+        // child IDs
+        Set<Long> childIds = updatedOrganisationalUnit.getChildIds();
+        assertTrue(childIds.contains(4L), "Child should still have further Child as child");
+        OrganisationalUnit childOrganisationalUnit = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(4L)).findFirst().get();
+        assertEquals("Child Org (CO) | OrgName4 (OName4)", childOrganisationalUnit.getFormattedName());
+
+        // original parent should not track update child
+        OrganisationalUnit updatedOriginalParent = organisationalUnitMap.get(originalParentId);
+        assertFalse(updatedOriginalParent.getChildIds().contains(3L), "Grand Parent should no longer have Parent as child");
+    }
+
+    @Test
+    void scenario3_makeGrandParentParentOfChild() {
+        OrganisationalUnitDto dto = new OrganisationalUnitDto();
+        dto.setName("Child Org");
+        dto.setAbbreviation("CO");
+        dto.setCode("CO-CODE");
+        dto.setParent("1"); // grandparent
+
+        OrganisationalUnit originalOrganisationalUnit = organisationalUnitMap.get(3L);
+        Long originalParentId = originalOrganisationalUnit.getParentId();
+        assertEquals(originalParentId, 2L);
+        OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
+        assertTrue(originalParent.getChildIds().contains(3L));
+
+        List<OrganisationalUnit> updateOrganisationalUnits = organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
+        OrganisationalUnit updatedOrganisationalUnit = updateOrganisationalUnits.stream().filter(o -> o.getId().equals(3L)).findFirst().get();
+
+        // formatted names
+        assertEquals("OrgName1 (OName1) | Child Org (CO)", updatedOrganisationalUnit.getFormattedName());
+
+        // new parent
+        assertEquals(updatedOrganisationalUnit.getParentId(), 1L);
+
+        // child IDs
+        Set<Long> childIds = updatedOrganisationalUnit.getChildIds();
+        assertTrue(childIds.contains(4L), "Child should still have further Child as child");
+        OrganisationalUnit childOrganisationalUnit = updateOrganisationalUnits.stream().filter(o -> o.getId().equals(4L)).findFirst().get();
+        assertEquals("OrgName1 (OName1) | Child Org (CO) | OrgName4 (OName4)", childOrganisationalUnit.getFormattedName());
+
+        // original parent should not track update child
+        OrganisationalUnit updatedOriginalParent = organisationalUnitMap.get(originalParentId);
+        assertFalse(updatedOriginalParent.getChildIds().contains(3L), "Grand Parent should no longer have Parent as child");
+    }
+
+    @Test
+    public void shouldRemoveParentAndChildrenOrganisationalUnits() {
+        assertEquals(6, organisationalUnitMap.size());
+        assertTrue(organisationalUnitMap.containsKey(1L));
+        assertTrue(organisationalUnitMap.containsKey(2L));
+        assertTrue(organisationalUnitMap.containsKey(3L));
+        assertTrue(organisationalUnitMap.containsKey(4L));
+        assertTrue(organisationalUnitMap.containsKey(5L));
+        assertTrue(organisationalUnitMap.containsKey(6L));
+
+        List<OrganisationalUnit> organisationalUnitIdsToBeRemoved = organisationalUnitMap.getMultiple(Collections.singleton(1L), true);
+        List<Long> removedOrganisationalUnitIds = organisationalUnitIdsToBeRemoved.stream().map(OrganisationalUnit::getId).toList();
+
+        organisationalUnitService.removeOrganisationalUnitsFromCache(removedOrganisationalUnitIds);
+
+        assertEquals(1, organisationalUnitMap.size());
+        assertFalse(organisationalUnitMap.containsKey(1L));
+        assertFalse(organisationalUnitMap.containsKey(2L));
+        assertFalse(organisationalUnitMap.containsKey(3L));
+        assertFalse(organisationalUnitMap.containsKey(4L));
+        assertFalse(organisationalUnitMap.containsKey(5L));
+        assertTrue(organisationalUnitMap.containsKey(6L));
     }
 }

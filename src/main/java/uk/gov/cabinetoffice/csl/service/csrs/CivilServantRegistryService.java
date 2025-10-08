@@ -27,7 +27,7 @@ public class CivilServantRegistryService {
         civilServantRegistryClient.patchCivilServant(patch);
     }
 
-    public void patchCivilServantOrganisation(OrganisationDTO organisationDTO) {
-        civilServantRegistryClient.patchCivilServantOrganisation(organisationDTO);
+    public void patchCivilServantOrganisation(OrganisationalUnitIdDto organisationalUnitIdDTO) {
+        civilServantRegistryClient.patchCivilServantOrganisation(organisationalUnitIdDTO);
     }
 }

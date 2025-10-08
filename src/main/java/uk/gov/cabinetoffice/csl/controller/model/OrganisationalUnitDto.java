@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrganisationalUnitParam {
-    private Long organisationUnitId;
+public class OrganisationalUnitDto {
+    private String code;
+    private String name;
+    private String abbreviation;
+    private String parent;
 }

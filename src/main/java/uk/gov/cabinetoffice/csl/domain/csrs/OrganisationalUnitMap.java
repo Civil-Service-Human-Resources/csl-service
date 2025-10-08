@@ -45,4 +45,24 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
         return organisationalUnits;
     }
 
+    public List<OrganisationalUnit> updateFormattedName(List<OrganisationalUnit> organisationalUnits) {
+        organisationalUnits
+            .forEach(o -> {
+                StringBuilder formattedName = new StringBuilder(o.getNameWithAbbreviation());
+                Long parentId = o.getParentId();
+                int parents = 0;
+                while (parentId != null) {
+                    OrganisationalUnit parentOrganisationalUnit = this.get(parentId);
+                    if (parents == 0) {
+                        parentOrganisationalUnit.addChildId(o.getId());
+                        parents++;
+                    }
+                    formattedName.insert(0, parentOrganisationalUnit.getNameWithAbbreviation() + " | ");
+                    parentId = parentOrganisationalUnit.getParentId();
+                }
+                o.setFormattedName(formattedName.toString());
+                this.put(o.getId(), o);
+            });
+        return organisationalUnits;
+    }
 }
