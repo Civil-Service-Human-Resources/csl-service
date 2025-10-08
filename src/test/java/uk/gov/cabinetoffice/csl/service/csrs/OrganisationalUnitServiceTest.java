@@ -377,7 +377,7 @@ class OrganisationalUnitServiceTest {
     }
 
     @Test
-    public void shouldRemoveParentAndChildren() {
+    public void shouldRemoveParentAndChildrenOrganisationalUnits() {
         assertEquals(6, organisationalUnitMap.size());
         assertTrue(organisationalUnitMap.containsKey(1L));
         assertTrue(organisationalUnitMap.containsKey(2L));
@@ -389,7 +389,7 @@ class OrganisationalUnitServiceTest {
         List<OrganisationalUnit> organisationalUnitIdsToBeRemoved = organisationalUnitMap.getMultiple(Collections.singleton(1L), true);
         List<Long> removedOrganisationalUnitIds = organisationalUnitIdsToBeRemoved.stream().map(OrganisationalUnit::getId).toList();
 
-        organisationalUnitService.removeOrganisationalUnitAndChildrenFromCache(removedOrganisationalUnitIds);
+        organisationalUnitService.removeOrganisationalUnitsFromCache(removedOrganisationalUnitIds);
 
         assertEquals(1, organisationalUnitMap.size());
         assertFalse(organisationalUnitMap.containsKey(1L));

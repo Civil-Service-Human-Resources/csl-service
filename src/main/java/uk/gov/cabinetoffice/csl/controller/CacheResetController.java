@@ -63,7 +63,7 @@ public class CacheResetController {
 
     @GetMapping(path = "/organisations/{organisationalUnitId}", produces = "application/json")
     public ResponseEntity<?> removeOrganisationalUnitFromCache(@PathVariable Long organisationalUnitId) {
-        organisationalUnitService.removeOrganisationalUnitAndChildrenFromCache(singletonList(organisationalUnitId));
+        organisationalUnitService.removeOrganisationalUnitsFromCache(singletonList(organisationalUnitId));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
