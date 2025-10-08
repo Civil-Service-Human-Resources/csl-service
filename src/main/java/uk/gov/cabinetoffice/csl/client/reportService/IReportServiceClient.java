@@ -26,6 +26,6 @@ public interface IReportServiceClient {
 
     <T extends ReportRequest> GetReportRequestsResponse<T> getReportExportRequest(ReportType reportType, String userId, List<String> statuses);
 
-    DownloadableFile downloadCourseCompletionsReport(String slug);
+    DownloadableFile downloadExportReport(ReportType reportType, String slug);
 
 }

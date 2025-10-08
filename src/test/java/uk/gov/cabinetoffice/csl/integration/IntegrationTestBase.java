@@ -17,6 +17,8 @@ import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -36,17 +38,24 @@ public class IntegrationTestBase extends CSLServiceWireMockServer {
     @Autowired
     protected WebApplicationContext context;
 
-
-    @BeforeEach
-    public void setup() {
+    protected SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor getJwtPostProcessor() {
         Jwt jwt = new Jwt("token", Instant.now(), Instant.MAX, Map.of("alg", "none"),
                 Map.of(
                         JwtClaimNames.SUB, "userId",
                         "user_name", "userId"
                 ));
-        SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor jwtPostProcessor = jwt()
-                .jwt(jwt)
-                .authorities(new SimpleGrantedAuthority("LEARNER"));
+        return jwt().jwt(jwt);
+    }
+
+    protected SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor getJwtPostProcessor(List<String> additionalRoles) {
+        List<String> roles = new ArrayList<>(List.of(new String[]{"LEARNER"}));
+        roles.addAll(additionalRoles);
+        return getJwtPostProcessor().authorities(roles.stream().map(SimpleGrantedAuthority::new).toArray(SimpleGrantedAuthority[]::new));
+    }
+
+    @BeforeEach
+    public void setup() {
+        SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor jwtPostProcessor = getJwtPostProcessor();
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(springSecurity())
