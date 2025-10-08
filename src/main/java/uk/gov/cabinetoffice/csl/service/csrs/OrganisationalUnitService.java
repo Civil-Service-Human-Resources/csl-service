@@ -32,7 +32,7 @@ public class OrganisationalUnitService {
 
     public OrganisationalUnitMap getOrganisationalUnitMap() {
         OrganisationalUnitMap map = organisationalUnitMapCache.get();
-        if (map == null) {
+        if (map == null || map.isEmpty()) {
             map = civilServantRegistryClient.getAllOrganisationalUnits();
             organisationalUnitMapCache.put(map);
         }
