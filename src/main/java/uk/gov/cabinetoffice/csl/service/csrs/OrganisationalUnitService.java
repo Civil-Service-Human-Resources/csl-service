@@ -178,6 +178,7 @@ public class OrganisationalUnitService {
     public DomainResponse addDomainToOrganisationalUnit(Long organisationUnitId, CreateDomainDto domain) {
         UpdateDomainResponse response = civilServantRegistryClient.addDomainToOrganisation(organisationUnitId, domain);
         List<Long> updatedIds = response.getUpdatedChildOrganisationIds();
+        updatedIds.add(organisationUnitId);
         updateOrganisationalUnits(updatedIds, organisationalUnit -> {
             organisationalUnit.addDomainAndSort(response.getDomain());
             return organisationalUnit;
@@ -188,6 +189,7 @@ public class OrganisationalUnitService {
     public DomainResponse removeDomainFromOrganisationalUnit(Long organisationUnitId, Long domainId, DeleteDomainDto body) {
         UpdateDomainResponse response = civilServantRegistryClient.deleteDomain(organisationUnitId, domainId, body);
         List<Long> updatedIds = response.getUpdatedChildOrganisationIds();
+        updatedIds.add(organisationUnitId);
         updateOrganisationalUnits(updatedIds, organisationalUnit -> {
             organisationalUnit.removeDomain(domainId);
             return organisationalUnit;
