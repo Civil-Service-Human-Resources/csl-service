@@ -199,7 +199,7 @@ public class OrganisationTest extends IntegrationTestBase {
                              "formattedName": "OrgName1 (OName1)",
                              "parentId": null,
                              "parent": null,
-                             "domains": null,
+                             "domains": [],
                              "agencyToken": null
                          },
                          {
@@ -227,7 +227,7 @@ public class OrganisationTest extends IntegrationTestBase {
                              "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)",
                              "parentId": 2,
                              "parent": null,
-                             "domains": null,
+                             "domains": [],
                              "agencyToken": null
                          },
                          {
@@ -238,7 +238,7 @@ public class OrganisationTest extends IntegrationTestBase {
                              "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)",
                              "parentId": 3,
                              "parent": null,
-                             "domains": null,
+                             "domains": [],
                              "agencyToken": null
                          },
                          {
@@ -249,7 +249,7 @@ public class OrganisationTest extends IntegrationTestBase {
                              "formattedName": "OrgName1 (OName1) | OrgName5 (OName5)",
                              "parentId": 1,
                              "parent": null,
-                             "domains": null,
+                             "domains": [],
                              "agencyToken": null
                          },
                          {
@@ -260,7 +260,7 @@ public class OrganisationTest extends IntegrationTestBase {
                              "formattedName": "OrgName6 (OName6)",
                              "parentId": null,
                              "parent": null,
-                             "domains": null,
+                             "domains": [],
                              "agencyToken": null
                          },
                          {
@@ -271,7 +271,7 @@ public class OrganisationTest extends IntegrationTestBase {
                              "formattedName": "OrgName7 (OName7)",
                              "parentId": null,
                              "parent": null,
-                             "domains": null,
+                             "domains": [],
                              "agencyToken": {
                                 "id": 1,
                                 "token": "token",
@@ -293,7 +293,7 @@ public class OrganisationTest extends IntegrationTestBase {
                              "formattedName": "OrgName7 (OName7) | OrgName8 (OName8)",
                              "parentId": 7,
                              "parent": null,
-                             "domains": null,
+                             "domains": [],
                              "agencyToken": null
                          },
                          {
@@ -304,7 +304,7 @@ public class OrganisationTest extends IntegrationTestBase {
                              "formattedName": "OrgName7 (OName7) | OrgName9 (OName9)",
                              "parentId": 7,
                              "parent": null,
-                             "domains": null,
+                             "domains": [],
                              "agencyToken": {
                                 "id": 2,
                                 "token": "token",
