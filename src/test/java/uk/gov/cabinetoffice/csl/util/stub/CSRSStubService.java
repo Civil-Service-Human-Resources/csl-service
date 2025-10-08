@@ -94,4 +94,26 @@ public class CSRSStubService {
                                 .withBody(response))
         );
     }
+
+    public StubMapping addDomain(int organisationId, String expectedInput, String response) {
+        return stubFor(
+                WireMock.post(urlPathEqualTo(String.format("/csrs/organisationalUnits/%s/domains", organisationId)))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
+    public StubMapping deleteDomain(int organisationId, int domainId, Boolean includeSubOrganisations, String response) {
+        return stubFor(
+                WireMock.delete(urlPathEqualTo(String.format("/csrs/organisationalUnits/%s/domains/%s", organisationId, domainId)))
+                        .withQueryParam("includeSubOrganisations", equalTo(includeSubOrganisations.toString()))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
 }

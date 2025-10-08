@@ -75,7 +75,7 @@ public class OrganisationalUnit implements Serializable {
     }
 
     public boolean domainExists(String domain) {
-        return Objects.requireNonNullElse(this.domains, new ArrayList<Domain>()).stream().anyMatch(d -> d.getDomain().equals(domain));
+        return getDomains().stream().anyMatch(d -> d.getDomain().equals(domain));
     }
 
     @JsonIgnore
@@ -94,6 +94,10 @@ public class OrganisationalUnit implements Serializable {
     @JsonIgnore
     public void removeDomain(Long domainId) {
         domains.removeIf(d -> d.getId().equals(domainId));
+    }
+
+    public List<Domain> getDomains() {
+        return Objects.requireNonNullElse(this.domains, new ArrayList<>());
     }
 
     @Override

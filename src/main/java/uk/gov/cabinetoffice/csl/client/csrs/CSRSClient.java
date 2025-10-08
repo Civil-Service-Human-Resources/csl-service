@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.ParallelHttpClient;
-import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.CreateDomainDto;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.DeleteDomainDto;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
@@ -119,14 +121,15 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public UpdateDomainResponse addDomainToOrganisation(Long organisationalUnitId, String domain) {
+    public UpdateDomainResponse addDomainToOrganisation(Long organisationalUnitId, CreateDomainDto domain) {
         String url = String.format("%s/%s/domains", organisationalUnits, organisationalUnitId);
-        return httpClient.executeRequest(RequestEntity.post(url).body(new Domain(domain)), UpdateDomainResponse.class);
+        return httpClient.executeRequest(RequestEntity.post(url).body(domain), UpdateDomainResponse.class);
     }
 
     @Override
-    public UpdateDomainResponse deleteDomain(Long organisationUnitId, Long domainId, boolean includeSubOrganisations) {
-        String url = String.format("%s/%s/domains/%s", organisationalUnits, organisationUnitId, domainId);
-        return httpClient.executeRequest(RequestEntity.post(url).body(new DeleteDomainModel(includeSubOrganisations)), UpdateDomainResponse.class);
+    public UpdateDomainResponse deleteDomain(Long organisationUnitId, Long domainId, DeleteDomainDto body) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(String.format("%s/%s/domains/%s", organisationalUnits, organisationUnitId, domainId))
+                .queryParam("includeSubOrganisations", body.isIncludeSubOrganisations());
+        return httpClient.executeRequest(RequestEntity.delete(uriBuilder.toUriString()).build(), UpdateDomainResponse.class);
     }
 }

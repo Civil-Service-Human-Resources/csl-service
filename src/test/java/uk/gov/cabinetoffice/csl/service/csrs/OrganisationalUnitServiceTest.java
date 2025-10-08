@@ -7,8 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
-import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
-import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitsParams;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitDto;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
@@ -89,27 +89,27 @@ class OrganisationalUnitServiceTest {
     @Test
     public void shouldReturnOrganisationsIdsIncludingParentAndChildren() {
         List<Long> organisationsIdsIncludingParentAndChildren1 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(1L));
-        log.debug("organisationsWithChildrenAsFlatList for id=1: "  + organisationsIdsIncludingParentAndChildren1);
+        log.debug("organisationsWithChildrenAsFlatList for id=1: " + organisationsIdsIncludingParentAndChildren1);
         assertEquals(5, organisationsIdsIncludingParentAndChildren1.size());
 
         List<Long> organisationsIdsIncludingParentAndChildren2 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(2L));
-        log.debug("organisationsWithChildrenAsFlatList for id=2: "  + organisationsIdsIncludingParentAndChildren2);
+        log.debug("organisationsWithChildrenAsFlatList for id=2: " + organisationsIdsIncludingParentAndChildren2);
         assertEquals(3, organisationsIdsIncludingParentAndChildren2.size());
 
         List<Long> organisationsIdsIncludingParentAndChildren3 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(3L));
-        log.debug("organisationsWithChildrenAsFlatList for id=3: "  + organisationsIdsIncludingParentAndChildren3);
+        log.debug("organisationsWithChildrenAsFlatList for id=3: " + organisationsIdsIncludingParentAndChildren3);
         assertEquals(2, organisationsIdsIncludingParentAndChildren3.size());
 
         List<Long> organisationsIdsIncludingParentAndChildren4 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(4L));
-        log.debug("organisationsWithChildrenAsFlatList for id=4: "  + organisationsIdsIncludingParentAndChildren4);
+        log.debug("organisationsWithChildrenAsFlatList for id=4: " + organisationsIdsIncludingParentAndChildren4);
         assertEquals(1, organisationsIdsIncludingParentAndChildren4.size());
 
         List<Long> organisationsIdsIncludingParentAndChildren5 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(5L));
-        log.debug("organisationsWithChildrenAsFlatList for id=5: "  + organisationsIdsIncludingParentAndChildren5);
+        log.debug("organisationsWithChildrenAsFlatList for id=5: " + organisationsIdsIncludingParentAndChildren5);
         assertEquals(1, organisationsIdsIncludingParentAndChildren5.size());
 
         List<Long> organisationsIdsIncludingParentAndChildren6 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(6L));
-        log.debug("organisationsWithChildrenAsFlatList for id=6: "  + organisationsIdsIncludingParentAndChildren6);
+        log.debug("organisationsWithChildrenAsFlatList for id=6: " + organisationsIdsIncludingParentAndChildren6);
         assertEquals(1, organisationsIdsIncludingParentAndChildren6.size());
     }
 
