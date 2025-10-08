@@ -59,7 +59,6 @@ public class DomainTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.updatedIds[0]").value(2))
                 .andExpect(jsonPath("$.updatedIds[1]").value(3))
                 .andExpect(jsonPath("$.updatedIds[2]").value(4))
-                .andExpect(jsonPath("$.updatedIds[3]").value(1))
                 .andExpect(jsonPath("$.domain.id").value(1))
                 .andExpect(jsonPath("$.domain.domain").value("abc.com"))
                 .andExpect(jsonPath("$.domain.createdTimestamp").value("2025-01-01T10:00:00"))
@@ -89,7 +88,6 @@ public class DomainTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.updatedIds[0]").value(2))
                 .andExpect(jsonPath("$.updatedIds[1]").value(3))
                 .andExpect(jsonPath("$.updatedIds[2]").value(4))
-                .andExpect(jsonPath("$.updatedIds[3]").value(1))
                 .andExpect(status().is2xxSuccessful());
     }
 
