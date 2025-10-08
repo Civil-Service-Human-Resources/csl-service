@@ -10,10 +10,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.ParallelHttpClient;
+import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
 @Slf4j
@@ -37,6 +40,9 @@ public class CSRSClient implements ICSRSClient {
     @Value("${csrs.grades}")
     private String grades;
 
+    @Value("${csrs.serviceUrl}")
+    private String serviceUrl;
+
     private final IHttpClient httpClient;
     private final OrganisationalUnitFactory organisationalUnitFactory;
 
@@ -55,7 +61,7 @@ public class CSRSClient implements ICSRSClient {
 
     @Override
     public OrganisationalUnitMap getAllOrganisationalUnits() {
-        log.info("Getting all organisational units");
+        log.info("Getting all organisational units from csrs");
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(allOrganisationalUnits);
         List<OrganisationalUnit> organisationalUnits = httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
                 .stream().toList();
@@ -90,15 +96,26 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public void patchCivilServantOrganisation(OrganisationDTO organisationDTO) {
+    public void patchCivilServantOrganisation(OrganisationalUnitIdDto organisationalUnitIdDTO) {
         String url = String.format("%s/me/organisationalUnit", civilServants);
-        httpClient.executeRequest(RequestEntity.patch(url).body(organisationDTO), Void.class);
+        httpClient.executeRequest(RequestEntity.patch(url).body(organisationalUnitIdDTO), Void.class);
     }
 
     @Override
     public void deleteOrganisationalUnit(Long organisationalUnitId) {
         String url = String.format("%s/%s", organisationalUnits, organisationalUnitId);
         httpClient.executeRequest(RequestEntity.delete(url).build(), Void.class);
+    }
+
+    @Override
+    public void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
+        String url = String.format("%s/%s", organisationalUnits, organisationalUnitId);
+        String parent = isNotBlank(organisationalUnitDto.getParent()) ?
+                serviceUrl + "/organisationalUnits/" + organisationalUnitDto.getParent() : null;
+        OrganisationalUnitDto request = new OrganisationalUnitDto(organisationalUnitDto.getCode(),
+                organisationalUnitDto.getName(), organisationalUnitDto.getAbbreviation(), parent);
+        log.info("Updating organisational unit data in csrs: {} for organisationalUnitId: {}", request, organisationalUnitId);
+        httpClient.executeRequest(RequestEntity.patch(url).body(request), Void.class);
     }
 
     @Override

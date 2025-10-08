@@ -3,6 +3,8 @@ package uk.gov.cabinetoffice.csl.service.report.params;
 import jakarta.validation.constraints.NotNull;
 import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 
+import java.time.ZoneId;
+
 public interface IReportRequestParams {
 
     @NotNull
@@ -18,6 +20,9 @@ public interface IReportRequestParams {
     @NotNull
     String getFullName();
 
+    @NotNull
+    String getTimezone();
+
     void setUserId(String value);
 
     void setUserEmail(String value);
@@ -25,4 +30,6 @@ public interface IReportRequestParams {
     void setDownloadBaseUrl(String value);
 
     void setFullName(String value);
+
+    void setTimezone(ZoneId of);
 }

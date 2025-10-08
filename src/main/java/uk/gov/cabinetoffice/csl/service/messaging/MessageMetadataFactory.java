@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.service.messaging;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.messaging.model.CourseCompletionMessage;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.*;
@@ -40,5 +41,12 @@ public class MessageMetadataFactory {
 
     public RegisteredLearnerOrganisationDeleteMessage generateRegisteredLearnersOrganisationDeleteMessage(List<Long> organisationIds) {
         return new RegisteredLearnerOrganisationDeleteMessage(new RegisteredLearnerOrganisationDelete(organisationIds));
+    }
+
+    public RegisteredLearnerOrganisationUpdateMessage generateRegisteredLearnersOrganisationUpdateMessage(List<OrganisationalUnit> multipleOrgs) {
+        List<RegisteredLearnerOrganisationUpdate> data = multipleOrgs.stream()
+                .map(o -> new RegisteredLearnerOrganisationUpdate(o.getId(), o.getFormattedName()))
+                .toList();
+        return new RegisteredLearnerOrganisationUpdateMessage(data);
     }
 }

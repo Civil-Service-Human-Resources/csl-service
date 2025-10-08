@@ -69,9 +69,9 @@ public class ReportService {
     }
 
     @PreAuthorize("hasAnyAuthority('REPORT_EXPORT')")
-    public DownloadableFile downloadCourseCompletionsReport(String slug) {
+    public DownloadableFile downloadCourseCompletionsReport(ReportType reportType, String slug) {
         try {
-            return reportServiceClient.downloadCourseCompletionsReport(slug);
+            return reportServiceClient.downloadExportReport(reportType, slug);
         } catch (RestClientResponseException e) {
             HttpStatusCode status = e.getStatusCode();
             if (status.equals(HttpStatus.FORBIDDEN)) {

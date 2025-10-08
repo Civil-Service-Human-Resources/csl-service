@@ -116,10 +116,12 @@ public class OrganisationalUnit implements Serializable {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("id", id)
+                .append("parentId", parentId)
+                .append("childIds", childIds)
                 .append("name", name)
+                .append("formattedName", formattedName)
                 .append("code", code)
                 .append("abbreviation", abbreviation)
-                .append("parentId", parentId)
                 .append("domains", domains)
                 .append("agencyToken", agencyToken)
                 .toString();

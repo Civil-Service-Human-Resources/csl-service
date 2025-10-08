@@ -1,6 +1,8 @@
 package uk.gov.cabinetoffice.csl.util.stub;
 
+import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -78,4 +80,16 @@ public class ReportServiceStubService {
         );
     }
 
+    public StubMapping getReportRequests(String userId, String statuses, String response) {
+        MappingBuilder mappingBuilder = WireMock.get(urlPathEqualTo("/report-service/registered-learners/report-requests"))
+                .withQueryParam("userId", equalTo(userId))
+                .withQueryParam("status", equalTo(statuses));
+        return stubFor(
+                mappingBuilder
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
 }

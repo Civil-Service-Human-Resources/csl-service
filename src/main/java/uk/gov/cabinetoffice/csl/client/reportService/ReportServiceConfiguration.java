@@ -29,4 +29,5 @@ public class ReportServiceConfiguration {
             case REGISTERED_LEARNER -> requestRegisteredLearnerReportUrl;
         };
     }
+    
 }

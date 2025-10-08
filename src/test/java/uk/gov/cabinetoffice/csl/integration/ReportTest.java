@@ -502,6 +502,7 @@ public class ReportTest extends IntegrationTestBase {
                     "userEmail": "email",
                     "userId": "id",
                     "fullName": "Test Name",
+                    "timezone": "Europe/London",
                     "downloadBaseUrl": "http://localhost:3005/download"
                 }
                 """;
@@ -512,6 +513,7 @@ public class ReportTest extends IntegrationTestBase {
                     "userEmail": "email",
                     "userId": "id",
                     "fullName": "Test Name",
+                    "timezone": "Europe/London",
                     "downloadBaseUrl": "http://localhost:3005/download"
                 }
                 """;
@@ -541,6 +543,25 @@ public class ReportTest extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.addedSuccessfully").value(true))
                 .andExpect(jsonPath("$.details").value("addedSuccessfully"));
+    }
+
+    @Test
+    public void testGetRegisteredLearnersOverview() throws Exception {
+        String getReportRequestsJson = """
+                {
+                    "requests": [
+                        {
+                            "reportRequestId": 1
+                        }
+                    ]
+                }
+                """;
+
+        cslStubService.getReportServiceStubService().getReportRequests("userId", "REQUESTED,PROCESSING", getReportRequestsJson);
+        mockMvc.perform(get("/admin/reporting/registered-learners/overview")
+                        .with(getJwtPostProcessor(List.of("REPORT_EXPORT"))))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.hasRequests").value(true));
     }
 
     @Test
