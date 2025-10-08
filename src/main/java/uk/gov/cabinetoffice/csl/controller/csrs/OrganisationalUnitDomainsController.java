@@ -28,7 +28,7 @@ public class OrganisationalUnitDomainsController {
     @DeleteMapping("/{domainId}")
     @ResponseStatus(HttpStatus.OK)
     public DomainResponse deleteDomain(@PathVariable("id") Long organisationUnitId, @PathVariable("domainId") Long domainId,
-                                       @RequestBody DeleteDomainDto body) {
+                                       DeleteDomainDto body) {
         log.info("Removing domain with id: {} from organisational unit id: {}", domainId, organisationUnitId);
         return organisationalUnitService.removeDomainFromOrganisationalUnit(organisationUnitId, domainId, body);
     }

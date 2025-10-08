@@ -80,11 +80,7 @@ public class DomainTest extends IntegrationTestBase {
                 }
                 """);
         mockMvc.perform(delete("/organisations/1/domains/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"includeSubOrganisations": true}
-                                """)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .param("includeSubOrganisations", "true"))
                 .andExpect(jsonPath("$.updatedIds[0]").value(2))
                 .andExpect(jsonPath("$.updatedIds[1]").value(3))
                 .andExpect(jsonPath("$.updatedIds[2]").value(4))
