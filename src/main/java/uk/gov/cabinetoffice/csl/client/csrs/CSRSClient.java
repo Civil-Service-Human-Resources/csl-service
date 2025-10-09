@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.ParallelHttpClient;
-import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitDto;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.CreateDomainDto;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.DeleteDomainDto;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
@@ -116,5 +118,18 @@ public class CSRSClient implements ICSRSClient {
                 organisationalUnitDto.getName(), organisationalUnitDto.getAbbreviation(), parent);
         log.info("Updating organisational unit data in csrs: {} for organisationalUnitId: {}", request, organisationalUnitId);
         httpClient.executeRequest(RequestEntity.patch(url).body(request), Void.class);
+    }
+
+    @Override
+    public UpdateDomainResponse addDomainToOrganisation(Long organisationalUnitId, CreateDomainDto domain) {
+        String url = String.format("%s/%s/domains", organisationalUnits, organisationalUnitId);
+        return httpClient.executeRequest(RequestEntity.post(url).body(domain), UpdateDomainResponse.class);
+    }
+
+    @Override
+    public UpdateDomainResponse deleteDomain(Long organisationUnitId, Long domainId, DeleteDomainDto body) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(String.format("%s/%s/domains/%s", organisationalUnits, organisationUnitId, domainId))
+                .queryParam("includeSubOrgs", body.isIncludeSubOrgs());
+        return httpClient.executeRequest(RequestEntity.delete(uriBuilder.toUriString()).build(), UpdateDomainResponse.class);
     }
 }

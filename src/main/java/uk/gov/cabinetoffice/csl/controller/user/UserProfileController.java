@@ -3,10 +3,10 @@ package uk.gov.cabinetoffice.csl.controller.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.cabinetoffice.csl.controller.model.FullNameParam;
-import uk.gov.cabinetoffice.csl.controller.model.GradeParam;
-import uk.gov.cabinetoffice.csl.controller.model.OrganisationalUnitIdParam;
-import uk.gov.cabinetoffice.csl.controller.model.ProfessionParam;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.FullNameParam;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.GradeParam;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitIdParam;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.ProfessionParam;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 import uk.gov.cabinetoffice.csl.service.user.UserProfileService;
 

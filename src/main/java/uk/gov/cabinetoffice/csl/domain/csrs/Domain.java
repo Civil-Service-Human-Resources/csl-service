@@ -16,4 +16,8 @@ public class Domain implements Serializable {
     Long id;
     String domain;
     LocalDateTime createdTimestamp;
+
+    public Domain(String domain) {
+        this.domain = domain;
+    }
 }

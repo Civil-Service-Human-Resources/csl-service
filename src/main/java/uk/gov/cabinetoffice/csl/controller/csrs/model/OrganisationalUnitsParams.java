@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.controller.model;
+package uk.gov.cabinetoffice.csl.controller.csrs.model;
 
 import lombok.*;
 

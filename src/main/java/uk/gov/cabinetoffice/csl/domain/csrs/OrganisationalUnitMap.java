@@ -12,6 +12,10 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
         return map;
     }
 
+    public void remove(Collection<Long> ids) {
+        ids.forEach(this::remove);
+    }
+
     public List<OrganisationalUnit> getHierarchy(Long organisationId) {
         OrganisationalUnit organisationalUnit = get(organisationId);
         List<OrganisationalUnit> hierarchy = new ArrayList<>(List.of(organisationalUnit));

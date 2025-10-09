@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.controller.model;
+package uk.gov.cabinetoffice.csl.controller.csrs.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GradeParam {
-    private Long gradeId;
+public class FullNameParam {
+    private String fullName;
 }
