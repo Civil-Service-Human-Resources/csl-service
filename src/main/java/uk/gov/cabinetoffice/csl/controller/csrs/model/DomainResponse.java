@@ -10,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 public class DomainResponse {
     private Domain domain;
-    private List<Long> updatedIds;
+    private List<Long> updatedChildIds;
 }
