@@ -85,7 +85,7 @@ public class DomainTest extends IntegrationTestBase {
                 }
                 """);
         mockMvc.perform(delete("/organisations/1/domains/1")
-                        .param("includeSubOrganisations", "true"))
+                        .param("includeSubOrgs", "true"))
                 .andExpect(jsonPath("$.updatedChildIds").isArray())
                 .andExpect(jsonPath("$.updatedChildIds").value(hasSize(3)))
                 .andExpect(jsonPath("$.updatedChildIds[0]").value(2))

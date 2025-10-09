@@ -129,7 +129,7 @@ public class CSRSClient implements ICSRSClient {
     @Override
     public UpdateDomainResponse deleteDomain(Long organisationUnitId, Long domainId, DeleteDomainDto body) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(String.format("%s/%s/domains/%s", organisationalUnits, organisationUnitId, domainId))
-                .queryParam("includeSubOrganisations", body.isIncludeSubOrganisations());
+                .queryParam("includeSubOrgs", body.isIncludeSubOrgs());
         return httpClient.executeRequest(RequestEntity.delete(uriBuilder.toUriString()).build(), UpdateDomainResponse.class);
     }
 }

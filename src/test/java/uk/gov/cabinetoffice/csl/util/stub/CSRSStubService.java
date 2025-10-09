@@ -109,7 +109,7 @@ public class CSRSStubService {
     public StubMapping deleteDomain(int organisationId, int domainId, Boolean includeSubOrganisations, String response) {
         return stubFor(
                 WireMock.delete(urlPathEqualTo(String.format("/csrs/organisationalUnits/%s/domains/%s", organisationId, domainId)))
-                        .withQueryParam("includeSubOrganisations", equalTo(includeSubOrganisations.toString()))
+                        .withQueryParam("includeSubOrgs", equalTo(includeSubOrganisations.toString()))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
