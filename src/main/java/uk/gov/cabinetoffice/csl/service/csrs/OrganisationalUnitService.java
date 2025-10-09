@@ -169,7 +169,7 @@ public class OrganisationalUnitService {
         return updatedOrganisationalUnits;
     }
 
-    private void updateOrganisationalUnits(List<Long> ids, IOrganisationalUnitUpdate update) {
+    private void updateOrganisationalUnits(Collection<Long> ids, IOrganisationalUnitUpdate update) {
         OrganisationalUnitMap map = getOrganisationalUnitMap();
         ids.forEach(id -> update.apply(map.get(id)));
         organisationalUnitMapCache.put(map);
@@ -177,9 +177,7 @@ public class OrganisationalUnitService {
 
     public DomainResponse addDomainToOrganisationalUnit(Long organisationUnitId, CreateDomainDto domain) {
         UpdateDomainResponse response = civilServantRegistryClient.addDomainToOrganisation(organisationUnitId, domain);
-        List<Long> updatedIds = response.getUpdatedChildOrganisationIds();
-        updatedIds.add(organisationUnitId);
-        updateOrganisationalUnits(updatedIds, organisationalUnit -> {
+        updateOrganisationalUnits(response.getAllUpdatedIds(), organisationalUnit -> {
             organisationalUnit.addDomainAndSort(response.getDomain());
             return organisationalUnit;
         });
@@ -188,9 +186,7 @@ public class OrganisationalUnitService {
 
     public DomainResponse removeDomainFromOrganisationalUnit(Long organisationUnitId, Long domainId, DeleteDomainDto body) {
         UpdateDomainResponse response = civilServantRegistryClient.deleteDomain(organisationUnitId, domainId, body);
-        List<Long> updatedIds = response.getUpdatedChildOrganisationIds();
-        updatedIds.add(organisationUnitId);
-        updateOrganisationalUnits(updatedIds, organisationalUnit -> {
+        updateOrganisationalUnits(response.getAllUpdatedIds(), organisationalUnit -> {
             organisationalUnit.removeDomain(domainId);
             return organisationalUnit;
         });

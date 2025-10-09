@@ -14,6 +14,7 @@ import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 import java.util.List;
 
 import static java.time.LocalDateTime.now;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -42,6 +43,7 @@ public class DomainTest extends IntegrationTestBase {
                 {"domain": "abc.com"}
                 """, """
                 {
+                    "primaryOrganisationId": 1,
                     "domain": {
                         "id": 1,
                         "domain": "abc.com",
@@ -56,6 +58,8 @@ public class DomainTest extends IntegrationTestBase {
                                 {"domain": "abc.com"}
                                 """)
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.updatedChildIds").isArray())
+                .andExpect(jsonPath("$.updatedChildIds").value(hasSize(3)))
                 .andExpect(jsonPath("$.updatedChildIds[0]").value(2))
                 .andExpect(jsonPath("$.updatedChildIds[1]").value(3))
                 .andExpect(jsonPath("$.updatedChildIds[2]").value(4))
@@ -76,11 +80,14 @@ public class DomainTest extends IntegrationTestBase {
         cslStubService.stubGetOrganisations(orgResponse);
         cslStubService.getCsrsStubService().deleteDomain(1, 1, true, """
                 {
+                    "primaryOrganisationId": 1,
                     "updatedChildOrganisationIds": [2,3,4]
                 }
                 """);
         mockMvc.perform(delete("/organisations/1/domains/1")
                         .param("includeSubOrganisations", "true"))
+                .andExpect(jsonPath("$.updatedChildIds").isArray())
+                .andExpect(jsonPath("$.updatedChildIds").value(hasSize(3)))
                 .andExpect(jsonPath("$.updatedChildIds[0]").value(2))
                 .andExpect(jsonPath("$.updatedChildIds[1]").value(3))
                 .andExpect(jsonPath("$.updatedChildIds[2]").value(4))
