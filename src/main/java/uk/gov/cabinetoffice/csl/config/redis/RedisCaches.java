@@ -6,6 +6,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.NullableModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
@@ -50,9 +51,9 @@ public class RedisCaches {
     }
 
     @Bean
-    public OrganisationalUnitMapCache organisationalUnitMapCache(CacheManager cacheManager) {
+    public OrganisationalUnitMapCache organisationalUnitMapCache(CacheManager cacheManager, ICSRSClient client) {
         Cache cache = cacheManager.getCache("organisations");
-        return new OrganisationalUnitMapCache(cache);
+        return new OrganisationalUnitMapCache(cache, client);
     }
 
     @Bean

@@ -4,9 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.DeleteOrganisationResponse;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitDto;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitOverview;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnitTree;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnits;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 
@@ -17,6 +20,15 @@ import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 public class OrganisationalUnitController {
 
     private final OrganisationalUnitService organisationalUnitService;
+
+    @GetMapping(path = "/overview-tree", produces = "application/json")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public OrganisationalUnitTree getOrganisationalUnitOverviewTree() {
+        log.info("Getting all organisational units as a tree");
+        return organisationalUnitService.getOrganisationalUnitTree();
+
+    }
 
     @GetMapping(path = "/full", produces = "application/json")
     @ResponseBody
@@ -35,20 +47,34 @@ public class OrganisationalUnitController {
         return organisationalUnitService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams);
     }
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public OrganisationalUnitOverview createOrganisationalUnit(@RequestBody OrganisationalUnitDto organisationalUnitDto) {
+        return organisationalUnitService.createOrganisationalUnit(organisationalUnitDto);
+    }
+
+    @GetMapping("/{organisationUnitId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public OrganisationalUnitOverview getOrganisation(@PathVariable("organisationUnitId") Long organisationUnitId) {
+        return organisationalUnitService.getOrganisationalUnitOverview(organisationUnitId);
+    }
+
     @DeleteMapping("/{organisationUnitId}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteOrganisationalUnit(@PathVariable("organisationUnitId") Long organisationUnitId) {
+    public DeleteOrganisationResponse deleteOrganisationalUnit(@PathVariable("organisationUnitId") Long organisationUnitId) {
         log.info("Deleting organisational unit id: {}", organisationUnitId);
-        organisationalUnitService.deleteOrganisationalUnit(organisationUnitId);
+        return organisationalUnitService.deleteOrganisationalUnit(organisationUnitId);
     }
 
     @PutMapping("/{organisationalUnitId}")
     @ResponseStatus(HttpStatus.OK)
-    public void updateOrganisationalUnit(
-            @PathVariable Long organisationalUnitId,
-            @RequestBody OrganisationalUnitDto request
+    public OrganisationalUnitOverview updateOrganisationalUnit(@PathVariable Long organisationalUnitId,
+                                                               @RequestBody OrganisationalUnitDto request
     ) {
         log.info("Update organisationalUnit for id: {} and request: {}", organisationalUnitId, request.toString());
-        organisationalUnitService.patchOrganisationalUnit(organisationalUnitId, request);
+        return organisationalUnitService.patchOrganisationalUnit(organisationalUnitId, request);
     }
+
 }

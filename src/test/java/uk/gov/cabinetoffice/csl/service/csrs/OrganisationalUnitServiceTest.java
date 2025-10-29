@@ -25,8 +25,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class OrganisationalUnitServiceTest {
 
-    private final OrganisationalUnitFactory organisationalUnitFactory = new OrganisationalUnitFactory();
     private OrganisationalUnitMap organisationalUnitMap;
+
+    @Mock
+    private OrganisationalUnitFactory organisationalUnitFactory;
 
     @Mock
     OrganisationalUnitMapCache organisationalUnitMapCache;
@@ -44,9 +46,9 @@ class OrganisationalUnitServiceTest {
 
     @BeforeEach
     public void setUp() {
-        organisationalUnitMap = organisationalUnitFactory.buildOrganisationalUnits(getAllOrganisationalUnits());
+        organisationalUnitMap = OrganisationalUnitMap.create(getAllOrganisationalUnits());
         when(organisationalUnitMapCache.get()).thenReturn(organisationalUnitMap);
-        organisationalUnitService = new OrganisationalUnitService(organisationalUnitMapCache, csrs,
+        organisationalUnitService = new OrganisationalUnitService(organisationalUnitMapCache, organisationalUnitFactory, csrs,
                 messageMetadataFactory, messagingClient);
     }
 
@@ -280,7 +282,7 @@ class OrganisationalUnitServiceTest {
         dto.setName("Parent Org");
         dto.setAbbreviation("PO");
         dto.setCode("PO-CODE");
-        dto.setParent(null);
+        dto.setParentId(null);
 
         OrganisationalUnit originalOrganisationalUnit = organisationalUnitMap.get(2L);
         Long originalParentId = originalOrganisationalUnit.getParentId();
@@ -380,17 +382,7 @@ class OrganisationalUnitServiceTest {
     public void shouldRemoveParentAndChildrenOrganisationalUnits() {
         assertEquals(6, organisationalUnitMap.size());
         assertTrue(organisationalUnitMap.containsKey(1L));
-        assertTrue(organisationalUnitMap.containsKey(2L));
-        assertTrue(organisationalUnitMap.containsKey(3L));
-        assertTrue(organisationalUnitMap.containsKey(4L));
-        assertTrue(organisationalUnitMap.containsKey(5L));
-        assertTrue(organisationalUnitMap.containsKey(6L));
-
-        List<OrganisationalUnit> organisationalUnitIdsToBeRemoved = organisationalUnitMap.getMultiple(Collections.singleton(1L), true);
-        List<Long> removedOrganisationalUnitIds = organisationalUnitIdsToBeRemoved.stream().map(OrganisationalUnit::getId).toList();
-
-        organisationalUnitService.removeOrganisationalUnitsFromCache(removedOrganisationalUnitIds);
-
+        organisationalUnitService.removeOrganisationalUnitsFromCache(List.of(1L));
         assertEquals(1, organisationalUnitMap.size());
         assertFalse(organisationalUnitMap.containsKey(1L));
         assertFalse(organisationalUnitMap.containsKey(2L));

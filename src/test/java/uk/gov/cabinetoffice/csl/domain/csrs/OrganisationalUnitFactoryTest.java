@@ -1,15 +1,20 @@
 package uk.gov.cabinetoffice.csl.domain.csrs;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ExtendWith(MockitoExtension.class)
 class OrganisationalUnitFactoryTest {
 
-    private OrganisationalUnitFactory organisationalUnitFactory = new OrganisationalUnitFactory();
+    @InjectMocks
+    private OrganisationalUnitFactory organisationalUnitFactory;
 
     private OrganisationalUnit generateOrganisationalUnit(Long id, String name, Long parentId) {
         OrganisationalUnit organisationalUnit = new OrganisationalUnit();
