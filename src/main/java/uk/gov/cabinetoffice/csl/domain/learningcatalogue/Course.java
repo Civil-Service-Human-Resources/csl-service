@@ -83,9 +83,7 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
 
     @JsonIgnore
     public Optional<Audience> getAudienceForDepartmentHierarchy(Collection<String> departmentCodeHierarchy) {
-        String[] departmentCodeHierarchyArray = departmentCodeHierarchy.toArray(new String[]{});
-        for (int i = (departmentCodeHierarchyArray.length - 1); i >= 0; i--) {
-            String code = departmentCodeHierarchyArray[i];
+        for (String code : departmentCodeHierarchy) {
             Audience audience = getRequiredAudienceWithDepCode(code);
             if (audience != null) {
                 return Optional.of(audience);
