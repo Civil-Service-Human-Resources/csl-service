@@ -53,13 +53,25 @@ public class LearningRecordTest extends IntegrationTestBase {
                               ],
                               "audiences": [
                                       {
-                                              "id": "aud1",
-                                              "name": "audience1",
+                                              "id": "DWP",
+                                              "name": "DWP",
                                               "areasOfWork": [],
-                                              "departments": ["CO"],
+                                              "departments": ["DWP"],
                                               "grades": [],
                                               "interests": [],
                                               "requiredBy": "2024-01-01T00:00:00Z",
+                                              "frequency": "P1Y",
+                                              "type": "REQUIRED_LEARNING",
+                                              "eventId": null
+                                      },
+                                      {
+                                              "id": "HMRC",
+                                              "name": "HMRC",
+                                              "areasOfWork": [],
+                                              "departments": ["HMRC"],
+                                              "grades": [],
+                                              "interests": [],
+                                              "requiredBy": "2023-01-01T00:00:00Z",
                                               "frequency": "P1Y",
                                               "type": "REQUIRED_LEARNING",
                                               "eventId": null
