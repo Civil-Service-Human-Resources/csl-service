@@ -170,8 +170,8 @@ public class CourseTest extends TestDataService {
         requiredLearningCourse.setDepartmentCodeToRequiredAudienceMap(Map.of("CO", 0, "HMRC", 1));
         // HMRC is higher up in the hierarchy for this list, so the HMRC learning period should be selected
         LearningPeriod learningPeriodResult = requiredLearningCourse.getLearningPeriodForDepartmentHierarchy(List.of("CO", "HMRC")).get();
-        assertEquals("Expected start date to equal 2023-01-01", LocalDate.of(2023, 1, 1), learningPeriodResult.getStartDate());
-        assertEquals("Expected start date to equal 2024-01-01", LocalDate.of(2024, 1, 1), learningPeriodResult.getEndDate());
+        assertEquals("Expected start date to equal 2024-01-01", LocalDate.of(2024, 1, 1), learningPeriodResult.getStartDate());
+        assertEquals("Expected start date to equal 2025-01-01", LocalDate.of(2025, 1, 1), learningPeriodResult.getEndDate());
     }
 
 
