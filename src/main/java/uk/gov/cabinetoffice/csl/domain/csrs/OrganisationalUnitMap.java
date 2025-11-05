@@ -24,7 +24,7 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
 
     private BasicOrganisationalUnitNode buildNode(OrganisationalUnit organisationalUnit) {
         List<BasicOrganisationalUnitNode> childNodes = organisationalUnit.getChildIds().stream().map(id -> buildNode(get(id)))
-                .sorted(Comparator.comparing(BasicOrganisationalUnitNode::getName)).toList();
+                .sorted(Comparator.comparing(BasicOrganisationalUnitNode::getName, String::compareToIgnoreCase)).toList();
         return new BasicOrganisationalUnitNode(organisationalUnit.getName(), organisationalUnit.getId(), childNodes);
     }
 
@@ -32,7 +32,7 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
         return values()
                 .stream().filter(o -> o.getParentId() == null)
                 .map(this::buildNode)
-                .sorted(Comparator.comparing(BasicOrganisationalUnitNode::getName))
+                .sorted(Comparator.comparing(BasicOrganisationalUnitNode::getName, String::compareToIgnoreCase))
                 .toList();
     }
 

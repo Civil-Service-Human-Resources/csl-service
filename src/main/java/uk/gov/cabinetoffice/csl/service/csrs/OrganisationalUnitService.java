@@ -56,7 +56,7 @@ public class OrganisationalUnitService {
                     return organisationalUnits.stream().map(organisationalUnitFactory::createOrganisationalUnitOverview);
                 }).collect(Collectors.toSet());
 
-        return new GetOrganisationalUnits(filtered.stream().sorted(Comparator.comparing(OrganisationalUnitOverview::getName)).toList());
+        return new GetOrganisationalUnits(filtered.stream().sorted(Comparator.comparing(OrganisationalUnitOverview::getName, String::compareToIgnoreCase)).toList());
     }
 
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(OrganisationalUnitsParams params) {
@@ -87,7 +87,7 @@ public class OrganisationalUnitService {
         }
         return new FormattedOrganisationalUnitNames(filtered.stream()
                 .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName(), o.getCode(), o.getAbbreviation()))
-                .sorted(Comparator.comparing(FormattedOrganisationalUnitName::getName))
+                .sorted(Comparator.comparing(FormattedOrganisationalUnitName::getName, String::compareToIgnoreCase))
                 .toList());
     }
 
