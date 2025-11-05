@@ -33,24 +33,27 @@ public class OrganisationalUnit implements Serializable {
     // Custom data
     private String formattedName;
     private String parentName;
-
-    @JsonIgnore
-    public Long getParentIdSafe() {
-        return parentId == null ? 0L : parentId;
-    }
-
     @JsonIgnore
     private AgencyToken inheritedAgencyToken;
-
     @JsonIgnore
     private Set<Long> childIds = new HashSet<>();
-    
+
     public OrganisationalUnit(Long id, String name, String code, String abbreviation, OrganisationalUnit parent) {
         this.id = id;
         this.name = name;
         this.code = code;
         this.abbreviation = abbreviation;
         this.parent = parent;
+    }
+
+    @JsonIgnore
+    public String getAbbreviationSafe() {
+        return abbreviation == null ? "" : abbreviation;
+    }
+
+    @JsonIgnore
+    public Long getParentIdSafe() {
+        return parentId == null ? 0L : parentId;
     }
 
     @JsonIgnore
@@ -90,6 +93,14 @@ public class OrganisationalUnit implements Serializable {
             domains.add(domain);
             sortDomainsByName();
         }
+    }
+
+    @JsonIgnore
+    public void resetCustomData() {
+        formattedName = null;
+        parentName = null;
+        inheritedAgencyToken = null;
+        childIds = new HashSet<>();
     }
 
     @JsonIgnore

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithSelectedOrganisationIdsParams;
 import uk.gov.cabinetoffice.csl.controller.model.RegisteredLearnerReportRequestParams;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 import uk.gov.cabinetoffice.csl.service.report.params.CourseCompletionReportRequestParams;
 import uk.gov.cabinetoffice.csl.service.report.params.CreateRegisteredLearnerReportRequestParams;
@@ -27,8 +26,8 @@ public class ReportRequestParamFactory {
         output.setFullName(input.getFullName());
         output.setTimezone(ZoneId.of(input.getTimezone()));
         if (input.getSelectedOrganisationIds() != null) {
-            List<OrganisationalUnit> organisations = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(input.getSelectedOrganisationIds());
-            output.setOrganisationIds(organisations.stream().map(OrganisationalUnit::getId).toList());
+            List<Long> organisationIds = organisationalUnitService.getOrganisationIdsWithChildrenAsFlatList(input.getSelectedOrganisationIds());
+            output.setOrganisationIds(organisationIds);
         }
         return output;
     }

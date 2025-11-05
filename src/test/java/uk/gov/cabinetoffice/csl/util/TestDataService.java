@@ -11,8 +11,10 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
-import uk.gov.cabinetoffice.csl.domain.rustici.*;
 import uk.gov.cabinetoffice.csl.domain.rustici.Course;
+import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
+import uk.gov.cabinetoffice.csl.domain.rustici.Learner;
+import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -50,11 +52,6 @@ public class TestDataService {
     ));
     private final Grade grade = new Grade(1L, "SEO", "Senior Executive Officer");
     private final AreaOfWork profession = new AreaOfWork(3L, "DDaT");
-
-
-    public UserDetailsDto generateUserDetailsDto() {
-        return new UserDetailsDto("", userEmail, learnerFirstName, 1, "professionName", lineManagerName, lineManagerEmail, 1, "gradeCode", depHierarchy);
-    }
 
     public ModuleRecord generateModuleRecord() {
         ModuleRecord mr = new ModuleRecord();
@@ -95,6 +92,7 @@ public class TestDataService {
                 userId,
                 userEmail,
                 learnerFirstName,
+                organisationalUnit.getId(),
                 profession.getId().intValue(),
                 profession.getName(),
                 grade.getId().intValue(),

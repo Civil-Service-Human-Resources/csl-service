@@ -15,6 +15,11 @@ public class OrganisationalUnitDto {
     private Long parentId;
 
     @JsonIgnore
+    public String getAbbreviationSafe() {
+        return abbreviation == null ? "" : abbreviation;
+    }
+
+    @JsonIgnore
     public Long getParentIdSafe() {
         return parentId == null ? 0L : parentId;
     }

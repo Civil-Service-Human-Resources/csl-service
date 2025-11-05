@@ -5,11 +5,9 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.jms.core.JmsTemplate;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
-import uk.gov.cabinetoffice.csl.domain.rustici.UserDetailsDto;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
@@ -47,6 +45,7 @@ public class CompleteEventTest extends IntegrationTestBase {
     @SneakyThrows
     public void testCompleteBookingAndUpdateCourseRecord() {
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
+        cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         cslStubService.getLearningCatalogue().getCourse(courseId, course);
         cslStubService.getLearnerRecord().getLearnerRecords("userId", "courseId", 0, """
                 {
@@ -103,7 +102,6 @@ public class CompleteEventTest extends IntegrationTestBase {
                 """;
         cslStubService.getLearnerRecord().getModuleRecord(moduleId, userId, getModuleRecordsResponse);
         cslStubService.getLearnerRecord().createLearnerRecords(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse);
-        UserDetailsDto dto = testDataService.generateUserDetailsDto();
         String expectedModuleRecordPUT = """
                 [{
                     "id" : 1,
@@ -128,15 +126,14 @@ public class CompleteEventTest extends IntegrationTestBase {
                 """;
         cslStubService.getLearnerRecord().updateModuleRecords(expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
         String url = String.format("/courses/%s/modules/%s/events/%s/complete_booking", courseId, moduleId, eventId);
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(utils.toJson(dto)))
+        mockMvc.perform(post(url))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.message").value("Successfully applied action 'Complete a booking' to course record"));
     }
 
     @Test
     public void testCompleteBookingNotApproved() throws Exception {
+        cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         cslStubService.getLearningCatalogue().getCourse(course);
         cslStubService.getLearnerRecord().getModuleRecord(moduleId, userId, """
@@ -151,11 +148,8 @@ public class CompleteEventTest extends IntegrationTestBase {
                     "state": "REGISTERED"
                 }]}
                 """);
-        UserDetailsDto dto = testDataService.generateUserDetailsDto();
         String url = String.format("/courses/%s/modules/%s/events/%s/complete_booking", courseId, moduleId, eventId);
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(utils.toJson(dto)))
+        mockMvc.perform(post(url))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.detail").value("Can't complete a booking that hasn't been approved"))
                 .andExpect(jsonPath("$.title").value("Record is in the incorrect state"));

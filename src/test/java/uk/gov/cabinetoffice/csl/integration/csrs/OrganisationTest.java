@@ -68,14 +68,14 @@ public class OrganisationTest extends IntegrationTestBase {
                     "code": "NEW_OU",
                     "name": "New Organisational Unit",
                     "abbreviation": "NOU",
-                    "parent": null
+                    "parentId": null
                 }""", """
                 {
                     "ID": 1,
                     "code": "NEW_OU",
                     "name": "New Organisational Unit",
                     "abbreviation": "NOU",
-                    "parent": null
+                    "parentId": null
                 }
                 """);
         mockMvc.perform(post("/organisations")
@@ -85,7 +85,7 @@ public class OrganisationTest extends IntegrationTestBase {
                                   "code": "NEW_OU",
                                   "name": "New Organisational Unit",
                                   "abbreviation": "NOU",
-                                  "parent": null
+                                  "parentId": null
                                 }
                                 """))
                 .andExpect(content().json("""
@@ -111,13 +111,14 @@ public class OrganisationTest extends IntegrationTestBase {
                     "code": "NEW_OU",
                     "name": "New Organisational Unit",
                     "abbreviation": "NOU",
-                    "parent": "1"
+                    "parentId": 1
                 }""", """
                 {
+                    "id": 10,
                     "code": "NEW_OU",
                     "name": "New Organisational Unit",
                     "abbreviation": "NOU",
-                    "parent": "1"
+                    "parentId": 1
                 }
                 """);
         mockMvc.perform(post("/organisations")
@@ -127,47 +128,93 @@ public class OrganisationTest extends IntegrationTestBase {
                                     "code": "NEW_OU",
                                     "name": "New Organisational Unit",
                                     "abbreviation": "NOU",
-                                    "parent": 1
+                                    "parentId": 1
                                 }
                                 """))
                 .andExpect(content().json("""
+                          {
+                            "id":10,
+                            "name":"New Organisational Unit",
+                            "code":"NEW_OU",
+                            "abbreviation":"NOU",
+                            "parentId":1,
+                            "parentName":"OrgName1",
+                            "domains":[],
+                            "agencyToken":null
+                        }
                         """, true))
                 .andExpect(status().is2xxSuccessful());
     }
 
     @Test
-    public void testUpdateOrganisationalUnit() throws Exception {
+    public void testUpdateOrganisationalUnitParentToChild() throws Exception {
         cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
-        cslStubService.getCsrsStubService().updateOrganisation(1, """
-                {
-                  "code": "ON1",
-                  "name": "OrgName2 edit",
-                  "abbreviation": "ON1E",
-                  "parent": "http://localhost:9000/csrs/organisationalUnits/1"
-                }""", """
-                {
-                  "code": "ON1",
-                  "name": "OrgName2 edit",
-                  "abbreviation": "ON1E",
-                  "parent": 1
-                }
-                """);
         mockMvc.perform(put("/organisations/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "code": "ON1",
+                                  "code": "ON2",
                                   "name": "OrgName2 edit",
-                                  "abbreviation": "ON1E",
-                                  "parent": 1
+                                  "abbreviation": "ON2E",
+                                  "parentId": 2
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdateOrganisationalUnitParentToSelf() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        mockMvc.perform(put("/organisations/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "code": "ON2",
+                                  "name": "OrgName2 edit",
+                                  "abbreviation": "ON2E",
+                                  "parentId": 1
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdateOrganisationalUnit() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        cslStubService.getCsrsStubService().updateOrganisation(2, """
+                {
+                  "code": "ON2",
+                  "name": "OrgName2 edit",
+                  "abbreviation": "ON2E",
+                  "parentId": 6
+                }""", """
+                {
+                  "code": "ON2",
+                  "name": "OrgName2 edit",
+                  "abbreviation": "ON2E",
+                  "parentId": 6
+                }
+                """);
+        mockMvc.perform(put("/organisations/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "code": "ON2",
+                                  "name": "OrgName2 edit",
+                                  "abbreviation": "ON2E",
+                                  "parentId": 6
                                 }
                                 """))
                 .andExpect(content().json("""
                         {
-                          "code": "ON1",
+                          "id":2,
+                          "code": "ON2",
                           "name": "OrgName2 edit",
-                          "abbreviation": "ON1E",
-                          "parent": 1
+                          "abbreviation": "ON2E",
+                          "parentName":"OrgName6",
+                          "parentId": 6,
+                          "domains":[{"id":1,"domain":"domain2.com","createdTimestamp":"2025-01-01T10:00:00"}],
+                          "agencyToken":null
                         }
                         """, true))
                 .andExpect(status().is2xxSuccessful());
@@ -181,13 +228,13 @@ public class OrganisationTest extends IntegrationTestBase {
                   "code": "ON2",
                   "name": "OrgName2",
                   "abbreviation": null,
-                  "parent": null
+                  "parentId": null
                 }""", """
                 {
                   "code": "ON2",
                   "name": "OrgName2",
                   "abbreviation": null,
-                  "parent": null
+                  "parentId": null
                 }
                 """);
         mockMvc.perform(put("/organisations/2")
@@ -197,15 +244,25 @@ public class OrganisationTest extends IntegrationTestBase {
                                   "code": "ON2",
                                   "name": "OrgName2",
                                   "abbreviation": null,
-                                  "parent": null
+                                  "parentId": null
                                 }
                                 """))
                 .andExpect(content().json("""
                         {
-                          "code": "ON2",
-                          "name": "OrgName2",
-                          "abbreviation": null,
-                          "parent": null
+                          "id":2,
+                          "name":"OrgName2",
+                          "code":"ON2",
+                          "abbreviation":null,
+                          "parentId":null,
+                          "parentName":null,
+                          "domains":[
+                            {
+                              "id":1,
+                              "domain":"domain2.com",
+                              "createdTimestamp":"2025-01-01T10:00:00"
+                            }
+                          ],
+                          "agencyToken":null
                         }
                         """, true))
                 .andExpect(status().is2xxSuccessful());
@@ -429,7 +486,7 @@ public class OrganisationTest extends IntegrationTestBase {
                       "code": "ON2",
                       "abbreviation": null,
                       "parentId": 1,
-                      "parent": null,
+                      "parent":  null,
                       "domains": [
                         {
                           "id": 1,
@@ -447,7 +504,7 @@ public class OrganisationTest extends IntegrationTestBase {
                       "code": "ON3",
                       "abbreviation": "OName3",
                       "parentId": 2,
-                      "parent": null,
+                      "parent":  null,
                       "domains": [],
                       "agencyToken": null,
                       "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)",
@@ -459,7 +516,7 @@ public class OrganisationTest extends IntegrationTestBase {
                       "code": "ON4",
                       "abbreviation": "OName4",
                       "parentId": 3,
-                      "parent": null,
+                      "parent":  null,
                       "domains": [],
                       "agencyToken": null,
                       "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)",
@@ -471,7 +528,7 @@ public class OrganisationTest extends IntegrationTestBase {
                       "code": "ON5",
                       "abbreviation": "OName5",
                       "parentId": 1,
-                      "parent": null,
+                      "parent":  null,
                       "domains": [],
                       "agencyToken": null,
                       "formattedName": "OrgName1 (OName1) | OrgName5 (OName5)",
@@ -483,7 +540,7 @@ public class OrganisationTest extends IntegrationTestBase {
                       "code": "ON6",
                       "abbreviation": "OName6",
                       "parentId": null,
-                      "parent": null,
+                      "parent":  null,
                       "domains": [],
                       "agencyToken": null,
                       "formattedName": "OrgName6 (OName6)",
@@ -495,7 +552,7 @@ public class OrganisationTest extends IntegrationTestBase {
                       "code": "ON7",
                       "abbreviation": "OName7",
                       "parentId": null,
-                      "parent": null,
+                      "parent":  null,
                       "domains": [],
                       "agencyToken": {
                         "id": 1,
@@ -513,7 +570,7 @@ public class OrganisationTest extends IntegrationTestBase {
                       "code": "ON8",
                       "abbreviation": "OName8",
                       "parentId": 7,
-                      "parent": null,
+                      "parent":  null,
                       "domains": [],
                       "agencyToken": null,
                       "formattedName": "OrgName7 (OName7) | OrgName8 (OName8)",
@@ -525,7 +582,7 @@ public class OrganisationTest extends IntegrationTestBase {
                       "code": "ON9",
                       "abbreviation": "OName9",
                       "parentId": 7,
-                      "parent": null,
+                      "parent":  null,
                       "domains": [],
                       "agencyToken": {
                         "id": 2,

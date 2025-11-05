@@ -34,7 +34,7 @@ class OrganisationalUnitFactoryTest {
                 generateOrganisationalUnit(5L, "org5", 6L),
                 generateOrganisationalUnit(6L, "org6", null)
         );
-        OrganisationalUnitMap map = organisationalUnitFactory.buildOrganisationalUnits(orgs);
+        OrganisationalUnitMap map = OrganisationalUnitMap.buildFromList(orgs);
         assertEquals(6, map.size());
         assertEquals("org1", map.get(1L).getFormattedName());
         assertEquals(Set.of(2L, 3L), map.get(1L).getChildIds());

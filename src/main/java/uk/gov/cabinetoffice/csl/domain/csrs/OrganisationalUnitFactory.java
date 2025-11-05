@@ -4,8 +4,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.AgencyTokenDTO;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitOverview;
 
-import java.util.List;
-
 @Service
 public class OrganisationalUnitFactory {
 
@@ -24,10 +22,6 @@ public class OrganisationalUnitFactory {
                 organisationalUnit.getAbbreviation(), organisationalUnit.getParentId(), organisationalUnit.getParentName(), organisationalUnit.getDomains(),
                 agencyTokenDTO
         );
-    }
-
-    public OrganisationalUnitMap buildOrganisationalUnits(List<OrganisationalUnit> organisationalUnits) {
-        return OrganisationalUnitMap.create(organisationalUnits);
     }
 
 }

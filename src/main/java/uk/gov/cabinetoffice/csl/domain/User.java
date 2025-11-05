@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import uk.gov.cabinetoffice.csl.domain.csrs.BasicOrganisationalUnit;
-import uk.gov.cabinetoffice.csl.domain.rustici.UserDetailsDto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ public class User implements Serializable {
     private final String id;
     private String email;
     private String name;
+    private Long organisationId;
     private Integer professionId;
     private String professionName;
     private Integer gradeId;
@@ -28,13 +28,6 @@ public class User implements Serializable {
     private String lineManagerName;
     private String lineManagerEmail;
     private ArrayList<BasicOrganisationalUnit> departmentHierarchy = new ArrayList<>();
-
-    public static User fromUserDetails(String uid, UserDetailsDto userDetailsDto) {
-        return new User(uid, userDetailsDto.getLearnerEmail(), userDetailsDto.getLearnerName(), userDetailsDto.getProfessionId(),
-                userDetailsDto.getProfessionName(), userDetailsDto.getGradeId(), userDetailsDto.getGradeName(),
-                userDetailsDto.getLineManagerName(), userDetailsDto.getLineManagerEmail(),
-                userDetailsDto.getDepartmentHierarchy());
-    }
 
     public String getFormattedOrganisationName() {
         return IntStream.range(0, departmentHierarchy.size())
@@ -44,10 +37,6 @@ public class User implements Serializable {
 
     public List<String> getDepartmentCodes() {
         return departmentHierarchy.stream().map(BasicOrganisationalUnit::getCode).collect(Collectors.toList());
-    }
-
-    public Integer getOrganisationId() {
-        return departmentHierarchy.stream().findFirst().map(BasicOrganisationalUnit::getId).orElse(null);
     }
 
     public boolean hasLineManager() {

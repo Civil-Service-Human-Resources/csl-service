@@ -87,7 +87,7 @@ public class AgencyTokenTest extends IntegrationTestBase {
                             "uid": "UID",
                             "agencyDomains": ["domain2.com", "domain.com"],
                             "capacity": 10,
-                            "spacesUsed": 0,
+                            "capacityUsed": 0,
                             "token": "abc"
                           }
                         }""", true))
@@ -152,7 +152,7 @@ public class AgencyTokenTest extends IntegrationTestBase {
                             "uid": "uid1",
                             "agencyDomains": ["domain2.com", "domain.com"],
                             "capacity": 30,
-                            "spacesUsed": 30,
+                            "capacityUsed": 30,
                             "token": "abc"
                           }
                         }""", true))

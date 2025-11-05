@@ -27,7 +27,7 @@ public interface ICSRSClient extends IFetchClient<OrganisationalUnitMap> {
 
     UpdateDomainResponse deleteDomain(Long organisationUnitId, Long domainId, DeleteDomainDto dto);
 
-    void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto);
+    OrganisationalUnit patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto);
 
     AgencyToken createAgencyToken(Long organisationUnitId, AgencyTokenDTO agencyTokenDto);
 

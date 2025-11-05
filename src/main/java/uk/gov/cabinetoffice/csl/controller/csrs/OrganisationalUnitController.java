@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitsParams;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnitTree;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnits;
+import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 
 @Slf4j
@@ -74,6 +75,9 @@ public class OrganisationalUnitController {
                                                                @RequestBody OrganisationalUnitDto request
     ) {
         log.info("Update organisationalUnit for id: {} and request: {}", organisationalUnitId, request.toString());
+        if (organisationalUnitId.equals(request.getParentIdSafe())) {
+            throw new ValidationException("Can't set parent ID to self");
+        }
         return organisationalUnitService.patchOrganisationalUnit(organisationalUnitId, request);
     }
 

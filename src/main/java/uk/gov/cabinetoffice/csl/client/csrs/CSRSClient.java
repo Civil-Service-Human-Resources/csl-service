@@ -24,12 +24,9 @@ public class CSRSClient implements ICSRSClient {
 
     private final IHttpClient httpClient;
     private final CsrsConfiguration csrsConfiguration;
-    private final OrganisationalUnitFactory organisationalUnitFactory;
 
-    public CSRSClient(@Qualifier("csrsHttpClient") ParallelHttpClient httpClient, CsrsConfiguration csrsConfiguration,
-                      OrganisationalUnitFactory organisationalUnitFactory) {
+    public CSRSClient(@Qualifier("csrsHttpClient") ParallelHttpClient httpClient, CsrsConfiguration csrsConfiguration) {
         this.httpClient = httpClient;
-        this.organisationalUnitFactory = organisationalUnitFactory;
         this.csrsConfiguration = csrsConfiguration;
     }
 
@@ -48,7 +45,7 @@ public class CSRSClient implements ICSRSClient {
         List<OrganisationalUnit> organisationalUnits = httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder,
                         csrsConfiguration.getOrganisationalUnitMaxPageSize())
                 .stream().toList();
-        return organisationalUnitFactory.buildOrganisationalUnits(organisationalUnits);
+        return OrganisationalUnitMap.buildFromList(organisationalUnits);
     }
 
     @Override
@@ -91,10 +88,10 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
+    public OrganisationalUnit patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
         String url = csrsConfiguration.getOrganisationalUnitUrl(organisationalUnitId);
         log.info("Updating organisational unit data in csrs: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
-        httpClient.executeRequest(RequestEntity.patch(url).body(organisationalUnitDto), Void.class);
+        return httpClient.executeRequest(RequestEntity.patch(url).body(organisationalUnitDto), OrganisationalUnit.class);
     }
 
     @Override

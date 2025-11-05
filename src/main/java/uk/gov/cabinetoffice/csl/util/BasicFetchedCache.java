@@ -21,5 +21,4 @@ public class BasicFetchedCache<T extends Serializable> extends BasicCache<T> {
         }
         return object;
     }
-
 }

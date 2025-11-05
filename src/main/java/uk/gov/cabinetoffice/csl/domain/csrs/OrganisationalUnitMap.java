@@ -3,26 +3,21 @@ package uk.gov.cabinetoffice.csl.domain.csrs;
 import org.springframework.lang.Nullable;
 
 import java.util.*;
-
-import static java.util.Collections.singletonList;
+import java.util.function.Function;
 
 public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
 
-    public static OrganisationalUnitMap create(List<OrganisationalUnit> organisationalUnits) {
+    public static OrganisationalUnitMap buildFromList(List<OrganisationalUnit> organisationalUnits) {
         OrganisationalUnitMap map = new OrganisationalUnitMap();
         for (OrganisationalUnit organisationalUnit : organisationalUnits) {
             map.put(organisationalUnit.getId(), organisationalUnit);
         }
-        organisationalUnits.forEach(map::buildOrganisationalUnit);
+        organisationalUnits.forEach(map::setOrganisationalUnitData);
         return map;
     }
 
     public OrganisationalUnit get(Long id) {
         return Optional.ofNullable(super.get(id)).orElseThrow(() -> new IllegalArgumentException("Organisational unit not found for id: " + id));
-    }
-
-    public AgencyToken getAgencyToken(Long id) {
-        return Optional.ofNullable(get(id).getAgencyToken()).orElseThrow(() -> new IllegalArgumentException("Agency token not found for organisation id: " + id));
     }
 
     private BasicOrganisationalUnitNode buildNode(OrganisationalUnit organisationalUnit) {
@@ -36,11 +31,27 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
                 .map(this::buildNode).toList();
     }
 
+    public OrganisationalUnit updateOrganisationalUnit(Long id, Function<OrganisationalUnit, OrganisationalUnit> update) {
+        OrganisationalUnit organisationalUnit = get(id);
+        if (organisationalUnit != null) {
+            organisationalUnit = update.apply(organisationalUnit);
+            put(organisationalUnit.getId(), organisationalUnit);
+        }
+        return organisationalUnit;
+    }
+
     public List<Long> delete(Collection<Long> ids) {
         return ids.stream().map(this::delete).flatMap(Collection::stream).toList();
     }
 
     public List<Long> delete(Long id) {
+        OrganisationalUnit organisationalUnit = get(id);
+        if (organisationalUnit.getParentId() != null) {
+            updateOrganisationalUnit(organisationalUnit.getParentId(), o -> {
+                o.getChildIds().remove(id);
+                return o;
+            });
+        }
         List<Long> idsToRemove = getMultiple(Collections.singleton(id), true)
                 .stream().map(OrganisationalUnit::getId).toList();
         idsToRemove.forEach(this::remove);
@@ -80,24 +91,23 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
         return organisationalUnits;
     }
 
-    public void updateAgencyToken(Long organisationalUnitId, @Nullable AgencyToken newAgencyToken) {
-        updateAgencyToken(organisationalUnitId, newAgencyToken, false);
+    public List<Long> getMultipleAsIds(Collection<Long> ids, boolean includeChildren) {
+        return getMultiple(ids, includeChildren).stream().map(OrganisationalUnit::getId).toList();
     }
-
-    private void updateAgencyToken(Long organisationalUnitId, @Nullable AgencyToken newAgencyToken, boolean inherited) {
-        OrganisationalUnit organisationalUnit = get(organisationalUnitId);
-        if (inherited) {
-            if (organisationalUnit.getAgencyToken() == null) {
-                organisationalUnit.setInheritedAgencyToken(newAgencyToken);
-                organisationalUnit.getChildIds().forEach(childId -> updateAgencyToken(childId, newAgencyToken, true));
-            }
-        } else {
-            organisationalUnit.setAgencyToken(newAgencyToken);
-            organisationalUnit.getChildIds().forEach(childId -> updateAgencyToken(childId, newAgencyToken, true));
-        }
+    
+    public List<OrganisationalUnit> rebuildHierarchy(OrganisationalUnit root) {
+        return getMultipleAsIds(List.of(root.getId()), true).stream()
+                .map(id -> {
+                    OrganisationalUnit organisationalUnit = get(id);
+                    organisationalUnit.resetCustomData();
+                    return organisationalUnit;
+                })
+                .map(this::setOrganisationalUnitData)
+                .toList();
     }
 
     public OrganisationalUnit setOrganisationalUnitData(OrganisationalUnit organisationalUnit) {
+        System.out.println("Building organisationalUnit " + organisationalUnit.getId());
         StringBuilder formattedName = new StringBuilder(organisationalUnit.getNameWithAbbreviation());
         Long parentId = organisationalUnit.getParentId();
         int parents = 0;
@@ -115,22 +125,15 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
             parentId = parentOrganisationalUnit.getParentId();
         }
         organisationalUnit.setFormattedName(formattedName.toString());
+        put(organisationalUnit.getId(), organisationalUnit);
         return organisationalUnit;
     }
 
-    public List<OrganisationalUnit> buildOrganisationalUnit(Long organisationalUnitId, boolean includeChildren) {
-        List<OrganisationalUnit> multipleOrgs = getMultiple(singletonList(organisationalUnitId), includeChildren);
-        multipleOrgs = buildOrganisationalUnit(multipleOrgs);
-        return multipleOrgs;
-    }
-
-    public OrganisationalUnit buildOrganisationalUnit(OrganisationalUnit organisationalUnit) {
-        organisationalUnit = setOrganisationalUnitData(organisationalUnit);
-        this.put(organisationalUnit.getId(), organisationalUnit);
+    public OrganisationalUnit updateAgencyToken(Long organisationalUnitId, @Nullable AgencyToken newAgencyToken) {
+        OrganisationalUnit organisationalUnit = get(organisationalUnitId);
+        organisationalUnit.setAgencyToken(newAgencyToken);
+        rebuildHierarchy(organisationalUnit);
         return organisationalUnit;
     }
 
-    public List<OrganisationalUnit> buildOrganisationalUnit(List<OrganisationalUnit> organisationalUnits) {
-        return organisationalUnits.stream().map(this::buildOrganisationalUnit).toList();
-    }
 }

@@ -18,7 +18,7 @@ class OrganisationalUnitMapTest {
 
     @BeforeEach
     public void setup() {
-        organisationalUnitMap = OrganisationalUnitMap.create(testDataService.generateOrganisationalUnitsPagedResponse().getContent());
+        organisationalUnitMap = OrganisationalUnitMap.buildFromList(testDataService.generateOrganisationalUnitsPagedResponse().getContent());
     }
 
     @Test

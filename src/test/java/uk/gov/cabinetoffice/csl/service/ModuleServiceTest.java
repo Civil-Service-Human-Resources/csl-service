@@ -17,8 +17,8 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationInput;
-import uk.gov.cabinetoffice.csl.domain.rustici.UserDetailsDto;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
+import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,6 +36,9 @@ public class ModuleServiceTest extends TestDataService {
 
     @Mock
     private LearningCatalogueService learningCatalogueService;
+
+    @Mock
+    private UserDetailsService userDetailsService;
 
     @Mock
     private RusticiService rusticiService;
@@ -58,9 +61,8 @@ public class ModuleServiceTest extends TestDataService {
         module.setModuleType(ModuleType.link);
         module.setUrl("https://test.com");
         CourseWithModule courseWithModule = mockCatalogueCall(course, module);
-        UserDetailsDto userDetailsDto = new UserDetailsDto();
-        LaunchLink result = moduleService.launchModule(user, getCourseId(), getModuleId(), userDetailsDto);
-        verify(moduleActionService, atMostOnce()).completeModule(courseWithModule, user);
+        LaunchLink result = moduleService.launchModule(getUserId(), getCourseId(), getModuleId());
+        verify(moduleActionService, atMostOnce()).completeModule(courseWithModule, getUserId());
         assertEquals("https://test.com", result.getLaunchLink());
     }
 
@@ -71,12 +73,12 @@ public class ModuleServiceTest extends TestDataService {
         ModuleRecord moduleRecord = generateModuleRecord();
         moduleRecord.setUid("uid");
         CourseWithModule courseWithModule = mockCatalogueCall(course, module);
-        when(moduleActionService.launchModule(courseWithModule, user)).thenReturn(moduleRecord);
+        when(moduleActionService.launchModule(courseWithModule, getUserId())).thenReturn(moduleRecord);
         LaunchLink launchLink = createLaunchLink();
-        UserDetailsDto userDetailsDto = generateUserDetailsDto();
-        RegistrationInput registrationInput = new RegistrationInput("uid", getCourseId(), getModuleId(), user.getId(), getLearnerFirstName(), "");
+        RegistrationInput registrationInput = new RegistrationInput("uid", getCourseId(), getModuleId(), getUserId(), getLearnerFirstName(), "");
         when(rusticiService.createLaunchLink(registrationInput)).thenReturn(launchLink);
-        LaunchLink result = moduleService.launchModule(user, getCourseId(), getModuleId(), userDetailsDto);
+        when(userDetailsService.getUserWithUid(getUserId())).thenReturn(user);
+        LaunchLink result = moduleService.launchModule(getUserId(), getCourseId(), getModuleId());
         assertEquals(launchLink, result);
     }
 
@@ -84,7 +86,7 @@ public class ModuleServiceTest extends TestDataService {
     public void shouldCompleteModule() {
         Module module = course.getModule(getModuleId());
         mockCatalogueCall(course, module);
-        ModuleResponse result = moduleService.completeModule(user, getCourseId(), getModuleId());
+        ModuleResponse result = moduleService.completeModule(getUserId(), getCourseId(), getModuleId());
         assertEquals("Successfully applied action 'Complete a module' to course record", result.getMessage());
         assertEquals(getModuleId(), result.getModuleId());
         assertEquals("Test Module", result.getModuleTitle());
