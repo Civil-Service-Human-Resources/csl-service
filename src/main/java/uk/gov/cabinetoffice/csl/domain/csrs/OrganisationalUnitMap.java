@@ -23,14 +23,17 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
     }
 
     private BasicOrganisationalUnitNode buildNode(OrganisationalUnit organisationalUnit) {
-        List<BasicOrganisationalUnitNode> childNodes = organisationalUnit.getChildIds().stream().map(id -> buildNode(get(id))).toList();
+        List<BasicOrganisationalUnitNode> childNodes = organisationalUnit.getChildIds().stream().map(id -> buildNode(get(id)))
+                .sorted(Comparator.comparing(BasicOrganisationalUnitNode::getName)).toList();
         return new BasicOrganisationalUnitNode(organisationalUnit.getName(), organisationalUnit.getId(), childNodes);
     }
 
     public List<BasicOrganisationalUnitNode> getOrganisationalUnitTree() {
         return values()
                 .stream().filter(o -> o.getParentId() == null)
-                .map(this::buildNode).toList();
+                .map(this::buildNode)
+                .sorted(Comparator.comparing(BasicOrganisationalUnitNode::getName))
+                .toList();
     }
 
     public OrganisationalUnit updateOrganisationalUnit(Long id, Function<OrganisationalUnit, OrganisationalUnit> update) {
