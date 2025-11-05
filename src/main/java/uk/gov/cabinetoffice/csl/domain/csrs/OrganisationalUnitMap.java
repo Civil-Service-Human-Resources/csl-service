@@ -1,10 +1,12 @@
 package uk.gov.cabinetoffice.csl.domain.csrs;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
 
+@Slf4j
 public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
 
     public static OrganisationalUnitMap buildFromList(List<OrganisationalUnit> organisationalUnits) {
@@ -94,7 +96,7 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
     public List<Long> getMultipleAsIds(Collection<Long> ids, boolean includeChildren) {
         return getMultiple(ids, includeChildren).stream().map(OrganisationalUnit::getId).toList();
     }
-    
+
     public List<OrganisationalUnit> rebuildHierarchy(OrganisationalUnit root) {
         return getMultipleAsIds(List.of(root.getId()), true).stream()
                 .map(id -> {
@@ -107,7 +109,7 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
     }
 
     public OrganisationalUnit setOrganisationalUnitData(OrganisationalUnit organisationalUnit) {
-        System.out.println("Building organisationalUnit " + organisationalUnit.getId());
+        log.info(String.format("Building organisationalUnit %s", organisationalUnit.getId()));
         StringBuilder formattedName = new StringBuilder(organisationalUnit.getNameWithAbbreviation());
         Long parentId = organisationalUnit.getParentId();
         int parents = 0;

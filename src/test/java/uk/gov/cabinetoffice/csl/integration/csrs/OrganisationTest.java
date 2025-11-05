@@ -366,6 +366,34 @@ public class OrganisationTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testGetOrganisationOverviewsNotParent() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        String expectedFormattedOrganisations = """
+                {
+                  "organisationalUnits": [
+                    {
+                      "id": 1,
+                      "name": "OrgName1",
+                      "code": "ON1",
+                      "abbreviation": "OName1",
+                      "parentId": null,
+                      "parentName": null,
+                      "domains": [],
+                      "agencyToken": null
+                    }
+                  ]
+                }
+                
+                """;
+        mockMvc.perform(get("/organisations")
+                        .param("organisationId", "1")
+                        .param("includeParents", "true")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedFormattedOrganisations, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
     public void testFormattedOrganisationsList() throws Exception {
         cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
         String expectedFormattedOrganisations = """
