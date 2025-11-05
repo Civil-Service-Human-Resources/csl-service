@@ -13,6 +13,10 @@ public class OrganisationalUnitFactory {
         this.agencyTokenFactory = agencyTokenFactory;
     }
 
+    public OrganisationalUnitOverview createOrganisationalUnitOverview(OrganisationalUnit organisationalUnit) {
+        return createOrganisationalUnitOverview(organisationalUnit, false);
+    }
+
     public OrganisationalUnitOverview createOrganisationalUnitOverview(OrganisationalUnit organisationalUnit, boolean newOrganisation) {
 
         AgencyTokenDTO agencyTokenDTO = organisationalUnit.getAgencyToken() == null ? null : agencyTokenFactory.createAgencyTokenDTO(organisationalUnit.getAgencyToken(), newOrganisation);

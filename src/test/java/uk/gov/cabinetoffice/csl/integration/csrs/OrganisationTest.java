@@ -312,6 +312,60 @@ public class OrganisationTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testGetOrganisationOverviews() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        String expectedFormattedOrganisations = """
+                {
+                  "organisationalUnits": [
+                    {
+                      "id": 1,
+                      "name": "OrgName1",
+                      "code": "ON1",
+                      "abbreviation": "OName1",
+                      "parentId": null,
+                      "parentName": null,
+                      "domains": [],
+                      "agencyToken": null
+                    },
+                    {
+                      "id": 2,
+                      "name": "OrgName2",
+                      "code": "ON2",
+                      "abbreviation": null,
+                      "parentId": 1,
+                      "parentName": "OrgName1",
+                      "domains": [
+                        {
+                          "id": 1,
+                          "domain": "domain2.com",
+                          "createdTimestamp": "2025-01-01T10:00:00"
+                        }
+                      ],
+                      "agencyToken": null
+                    },
+                    {
+                      "id": 3,
+                      "name": "OrgName3",
+                      "code": "ON3",
+                      "abbreviation": "OName3",
+                      "parentId": 2,
+                      "parentName": "OrgName2",
+                      "domains": [],
+                      "agencyToken": null
+                    }
+                  ]
+                }
+                
+                """;
+        mockMvc.perform(get("/organisations")
+                        .param("organisationId", "3")
+                        .param("includeParents", "true")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedFormattedOrganisations, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
     public void testFormattedOrganisationsList() throws Exception {
         cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
         String expectedFormattedOrganisations = """

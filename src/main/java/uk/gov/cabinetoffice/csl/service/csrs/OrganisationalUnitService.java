@@ -14,6 +14,7 @@ import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.Regis
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.azure.core.util.CoreUtils.isNullOrEmpty;
 
@@ -35,6 +36,27 @@ public class OrganisationalUnitService {
     public OrganisationalUnits getAllOrganisationalUnits() {
         log.info("Getting all organisational units");
         return new OrganisationalUnits(getOrganisationalUnitMap().values().stream().toList());
+    }
+
+    public GetOrganisationalUnits getOrganisationalUnitOverview(GetOrganisationUnitsFilter params) {
+        OrganisationalUnitMap allOrganisationalUnits = getOrganisationalUnitMap();
+        Set<OrganisationalUnitOverview> filtered = params.getOrganisationId()
+                .stream().flatMap(id -> {
+                    ArrayList<OrganisationalUnit> organisationalUnits = new ArrayList<>();
+                    OrganisationalUnit organisationalUnit = allOrganisationalUnits.get(id);
+                    organisationalUnits.add(organisationalUnit);
+                    if (params.isIncludeParents()) {
+                        Long currentParentId = organisationalUnit.getParentId();
+                        while (currentParentId != null) {
+                            OrganisationalUnit currentParent = allOrganisationalUnits.get(currentParentId);
+                            organisationalUnits.add(currentParent);
+                            currentParentId = currentParent.getParentId();
+                        }
+                    }
+                    return organisationalUnits.stream().map(organisationalUnitFactory::createOrganisationalUnitOverview);
+                }).collect(Collectors.toSet());
+
+        return new GetOrganisationalUnits(filtered.stream().sorted(Comparator.comparing(OrganisationalUnitOverview::getName)).toList());
     }
 
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(OrganisationalUnitsParams params) {
