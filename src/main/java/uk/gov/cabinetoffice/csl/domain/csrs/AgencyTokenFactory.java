@@ -23,11 +23,15 @@ public class AgencyTokenFactory {
         }
     }
 
-    public AgencyTokenDTO createAgencyTokenDTO(AgencyToken agencyToken, boolean newToken) {
-        int capacityUsed = newToken ? 0 : identityService.getCapacityUsedForAgencyToken(agencyToken.getUid());
-        return new AgencyTokenDTO(agencyToken.getUid(),
-                agencyToken.getAgencyDomains().stream().map(AgencyDomain::getDomain).collect(Collectors.toSet()),
-                agencyToken.getCapacity(), capacityUsed, agencyToken.getToken());
+    public AgencyToken formatAgencyToken(AgencyToken existingToken) {
+        int capacityUsed = identityService.getCapacityUsedForAgencyToken(existingToken.getUid());
+        existingToken.setCapacityUsed(capacityUsed);
+        return existingToken;
+    }
+
+    public AgencyToken createAgencyToken(AgencyTokenDTO agencyTokenDTO) {
+        return new AgencyToken(agencyTokenDTO.getToken(), agencyTokenDTO.getCapacity(),
+                agencyTokenDTO.getDomain().stream().map(AgencyDomain::new).collect(Collectors.toSet()));
     }
 
 }

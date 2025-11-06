@@ -227,7 +227,7 @@ public class TestDataService {
         organisationalUnits7.setName("OrgName7");
         organisationalUnits7.setAbbreviation("OName7");
         organisationalUnits7.setCode("ON7");
-        organisationalUnits7.setAgencyToken(new AgencyToken(1L, "token", "uid1", 30, Set.of(new AgencyDomain(1L, "agency.com"))));
+        organisationalUnits7.setAgencyToken(new AgencyToken(1L, "uid1", "token", 30, 20, Set.of(new AgencyDomain(1L, "agency.com"))));
         organisationalUnits.add(organisationalUnits7);
 
         OrganisationalUnit organisationalUnits8 = new OrganisationalUnit();
@@ -244,7 +244,7 @@ public class TestDataService {
         organisationalUnits9.setName("OrgName9");
         organisationalUnits9.setAbbreviation("OName9");
         organisationalUnits9.setCode("ON9");
-        organisationalUnits9.setAgencyToken(new AgencyToken(2L, "token", "uid2", 1, Set.of(new AgencyDomain(2L, "agency2.com"))));
+        organisationalUnits9.setAgencyToken(new AgencyToken(2L, "uid2", "token", 1, 1, Set.of(new AgencyDomain(2L, "agency2.com"))));
         organisationalUnits.add(organisationalUnits9);
 
         return organisationalUnits;

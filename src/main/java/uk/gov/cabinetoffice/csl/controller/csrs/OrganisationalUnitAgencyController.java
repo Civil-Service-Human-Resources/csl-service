@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.controller.csrs;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class OrganisationalUnitAgencyController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OrganisationalUnitOverview createAgencyToken(@PathVariable("id") Long organisationUnitId,
-                                                        @RequestBody AgencyTokenDTO agencyToken) {
+                                                        @RequestBody @Valid AgencyTokenDTO agencyToken) {
         log.info("Adding agency token to organisational unit id: {}", organisationUnitId);
         return agencyTokenService.createAgencyToken(organisationUnitId, agencyToken);
     }
@@ -27,7 +28,7 @@ public class OrganisationalUnitAgencyController {
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public OrganisationalUnitOverview updateAgencyToken(@PathVariable("id") Long organisationUnitId,
-                                                        @RequestBody AgencyTokenDTO agencyToken) {
+                                                        @RequestBody @Valid AgencyTokenDTO agencyToken) {
         log.info("Updating agency token for organisational unit id: {}", organisationUnitId);
         return agencyTokenService.updateAgencyToken(organisationUnitId, agencyToken);
     }

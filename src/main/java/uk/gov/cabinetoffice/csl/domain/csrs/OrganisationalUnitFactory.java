@@ -1,7 +1,6 @@
 package uk.gov.cabinetoffice.csl.domain.csrs;
 
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.controller.csrs.model.AgencyTokenDTO;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitOverview;
 
 @Service
@@ -14,17 +13,20 @@ public class OrganisationalUnitFactory {
     }
 
     public OrganisationalUnitOverview createOrganisationalUnitOverview(OrganisationalUnit organisationalUnit) {
-        return createOrganisationalUnitOverview(organisationalUnit, false);
+        return createOrganisationalUnitOverview(organisationalUnit, true);
     }
 
-    public OrganisationalUnitOverview createOrganisationalUnitOverview(OrganisationalUnit organisationalUnit, boolean newOrganisation) {
+    public OrganisationalUnitOverview createOrganisationalUnitOverview(OrganisationalUnit organisationalUnit, boolean includeAgencyCapacityUsed) {
 
-        AgencyTokenDTO agencyTokenDTO = organisationalUnit.getAgencyToken() == null ? null : agencyTokenFactory.createAgencyTokenDTO(organisationalUnit.getAgencyToken(), newOrganisation);
+        AgencyToken agencyToken = organisationalUnit.getAgencyToken();
+        if (agencyToken != null && includeAgencyCapacityUsed) {
+            agencyToken = agencyTokenFactory.formatAgencyToken(organisationalUnit.getAgencyToken());
+        }
 
         return new OrganisationalUnitOverview(
                 organisationalUnit.getId(), organisationalUnit.getName(), organisationalUnit.getCode(),
                 organisationalUnit.getAbbreviation(), organisationalUnit.getParentId(), organisationalUnit.getParentName(), organisationalUnit.getDomains(),
-                agencyTokenDTO
+                agencyToken
         );
     }
 

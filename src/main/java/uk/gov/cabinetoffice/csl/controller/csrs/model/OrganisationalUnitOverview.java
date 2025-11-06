@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.gov.cabinetoffice.csl.domain.csrs.AgencyToken;
 import uk.gov.cabinetoffice.csl.domain.csrs.Domain;
 
 import java.util.List;
@@ -21,5 +22,5 @@ public class OrganisationalUnitOverview {
     private Long parentId;
     private String parentName;
     private List<Domain> domains;
-    private AgencyTokenDTO agencyToken;
+    private AgencyToken agencyToken;
 }

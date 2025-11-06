@@ -1,6 +1,5 @@
 package uk.gov.cabinetoffice.csl.client.csrs;
 
-import uk.gov.cabinetoffice.csl.controller.csrs.model.AgencyTokenDTO;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.CreateDomainDto;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.DeleteDomainDto;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitDto;
@@ -29,9 +28,9 @@ public interface ICSRSClient extends IFetchClient<OrganisationalUnitMap> {
 
     OrganisationalUnit patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto);
 
-    AgencyToken createAgencyToken(Long organisationUnitId, AgencyTokenDTO agencyTokenDto);
+    AgencyToken createAgencyToken(Long organisationUnitId, AgencyToken agencyTokenDto);
 
-    AgencyToken updateAgencyToken(Long organisationUnitId, AgencyTokenDTO agencyToken);
+    AgencyToken updateAgencyToken(Long organisationUnitId, AgencyToken agencyToken);
 
     void deleteAgencyToken(Long organisationalUnitId);
 

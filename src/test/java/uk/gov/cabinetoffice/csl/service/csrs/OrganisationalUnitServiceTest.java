@@ -197,7 +197,7 @@ class OrganisationalUnitServiceTest extends CsrsServiceTestBase {
         OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
         assertTrue(originalParent.getChildIds().contains(2L));
 
-        when(organisationalUnitFactory.createOrganisationalUnitOverview(originalOrganisationalUnit, false)).thenReturn(new OrganisationalUnitOverview());
+        when(organisationalUnitFactory.createOrganisationalUnitOverview(originalOrganisationalUnit)).thenReturn(new OrganisationalUnitOverview());
 
         organisationalUnitService.patchOrganisationalUnit(2L, dto);
         OrganisationalUnit updatedOrganisationalUnit = organisationalUnitMap.get(2L);

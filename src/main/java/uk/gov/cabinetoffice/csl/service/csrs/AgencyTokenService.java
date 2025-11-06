@@ -25,21 +25,23 @@ public class AgencyTokenService {
         return organisationalUnitMap.get(organisationalUnitId);
     }
 
-    public OrganisationalUnitOverview createAgencyToken(Long organisationalUnitId, AgencyTokenDTO agencyToken) {
-        AgencyToken response = civilServantRegistryClient.createAgencyToken(organisationalUnitId, agencyToken);
-        OrganisationalUnit organisationalUnit = updateAgencyTokenForOrganisation(organisationalUnitId, response);
-        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, true);
+    public OrganisationalUnitOverview createAgencyToken(Long organisationalUnitId, AgencyTokenDTO agencyTokenDto) {
+        AgencyToken agencyToken = agencyTokenFactory.createAgencyToken(agencyTokenDto);
+        agencyToken = civilServantRegistryClient.createAgencyToken(organisationalUnitId, agencyToken);
+        OrganisationalUnit organisationalUnit = updateAgencyTokenForOrganisation(organisationalUnitId, agencyToken);
+        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, false);
     }
 
-    public OrganisationalUnitOverview updateAgencyToken(Long organisationalUnitId, AgencyTokenDTO agencyToken) {
+    public OrganisationalUnitOverview updateAgencyToken(Long organisationalUnitId, AgencyTokenDTO agencyTokenDto) {
         OrganisationalUnitMap organisationalUnitMap = organisationalUnitMapCache.get();
         OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
         AgencyToken existingToken = organisationalUnit.getAgencyToken();
-        if (!agencyTokenFactory.isCapacityValidForToken(existingToken, agencyToken))
+        if (!agencyTokenFactory.isCapacityValidForToken(existingToken, agencyTokenDto))
             throw new ValidationException("New token capacity cannot be lower than current spaces used");
-        AgencyToken response = civilServantRegistryClient.updateAgencyToken(organisationalUnitId, agencyToken);
-        organisationalUnit = organisationalUnitMap.updateAgencyToken(organisationalUnitId, response);
-        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, false);
+        AgencyToken agencyToken = agencyTokenFactory.createAgencyToken(agencyTokenDto);
+        agencyToken = civilServantRegistryClient.updateAgencyToken(organisationalUnitId, agencyToken);
+        organisationalUnit = organisationalUnitMap.updateAgencyToken(organisationalUnitId, agencyToken);
+        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, true);
     }
 
     public void deleteAgencyToken(Long organisationalUnitId) {

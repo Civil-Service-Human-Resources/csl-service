@@ -11,7 +11,6 @@ import uk.gov.cabinetoffice.csl.service.IdentityAPIService;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AgencyTokenFactoryTest {
@@ -23,25 +22,16 @@ class AgencyTokenFactoryTest {
     private AgencyTokenFactory agencyTokenFactory;
 
     @Test
-    public void testCreateAgencyTokenDTO() {
-        AgencyToken agencyToken = new AgencyToken();
-        agencyToken.setUid("UID");
-        agencyToken.setAgencyDomains(Set.of(new AgencyDomain(1L, "domain.com")));
-        AgencyTokenDTO dto = agencyTokenFactory.createAgencyTokenDTO(agencyToken, true);
-        assertEquals("UID", dto.getUid());
-        assertEquals(0, dto.getCapacityUsed());
-        assertEquals("domain.com", dto.getAgencyDomains().toArray()[0].toString());
+    public void testCreateAgencyToken() {
+        AgencyTokenDTO agencyTokenDto = new AgencyTokenDTO();
+        agencyTokenDto.setToken("token");
+        agencyTokenDto.setCapacity(10);
+        agencyTokenDto.setDomain(Set.of("domain.com"));
+        AgencyToken agencyToken = agencyTokenFactory.createAgencyToken(agencyTokenDto);
+        assertEquals("token", agencyToken.getToken());
+        assertEquals(0, agencyToken.getCapacityUsed());
+        assertEquals(10, agencyToken.getCapacity());
+        assertEquals("domain.com", agencyToken.getAgencyDomains().stream().findFirst().get().getDomain());
     }
 
-    @Test
-    public void testUpdateAgencyToken() {
-        when(identityService.getCapacityUsedForAgencyToken("UID")).thenReturn(10);
-        AgencyToken agencyToken = new AgencyToken();
-        agencyToken.setUid("UID");
-        agencyToken.setAgencyDomains(Set.of(new AgencyDomain(1L, "domain.com")));
-        AgencyTokenDTO dto = agencyTokenFactory.createAgencyTokenDTO(agencyToken, false);
-        assertEquals("UID", dto.getUid());
-        assertEquals(10, dto.getCapacityUsed());
-        assertEquals("domain.com", dto.getAgencyDomains().toArray()[0].toString());
-    }
 }

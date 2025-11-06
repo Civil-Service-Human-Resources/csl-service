@@ -181,7 +181,7 @@ public class OrganisationalUnitService {
 
         organisationalUnitMapCache.put(organisationalUnitMap);
 
-        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, false);
+        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit);
     }
 
     private void updateReportingData(List<OrganisationalUnit> multipleOrgs) {
@@ -222,7 +222,7 @@ public class OrganisationalUnitService {
     public OrganisationalUnitOverview getOrganisationalUnitOverview(Long organisationalUnitId) {
         OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
         OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
-        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, false);
+        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit);
     }
 
     public OrganisationalUnitOverview createOrganisationalUnit(OrganisationalUnitDto organisationalUnitDto) {
@@ -230,7 +230,7 @@ public class OrganisationalUnitService {
         OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
         organisationalUnit = organisationalUnitMap.setOrganisationalUnitData(organisationalUnit);
         organisationalUnitMapCache.put(organisationalUnitMap);
-        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, true);
+        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, false);
     }
 
 }

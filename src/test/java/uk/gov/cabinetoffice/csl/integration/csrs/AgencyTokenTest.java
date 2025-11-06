@@ -35,12 +35,16 @@ public class AgencyTokenTest extends IntegrationTestBase {
         cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
         cslStubService.getCsrsStubService().addToken(1, """
                 {
-                    "agencyDomains": [
-                        "domain.com",
-                        "domain2.com"
-                    ],
+                    "token": "abc",
                     "capacity": 10,
-                    "token": "abc"
+                    "agencyDomains": [
+                        {
+                            "domain": "domain.com"
+                        },
+                        {
+                            "domain": "domain2.com"
+                        }
+                    ]
                 }
                 """, """
                 {
@@ -65,7 +69,7 @@ public class AgencyTokenTest extends IntegrationTestBase {
         mockMvc.perform(post("/organisations/1/agency-token")
                         .content("""
                                 {
-                                    "agencyDomains": [
+                                    "domain": [
                                         "domain.com",
                                         "domain2.com"
                                     ],
@@ -84,13 +88,18 @@ public class AgencyTokenTest extends IntegrationTestBase {
                           "parentName": null,
                           "domains": [],
                           "agencyToken": {
+                            "id": 10,
                             "uid": "UID",
-                            "agencyDomains": ["domain2.com", "domain.com"],
+                            "token": "abc",
                             "capacity": 10,
                             "capacityUsed": 0,
-                            "token": "abc"
+                            "agencyDomains": [
+                              { "id": 1, "domain": "domain.com" },
+                              { "id": 2, "domain": "domain2.com" }
+                            ]
                           }
-                        }""", true))
+                        }
+                        """, true))
                 .andExpect(status().is2xxSuccessful());
     }
 
@@ -100,12 +109,16 @@ public class AgencyTokenTest extends IntegrationTestBase {
         cslStubService.getIdentityAPIServiceStubService().getAgencyTokenSpacesUsed("uid1", 30);
         cslStubService.getCsrsStubService().updateToken(7, """
                 {
-                    "agencyDomains": [
-                        "domain.com",
-                        "domain2.com"
-                    ],
+                    "token": "abc",
                     "capacity": 30,
-                    "token": "abc"
+                    "agencyDomains": [
+                        {
+                            "domain": "domain.com"
+                        },
+                        {
+                            "domain": "domain2.com"
+                        }
+                    ]
                 }
                 """, """
                 {
@@ -130,7 +143,7 @@ public class AgencyTokenTest extends IntegrationTestBase {
         mockMvc.perform(put("/organisations/7/agency-token")
                         .content("""
                                 {
-                                    "agencyDomains": [
+                                    "domain": [
                                         "domain.com",
                                         "domain2.com"
                                     ],
@@ -149,11 +162,15 @@ public class AgencyTokenTest extends IntegrationTestBase {
                           "parentName": null,
                           "domains": [],
                           "agencyToken": {
+                            "id": 1,
                             "uid": "uid1",
-                            "agencyDomains": ["domain2.com", "domain.com"],
+                            "token": "abc",
                             "capacity": 30,
                             "capacityUsed": 30,
-                            "token": "abc"
+                            "agencyDomains": [
+                              { "id": 1, "domain": "domain.com" },
+                              { "id": 2, "domain": "domain2.com" }
+                            ]
                           }
                         }""", true))
                 .andExpect(status().is2xxSuccessful());

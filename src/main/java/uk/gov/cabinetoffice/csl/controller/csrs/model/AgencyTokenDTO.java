@@ -17,7 +17,7 @@ public class AgencyTokenDTO {
 
     private String uid;
     @NotEmpty
-    private Set<String> agencyDomains;
+    private Set<String> domain;
     @Min(1)
     private int capacity;
     private int capacityUsed;

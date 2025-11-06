@@ -52,8 +52,9 @@ class AgencyTokenServiceTest extends CsrsServiceTestBase {
         agencyToken.setUid("UID");
         AgencyToken response = new AgencyToken();
         response.setUid("UID");
-        when(csrs.createAgencyToken(1L, agencyToken)).thenReturn(response);
-        when(organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnitMap.get(1L), true)).thenReturn(new OrganisationalUnitOverview());
+        when(agencyTokenFactory.createAgencyToken(agencyToken)).thenReturn(response);
+        when(csrs.createAgencyToken(1L, response)).thenReturn(response);
+        when(organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnitMap.get(1L), false)).thenReturn(new OrganisationalUnitOverview());
         agencyTokenService.createAgencyToken(1L, agencyToken);
         assertEquals("UID", organisationalUnitMap.get(1L).getAgencyToken().getUid());
         assertEquals("UID", organisationalUnitMap.get(2L).getInheritedAgencyToken().getUid());
@@ -68,9 +69,10 @@ class AgencyTokenServiceTest extends CsrsServiceTestBase {
         agencyToken.setUid("UID2");
         AgencyToken response = new AgencyToken();
         response.setUid("UID2");
+        when(agencyTokenFactory.createAgencyToken(agencyToken)).thenReturn(response);
         when(agencyTokenFactory.isCapacityValidForToken(existingToken, agencyToken)).thenReturn(true);
-        when(csrs.updateAgencyToken(1L, agencyToken)).thenReturn(response);
-        when(organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnitMap.get(1L), false)).thenReturn(new OrganisationalUnitOverview());
+        when(csrs.updateAgencyToken(1L, response)).thenReturn(response);
+        when(organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnitMap.get(1L), true)).thenReturn(new OrganisationalUnitOverview());
         agencyTokenService.updateAgencyToken(1L, agencyToken);
         assertEquals("UID2", organisationalUnitMap.get(1L).getAgencyToken().getUid());
         assertEquals("UID2", organisationalUnitMap.get(2L).getInheritedAgencyToken().getUid());

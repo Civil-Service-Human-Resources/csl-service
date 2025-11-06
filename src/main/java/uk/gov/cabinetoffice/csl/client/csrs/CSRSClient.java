@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.ParallelHttpClient;
-import uk.gov.cabinetoffice.csl.controller.csrs.model.AgencyTokenDTO;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.CreateDomainDto;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.DeleteDomainDto;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitDto;
@@ -95,13 +94,13 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public AgencyToken createAgencyToken(Long organisationalUnitId, AgencyTokenDTO agencyTokenDto) {
+    public AgencyToken createAgencyToken(Long organisationalUnitId, AgencyToken agencyTokenDto) {
         String url = csrsConfiguration.getAgencyTokenUrl(organisationalUnitId);
         return httpClient.executeRequest(RequestEntity.post(url).body(agencyTokenDto), AgencyToken.class);
     }
 
     @Override
-    public AgencyToken updateAgencyToken(Long organisationalUnitId, AgencyTokenDTO agencyTokenDto) {
+    public AgencyToken updateAgencyToken(Long organisationalUnitId, AgencyToken agencyTokenDto) {
         String url = csrsConfiguration.getAgencyTokenUrl(organisationalUnitId);
         return httpClient.executeRequest(RequestEntity.patch(url).body(agencyTokenDto), AgencyToken.class);
     }
