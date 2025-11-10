@@ -228,6 +228,7 @@ public class OrganisationalUnitService {
     public OrganisationalUnitOverview createOrganisationalUnit(OrganisationalUnitDto organisationalUnitDto) {
         OrganisationalUnit organisationalUnit = civilServantRegistryClient.createOrganisationalUnit(organisationalUnitDto);
         OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
+        organisationalUnit.setParentId(organisationalUnitDto.getParentId());
         organisationalUnit = organisationalUnitMap.setOrganisationalUnitData(organisationalUnit);
         organisationalUnitMapCache.put(organisationalUnitMap);
         return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, false);

@@ -68,14 +68,13 @@ public class OrganisationTest extends IntegrationTestBase {
                     "code": "NEW_OU",
                     "name": "New Organisational Unit",
                     "abbreviation": "NOU",
-                    "parentId": null
+                    "parent": null
                 }""", """
                 {
                     "ID": 1,
                     "code": "NEW_OU",
                     "name": "New Organisational Unit",
-                    "abbreviation": "NOU",
-                    "parentId": null
+                    "abbreviation": "NOU"
                 }
                 """);
         mockMvc.perform(post("/organisations")
@@ -111,14 +110,13 @@ public class OrganisationTest extends IntegrationTestBase {
                     "code": "NEW_OU",
                     "name": "New Organisational Unit",
                     "abbreviation": "NOU",
-                    "parentId": 1
+                    "parent": "http://localhost:9000/csrs/organisationalUnits/1"
                 }""", """
                 {
                     "id": 10,
                     "code": "NEW_OU",
                     "name": "New Organisational Unit",
-                    "abbreviation": "NOU",
-                    "parentId": 1
+                    "abbreviation": "NOU"
                 }
                 """);
         mockMvc.perform(post("/organisations")
@@ -186,13 +184,13 @@ public class OrganisationTest extends IntegrationTestBase {
                   "code": "ON2",
                   "name": "OrgName2 edit",
                   "abbreviation": "ON2E",
-                  "parentId": 6
+                  "parentId": 6,
+                  "parent": "http://localhost:9000/csrs/organisationalUnits/6"
                 }""", """
                 {
                   "code": "ON2",
                   "name": "OrgName2 edit",
-                  "abbreviation": "ON2E",
-                  "parentId": 6
+                  "abbreviation": "ON2E"
                 }
                 """);
         mockMvc.perform(put("/organisations/2")
@@ -228,13 +226,12 @@ public class OrganisationTest extends IntegrationTestBase {
                   "code": "ON2",
                   "name": "OrgName2",
                   "abbreviation": null,
-                  "parentId": null
+                  "parent": null
                 }""", """
                 {
                   "code": "ON2",
                   "name": "OrgName2",
-                  "abbreviation": null,
-                  "parentId": null
+                  "abbreviation": null
                 }
                 """);
         mockMvc.perform(put("/organisations/2")

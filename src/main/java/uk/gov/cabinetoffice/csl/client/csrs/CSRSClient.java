@@ -89,6 +89,9 @@ public class CSRSClient implements ICSRSClient {
     @Override
     public OrganisationalUnit patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
         String url = csrsConfiguration.getOrganisationalUnitUrl(organisationalUnitId);
+        if (organisationalUnitDto.getParentId() != null) {
+            organisationalUnitDto.setParent(csrsConfiguration.getOrganisationalUnitResourceUrl(organisationalUnitDto.getParentId()));
+        }
         log.info("Updating organisational unit data in csrs: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
         return httpClient.executeRequest(RequestEntity.patch(url).body(organisationalUnitDto), OrganisationalUnit.class);
     }
@@ -114,6 +117,9 @@ public class CSRSClient implements ICSRSClient {
     @Override
     public OrganisationalUnit createOrganisationalUnit(OrganisationalUnitDto organisationalUnitDto) {
         String url = csrsConfiguration.getOrganisationalUnits();
+        if (organisationalUnitDto.getParentId() != null) {
+            organisationalUnitDto.setParent(csrsConfiguration.getOrganisationalUnitResourceUrl(organisationalUnitDto.getParentId()));
+        }
         return httpClient.executeRequest(RequestEntity.post(url).body(organisationalUnitDto), OrganisationalUnit.class);
     }
 

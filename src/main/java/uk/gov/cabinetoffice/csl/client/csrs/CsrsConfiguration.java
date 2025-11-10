@@ -29,6 +29,8 @@ public class CsrsConfiguration {
     private final String domains;
     @NotNull
     private final String grades;
+    @NotNull
+    private final String serviceUrl;
 
     public String getCivilServantProfileUrl(String uid) {
         return String.format("%s/resource/%s/profile", civilServants, uid);
@@ -45,7 +47,11 @@ public class CsrsConfiguration {
     public String getOrganisationalUnitUrl(Long organisationalUnitId) {
         return String.format("%s/%s", organisationalUnits, organisationalUnitId);
     }
-    
+
+    public String getOrganisationalUnitResourceUrl(Long organisationalUnitId) {
+        return String.format("%s/organisationalUnits/%s", serviceUrl, organisationalUnitId);
+    }
+
     public String getAgencyTokenUrl(Long organisationalUnitId) {
         return String.format("%s/%s", getOrganisationalUnitUrl(organisationalUnitId), agencyToken);
     }

@@ -13,6 +13,7 @@ public class OrganisationalUnitDto {
     private String name;
     private String abbreviation;
     private Long parentId;
+    private String parent;
 
     @JsonIgnore
     public String getAbbreviationSafe() {
