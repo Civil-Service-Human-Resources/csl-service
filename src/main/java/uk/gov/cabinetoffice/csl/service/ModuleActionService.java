@@ -101,7 +101,6 @@ public class ModuleActionService {
     public void completeModule(CourseWithModule courseWithModule, User user, IModuleAction completionAction) {
         log.info("Completing module {}...", courseWithModule.getModule().getResourceId());
         Course course = courseWithModule.getCourse();
-        log.info("Course with Module: ", course);
         ModuleRecordResourceId recordResourceId = new ModuleRecordResourceId(user.getId(), courseWithModule.getModule().getResourceId());
         List<ModuleRecordResourceId> idsToFetch = new ArrayList<>(List.of(recordResourceId));
         List<ModuleRecordResourceId> requiredModuleIds = course.getRequiredModulesForCompletion()
