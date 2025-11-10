@@ -99,9 +99,9 @@ public class ModuleActionService {
     }
 
     public void completeModule(CourseWithModule courseWithModule, User user, IModuleAction completionAction) {
-        log.info("Completing module {}", courseWithModule.getModule().getResourceId());
+        log.info("Completing module {}...", courseWithModule.getModule().getResourceId());
         Course course = courseWithModule.getCourse();
-        log.info("Course ID: {}", course.getResourceId());
+        log.info("Course with Module: ", course);
         ModuleRecordResourceId recordResourceId = new ModuleRecordResourceId(user.getId(), courseWithModule.getModule().getResourceId());
         List<ModuleRecordResourceId> idsToFetch = new ArrayList<>(List.of(recordResourceId));
         List<ModuleRecordResourceId> requiredModuleIds = course.getRequiredModulesForCompletion()
@@ -130,8 +130,7 @@ public class ModuleActionService {
             }
             else{
                 log.info("Course could not be set as complete: ");
-                log.info("Remaining module size: ", remainingModuleIds.size());
-                log.info("First remaining module ID: ", remainingModuleIds.get(0));
+                log.info("Remaining module IDs: ", remainingModuleIds);
                 log.info("Module ID from course with module: ", courseWithModule.getModule().getResourceId());
             }
         } else {
