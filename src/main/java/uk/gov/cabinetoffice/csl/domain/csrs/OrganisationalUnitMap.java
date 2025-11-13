@@ -101,12 +101,11 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
     }
 
     public List<OrganisationalUnit> rebuildHierarchy(OrganisationalUnit root) {
-        return getMultipleAsIds(List.of(root.getId()), true).stream()
-                .map(id -> {
-                    OrganisationalUnit organisationalUnit = get(id);
-                    organisationalUnit.resetCustomData();
-                    return organisationalUnit;
-                })
+        ArrayList<OrganisationalUnit> hierarchy = new ArrayList<>();
+        hierarchy.add(root);
+        hierarchy.addAll(getMultiple(root.getChildIds(), true).stream().toList());
+        return hierarchy.stream()
+                .peek(OrganisationalUnit::resetCustomData)
                 .map(this::setOrganisationalUnitData)
                 .toList();
     }

@@ -41,6 +41,7 @@ public class AgencyTokenService {
         AgencyToken agencyToken = agencyTokenFactory.createAgencyToken(agencyTokenDto);
         agencyToken = civilServantRegistryClient.updateAgencyToken(organisationalUnitId, agencyToken);
         organisationalUnit = organisationalUnitMap.updateAgencyToken(organisationalUnitId, agencyToken);
+        organisationalUnitMapCache.put(organisationalUnitMap);
         return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, true);
     }
 

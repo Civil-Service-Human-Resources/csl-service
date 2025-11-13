@@ -110,7 +110,7 @@ public class AgencyTokenTest extends IntegrationTestBase {
         cslStubService.getCsrsStubService().updateToken(7, """
                 {
                     "token": "abc",
-                    "capacity": 30,
+                    "capacity": 300,
                     "agencyDomains": [
                         {
                             "domain": "domain.com"
@@ -125,7 +125,7 @@ public class AgencyTokenTest extends IntegrationTestBase {
                     "id": 1,
                     "token": "abc",
                     "uid": "uid1",
-                    "capacity": 30,
+                    "capacity": 300,
                     "agencyDomains": [
                         {
                             "id": 1,
@@ -147,7 +147,7 @@ public class AgencyTokenTest extends IntegrationTestBase {
                                         "domain.com",
                                         "domain2.com"
                                     ],
-                                    "capacity": 30,
+                                    "capacity": 300,
                                     "token": "abc"
                                 }
                                 """)
@@ -165,7 +165,7 @@ public class AgencyTokenTest extends IntegrationTestBase {
                             "id": 1,
                             "uid": "uid1",
                             "token": "abc",
-                            "capacity": 30,
+                            "capacity": 300,
                             "capacityUsed": 30,
                             "agencyDomains": [
                               { "id": 1, "domain": "domain.com" },
