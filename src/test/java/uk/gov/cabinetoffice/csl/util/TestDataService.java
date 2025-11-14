@@ -11,8 +11,10 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
-import uk.gov.cabinetoffice.csl.domain.rustici.*;
 import uk.gov.cabinetoffice.csl.domain.rustici.Course;
+import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
+import uk.gov.cabinetoffice.csl.domain.rustici.Learner;
+import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -50,11 +52,6 @@ public class TestDataService {
     ));
     private final Grade grade = new Grade(1L, "SEO", "Senior Executive Officer");
     private final AreaOfWork profession = new AreaOfWork(3L, "DDaT");
-
-
-    public UserDetailsDto generateUserDetailsDto() {
-        return new UserDetailsDto("", userEmail, learnerFirstName, 1, "professionName", lineManagerName, lineManagerEmail, 1, "gradeCode", depHierarchy);
-    }
 
     public ModuleRecord generateModuleRecord() {
         ModuleRecord mr = new ModuleRecord();
@@ -95,6 +92,7 @@ public class TestDataService {
                 userId,
                 userEmail,
                 learnerFirstName,
+                organisationalUnit.getId(),
                 profession.getId().intValue(),
                 profession.getName(),
                 grade.getId().intValue(),
@@ -229,7 +227,7 @@ public class TestDataService {
         organisationalUnits7.setName("OrgName7");
         organisationalUnits7.setAbbreviation("OName7");
         organisationalUnits7.setCode("ON7");
-        organisationalUnits7.setAgencyToken(new AgencyToken(1L, "token", "uid", 1, Set.of(new AgencyDomain(1L, "agency.com"))));
+        organisationalUnits7.setAgencyToken(new AgencyToken(1L, "uid1", "token", 30, 20, Set.of(new AgencyDomain(1L, "agency.com"))));
         organisationalUnits.add(organisationalUnits7);
 
         OrganisationalUnit organisationalUnits8 = new OrganisationalUnit();
@@ -246,7 +244,7 @@ public class TestDataService {
         organisationalUnits9.setName("OrgName9");
         organisationalUnits9.setAbbreviation("OName9");
         organisationalUnits9.setCode("ON9");
-        organisationalUnits9.setAgencyToken(new AgencyToken(2L, "token", "uid", 1, Set.of(new AgencyDomain(2L, "agency2.com"))));
+        organisationalUnits9.setAgencyToken(new AgencyToken(2L, "uid2", "token", 1, 1, Set.of(new AgencyDomain(2L, "agency2.com"))));
         organisationalUnits.add(organisationalUnits9);
 
         return organisationalUnits;

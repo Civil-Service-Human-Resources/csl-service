@@ -6,18 +6,17 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
-import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
+import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerOrganisationDeleteMessage;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerOrganisationUpdateMessage;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.azure.core.util.CoreUtils.isNullOrEmpty;
-import static java.util.Collections.singletonList;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Slf4j
 @Service
@@ -25,22 +24,39 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class OrganisationalUnitService {
 
     private final OrganisationalUnitMapCache organisationalUnitMapCache;
+    private final OrganisationalUnitFactory organisationalUnitFactory;
     private final ICSRSClient civilServantRegistryClient;
     private final MessageMetadataFactory messageMetadataFactory;
     private final IMessagingClient messagingClient;
 
     public OrganisationalUnitMap getOrganisationalUnitMap() {
-        OrganisationalUnitMap map = organisationalUnitMapCache.get();
-        if (map == null || map.isEmpty()) {
-            map = civilServantRegistryClient.getAllOrganisationalUnits();
-            organisationalUnitMapCache.put(map);
-        }
-        return map;
+        return organisationalUnitMapCache.get();
     }
 
     public OrganisationalUnits getAllOrganisationalUnits() {
         log.info("Getting all organisational units");
         return new OrganisationalUnits(getOrganisationalUnitMap().values().stream().toList());
+    }
+
+    public GetOrganisationalUnits getOrganisationalUnitOverview(GetOrganisationUnitsFilter params) {
+        OrganisationalUnitMap allOrganisationalUnits = getOrganisationalUnitMap();
+        Set<OrganisationalUnitOverview> filtered = params.getOrganisationId()
+                .stream().flatMap(id -> {
+                    ArrayList<OrganisationalUnit> organisationalUnits = new ArrayList<>();
+                    OrganisationalUnit organisationalUnit = allOrganisationalUnits.get(id);
+                    organisationalUnits.add(organisationalUnit);
+                    if (params.isIncludeParents()) {
+                        Long currentParentId = organisationalUnit.getParentId();
+                        while (currentParentId != null) {
+                            OrganisationalUnit currentParent = allOrganisationalUnits.get(currentParentId);
+                            organisationalUnits.add(currentParent);
+                            currentParentId = currentParent.getParentId();
+                        }
+                    }
+                    return organisationalUnits.stream().map(organisationalUnitFactory::createOrganisationalUnitOverview);
+                }).collect(Collectors.toSet());
+
+        return new GetOrganisationalUnits(filtered.stream().sorted(Comparator.comparing(OrganisationalUnitOverview::getName, String::compareToIgnoreCase)).toList());
     }
 
     public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(OrganisationalUnitsParams params) {
@@ -71,18 +87,12 @@ public class OrganisationalUnitService {
         }
         return new FormattedOrganisationalUnitNames(filtered.stream()
                 .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName(), o.getCode(), o.getAbbreviation()))
-                .sorted(Comparator.comparing(FormattedOrganisationalUnitName::getName))
+                .sorted(Comparator.comparing(FormattedOrganisationalUnitName::getName, String::compareToIgnoreCase))
                 .toList());
     }
 
-    public List<OrganisationalUnit> getOrganisationsWithChildrenAsFlatList(List<Long> organisationIds) {
-        return getOrganisationalUnitMap()
-                .getMultiple(organisationIds, true);
-    }
-
-    public List<Long> getOrganisationsIdsIncludingParentAndChildren(List<Long> organisationIds) {
-        return getOrganisationsWithChildrenAsFlatList(organisationIds)
-                .stream().map(OrganisationalUnit::getId).collect(Collectors.toList());
+    public List<Long> getOrganisationIdsWithChildrenAsFlatList(List<Long> organisationIds) {
+        return getOrganisationalUnitMap().getMultipleAsIds(organisationIds, true);
     }
 
     public Map<Long, List<OrganisationalUnit>> getOrganisationsWithChildrenAsFlatListMap(List<Long> organisationIds) {
@@ -96,14 +106,14 @@ public class OrganisationalUnitService {
         return getOrganisationalUnitMap().getHierarchies(organisationIds);
     }
 
-    public void deleteOrganisationalUnit(Long organisationalUnitId) {
+    public DeleteOrganisationResponse deleteOrganisationalUnit(Long organisationalUnitId) {
         log.info("Deleting organisational unit for id: {}", organisationalUnitId);
-        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
-        List<OrganisationalUnit> organisationalUnitAndChildren = organisationalUnitMap.getMultiple(Collections.singleton(organisationalUnitId), true);
-        List<Long> organisationalUnitIdsToBeRemoved = organisationalUnitAndChildren.stream().map(OrganisationalUnit::getId).toList();
         civilServantRegistryClient.deleteOrganisationalUnit(organisationalUnitId);
-        removeOrganisationalUnitsFromCache(organisationalUnitIdsToBeRemoved);
+        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
+        List<Long> organisationalUnitIdsToBeRemoved = organisationalUnitMap.delete(organisationalUnitId);
+        organisationalUnitMapCache.put(organisationalUnitMap);
         deleteFromReportingData(organisationalUnitIdsToBeRemoved);
+        return new DeleteOrganisationResponse(organisationalUnitIdsToBeRemoved);
     }
 
     private void deleteFromReportingData(List<Long> organisationIds) {
@@ -115,7 +125,8 @@ public class OrganisationalUnitService {
     public void removeOrganisationalUnitsFromCache(List<Long> organisationIds) {
         log.info("Removing organisationalUnits from cache for the organisationalUnitIds: {}", organisationIds);
         OrganisationalUnitMap organisationalUnitMap = organisationalUnitMapCache.get();
-        organisationIds.forEach(organisationalUnitMap::remove);
+        List<Long> idsRemoved = organisationalUnitMap.delete(organisationIds);
+        log.info("Ids removed: {}", idsRemoved);
         organisationalUnitMapCache.put(organisationalUnitMap);
     }
 
@@ -124,13 +135,56 @@ public class OrganisationalUnitService {
         log.info("Organisations are removed from the cache.");
     }
 
-    public void patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
+    public OrganisationalUnitOverview patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
         log.info("Updating organisational unit data: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
+        if (organisationalUnitId.equals(organisationalUnitDto.getParentIdSafe())) {
+            throw new ValidationException("Can't set parent ID to self");
+        }
+        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
+        if (organisationalUnitDto.getParentId() != null) {
+            if (organisationalUnitMap.getMultipleAsIds(List.of(organisationalUnitId), true)
+                    .contains(organisationalUnitDto.getParentId())) {
+                throw new ValidationException("Can't set a parent organisation to a child in the same hierarchy");
+            }
+        }
         civilServantRegistryClient.patchOrganisationalUnit(organisationalUnitId, organisationalUnitDto);
-        log.info("Updating organisational unit data in cache: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
-        List<OrganisationalUnit> multipleOrgs = updateOrganisationalUnitsInCache(organisationalUnitId, organisationalUnitDto);
-        log.info("Updating organisational units formatted name in reporting for organisationalUnits: {}", multipleOrgs);
-        updateReportingData(multipleOrgs);
+        OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
+        organisationalUnit.setCode(organisationalUnitDto.getCode());
+        boolean requiresRebuild = false;
+        if (!organisationalUnit.getParentIdSafe().equals(organisationalUnitDto.getParentIdSafe())) {
+            requiresRebuild = true;
+            if (organisationalUnit.getParentId() != null) {
+                organisationalUnitMap.updateOrganisationalUnit(organisationalUnit.getParentId(), o -> {
+                    o.getChildIds().remove(organisationalUnitId);
+                    return o;
+                });
+            }
+            Optional.ofNullable(organisationalUnitDto.getParentId())
+                    .map(newParentIdStr -> organisationalUnitMap.get(organisationalUnitDto.getParentId()))
+                    .ifPresentOrElse(newParent -> {
+                        organisationalUnit.setParentId(newParent.getId());
+                        organisationalUnit.setParentName(newParent.getName());
+                    }, () -> {
+                        organisationalUnit.setParentId(null);
+                        organisationalUnit.setParentName(null);
+                    });
+        }
+
+        if (!(organisationalUnit.getAbbreviationSafe().equals(organisationalUnitDto.getAbbreviationSafe())
+                || organisationalUnit.getName().equals(organisationalUnitDto.getName()))) {
+            requiresRebuild = true;
+            organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
+            organisationalUnit.setName(organisationalUnitDto.getName());
+        }
+
+        if (requiresRebuild) {
+            List<OrganisationalUnit> updatedOrganisationalUnits = organisationalUnitMap.rebuildHierarchy(organisationalUnit);
+            updateReportingData(updatedOrganisationalUnits);
+        }
+
+        organisationalUnitMapCache.put(organisationalUnitMap);
+
+        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit);
     }
 
     private void updateReportingData(List<OrganisationalUnit> multipleOrgs) {
@@ -139,45 +193,16 @@ public class OrganisationalUnitService {
         messagingClient.sendMessages(List.of(message));
     }
 
-    public List<OrganisationalUnit> updateOrganisationalUnitsInCache(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
-        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
-        OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
-        if (organisationalUnit == null) {
-            log.error("OrganisationalUnit not found for id: {}", organisationalUnitId);
-            throw new NotFoundException("OrganisationalUnit not found for id: " + organisationalUnitId);
-        }
-
-        Long originalParentId = organisationalUnit.getParentId();
-        String newParentIdStr = organisationalUnitDto.getParent();
-        Long newParentId = isNotBlank(newParentIdStr) ? Long.parseLong(newParentIdStr) : null;
-        OrganisationalUnit newParent = organisationalUnitMap.get(newParentId);
-        organisationalUnit.setParent(newParent);
-        organisationalUnit.setParentId(newParent != null ? newParent.getId() : null);
-        organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
-        organisationalUnit.setCode(organisationalUnitDto.getCode());
-        organisationalUnit.setName(organisationalUnitDto.getName());
-
-        List<OrganisationalUnit> multipleOrgs = organisationalUnitMap.getMultiple(singletonList(organisationalUnitId), true);
-        List<OrganisationalUnit> updatedOrganisationalUnits = organisationalUnitMap.updateFormattedName(multipleOrgs);
-        updatedOrganisationalUnits.forEach(u -> organisationalUnitMap.put(u.getId(), u));
-        if (originalParentId != null) {
-            OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
-            originalParent.getChildIds().remove(organisationalUnitId);
-            organisationalUnitMap.put(originalParent.getId(), originalParent);
-        }
-        organisationalUnitMapCache.put(organisationalUnitMap);
-        return updatedOrganisationalUnits;
-    }
-
-    private void updateOrganisationalUnits(Collection<Long> ids, IOrganisationalUnitUpdate update) {
+    public List<OrganisationalUnit> updateOrganisationalUnit(Collection<Long> ids, Function<OrganisationalUnit, OrganisationalUnit> update) {
         OrganisationalUnitMap map = getOrganisationalUnitMap();
-        ids.forEach(id -> update.apply(map.get(id)));
+        List<OrganisationalUnit> results = ids.stream().map(id -> update.apply(map.get(id))).toList();
         organisationalUnitMapCache.put(map);
+        return results;
     }
 
     public DomainResponse addDomainToOrganisationalUnit(Long organisationUnitId, CreateDomainDto domain) {
         UpdateDomainResponse response = civilServantRegistryClient.addDomainToOrganisation(organisationUnitId, domain);
-        updateOrganisationalUnits(response.getAllUpdatedIds(), organisationalUnit -> {
+        updateOrganisationalUnit(response.getAllUpdatedIds(), organisationalUnit -> {
             organisationalUnit.addDomainAndSort(response.getDomain());
             return organisationalUnit;
         });
@@ -186,10 +211,30 @@ public class OrganisationalUnitService {
 
     public DomainResponse removeDomainFromOrganisationalUnit(Long organisationUnitId, Long domainId, DeleteDomainDto body) {
         UpdateDomainResponse response = civilServantRegistryClient.deleteDomain(organisationUnitId, domainId, body);
-        updateOrganisationalUnits(response.getAllUpdatedIds(), organisationalUnit -> {
+        updateOrganisationalUnit(response.getAllUpdatedIds(), organisationalUnit -> {
             organisationalUnit.removeDomain(domainId);
             return organisationalUnit;
         });
         return new DomainResponse(response.getDomain(), response.getUpdatedChildOrganisationIds());
     }
+
+    public OrganisationalUnitTree getOrganisationalUnitTree() {
+        return new OrganisationalUnitTree(getOrganisationalUnitMap().getOrganisationalUnitTree());
+    }
+
+    public OrganisationalUnitOverview getOrganisationalUnitOverview(Long organisationalUnitId) {
+        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
+        OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
+        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit);
+    }
+
+    public OrganisationalUnitOverview createOrganisationalUnit(OrganisationalUnitDto organisationalUnitDto) {
+        OrganisationalUnit organisationalUnit = civilServantRegistryClient.createOrganisationalUnit(organisationalUnitDto);
+        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
+        organisationalUnit.setParentId(organisationalUnitDto.getParentId());
+        organisationalUnit = organisationalUnitMap.setOrganisationalUnitData(organisationalUnit);
+        organisationalUnitMapCache.put(organisationalUnitMap);
+        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, false);
+    }
+
 }

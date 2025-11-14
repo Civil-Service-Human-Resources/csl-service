@@ -53,6 +53,11 @@ public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
         return createProblemDetail(400, ex, "Client authentication exception");
     }
 
+    @ExceptionHandler(ValidationException.class)
+    public ProblemDetail handleValidationException(ValidationException ex) {
+        return createProblemDetail(400, ex, "Validation exception");
+    }
+
     @ExceptionHandler(ForbiddenException.class)
     public ProblemDetail handleForbiddenException(ForbiddenException ex) {
         return createProblemDetail(403, ex, "Forbidden exception");

@@ -84,9 +84,10 @@ public class BookEventTest extends IntegrationTestBase {
                         "accessibilityOptions": "%s", "status": "%s"}
                         """, dto.getEvent(), userId, userEmail, testDataService.getLearnerFirstName(), "2023-01-01T10:00:00Z", "access1,access2",
                 "Confirmed");
+        cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
         cslStubService.stubCreateModuleRecords(courseId, moduleId, course, userId, expectedModuleRecordPOST, expectedModuleRecordPOSTResponse);
-        BookEventDto inputDto = new BookEventDto(List.of("access1", "access2"), "", testDataService.generateUserDetailsDto());
+        BookEventDto inputDto = new BookEventDto(List.of("access1", "access2"), "");
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -138,7 +139,8 @@ public class BookEventTest extends IntegrationTestBase {
                 """;
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
         cslStubService.stubCreateModuleRecords(courseId, moduleId, course, userId, expectedModuleRecordPOST, expectedModuleRecordPOSTResponse);
-        BookEventDto inputDto = new BookEventDto(List.of("access1"), "poNumber123", testDataService.generateUserDetailsDto());
+        cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
+        BookEventDto inputDto = new BookEventDto(List.of("access1"), "poNumber123");
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)

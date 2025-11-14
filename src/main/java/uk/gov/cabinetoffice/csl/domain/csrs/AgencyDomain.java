@@ -14,4 +14,8 @@ import java.io.Serializable;
 public class AgencyDomain implements Serializable {
     private Long id;
     private String domain;
+
+    public AgencyDomain(String domain) {
+        this.domain = domain;
+    }
 }

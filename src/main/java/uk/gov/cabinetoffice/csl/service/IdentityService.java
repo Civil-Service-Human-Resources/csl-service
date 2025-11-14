@@ -37,4 +37,5 @@ public class IdentityService {
     public void removeServiceTokenFromCache() {
         log.info("IdentityService.removeServiceTokenFromCache: service token is removed from the cache.");
     }
+
 }

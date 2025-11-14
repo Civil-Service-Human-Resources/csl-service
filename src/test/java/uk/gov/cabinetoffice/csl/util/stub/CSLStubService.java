@@ -27,6 +27,7 @@ public class CSLStubService {
     private final CSRSStubService csrsStubService;
     private final NotificationServiceStubService notificationServiceStubService;
     private final FrontendStubService frontend;
+    private final IdentityAPIServiceStubService identityAPIServiceStubService;
 
     public void assertStubbedRequests(List<StubMapping> stubs) {
         stubs.forEach(stub -> assertEquals(1, WireMock.findAll(requestMadeFor(stub.getRequest())).size(),
