@@ -88,7 +88,7 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
             if (organisationalUnit != null) {
                 organisationalUnits.add(organisationalUnit);
                 if (includeChildren) {
-                    List<OrganisationalUnit> childOrgs = getMultiple(organisationalUnit.getChildIds(), true);
+                    List<OrganisationalUnit> childOrgs = getMultiple(organisationalUnit.getChildIds(), includeChildren);
                     organisationalUnits.addAll(childOrgs);
                 }
             }

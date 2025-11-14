@@ -137,6 +137,9 @@ public class OrganisationalUnitService {
 
     public OrganisationalUnitOverview patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
         log.info("Updating organisational unit data: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
+        if (organisationalUnitId.equals(organisationalUnitDto.getParentIdSafe())) {
+            throw new ValidationException("Can't set parent ID to self");
+        }
         OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
         if (organisationalUnitDto.getParentId() != null) {
             if (organisationalUnitMap.getMultipleAsIds(List.of(organisationalUnitId), true)
