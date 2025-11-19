@@ -132,9 +132,9 @@ public class ModuleActionService {
                 completeCourse = true;
             }
             else{
-                log.info("Course could not be set as complete: ");
-                log.info("Remaining module IDs: ", remainingModuleIds);
-                log.info("Module ID from course with module: ", courseWithModule.getModule().getResourceId());
+                log.info("Course could not be set as complete");
+                log.info("Remaining module IDs: {}", remainingModuleIds);
+                log.info("Module ID from course with module: {}", courseWithModule.getModule().getResourceId());
             }
         } else {
             moduleMap = learnerRecordService.getModuleRecordsMap(idsToFetch);
