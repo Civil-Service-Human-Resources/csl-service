@@ -118,24 +118,34 @@ public class ModuleActionService {
             LearningPeriod learningPeriod = course.getLearningPeriodForDepartmentHierarchy(user.getDepartmentCodes()).orElse(null);
             List<String> remainingModuleIds = new ArrayList<>();
             for (ModuleRecordResourceId requiredModuleId : requiredModuleIds) {
+                log.info("Checking module with ID: {}", requiredModuleId.getResourceId());
                 ModuleRecord mr = moduleMap.get(requiredModuleId.getAsString());
                 State moduleRecordState = mr == null ? State.NULL : mr.getStateForLearningPeriod(learningPeriod);
                 log.debug("Module {} state is {}", requiredModuleId, moduleRecordState);
                 if (!moduleRecordState.equals(State.COMPLETED)) {
                     remainingModuleIds.add(requiredModuleId.getResourceId());
+                    log.info("Module {} added to remaining modules", requiredModuleId.getResourceId());
                 }
             }
             if (remainingModuleIds.size() == 1 && Objects.equals(remainingModuleIds.get(0), courseWithModule.getModule().getResourceId())) {
+                log.info("Course set as complete");
                 completeCourse = true;
+            }
+            else{
+                log.info("Course could not be set as complete: ");
+                log.info("Remaining module IDs: ", remainingModuleIds);
+                log.info("Module ID from course with module: ", courseWithModule.getModule().getResourceId());
             }
         } else {
             moduleMap = learnerRecordService.getModuleRecordsMap(idsToFetch);
         }
         ModuleRecord moduleRecord = processModuleActions(courseWithModule, List.of(new UserToModuleAction(userId, completionAction)), moduleMap).get(recordResourceId.getAsString());
         if (completeCourse) {
-            log.debug("Completed module was the last required module remaining for course completion. Completing course.");
+            log.info("Completed module was the last required module remaining for course completion. Completing course.");
             ActionResult actionResult = courseActionService.completeCourse(course, user, moduleRecord.getCompletionDate());
+            log.info("Completed course");
             actionResultService.processResults(actionResult);
+            log.info("Results processed");
         }
     }
 }
