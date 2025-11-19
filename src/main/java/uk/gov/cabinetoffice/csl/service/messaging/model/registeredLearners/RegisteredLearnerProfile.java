@@ -9,7 +9,7 @@ public class RegisteredLearnerProfile {
     private final String uid;
     private final String email;
     private final String fullName;
-    private final Integer organisationId;
+    private final Long organisationId;
     private final String organisationName;
     private final Integer gradeId;
     private final String gradeName;

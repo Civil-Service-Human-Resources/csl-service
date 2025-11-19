@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
 import uk.gov.cabinetoffice.csl.controller.model.CancelBookingDto;
 import uk.gov.cabinetoffice.csl.controller.model.EventResponse;
-import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.domain.rustici.UserDetailsDto;
 import uk.gov.cabinetoffice.csl.service.EventService;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 
@@ -30,9 +28,7 @@ public class EventController {
                                    @PathVariable("eventId") String eventId,
                                    @Valid @RequestBody BookEventDto dto) {
         log.debug("resourceId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
-        String learnerId = userAuthService.getUsername();
-        User user = new User(learnerId);
-        return eventService.bookEvent(user, courseId, moduleId, eventId, dto);
+        return eventService.bookEvent(userAuthService.getUsername(), courseId, moduleId, eventId, dto);
     }
 
     @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/events/{eventId}/cancel_booking", produces = "application/json")
@@ -42,20 +38,16 @@ public class EventController {
                                        @PathVariable("eventId") String eventId,
                                        @Valid @RequestBody CancelBookingDto dto) {
         log.debug("resourceId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
-        String learnerId = userAuthService.getUsername();
-        User user = new User(learnerId);
-        return eventService.cancelBooking(user, courseId, moduleId, eventId, dto);
+        return eventService.cancelBooking(userAuthService.getUsername(), courseId, moduleId, eventId, dto);
     }
 
     @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/events/{eventId}/complete_booking", produces = "application/json")
     @ResponseBody
     public EventResponse completeBooking(@PathVariable("courseId") String courseId,
                                          @PathVariable("moduleId") String moduleId,
-                                         @PathVariable("eventId") String eventId,
-                                         @Valid @RequestBody UserDetailsDto dto) {
+                                         @PathVariable("eventId") String eventId) {
         log.debug("resourceId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
-        User user = User.fromUserDetails(userAuthService.getUsername(), dto);
-        return eventService.completeBooking(user, courseId, moduleId, eventId);
+        return eventService.completeBooking(userAuthService.getUsername(), courseId, moduleId, eventId);
     }
 
     @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/events/{eventId}/skip_booking", produces = "application/json")
@@ -64,7 +56,6 @@ public class EventController {
                                      @PathVariable("moduleId") String moduleId,
                                      @PathVariable("eventId") String eventId) {
         log.debug("resourceId: {}, moduleId: {}, eventId: {}", courseId, moduleId, eventId);
-        String learnerId = userAuthService.getUsername();
-        return eventService.skipBooking(new User(learnerId), courseId, moduleId, eventId);
+        return eventService.skipBooking(userAuthService.getUsername(), courseId, moduleId, eventId);
     }
 }

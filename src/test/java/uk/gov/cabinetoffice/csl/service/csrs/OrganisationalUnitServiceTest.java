@@ -4,17 +4,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitDto;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitOverview;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitsParams;
-import uk.gov.cabinetoffice.csl.domain.csrs.*;
+import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnitFactory;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnitMap;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -23,15 +30,16 @@ import static org.mockito.Mockito.when;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-class OrganisationalUnitServiceTest {
+class OrganisationalUnitServiceTest extends CsrsServiceTestBase {
 
-    private final OrganisationalUnitFactory organisationalUnitFactory = new OrganisationalUnitFactory();
     private OrganisationalUnitMap organisationalUnitMap;
+
+    @Mock
+    private OrganisationalUnitFactory organisationalUnitFactory;
 
     @Mock
     OrganisationalUnitMapCache organisationalUnitMapCache;
 
-    @Mock
     private MessageMetadataFactory messageMetadataFactory;
 
     @Mock
@@ -40,13 +48,15 @@ class OrganisationalUnitServiceTest {
     @Mock
     private ICSRSClient csrs;
 
+    @InjectMocks
     private OrganisationalUnitService organisationalUnitService;
 
     @BeforeEach
     public void setUp() {
-        organisationalUnitMap = organisationalUnitFactory.buildOrganisationalUnits(getAllOrganisationalUnits());
+        organisationalUnitMap = OrganisationalUnitMap.buildFromList(getAllOrganisationalUnits());
         when(organisationalUnitMapCache.get()).thenReturn(organisationalUnitMap);
-        organisationalUnitService = new OrganisationalUnitService(organisationalUnitMapCache, csrs,
+        messageMetadataFactory = new MessageMetadataFactory();
+        organisationalUnitService = new OrganisationalUnitService(organisationalUnitMapCache, organisationalUnitFactory, csrs,
                 messageMetadataFactory, messagingClient);
     }
 
@@ -61,56 +71,29 @@ class OrganisationalUnitServiceTest {
 
     @Test
     public void shouldReturnOrganisationsWithChildrenAsFlatList() {
-        List<OrganisationalUnit> organisationsWithChildrenAsFlatList1 = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(List.of(1L));
+        List<Long> organisationsWithChildrenAsFlatList1 = organisationalUnitService.getOrganisationIdsWithChildrenAsFlatList(List.of(1L));
         log.debug("organisationsWithChildrenAsFlatList for id=1: " + organisationsWithChildrenAsFlatList1);
         assertEquals(5, organisationsWithChildrenAsFlatList1.size());
 
-        List<OrganisationalUnit> organisationsWithChildrenAsFlatList2 = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(List.of(2L));
+        List<Long> organisationsWithChildrenAsFlatList2 = organisationalUnitService.getOrganisationIdsWithChildrenAsFlatList(List.of(2L));
         log.debug("organisationsWithChildrenAsFlatList for id=2: " + organisationsWithChildrenAsFlatList2);
         assertEquals(3, organisationsWithChildrenAsFlatList2.size());
 
-        List<OrganisationalUnit> organisationsWithChildrenAsFlatList3 = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(List.of(3L));
+        List<Long> organisationsWithChildrenAsFlatList3 = organisationalUnitService.getOrganisationIdsWithChildrenAsFlatList(List.of(3L));
         log.debug("organisationsWithChildrenAsFlatList for id=3: " + organisationsWithChildrenAsFlatList3);
         assertEquals(2, organisationsWithChildrenAsFlatList3.size());
 
-        List<OrganisationalUnit> organisationsWithChildrenAsFlatList4 = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(List.of(4L));
+        List<Long> organisationsWithChildrenAsFlatList4 = organisationalUnitService.getOrganisationIdsWithChildrenAsFlatList(List.of(4L));
         log.debug("organisationsWithChildrenAsFlatList for id=4: " + organisationsWithChildrenAsFlatList4);
         assertEquals(1, organisationsWithChildrenAsFlatList4.size());
 
-        List<OrganisationalUnit> organisationsWithChildrenAsFlatList5 = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(List.of(5L));
+        List<Long> organisationsWithChildrenAsFlatList5 = organisationalUnitService.getOrganisationIdsWithChildrenAsFlatList(List.of(5L));
         log.debug("organisationsWithChildrenAsFlatList for id=5: " + organisationsWithChildrenAsFlatList5);
         assertEquals(1, organisationsWithChildrenAsFlatList5.size());
 
-        List<OrganisationalUnit> organisationsWithChildrenAsFlatList6 = organisationalUnitService.getOrganisationsWithChildrenAsFlatList(List.of(6L));
+        List<Long> organisationsWithChildrenAsFlatList6 = organisationalUnitService.getOrganisationIdsWithChildrenAsFlatList(List.of(6L));
         log.debug("organisationsWithChildrenAsFlatList for id=6: " + organisationsWithChildrenAsFlatList6);
         assertEquals(1, organisationsWithChildrenAsFlatList6.size());
-    }
-
-    @Test
-    public void shouldReturnOrganisationsIdsIncludingParentAndChildren() {
-        List<Long> organisationsIdsIncludingParentAndChildren1 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(1L));
-        log.debug("organisationsWithChildrenAsFlatList for id=1: " + organisationsIdsIncludingParentAndChildren1);
-        assertEquals(5, organisationsIdsIncludingParentAndChildren1.size());
-
-        List<Long> organisationsIdsIncludingParentAndChildren2 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(2L));
-        log.debug("organisationsWithChildrenAsFlatList for id=2: " + organisationsIdsIncludingParentAndChildren2);
-        assertEquals(3, organisationsIdsIncludingParentAndChildren2.size());
-
-        List<Long> organisationsIdsIncludingParentAndChildren3 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(3L));
-        log.debug("organisationsWithChildrenAsFlatList for id=3: " + organisationsIdsIncludingParentAndChildren3);
-        assertEquals(2, organisationsIdsIncludingParentAndChildren3.size());
-
-        List<Long> organisationsIdsIncludingParentAndChildren4 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(4L));
-        log.debug("organisationsWithChildrenAsFlatList for id=4: " + organisationsIdsIncludingParentAndChildren4);
-        assertEquals(1, organisationsIdsIncludingParentAndChildren4.size());
-
-        List<Long> organisationsIdsIncludingParentAndChildren5 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(5L));
-        log.debug("organisationsWithChildrenAsFlatList for id=5: " + organisationsIdsIncludingParentAndChildren5);
-        assertEquals(1, organisationsIdsIncludingParentAndChildren5.size());
-
-        List<Long> organisationsIdsIncludingParentAndChildren6 = organisationalUnitService.getOrganisationsIdsIncludingParentAndChildren(List.of(6L));
-        log.debug("organisationsWithChildrenAsFlatList for id=6: " + organisationsIdsIncludingParentAndChildren6);
-        assertEquals(1, organisationsIdsIncludingParentAndChildren6.size());
     }
 
     @Test
@@ -201,94 +184,23 @@ class OrganisationalUnitServiceTest {
         assertEquals("OrgName1 (OName1) | OrgName5 (OName5)", orgMap.get(5L).getName());
     }
 
-    private List<OrganisationalUnit> getAllOrganisationalUnits() {
-
-        Domain domain1 = new Domain(1L, "domain1.com", LocalDateTime.now());
-        Domain domain2 = new Domain(2L, "domain2.com", LocalDateTime.now());
-        Domain domain3 = new Domain(3L, "domain3.com", LocalDateTime.now());
-
-        List<OrganisationalUnit> organisationalUnits = new ArrayList<>();
-
-        OrganisationalUnit organisationalUnits1 = new OrganisationalUnit();
-        organisationalUnits1.setId(1L);
-        organisationalUnits1.setName("OrgName1");
-        organisationalUnits1.setFormattedName("OrgName1 (OName1)");
-        organisationalUnits1.setParentId(null);
-        organisationalUnits1.setParent(null);
-        organisationalUnits1.setAbbreviation("OName1");
-        organisationalUnits1.setCode("ON1");
-        organisationalUnits1.setDomains(Arrays.asList(domain1, domain2));
-        organisationalUnits.add(organisationalUnits1);
-
-        OrganisationalUnit organisationalUnits2 = new OrganisationalUnit();
-        organisationalUnits2.setId(2L);
-        organisationalUnits2.setName("OrgName2");
-        organisationalUnits2.setFormattedName("OrgName1 (OName1) | OrgName2");
-        organisationalUnits2.setParentId(1L);
-        organisationalUnits1.setParent(organisationalUnits1);
-        organisationalUnits2.setAbbreviation("");
-        organisationalUnits2.setCode("ON2");
-        organisationalUnits2.setDomains(Arrays.asList(domain1, domain2, domain3));
-        organisationalUnits.add(organisationalUnits2);
-
-        OrganisationalUnit organisationalUnits3 = new OrganisationalUnit();
-        organisationalUnits3.setId(3L);
-        organisationalUnits3.setName("OrgName3");
-        organisationalUnits3.setFormattedName("OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)");
-        organisationalUnits3.setParentId(2L);
-        organisationalUnits1.setParent(organisationalUnits2);
-        organisationalUnits3.setAbbreviation("OName3");
-        organisationalUnits3.setCode("ON3");
-        organisationalUnits.add(organisationalUnits3);
-
-        OrganisationalUnit organisationalUnits4 = new OrganisationalUnit();
-        organisationalUnits4.setId(4L);
-        organisationalUnits4.setName("OrgName4");
-        organisationalUnits4.setFormattedName("OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)");
-        organisationalUnits4.setParentId(3L);
-        organisationalUnits1.setParent(organisationalUnits3);
-        organisationalUnits4.setAbbreviation("OName4");
-        organisationalUnits4.setCode("ON4");
-        organisationalUnits.add(organisationalUnits4);
-
-        OrganisationalUnit organisationalUnits5 = new OrganisationalUnit();
-        organisationalUnits5.setId(5L);
-        organisationalUnits5.setName("OrgName5");
-        organisationalUnits5.setFormattedName("OrgName1 (OName1) | OrgName5 (OName5)");
-        organisationalUnits5.setParentId(1L);
-        organisationalUnits1.setParent(organisationalUnits1);
-        organisationalUnits5.setAbbreviation("OName5");
-        organisationalUnits5.setCode("ON5");
-        organisationalUnits5.setDomains(Arrays.asList(domain1, domain2, domain3));
-        organisationalUnits.add(organisationalUnits5);
-
-        OrganisationalUnit organisationalUnits6 = new OrganisationalUnit();
-        organisationalUnits6.setId(6L);
-        organisationalUnits6.setName("OrgName6");
-        organisationalUnits6.setFormattedName("OrgName6 (OName6)");
-        organisationalUnits6.setAbbreviation("OName6");
-        organisationalUnits6.setCode("ON6");
-        organisationalUnits6.setDomains(List.of(domain3));
-        organisationalUnits.add(organisationalUnits6);
-
-        return organisationalUnits;
-    }
-
     @Test
     void scenario1_removeGrandParentFromParent() {
         OrganisationalUnitDto dto = new OrganisationalUnitDto();
         dto.setName("Parent Org");
         dto.setAbbreviation("PO");
         dto.setCode("PO-CODE");
-        dto.setParent(null);
+        dto.setParentId(null);
 
         OrganisationalUnit originalOrganisationalUnit = organisationalUnitMap.get(2L);
         Long originalParentId = originalOrganisationalUnit.getParentId();
         OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
         assertTrue(originalParent.getChildIds().contains(2L));
 
-        List<OrganisationalUnit> updatedOrganisationalUnits = organisationalUnitService.updateOrganisationalUnitsInCache(2L, dto);
-        OrganisationalUnit updatedOrganisationalUnit = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(2L)).findFirst().get();
+        when(organisationalUnitFactory.createOrganisationalUnitOverview(originalOrganisationalUnit)).thenReturn(new OrganisationalUnitOverview());
+
+        organisationalUnitService.patchOrganisationalUnit(2L, dto);
+        OrganisationalUnit updatedOrganisationalUnit = organisationalUnitMap.get(2L);
 
         //Updated formatted name
         assertEquals("Parent Org (PO)", updatedOrganisationalUnit.getFormattedName());
@@ -300,7 +212,7 @@ class OrganisationalUnitServiceTest {
         // child IDs
         Set<Long> childIds = updatedOrganisationalUnit.getChildIds();
         assertTrue(childIds.contains(3L), "Parent should still have Child as child");
-        OrganisationalUnit childOrganisationalUnit = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(3L)).findFirst().get();
+        OrganisationalUnit childOrganisationalUnit = organisationalUnitMap.get(3L);
         assertEquals("Parent Org (PO) | OrgName3 (OName3)", childOrganisationalUnit.getFormattedName());
 
         // original parent should not track update child
@@ -314,15 +226,15 @@ class OrganisationalUnitServiceTest {
         dto.setName("Child Org");
         dto.setAbbreviation("CO");
         dto.setCode("CO-CODE");
-        dto.setParent(null);
+        dto.setParentId(null);
 
         OrganisationalUnit originalOrganisationalUnit = organisationalUnitMap.get(3L);
         Long originalParentId = originalOrganisationalUnit.getParentId();
         OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
         assertTrue(originalParent.getChildIds().contains(3L));
 
-        List<OrganisationalUnit> updatedOrganisationalUnits = organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
-        OrganisationalUnit updatedOrganisationalUnit = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(3L)).findFirst().get();
+        organisationalUnitService.patchOrganisationalUnit(3L, dto);
+        OrganisationalUnit updatedOrganisationalUnit = organisationalUnitMap.get(3L);
 
         // formatted names
         assertEquals("Child Org (CO)", updatedOrganisationalUnit.getFormattedName());
@@ -334,7 +246,7 @@ class OrganisationalUnitServiceTest {
         // child IDs
         Set<Long> childIds = updatedOrganisationalUnit.getChildIds();
         assertTrue(childIds.contains(4L), "Child should still have further Child as child");
-        OrganisationalUnit childOrganisationalUnit = updatedOrganisationalUnits.stream().filter(o -> o.getId().equals(4L)).findFirst().get();
+        OrganisationalUnit childOrganisationalUnit = organisationalUnitMap.get(4L);
         assertEquals("Child Org (CO) | OrgName4 (OName4)", childOrganisationalUnit.getFormattedName());
 
         // original parent should not track update child
@@ -348,7 +260,7 @@ class OrganisationalUnitServiceTest {
         dto.setName("Child Org");
         dto.setAbbreviation("CO");
         dto.setCode("CO-CODE");
-        dto.setParent("1"); // grandparent
+        dto.setParentId(1L); // grandparent
 
         OrganisationalUnit originalOrganisationalUnit = organisationalUnitMap.get(3L);
         Long originalParentId = originalOrganisationalUnit.getParentId();
@@ -356,9 +268,8 @@ class OrganisationalUnitServiceTest {
         OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
         assertTrue(originalParent.getChildIds().contains(3L));
 
-        List<OrganisationalUnit> updateOrganisationalUnits = organisationalUnitService.updateOrganisationalUnitsInCache(3L, dto);
-        OrganisationalUnit updatedOrganisationalUnit = updateOrganisationalUnits.stream().filter(o -> o.getId().equals(3L)).findFirst().get();
-
+        organisationalUnitService.patchOrganisationalUnit(3L, dto);
+        OrganisationalUnit updatedOrganisationalUnit = organisationalUnitMap.get(3L);
         // formatted names
         assertEquals("OrgName1 (OName1) | Child Org (CO)", updatedOrganisationalUnit.getFormattedName());
 
@@ -368,7 +279,7 @@ class OrganisationalUnitServiceTest {
         // child IDs
         Set<Long> childIds = updatedOrganisationalUnit.getChildIds();
         assertTrue(childIds.contains(4L), "Child should still have further Child as child");
-        OrganisationalUnit childOrganisationalUnit = updateOrganisationalUnits.stream().filter(o -> o.getId().equals(4L)).findFirst().get();
+        OrganisationalUnit childOrganisationalUnit = organisationalUnitMap.get(4L);
         assertEquals("OrgName1 (OName1) | Child Org (CO) | OrgName4 (OName4)", childOrganisationalUnit.getFormattedName());
 
         // original parent should not track update child
@@ -380,17 +291,7 @@ class OrganisationalUnitServiceTest {
     public void shouldRemoveParentAndChildrenOrganisationalUnits() {
         assertEquals(6, organisationalUnitMap.size());
         assertTrue(organisationalUnitMap.containsKey(1L));
-        assertTrue(organisationalUnitMap.containsKey(2L));
-        assertTrue(organisationalUnitMap.containsKey(3L));
-        assertTrue(organisationalUnitMap.containsKey(4L));
-        assertTrue(organisationalUnitMap.containsKey(5L));
-        assertTrue(organisationalUnitMap.containsKey(6L));
-
-        List<OrganisationalUnit> organisationalUnitIdsToBeRemoved = organisationalUnitMap.getMultiple(Collections.singleton(1L), true);
-        List<Long> removedOrganisationalUnitIds = organisationalUnitIdsToBeRemoved.stream().map(OrganisationalUnit::getId).toList();
-
-        organisationalUnitService.removeOrganisationalUnitsFromCache(removedOrganisationalUnitIds);
-
+        organisationalUnitService.removeOrganisationalUnitsFromCache(List.of(1L));
         assertEquals(1, organisationalUnitMap.size());
         assertFalse(organisationalUnitMap.containsKey(1L));
         assertFalse(organisationalUnitMap.containsKey(2L));

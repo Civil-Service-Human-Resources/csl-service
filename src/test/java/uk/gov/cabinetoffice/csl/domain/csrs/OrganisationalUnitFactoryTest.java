@@ -1,15 +1,20 @@
 package uk.gov.cabinetoffice.csl.domain.csrs;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ExtendWith(MockitoExtension.class)
 class OrganisationalUnitFactoryTest {
 
-    private OrganisationalUnitFactory organisationalUnitFactory = new OrganisationalUnitFactory();
+    @InjectMocks
+    private OrganisationalUnitFactory organisationalUnitFactory;
 
     private OrganisationalUnit generateOrganisationalUnit(Long id, String name, Long parentId) {
         OrganisationalUnit organisationalUnit = new OrganisationalUnit();
@@ -29,7 +34,7 @@ class OrganisationalUnitFactoryTest {
                 generateOrganisationalUnit(5L, "org5", 6L),
                 generateOrganisationalUnit(6L, "org6", null)
         );
-        OrganisationalUnitMap map = organisationalUnitFactory.buildOrganisationalUnits(orgs);
+        OrganisationalUnitMap map = OrganisationalUnitMap.buildFromList(orgs);
         assertEquals(6, map.size());
         assertEquals("org1", map.get(1L).getFormattedName());
         assertEquals(Set.of(2L, 3L), map.get(1L).getChildIds());

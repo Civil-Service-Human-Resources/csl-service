@@ -6,12 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
+import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
-import uk.gov.cabinetoffice.csl.domain.rustici.UserDetailsDto;
+import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 
 import java.math.BigDecimal;
@@ -22,20 +23,22 @@ import java.time.ZoneId;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("no-redis")
 public class BookingDtoFactoryTest {
 
     private BookingDtoFactory bookingDtoFactory;
+    private UserDetailsService userDetailsService = mock(UserDetailsService.class);
 
     private final TestDataService testDataService = new TestDataService();
 
     @BeforeEach
     public void setup() {
         bookingDtoFactory = new BookingDtoFactory("catalogue_url",
-                Clock.fixed(Instant.parse("2023-01-01T10:00:00.000Z"), ZoneId.of("Europe/London")));
+                Clock.fixed(Instant.parse("2023-01-01T10:00:00.000Z"), ZoneId.of("Europe/London")),
+                userDetailsService);
         reset();
     }
 
@@ -48,9 +51,9 @@ public class BookingDtoFactoryTest {
         CourseWithModuleWithEvent courseWithModuleWithEvent = new CourseWithModuleWithEvent(
                 new CourseWithModule(course, module), event
         );
-        UserDetailsDto userDetailsDto = testDataService.generateUserDetailsDto();
+        User user = testDataService.generateUser();
+        when(userDetailsService.getUserWithUid("learnerUID")).thenReturn(user);
         BookEventDto bookEventDto = new BookEventDto();
-        bookEventDto.setUserDetailsDto(userDetailsDto);
         BookingDto dto = bookingDtoFactory.createBooking("learnerUID", courseWithModuleWithEvent, bookEventDto);
 
         assertEquals(dto.getEvent(), URI.create("catalogue_url/courses/courseId/modules/moduleId/events/eventId"));
@@ -69,18 +72,17 @@ public class BookingDtoFactoryTest {
         CourseWithModuleWithEvent courseWithModuleWithEvent = new CourseWithModuleWithEvent(
                 new CourseWithModule(course, module), event
         );
-        UserDetailsDto userDetailsDto = testDataService.generateUserDetailsDto();
+        User user = testDataService.generateUser();
+        when(userDetailsService.getUserWithUid("learnerUID")).thenReturn(user);
         BookEventDto bookEventDto = new BookEventDto();
-        bookEventDto.setUserDetailsDto(userDetailsDto);
         bookEventDto.setAccessibilityOptions(List.of("accessibilityOption1", "accessibilityOption2"));
-        bookEventDto.getUserDetailsDto().setLearnerEmail("learner@domain.com");
         BookingDto dto = bookingDtoFactory.createBooking("learnerUID", courseWithModuleWithEvent, bookEventDto);
 
         assertEquals(dto.getEvent(), URI.create("catalogue_url/courses/courseId/modules/moduleId/events/eventId"));
-        assertEquals(dto.getLearner(), "learnerUID");
-        assertEquals(dto.getLearnerEmail(), "learner@domain.com");
-        assertEquals(dto.getAccessibilityOptions(), "accessibilityOption1,accessibilityOption2");
-        assertEquals(dto.getStatus(), BookingStatus.REQUESTED);
+        assertEquals("learnerUID", dto.getLearner());
+        assertEquals("userEmail@email.com", dto.getLearnerEmail());
+        assertEquals("accessibilityOption1,accessibilityOption2", dto.getAccessibilityOptions());
+        assertEquals(BookingStatus.REQUESTED, dto.getStatus());
     }
 
 }

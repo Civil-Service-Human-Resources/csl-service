@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.domain.rustici;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.cabinetoffice.csl.domain.User;
 
 @Data
 @AllArgsConstructor
@@ -15,17 +16,15 @@ public class RegistrationInput {
     private String learnerFirstName;
     private String learnerLastName;
 
-    public static RegistrationInput from(String learnerId, String moduleId, String moduleRecordUid, String courseId,
-                                         UserDetailsDto userDetailsDto) {
-        String learnerFirstName = userDetailsDto.getLearnerName();
-        String learnerLastName = userDetailsDto.getLearnerLastName();
+    public static RegistrationInput from(User user, String moduleId, String moduleRecordUid, String courseId) {
+        String learnerFirstName = user.getName();
         return new RegistrationInput(
                 moduleRecordUid,
                 courseId,
                 moduleId,
-                learnerId,
+                user.getId(),
                 learnerFirstName,
-                learnerLastName == null ? "" : learnerLastName
+                ""
         );
     }
 }
