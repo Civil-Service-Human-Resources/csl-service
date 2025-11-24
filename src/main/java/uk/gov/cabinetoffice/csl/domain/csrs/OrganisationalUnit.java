@@ -32,10 +32,9 @@ public class OrganisationalUnit implements Serializable {
 
     // Custom data
     private String formattedName;
-
+    private String parentName;
     @JsonIgnore
     private AgencyToken inheritedAgencyToken;
-
     @JsonIgnore
     private Set<Long> childIds = new HashSet<>();
 
@@ -45,6 +44,16 @@ public class OrganisationalUnit implements Serializable {
         this.code = code;
         this.abbreviation = abbreviation;
         this.parent = parent;
+    }
+
+    @JsonIgnore
+    public String getAbbreviationSafe() {
+        return abbreviation == null ? "" : abbreviation;
+    }
+
+    @JsonIgnore
+    public Long getParentIdSafe() {
+        return parentId == null ? 0L : parentId;
     }
 
     @JsonIgnore
@@ -81,19 +90,29 @@ public class OrganisationalUnit implements Serializable {
     @JsonIgnore
     public void addDomainAndSort(Domain domain) {
         if (!domainExists(domain.domain)) {
+            List<Domain> domains = this.getDomains();
             domains.add(domain);
+            this.domains = domains;
             sortDomainsByName();
         }
     }
 
     @JsonIgnore
+    public void resetCustomData() {
+        formattedName = null;
+        parentName = null;
+        inheritedAgencyToken = null;
+        childIds = new HashSet<>();
+    }
+
+    @JsonIgnore
     private void sortDomainsByName() {
-        domains.sort(Comparator.comparing(Domain::getDomain));
+        getDomains().sort(Comparator.comparing(Domain::getDomain));
     }
 
     @JsonIgnore
     public void removeDomain(Long domainId) {
-        domains.removeIf(d -> d.getId().equals(domainId));
+        getDomains().removeIf(d -> d.getId().equals(domainId));
     }
 
     public List<Domain> getDomains() {
@@ -126,7 +145,7 @@ public class OrganisationalUnit implements Serializable {
                 .append("formattedName", formattedName)
                 .append("code", code)
                 .append("abbreviation", abbreviation)
-                .append("domains", domains)
+                .append("domains", getDomains())
                 .append("agencyToken", agencyToken)
                 .toString();
     }

@@ -5,12 +5,10 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
-import uk.gov.cabinetoffice.csl.domain.rustici.UserDetailsDto;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
@@ -37,7 +35,6 @@ public class ModuleLaunchTest extends IntegrationTestBase {
     private String userId;
     private String moduleId;
     private Course course;
-    private UserDetailsDto input;
     private LaunchLink launchLink;
 
     @PostConstruct
@@ -46,7 +43,6 @@ public class ModuleLaunchTest extends IntegrationTestBase {
         userId = testDataService.getUserId();
         moduleId = testDataService.getModuleId();
         course = testDataService.generateCourse(true, false);
-        input = testDataService.generateUserDetailsDto();
         launchLink = new LaunchLink("http://launch.link");
     }
 
@@ -85,14 +81,13 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                     "state": "IN_PROGRESS"
                 }]}
                 """;
+        cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         cslStubService.stubUpdateModuleRecord(course, moduleId, userId, getModuleRecordsResponse, expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
         LaunchLinkRequest req = testDataService.generateLaunchLinkRequest();
         cslStubService.getRustici().postLaunchLink("uid", req, launchLink, false);
 
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(utils.toJson(input)))
+        mockMvc.perform(post(url))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
     }
@@ -137,10 +132,9 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 }]}
                 """;
         cslStubService.getLearnerRecord().updateModuleRecords(expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
+        cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId0);
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(utils.toJson(input)))
+        mockMvc.perform(post(url))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
     }
@@ -150,10 +144,11 @@ public class ModuleLaunchTest extends IntegrationTestBase {
         List<StubMapping> stubs = new ArrayList<>();
         Course requiredCourse = testDataService.generateCourse(true, false);
         requiredCourse.setAudiences(List.of(
-                testDataService.generateRequiredAudience(input.getDepartmentHierarchy().get(0).getCode())
+                testDataService.generateRequiredAudience(testDataService.getOrganisationalUnit().getCode())
         ));
         requiredCourse.getModule(moduleId).setModuleType(ModuleType.file);
         requiredCourse.getModule(moduleId).setUrl("http://launch.link");
+        cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         stubs.add(cslStubService.getLearningCatalogue().getCourse(courseId, requiredCourse));
         stubs.add(cslStubService.getLearnerRecord().getLearnerRecords("userId", "courseId", 0, """
                 {
@@ -234,9 +229,7 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 """;
         stubs.add(cslStubService.getNotificationServiceStubService().sendEmail("NOTIFY_LINE_MANAGER_COMPLETED_LEARNING", expectedMessageDto));
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(utils.toJson(input)))
+        mockMvc.perform(post(url))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
         cslStubService.assertStubbedRequests(stubs);
@@ -310,10 +303,9 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 """;
         stubs.addAll(cslStubService.stubCreateModuleRecords(courseId, moduleId, course, userId, expectedModuleRecordPOST, expectedModuleRecordPOSTResponse));
         stubs.add(cslStubService.getLearnerRecord().createLearnerRecords(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse));
+        cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(utils.toJson(input)))
+        mockMvc.perform(post(url))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
         cslStubService.assertStubbedRequests(stubs);
@@ -413,14 +405,13 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                     "completionDate" : "2023-01-01T10:00:00"
                 }]}
                 """;
+        cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         stubs.add(cslStubService.getLearningCatalogue().getCourse(courseId, testCourse));
         stubs.add(cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("moduleId0", "moduleId1"), expectedModuleRecordGET));
         stubs.add(cslStubService.getLearnerRecord().createModuleRecords(expectedModuleRecordPOST, expectedModuleRecordPOSTResponse));
         stubs.add(cslStubService.getLearnerRecord().createLearnerRecordEvent(expectedLearnerRecordsPOST, expectedLearnerRecordsPOSTResponse));
         String url = String.format("/courses/%s/modules/%s/launch", courseId, module1);
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(utils.toJson(input)))
+        mockMvc.perform(post(url))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
         cslStubService.assertStubbedRequests(stubs);

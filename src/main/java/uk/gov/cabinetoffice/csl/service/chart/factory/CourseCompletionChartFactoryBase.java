@@ -3,7 +3,6 @@ package uk.gov.cabinetoffice.csl.service.chart.factory;
 import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.controller.model.SelectedOrganisationIdsCourseCompletionsParams;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.identity.IdentityDto;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.ReportType;
@@ -43,8 +42,7 @@ public abstract class CourseCompletionChartFactoryBase<A extends IAggregation> {
         params.setProfessionIds(apiParams.getProfessionIds());
         params.setGradeIds(apiParams.getGradeIds());
         if (apiParams.getSelectedOrganisationIds() != null) {
-            params.setOrganisationIds(organisationalUnitService.getOrganisationsWithChildrenAsFlatList(apiParams.getSelectedOrganisationIds())
-                    .stream().map(OrganisationalUnit::getId).toList());
+            params.setOrganisationIds(organisationalUnitService.getOrganisationIdsWithChildrenAsFlatList(apiParams.getSelectedOrganisationIds()));
         }
         return params;
     }
