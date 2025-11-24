@@ -90,7 +90,7 @@ public class OrganisationalUnit implements Serializable {
     @JsonIgnore
     public void addDomainAndSort(Domain domain) {
         if (!domainExists(domain.domain)) {
-            domains.add(domain);
+            getDomains().add(domain);
             sortDomainsByName();
         }
     }
@@ -105,12 +105,12 @@ public class OrganisationalUnit implements Serializable {
 
     @JsonIgnore
     private void sortDomainsByName() {
-        domains.sort(Comparator.comparing(Domain::getDomain));
+        getDomains().sort(Comparator.comparing(Domain::getDomain));
     }
 
     @JsonIgnore
     public void removeDomain(Long domainId) {
-        domains.removeIf(d -> d.getId().equals(domainId));
+        getDomains().removeIf(d -> d.getId().equals(domainId));
     }
 
     public List<Domain> getDomains() {
@@ -143,7 +143,7 @@ public class OrganisationalUnit implements Serializable {
                 .append("formattedName", formattedName)
                 .append("code", code)
                 .append("abbreviation", abbreviation)
-                .append("domains", domains)
+                .append("domains", getDomains())
                 .append("agencyToken", agencyToken)
                 .toString();
     }
