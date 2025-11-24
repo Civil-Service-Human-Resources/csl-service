@@ -90,7 +90,9 @@ public class OrganisationalUnit implements Serializable {
     @JsonIgnore
     public void addDomainAndSort(Domain domain) {
         if (!domainExists(domain.domain)) {
-            getDomains().add(domain);
+            List<Domain> domains = this.getDomains();
+            domains.add(domain);
+            this.domains = domains;
             sortDomainsByName();
         }
     }
