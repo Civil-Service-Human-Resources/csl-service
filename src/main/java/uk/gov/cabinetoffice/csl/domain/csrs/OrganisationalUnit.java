@@ -32,6 +32,7 @@ public class OrganisationalUnit implements Serializable {
 
     // Custom data
     private String formattedName;
+    private String formattedNameWithoutAbbreviation;
     private String parentName;
     @JsonIgnore
     private AgencyToken inheritedAgencyToken;
@@ -100,6 +101,7 @@ public class OrganisationalUnit implements Serializable {
     @JsonIgnore
     public void resetCustomData() {
         formattedName = null;
+        formattedNameWithoutAbbreviation = null;
         parentName = null;
         inheritedAgencyToken = null;
         childIds = new HashSet<>();
@@ -142,11 +144,12 @@ public class OrganisationalUnit implements Serializable {
                 .append("parentId", parentId)
                 .append("childIds", childIds)
                 .append("name", name)
-                .append("formattedName", formattedName)
                 .append("code", code)
                 .append("abbreviation", abbreviation)
                 .append("domains", getDomains())
                 .append("agencyToken", agencyToken)
+                .append("formattedName", formattedName)
+                .append("formattedNameWithoutAbbreviation", formattedNameWithoutAbbreviation)
                 .toString();
     }
 

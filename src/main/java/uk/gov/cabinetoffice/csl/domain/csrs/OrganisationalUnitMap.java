@@ -113,6 +113,7 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
     public OrganisationalUnit setOrganisationalUnitData(OrganisationalUnit organisationalUnit) {
         log.info(String.format("Building organisationalUnit %s", organisationalUnit.getId()));
         StringBuilder formattedName = new StringBuilder(organisationalUnit.getNameWithAbbreviation());
+        StringBuilder formattedNameWithoutAbbreviation = new StringBuilder(organisationalUnit.getName());
         Long parentId = organisationalUnit.getParentId();
         int parents = 0;
         while (parentId != null) {
@@ -126,9 +127,11 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
                 organisationalUnit.setInheritedAgencyToken(parentOrganisationalUnit.getAgencyToken());
             }
             formattedName.insert(0, parentOrganisationalUnit.getNameWithAbbreviation() + " | ");
+            formattedNameWithoutAbbreviation.insert(0, parentOrganisationalUnit.getName() + " | ");
             parentId = parentOrganisationalUnit.getParentId();
         }
         organisationalUnit.setFormattedName(formattedName.toString());
+        organisationalUnit.setFormattedNameWithoutAbbreviation(formattedNameWithoutAbbreviation.toString());
         put(organisationalUnit.getId(), organisationalUnit);
         return organisationalUnit;
     }

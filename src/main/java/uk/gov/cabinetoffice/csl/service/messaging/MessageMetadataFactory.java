@@ -45,7 +45,7 @@ public class MessageMetadataFactory {
 
     public RegisteredLearnerOrganisationUpdateMessage generateRegisteredLearnersOrganisationUpdateMessage(List<OrganisationalUnit> multipleOrgs) {
         List<RegisteredLearnerOrganisationUpdate> data = multipleOrgs.stream()
-                .map(o -> new RegisteredLearnerOrganisationUpdate(o.getId(), o.getFormattedName()))
+                .map(o -> new RegisteredLearnerOrganisationUpdate(o.getId(), o.getFormattedNameWithoutAbbreviation()))
                 .toList();
         return new RegisteredLearnerOrganisationUpdateMessage(data);
     }
