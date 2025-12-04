@@ -202,6 +202,9 @@ class OrganisationalUnitServiceTest extends CsrsServiceTestBase {
         //Updated formatted name
         assertEquals("Parent Org (PO)", updatedOrganisationalUnit.getFormattedName());
         assertEquals("Parent Org", updatedOrganisationalUnit.getFormattedNameWithoutAbbreviation());
+        assertEquals("Parent Org", updatedOrganisationalUnit.getName());
+        assertEquals("PO", updatedOrganisationalUnit.getAbbreviation());
+        assertEquals("PO-CODE", updatedOrganisationalUnit.getCode());
 
         // parent should be top-level
         assertNull(updatedOrganisationalUnit.getParentId());
@@ -238,6 +241,9 @@ class OrganisationalUnitServiceTest extends CsrsServiceTestBase {
         // formatted names
         assertEquals("Child Org (CO)", updatedOrganisationalUnit.getFormattedName());
         assertEquals("Child Org", updatedOrganisationalUnit.getFormattedNameWithoutAbbreviation());
+        assertEquals("Child Org", updatedOrganisationalUnit.getName());
+        assertEquals("CO", updatedOrganisationalUnit.getAbbreviation());
+        assertEquals("CO-CODE", updatedOrganisationalUnit.getCode());
 
         // child should be top-level
         assertNull(updatedOrganisationalUnit.getParentId());
@@ -274,6 +280,9 @@ class OrganisationalUnitServiceTest extends CsrsServiceTestBase {
         // formatted names
         assertEquals("OrgName1 (OName1) | Child Org (CO)", updatedOrganisationalUnit.getFormattedName());
         assertEquals("OrgName1 | Child Org", updatedOrganisationalUnit.getFormattedNameWithoutAbbreviation());
+        assertEquals("Child Org", updatedOrganisationalUnit.getName());
+        assertEquals("CO", updatedOrganisationalUnit.getAbbreviation());
+        assertEquals("CO-CODE", updatedOrganisationalUnit.getCode());
 
         // new parent
         assertEquals(1L, updatedOrganisationalUnit.getParentId());
