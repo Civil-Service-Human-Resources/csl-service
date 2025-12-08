@@ -6,10 +6,13 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.NullableModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitMapCache;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.RequiredLearningMapCache;
+import uk.gov.cabinetoffice.csl.util.ModuleRecordCache;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
 import java.util.Map;
@@ -36,16 +39,21 @@ public class RedisCaches {
     }
 
     @Bean
-    public ObjectCache<ModuleRecord> moduleRecordCache(CacheManager cacheManager) {
+    public ModuleRecordCache moduleRecordCache(CacheManager cacheManager) {
         Cache cache = cacheManager.getCache("module-record");
-        return new ObjectCache<>(cache, ModuleRecord.class);
+        return new ModuleRecordCache(cache, NullableModuleRecord.class);
     }
 
     @Bean
     public ObjectCache<LearnerRecord> learnerRecordCache(CacheManager cacheManager) {
-        Cache cache2 = cacheManager.getCache("organisations");
         Cache cache = cacheManager.getCache("learner-record");
         return new ObjectCache<>(cache, LearnerRecord.class);
+    }
+
+    @Bean
+    public OrganisationalUnitMapCache organisationalUnitMapCache(CacheManager cacheManager, ICSRSClient client) {
+        Cache cache = cacheManager.getCache("organisations");
+        return new OrganisationalUnitMapCache(cache, client);
     }
 
     @Bean

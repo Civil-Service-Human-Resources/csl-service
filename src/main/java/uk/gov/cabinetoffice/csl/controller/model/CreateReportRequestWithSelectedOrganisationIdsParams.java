@@ -5,13 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.gov.cabinetoffice.csl.service.report.params.ISelectedOrganisationalReportRequestParams;
 import uk.gov.cabinetoffice.csl.validators.frontendUrl.ValidFrontendUrl;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateReportRequestWithSelectedOrganisationIdsParams extends SelectedOrganisationIdsCourseCompletionsParams {
+public class CreateReportRequestWithSelectedOrganisationIdsParams extends SelectedOrganisationIdsCourseCompletionsParams implements ISelectedOrganisationalReportRequestParams {
 
     @NotNull
     protected String userId;
@@ -23,6 +24,7 @@ public class CreateReportRequestWithSelectedOrganisationIdsParams extends Select
     @ValidFrontendUrl
     protected String downloadBaseUrl;
 
+    @NotNull
     protected String fullName;
 
 }

@@ -17,6 +17,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.rustici.CSLRusticiProps;
+import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +33,17 @@ public class ModuleActionService {
     private final CourseActionService courseActionService;
     private final LearnerRecordService learnerRecordService;
     private final ActionResultService actionResultService;
+    private final UserDetailsService userDetailsService;
 
     public ModuleActionService(ModuleRecordActionFactory moduleRecordActionFactory, ModuleRecordFactory moduleRecordFactory,
-                               CourseActionService courseActionService, LearnerRecordService learnerRecordService, ActionResultService actionResultService) {
+                               CourseActionService courseActionService, LearnerRecordService learnerRecordService,
+                               ActionResultService actionResultService, UserDetailsService userDetailsService) {
         this.moduleRecordActionFactory = moduleRecordActionFactory;
         this.moduleRecordFactory = moduleRecordFactory;
         this.courseActionService = courseActionService;
         this.learnerRecordService = learnerRecordService;
         this.actionResultService = actionResultService;
+        this.userDetailsService = userDetailsService;
     }
 
     private ModuleRecord processAction(@Nullable ModuleRecord moduleRecord, CourseWithModule courseWithModule, UserToModuleAction action) {
@@ -55,8 +59,8 @@ public class ModuleActionService {
         return moduleRecord;
     }
 
-    public ModuleRecord launchModule(CourseWithModule courseWithModule, User user) {
-        UserToModuleAction action = new UserToModuleAction(user.getId(), moduleRecordActionFactory.getLaunchModuleAction());
+    public ModuleRecord launchModule(CourseWithModule courseWithModule, String userId) {
+        UserToModuleAction action = new UserToModuleAction(userId, moduleRecordActionFactory.getLaunchModuleAction());
         return processModuleAction(courseWithModule, action);
     }
 
@@ -84,27 +88,27 @@ public class ModuleActionService {
         return learnerRecordService.applyModuleRecordUpdates(result);
     }
 
-    public void rollUpModule(CourseWithModule courseWithModule, User user, CSLRusticiProps properties) {
+    public void rollUpModule(CourseWithModule courseWithModule, CSLRusticiProps properties) {
         IModuleAction action = moduleRecordActionFactory.getRollUpModuleAction(properties);
         if (properties.getCompletionDate() != null) {
-            completeModule(courseWithModule, user, action);
+            completeModule(courseWithModule, properties.getLearnerId(), action);
         } else {
-            processModuleAction(courseWithModule, new UserToModuleAction(user.getId(), action));
+            processModuleAction(courseWithModule, new UserToModuleAction(properties.getLearnerId(), action));
         }
     }
 
-    public void completeModule(CourseWithModule courseWithModule, User user) {
+    public void completeModule(CourseWithModule courseWithModule, String userId) {
         IModuleAction action = moduleRecordActionFactory.getCompleteModuleAction();
-        completeModule(courseWithModule, user, action);
+        completeModule(courseWithModule, userId, action);
     }
 
-    public void completeModule(CourseWithModule courseWithModule, User user, IModuleAction completionAction) {
-        log.info("Completing module {}...", courseWithModule.getModule().getResourceId());
+    public void completeModule(CourseWithModule courseWithModule, String userId, IModuleAction completionAction) {
+        User user = userDetailsService.getUserWithUid(userId);
         Course course = courseWithModule.getCourse();
-        ModuleRecordResourceId recordResourceId = new ModuleRecordResourceId(user.getId(), courseWithModule.getModule().getResourceId());
+        ModuleRecordResourceId recordResourceId = new ModuleRecordResourceId(userId, courseWithModule.getModule().getResourceId());
         List<ModuleRecordResourceId> idsToFetch = new ArrayList<>(List.of(recordResourceId));
         List<ModuleRecordResourceId> requiredModuleIds = course.getRequiredModulesForCompletion()
-                .stream().map(m -> new ModuleRecordResourceId(user.getId(), m.getResourceId())).toList();
+                .stream().map(m -> new ModuleRecordResourceId(userId, m.getResourceId())).toList();
         boolean completeCourse = false;
         Map<String, ModuleRecord> moduleMap;
         if (requiredModuleIds.contains(recordResourceId)) {
@@ -128,14 +132,14 @@ public class ModuleActionService {
                 completeCourse = true;
             }
             else{
-                log.info("Course could not be set as complete: ");
-                log.info("Remaining module IDs: ", remainingModuleIds);
-                log.info("Module ID from course with module: ", courseWithModule.getModule().getResourceId());
+                log.info("Course could not be set as complete");
+                log.info("Remaining module IDs: {}", remainingModuleIds);
+                log.info("Module ID from course with module: {}", courseWithModule.getModule().getResourceId());
             }
         } else {
             moduleMap = learnerRecordService.getModuleRecordsMap(idsToFetch);
         }
-        ModuleRecord moduleRecord = processModuleActions(courseWithModule, List.of(new UserToModuleAction(user.getId(), completionAction)), moduleMap).get(recordResourceId.getAsString());
+        ModuleRecord moduleRecord = processModuleActions(courseWithModule, List.of(new UserToModuleAction(userId, completionAction)), moduleMap).get(recordResourceId.getAsString());
         if (completeCourse) {
             log.info("Completed module was the last required module remaining for course completion. Completing course.");
             ActionResult actionResult = courseActionService.completeCourse(course, user, moduleRecord.getCompletionDate());

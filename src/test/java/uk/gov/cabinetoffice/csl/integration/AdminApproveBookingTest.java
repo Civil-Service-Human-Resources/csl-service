@@ -96,8 +96,8 @@ public class AdminApproveBookingTest extends IntegrationTestBase {
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.message")
-                        .value("Successfully applied action 'Approve a booking' to course record"));
+                .andExpect(jsonPath("$.bookingId").value("1"))
+                .andExpect(jsonPath("$.learner").value("userId"));
     }
 
 }

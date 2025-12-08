@@ -10,14 +10,13 @@ import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learning.Learning;
 import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearning;
 import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearningCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
-import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitListService;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.learningResources.course.CourseRecordService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
@@ -37,7 +36,7 @@ public class RequiredLearningService {
     private final CourseRecordService courseRecordService;
     private final LearnerRecordDataUtils learnerRecordDataUtils;
     private final LearningCatalogueService learningCatalogueService;
-    private final OrganisationalUnitListService organisationalUnitListService;
+    private final OrganisationalUnitService organisationalUnitService;
     private final UserDetailsService userDetailsService;
     private final LearningFactory<RequiredLearningDisplayCourseFactory> requiredLearningFactory;
 
@@ -52,7 +51,8 @@ public class RequiredLearningService {
 
     public RequiredLearning getRequiredLearning(String uid) {
         User user = userDetailsService.getUserWithUid(uid);
-        List<Course> requiredLearning = learningCatalogueService.getRequiredLearningForDepartments(user.getDepartmentCodes());
+        List<Course> requiredLearning = learningCatalogueService.getRequiredLearningForDepartments(user.getDepartmentCodes())
+                .stream().filter(Course::shouldBeDisplayed).toList();
         Map<String, LocalDateTime> completionDates = learnerRecordDataUtils
                 .getCompletionDatesForCourses(uid, requiredLearning.stream().map(Course::getId).toList());
         List<RequiredLearningCourse> requiredLearningCourses = new ArrayList<>();
@@ -63,18 +63,22 @@ public class RequiredLearningService {
                     if (completionDate == null || lp.getStartDateAsDateTime().isAfter(completionDate)) {
                         RequiredLearningCourse requiredLearningCourse = new RequiredLearningCourse(
                                 course.getId(), course.getTitle(), course.getShortDescription(),
-                                course.getCourseType(), course.getDurationInMinutes(), course.getModules().size(),
-                                State.NULL, lp);
+                                course.getCourseType(), course.getDurationInSeconds(), course.getModules().size(),
+                                course.getCost(), State.NULL, lp);
                         requiredLearningCourses.add(requiredLearningCourse);
                         moduleRecordIdsToFetch.addAll(course.getRequiredModuleIdsForCompletion().stream()
                                 .map(id -> new ModuleRecordResourceId(uid, id)).toList());
                     }
                 }));
         if (!moduleRecordIdsToFetch.isEmpty()) {
-            Map<String, List<ModuleRecord>> moduleRecords = learnerRecordDataUtils.getModuleRecordsForCourses(
+            Map<String, ModuleRecordCollection> moduleRecords = learnerRecordDataUtils.getModuleRecordsForCourses(
                     requiredLearningCourses.stream().map(RequiredLearningCourse::getId).toList(), moduleRecordIdsToFetch);
             requiredLearningCourses
-                    .forEach(course -> course.setStatusForModules(moduleRecords.get(course.getId())));
+                    .forEach(course -> {
+                        if (moduleRecords.get(course.getId()).getLatestUpdatedDate().isAfter(course.getLearningPeriod().getStartDateAsDateTime())) {
+                            course.setStatus(State.IN_PROGRESS);
+                        }
+                    });
         }
         RequiredLearning requiredLearningResponse = new RequiredLearning(uid, requiredLearningCourses);
         requiredLearningResponse.sortCourses();
@@ -83,7 +87,7 @@ public class RequiredLearningService {
 
     public RequiredLearningMapResponse getRequiredLearningMapForOrganisations(GetRequiredLearningForDepartmentsParams params) {
         Map<Long, List<CourseWithTitle>> result = new HashMap<>();
-        Map<Long, List<OrganisationalUnit>> orgHierarchies = organisationalUnitListService.getHierarchies(params.getOrganisationIds());
+        Map<Long, List<OrganisationalUnit>> orgHierarchies = organisationalUnitService.getHierarchies(params.getOrganisationIds());
         Map<String, List<Course>> courseMap = learningCatalogueService.getRequiredLearningForDepartmentsMap(orgHierarchies.values().stream().flatMap(organisationalUnits -> organisationalUnits.stream().map(OrganisationalUnit::getCode)).collect(Collectors.toSet()));
         orgHierarchies.forEach((key, value) -> {
             List<CourseWithTitle> courses = new ArrayList<>();

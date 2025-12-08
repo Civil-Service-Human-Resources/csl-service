@@ -2,18 +2,20 @@ package uk.gov.cabinetoffice.csl.service.messaging;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
+import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.messaging.model.CourseCompletionMessage;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class MessageMetadataFactory {
 
     public CourseCompletionMessage generateCourseCompletionMessage(LocalDateTime completionDate, User user, Course course) {
         return new CourseCompletionMessage(completionDate, user.getId(), user.getEmail(), course.getId(), course.getTitle(),
-                user.getOrganisationId(), user.getFormattedOrganisationName(), user.getProfessionId(),
+                user.getOrganisationId().intValue(), user.getFormattedOrganisationName(), user.getProfessionId(),
                 user.getProfessionName(), user.getGradeId(), user.getGradeName());
     }
 
@@ -35,5 +37,16 @@ public class MessageMetadataFactory {
 
     public RegisteredLearnerEmailUpdateMessage generateRegisteredLearnerEmailUpdateMessage(String uid, String email) {
         return new RegisteredLearnerEmailUpdateMessage(new RegisteredLearnerEmailUpdate(uid, email));
+    }
+
+    public RegisteredLearnerOrganisationDeleteMessage generateRegisteredLearnersOrganisationDeleteMessage(List<Long> organisationIds) {
+        return new RegisteredLearnerOrganisationDeleteMessage(new RegisteredLearnerOrganisationDelete(organisationIds));
+    }
+
+    public RegisteredLearnerOrganisationUpdateMessage generateRegisteredLearnersOrganisationUpdateMessage(List<OrganisationalUnit> multipleOrgs) {
+        List<RegisteredLearnerOrganisationUpdate> data = multipleOrgs.stream()
+                .map(o -> new RegisteredLearnerOrganisationUpdate(o.getId(), o.getFormattedNameWithoutAbbreviation()))
+                .toList();
+        return new RegisteredLearnerOrganisationUpdateMessage(data);
     }
 }

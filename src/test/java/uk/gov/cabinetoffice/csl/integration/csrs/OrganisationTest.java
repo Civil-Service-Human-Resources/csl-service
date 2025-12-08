@@ -14,7 +14,7 @@ import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,6 +32,362 @@ public class OrganisationTest extends IntegrationTestBase {
     @PostConstruct
     public void setupData() {
         organisationalUnitsPagedResponse = testDataService.generateOrganisationalUnitsPagedResponse();
+    }
+
+    @Test
+    public void testGetOrganisationalUnitOverview() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        mockMvc.perform(get("/organisations/2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("""
+                        {
+                          "id": 2,
+                          "name": "OrgName2",
+                          "code": "ON2",
+                          "abbreviation": null,
+                          "parentId": 1,
+                          "parentName": "OrgName1",
+                          "domains": [
+                            {
+                              "id": 1,
+                              "domain": "domain2.com",
+                              "createdTimestamp": "2025-01-01T10:00:00"
+                            }
+                          ],
+                          "agencyToken": null
+                        }
+                        """, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void testCreateOrganisationalUnit() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        cslStubService.getCsrsStubService().createOrganisation("""
+                {
+                    "code": "NEW_OU",
+                    "name": "New Organisational Unit",
+                    "abbreviation": "NOU",
+                    "parent": null
+                }""", """
+                {
+                    "ID": 1,
+                    "code": "NEW_OU",
+                    "name": "New Organisational Unit",
+                    "abbreviation": "NOU"
+                }
+                """);
+        mockMvc.perform(post("/organisations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "code": "NEW_OU",
+                                  "name": "New Organisational Unit",
+                                  "abbreviation": "NOU",
+                                  "parentId": null
+                                }
+                                """))
+                .andExpect(content().json("""
+                        {
+                          "id": null,
+                          "name": "New Organisational Unit",
+                          "code": "NEW_OU",
+                          "abbreviation": "NOU",
+                          "parentId": null,
+                          "parentName": null,
+                          "domains": [],
+                          "agencyToken": null
+                        }
+                        """, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void testCreateOrganisationalUnitWithParent() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        cslStubService.getCsrsStubService().createOrganisation("""
+                {
+                    "code": "NEW_OU",
+                    "name": "New Organisational Unit",
+                    "abbreviation": "NOU",
+                    "parent": "http://localhost:9000/csrs/organisationalUnits/1"
+                }""", """
+                {
+                    "id": 10,
+                    "code": "NEW_OU",
+                    "name": "New Organisational Unit",
+                    "abbreviation": "NOU"
+                }
+                """);
+        mockMvc.perform(post("/organisations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "code": "NEW_OU",
+                                    "name": "New Organisational Unit",
+                                    "abbreviation": "NOU",
+                                    "parentId": 1
+                                }
+                                """))
+                .andExpect(content().json("""
+                          {
+                            "id":10,
+                            "name":"New Organisational Unit",
+                            "code":"NEW_OU",
+                            "abbreviation":"NOU",
+                            "parentId":1,
+                            "parentName":"OrgName1",
+                            "domains":[],
+                            "agencyToken":null
+                        }
+                        """, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void testUpdateOrganisationalUnitParentToChild() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        mockMvc.perform(put("/organisations/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "code": "ON2",
+                                  "name": "OrgName2 edit",
+                                  "abbreviation": "ON2E",
+                                  "parentId": 2
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdateOrganisationalUnitParentToSelf() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        mockMvc.perform(put("/organisations/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "code": "ON2",
+                                  "name": "OrgName2 edit",
+                                  "abbreviation": "ON2E",
+                                  "parentId": 1
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdateOrganisationalUnit() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        cslStubService.getCsrsStubService().updateOrganisation(2, """
+                {
+                  "code": "ON2",
+                  "name": "OrgName2 edit",
+                  "abbreviation": "ON2E",
+                  "parentId": 6,
+                  "parent": "http://localhost:9000/csrs/organisationalUnits/6"
+                }""", """
+                {
+                  "code": "ON2",
+                  "name": "OrgName2 edit",
+                  "abbreviation": "ON2E"
+                }
+                """);
+        mockMvc.perform(put("/organisations/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "code": "ON2",
+                                  "name": "OrgName2 edit",
+                                  "abbreviation": "ON2E",
+                                  "parentId": 6
+                                }
+                                """))
+                .andExpect(content().json("""
+                        {
+                          "id":2,
+                          "code": "ON2",
+                          "name": "OrgName2 edit",
+                          "abbreviation": "ON2E",
+                          "parentName":"OrgName6",
+                          "parentId": 6,
+                          "domains":[{"id":1,"domain":"domain2.com","createdTimestamp":"2025-01-01T10:00:00"}],
+                          "agencyToken":null
+                        }
+                        """, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void testUnlinkParent() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        cslStubService.getCsrsStubService().updateOrganisation(2, """
+                {
+                  "code": "ON2",
+                  "name": "OrgName2",
+                  "abbreviation": null,
+                  "parent": null
+                }""", """
+                {
+                  "code": "ON2",
+                  "name": "OrgName2",
+                  "abbreviation": null
+                }
+                """);
+        mockMvc.perform(put("/organisations/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "code": "ON2",
+                                  "name": "OrgName2",
+                                  "abbreviation": null,
+                                  "parentId": null
+                                }
+                                """))
+                .andExpect(content().json("""
+                        {
+                          "id":2,
+                          "name":"OrgName2",
+                          "code":"ON2",
+                          "abbreviation":null,
+                          "parentId":null,
+                          "parentName":null,
+                          "domains":[
+                            {
+                              "id":1,
+                              "domain":"domain2.com",
+                              "createdTimestamp":"2025-01-01T10:00:00"
+                            }
+                          ],
+                          "agencyToken":null
+                        }
+                        """, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void testGetOrganisationalUnitsTree() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        String expectedFormattedOrganisations = """
+                {
+                  "organisationalUnits": [
+                    {
+                      "name": "OrgName1",
+                      "id": 1,
+                      "children": [
+                        {
+                          "name": "OrgName2",
+                          "id": 2,
+                          "children": [
+                            {
+                              "name": "OrgName3",
+                              "id": 3,
+                              "children": [{ "name": "OrgName4", "id": 4, "children": [] }]
+                            }
+                          ]
+                        },
+                        { "name": "OrgName5", "id": 5, "children": [] }
+                      ]
+                    },
+                    { "name": "OrgName6", "id": 6, "children": [] },
+                    {
+                      "name": "OrgName7",
+                      "id": 7,
+                      "children": [
+                        { "name": "OrgName8", "id": 8, "children": [] },
+                        { "name": "OrgName9", "id": 9, "children": [] }
+                      ]
+                    }
+                  ]
+                }
+                """;
+
+        mockMvc.perform(get("/organisations/overview-tree")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedFormattedOrganisations, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void testGetOrganisationOverviews() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        String expectedFormattedOrganisations = """
+                {
+                  "organisationalUnits": [
+                    {
+                      "id": 1,
+                      "name": "OrgName1",
+                      "code": "ON1",
+                      "abbreviation": "OName1",
+                      "parentId": null,
+                      "parentName": null,
+                      "domains": [],
+                      "agencyToken": null
+                    },
+                    {
+                      "id": 2,
+                      "name": "OrgName2",
+                      "code": "ON2",
+                      "abbreviation": null,
+                      "parentId": 1,
+                      "parentName": "OrgName1",
+                      "domains": [
+                        {
+                          "id": 1,
+                          "domain": "domain2.com",
+                          "createdTimestamp": "2025-01-01T10:00:00"
+                        }
+                      ],
+                      "agencyToken": null
+                    },
+                    {
+                      "id": 3,
+                      "name": "OrgName3",
+                      "code": "ON3",
+                      "abbreviation": "OName3",
+                      "parentId": 2,
+                      "parentName": "OrgName2",
+                      "domains": [],
+                      "agencyToken": null
+                    }
+                  ]
+                }
+                
+                """;
+        mockMvc.perform(get("/organisations")
+                        .param("organisationId", "3")
+                        .param("includeParents", "true")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedFormattedOrganisations, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void testGetOrganisationOverviewsNotParent() throws Exception {
+        cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
+        String expectedFormattedOrganisations = """
+                {
+                  "organisationalUnits": [
+                    {
+                      "id": 1,
+                      "name": "OrgName1",
+                      "code": "ON1",
+                      "abbreviation": "OName1",
+                      "parentId": null,
+                      "parentName": null,
+                      "domains": [],
+                      "agencyToken": null
+                    }
+                  ]
+                }
+                
+                """;
+        mockMvc.perform(get("/organisations")
+                        .param("organisationId", "1")
+                        .param("includeParents", "true")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedFormattedOrganisations, true))
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -190,135 +546,145 @@ public class OrganisationTest extends IntegrationTestBase {
         cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
         String expectedOrganisations = """
                 {
-                    "organisationalUnits": [
-                         {
-                             "id": 1,
-                             "name": "OrgName1",
-                             "code": "ON1",
-                             "abbreviation": "OName1",
-                             "formattedName": "OrgName1 (OName1)",
-                             "parentId": null,
-                             "parent": null,
-                             "domains": null,
-                             "agencyToken": null
-                         },
-                         {
-                             "id": 2,
-                             "name": "OrgName2",
-                             "code": "ON2",
-                             "abbreviation": null,
-                             "formattedName": "OrgName1 (OName1) | OrgName2",
-                             "parentId": 1,
-                             "parent": null,
-                             "domains": [
-                                  {
-                                    "id": 1,
-                                    "domain": "domain2.com",
-                                    "createdTimestamp": "2025-01-01T10:00:00"
-                                  }
-                             ],
-                             "agencyToken": null
-                         },
-                         {
-                             "id": 3,
-                             "name": "OrgName3",
-                             "code": "ON3",
-                             "abbreviation": "OName3",
-                             "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)",
-                             "parentId": 2,
-                             "parent": null,
-                             "domains": null,
-                             "agencyToken": null
-                         },
-                         {
-                             "id": 4,
-                             "name": "OrgName4",
-                             "code": "ON4",
-                             "abbreviation": "OName4",
-                             "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)",
-                             "parentId": 3,
-                             "parent": null,
-                             "domains": null,
-                             "agencyToken": null
-                         },
-                         {
-                             "id": 5,
-                             "name": "OrgName5",
-                             "code": "ON5",
-                             "abbreviation": "OName5",
-                             "formattedName": "OrgName1 (OName1) | OrgName5 (OName5)",
-                             "parentId": 1,
-                             "parent": null,
-                             "domains": null,
-                             "agencyToken": null
-                         },
-                         {
-                             "id": 6,
-                             "name": "OrgName6",
-                             "code": "ON6",
-                             "abbreviation": "OName6",
-                             "formattedName": "OrgName6 (OName6)",
-                             "parentId": null,
-                             "parent": null,
-                             "domains": null,
-                             "agencyToken": null
-                         },
-                         {
-                             "id": 7,
-                             "name": "OrgName7",
-                             "code": "ON7",
-                             "abbreviation": "OName7",
-                             "formattedName": "OrgName7 (OName7)",
-                             "parentId": null,
-                             "parent": null,
-                             "domains": null,
-                             "agencyToken": {
-                                "id": 1,
-                                "token": "token",
-                                "uid": "uid",
-                                "capacity": 1,
-                                "agencyDomains": [
-                                  {
-                                    "id": 1,
-                                    "domain": "agency.com"
-                                  }
-                                ]
-                             }
-                         },
-                         {
-                             "id": 8,
-                             "name": "OrgName8",
-                             "code": "ON8",
-                             "abbreviation": "OName8",
-                             "formattedName": "OrgName7 (OName7) | OrgName8 (OName8)",
-                             "parentId": 7,
-                             "parent": null,
-                             "domains": null,
-                             "agencyToken": null
-                         },
-                         {
-                             "id": 9,
-                             "name": "OrgName9",
-                             "code": "ON9",
-                             "abbreviation": "OName9",
-                             "formattedName": "OrgName7 (OName7) | OrgName9 (OName9)",
-                             "parentId": 7,
-                             "parent": null,
-                             "domains": null,
-                             "agencyToken": {
-                                "id": 2,
-                                "token": "token",
-                                "uid": "uid",
-                                "capacity": 1,
-                                "agencyDomains": [
-                                  {
-                                    "id": 2,
-                                    "domain": "agency2.com"
-                                  }
-                                ]
-                             }
-                         }
-                    ]
+                  "organisationalUnits": [
+                    {
+                      "id": 1,
+                      "name": "OrgName1",
+                      "code": "ON1",
+                      "abbreviation": "OName1",
+                      "parentId": null,
+                      "parent": null,
+                      "domains": [],
+                      "agencyToken": null,
+                      "formattedName": "OrgName1 (OName1)",
+                      "formattedNameWithoutAbbreviation": "OrgName1",
+                      "parentName": null
+                    },
+                    {
+                      "id": 2,
+                      "name": "OrgName2",
+                      "code": "ON2",
+                      "abbreviation": null,
+                      "parentId": 1,
+                      "parent": null,
+                      "domains": [
+                        {
+                          "id": 1,
+                          "domain": "domain2.com",
+                          "createdTimestamp": "2025-01-01T10:00:00"
+                        }
+                      ],
+                      "agencyToken": null,
+                      "formattedName": "OrgName1 (OName1) | OrgName2",
+                      "formattedNameWithoutAbbreviation": "OrgName1 | OrgName2",
+                      "parentName": "OrgName1"
+                    },
+                    {
+                      "id": 3,
+                      "name": "OrgName3",
+                      "code": "ON3",
+                      "abbreviation": "OName3",
+                      "parentId": 2,
+                      "parent": null,
+                      "domains": [],
+                      "agencyToken": null,
+                      "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3)",
+                      "formattedNameWithoutAbbreviation": "OrgName1 | OrgName2 | OrgName3",
+                      "parentName": "OrgName2"
+                    },
+                    {
+                      "id": 4,
+                      "name": "OrgName4",
+                      "code": "ON4",
+                      "abbreviation": "OName4",
+                      "parentId": 3,
+                      "parent": null,
+                      "domains": [],
+                      "agencyToken": null,
+                      "formattedName": "OrgName1 (OName1) | OrgName2 | OrgName3 (OName3) | OrgName4 (OName4)",
+                      "formattedNameWithoutAbbreviation": "OrgName1 | OrgName2 | OrgName3 | OrgName4",
+                      "parentName": "OrgName3"
+                    },
+                    {
+                      "id": 5,
+                      "name": "OrgName5",
+                      "code": "ON5",
+                      "abbreviation": "OName5",
+                      "parentId": 1,
+                      "parent": null,
+                      "domains": [],
+                      "agencyToken": null,
+                      "formattedName": "OrgName1 (OName1) | OrgName5 (OName5)",
+                      "formattedNameWithoutAbbreviation": "OrgName1 | OrgName5",
+                      "parentName": "OrgName1"
+                    },
+                    {
+                      "id": 6,
+                      "name": "OrgName6",
+                      "code": "ON6",
+                      "abbreviation": "OName6",
+                      "parentId": null,
+                      "parent": null,
+                      "domains": [],
+                      "agencyToken": null,
+                      "formattedName": "OrgName6 (OName6)",
+                      "formattedNameWithoutAbbreviation": "OrgName6",
+                      "parentName": null
+                    },
+                    {
+                      "id": 7,
+                      "name": "OrgName7",
+                      "code": "ON7",
+                      "abbreviation": "OName7",
+                      "parentId": null,
+                      "parent": null,
+                      "domains": [],
+                      "agencyToken": {
+                        "id": 1,
+                        "uid": "uid1",
+                        "token": "token",
+                        "capacity": 30,
+                        "capacityUsed": 20,
+                        "agencyDomains": [{ "id": 1, "domain": "agency.com" }]
+                      },
+                      "formattedName": "OrgName7 (OName7)",
+                      "formattedNameWithoutAbbreviation": "OrgName7",
+                      "parentName": null
+                    },
+                    {
+                      "id": 8,
+                      "name": "OrgName8",
+                      "code": "ON8",
+                      "abbreviation": "OName8",
+                      "parentId": 7,
+                      "parent": null,
+                      "domains": [],
+                      "agencyToken": null,
+                      "formattedName": "OrgName7 (OName7) | OrgName8 (OName8)",
+                      "formattedNameWithoutAbbreviation": "OrgName7 | OrgName8",
+                      "parentName": "OrgName7"
+                    },
+                    {
+                      "id": 9,
+                      "name": "OrgName9",
+                      "code": "ON9",
+                      "abbreviation": "OName9",
+                      "parentId": 7,
+                      "parent": null,
+                      "domains": [],
+                      "agencyToken": {
+                        "id": 2,
+                        "uid": "uid2",
+                        "token": "token",
+                        "capacity": 1,
+                        "capacityUsed": 1,
+                        "agencyDomains": [{ "id": 2, "domain": "agency2.com" }]
+                      },
+                      "formattedName": "OrgName7 (OName7) | OrgName9 (OName9)",
+                      "formattedNameWithoutAbbreviation": "OrgName7 | OrgName9",
+                      "parentName": "OrgName7"
+                    }
+                  ]
                 }
                 """;
 

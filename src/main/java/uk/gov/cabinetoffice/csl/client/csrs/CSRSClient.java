@@ -2,7 +2,6 @@ package uk.gov.cabinetoffice.csl.client.csrs;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
@@ -10,6 +9,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.ParallelHttpClient;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.CreateDomainDto;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.DeleteDomainDto;
+import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
@@ -19,52 +21,37 @@ import java.util.List;
 @Slf4j
 public class CSRSClient implements ICSRSClient {
 
-    @Value("${csrs.organisationalUnitMaxPageSize}")
-    private Integer organisationalUnitMaxPageSize;
-
-    @Value("${csrs.civilServants}")
-    private String civilServants;
-
-    @Value("${csrs.allOrganisationalUnits}")
-    private String allOrganisationalUnits;
-
-    @Value("${csrs.professions}")
-    private String professionsTree;
-
-    @Value("${csrs.grades}")
-    private String grades;
-
     private final IHttpClient httpClient;
-    private final OrganisationalUnitFactory organisationalUnitFactory;
+    private final CsrsConfiguration csrsConfiguration;
 
-    public CSRSClient(@Qualifier("csrsHttpClient") ParallelHttpClient httpClient, OrganisationalUnitFactory organisationalUnitFactory) {
+    public CSRSClient(@Qualifier("csrsHttpClient") ParallelHttpClient httpClient, CsrsConfiguration csrsConfiguration) {
         this.httpClient = httpClient;
-        this.organisationalUnitFactory = organisationalUnitFactory;
+        this.csrsConfiguration = csrsConfiguration;
     }
 
     @Override
     public CivilServant getCivilServantProfileWithUid(String uid) {
         log.info("Getting civil servant with uid '{}'", uid);
-        String url = String.format("%s/resource/%s/profile", civilServants, uid);
+        String url = csrsConfiguration.getCivilServantProfileUrl(uid);
         RequestEntity<Void> request = RequestEntity.get(url).build();
         return httpClient.executeRequest(request, CivilServant.class);
     }
 
     @Override
-    @Cacheable("organisations")
-    public OrganisationalUnitMap getAllOrganisationalUnits() {
-        log.info("Getting all organisational units");
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(allOrganisationalUnits);
-        List<OrganisationalUnit> organisationalUnits = httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder, organisationalUnitMaxPageSize)
+    public OrganisationalUnitMap fetch() {
+        log.info("Getting all organisational units from csrs");
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(csrsConfiguration.getAllOrganisationalUnits());
+        List<OrganisationalUnit> organisationalUnits = httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder,
+                        csrsConfiguration.getOrganisationalUnitMaxPageSize())
                 .stream().toList();
-        return organisationalUnitFactory.buildOrganisationalUnits(organisationalUnits);
+        return OrganisationalUnitMap.buildFromList(organisationalUnits);
     }
 
     @Override
     @Cacheable("areas-of-work")
     public List<AreaOfWork> getAreasOfWork() {
         return httpClient.executeTypeReferenceRequest(
-                RequestEntity.get(professionsTree).build(),
+                RequestEntity.get(csrsConfiguration.getProfessionsTree()).build(),
                 new ParameterizedTypeReference<>() {
                 }
         );
@@ -74,7 +61,7 @@ public class CSRSClient implements ICSRSClient {
     @Cacheable("grades")
     public List<Grade> getGrades() {
         GetGradesResponse response = httpClient.executeTypeReferenceRequest(
-                RequestEntity.get(grades).build(),
+                RequestEntity.get(csrsConfiguration.getGrades()).build(),
                 new ParameterizedTypeReference<>() {
                 }
         );
@@ -83,13 +70,70 @@ public class CSRSClient implements ICSRSClient {
 
     @Override
     public void patchCivilServant(PatchCivilServantDto patch) {
-        String url = String.format("%s/me", civilServants);
+        String url = csrsConfiguration.getCivilServantMeUrl();
         httpClient.executeRequest(RequestEntity.patch(url).body(patch.getAsApiParams()), Void.class);
     }
 
     @Override
-    public void patchCivilServantOrganisation(UpdateOrganisationDTO updateOrganisationDTO) {
-        String url = String.format("%s/me/organisationalUnit", civilServants);
-        httpClient.executeRequest(RequestEntity.patch(url).body(updateOrganisationDTO), Void.class);
+    public void patchCivilServantOrganisation(OrganisationalUnitIdDto organisationalUnitIdDTO) {
+        String url = csrsConfiguration.getCivilServantMeOrganisationUrl();
+        httpClient.executeRequest(RequestEntity.patch(url).body(organisationalUnitIdDTO), Void.class);
     }
+
+    @Override
+    public void deleteOrganisationalUnit(Long organisationalUnitId) {
+        String url = csrsConfiguration.getOrganisationalUnitUrl(organisationalUnitId);
+        httpClient.executeRequest(RequestEntity.delete(url).build(), Void.class);
+    }
+
+    @Override
+    public OrganisationalUnit patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
+        String url = csrsConfiguration.getOrganisationalUnitUrl(organisationalUnitId);
+        if (organisationalUnitDto.getParentId() != null) {
+            organisationalUnitDto.setParent(csrsConfiguration.getOrganisationalUnitResourceUrl(organisationalUnitDto.getParentId()));
+        }
+        log.info("Updating organisational unit data in csrs: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
+        return httpClient.executeRequest(RequestEntity.patch(url).body(organisationalUnitDto), OrganisationalUnit.class);
+    }
+
+    @Override
+    public AgencyToken createAgencyToken(Long organisationalUnitId, AgencyToken agencyTokenDto) {
+        String url = csrsConfiguration.getAgencyTokenUrl(organisationalUnitId);
+        return httpClient.executeRequest(RequestEntity.post(url).body(agencyTokenDto), AgencyToken.class);
+    }
+
+    @Override
+    public AgencyToken updateAgencyToken(Long organisationalUnitId, AgencyToken agencyTokenDto) {
+        String url = csrsConfiguration.getAgencyTokenUrl(organisationalUnitId);
+        return httpClient.executeRequest(RequestEntity.patch(url).body(agencyTokenDto), AgencyToken.class);
+    }
+
+    @Override
+    public void deleteAgencyToken(Long organisationalUnitId) {
+        String url = csrsConfiguration.getAgencyTokenUrl(organisationalUnitId);
+        httpClient.executeRequest(RequestEntity.delete(url).build(), Void.class);
+    }
+
+    @Override
+    public OrganisationalUnit createOrganisationalUnit(OrganisationalUnitDto organisationalUnitDto) {
+        String url = csrsConfiguration.getOrganisationalUnits();
+        if (organisationalUnitDto.getParentId() != null) {
+            organisationalUnitDto.setParent(csrsConfiguration.getOrganisationalUnitResourceUrl(organisationalUnitDto.getParentId()));
+        }
+        return httpClient.executeRequest(RequestEntity.post(url).body(organisationalUnitDto), OrganisationalUnit.class);
+    }
+
+    @Override
+    public UpdateDomainResponse addDomainToOrganisation(Long organisationalUnitId, CreateDomainDto domain) {
+        String url = csrsConfiguration.getDomainsUrl(organisationalUnitId);
+        return httpClient.executeRequest(RequestEntity.post(url).body(domain), UpdateDomainResponse.class);
+    }
+
+    @Override
+    public UpdateDomainResponse deleteDomain(Long organisationalUnitId, Long domainId, DeleteDomainDto body) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(csrsConfiguration.getDomainsUrl(organisationalUnitId, domainId))
+                .queryParam("includeSubOrgs", body.isIncludeSubOrgs());
+        return httpClient.executeRequest(RequestEntity.delete(uriBuilder.toUriString()).build(), UpdateDomainResponse.class);
+    }
+
 }

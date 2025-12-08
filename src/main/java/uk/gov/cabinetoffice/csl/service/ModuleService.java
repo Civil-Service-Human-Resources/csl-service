@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.client.frontend.IFrontendClient;
 import uk.gov.cabinetoffice.csl.controller.model.ModuleResponse;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
@@ -10,7 +11,10 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.module.ModuleRecord
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
-import uk.gov.cabinetoffice.csl.domain.rustici.*;
+import uk.gov.cabinetoffice.csl.domain.rustici.CSLRusticiProps;
+import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
+import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationInput;
+import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
@@ -20,29 +24,31 @@ import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 public class ModuleService {
 
     private final ModuleActionService moduleActionService;
+    private final IFrontendClient frontendClient;
     private final LearningCatalogueService learningCatalogueService;
     private final RusticiService rusticiService;
     private final UserDetailsService userDetailsService;
 
-    public LaunchLink launchModule(User user, String courseId, String moduleId, UserDetailsDto userDetailsDto) {
+    public LaunchLink launchModule(String userId, String courseId, String moduleId) {
         CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
         Module module = courseWithModule.getModule();
         if (module.isType(ModuleType.link) || module.isType(ModuleType.file)) {
-            moduleActionService.completeModule(courseWithModule, user);
+            moduleActionService.completeModule(courseWithModule, userId);
         } else {
-            ModuleRecord moduleRecord = moduleActionService.launchModule(courseWithModule, user);
+            ModuleRecord moduleRecord = moduleActionService.launchModule(courseWithModule, userId);
             if (module.isType(ModuleType.elearning)) {
+                User user = userDetailsService.getUserWithUid(userId);
                 return rusticiService.createLaunchLink(RegistrationInput.from(
-                        user.getId(), moduleId, moduleRecord.getUid(), courseId, userDetailsDto
+                        user, moduleId, moduleRecord.getUid(), courseId
                 ));
             }
         }
         return new LaunchLink(courseWithModule.getModule().getUrl());
     }
 
-    public ModuleResponse completeModule(User user, String courseId, String moduleId) {
+    public ModuleResponse completeModule(String userId, String courseId, String moduleId) {
         CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
-        moduleActionService.completeModule(courseWithModule, user);
+        moduleActionService.completeModule(courseWithModule, userId);
         return ModuleResponse.fromMetada(ModuleRecordAction.COMPLETE_MODULE, courseWithModule);
     }
 
@@ -50,9 +56,9 @@ public class ModuleService {
         log.info("rusticiRollupData: {}", rusticiRollupData);
         CSLRusticiProps properties = rusticiService.getCSLDataFromRollUpData(rusticiRollupData);
         if (properties.shouldProcess()) {
-            User user = userDetailsService.getUserWithUid(properties.getLearnerId());
             CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(properties.getCourseId(), properties.getModuleId());
-            moduleActionService.rollUpModule(courseWithModule, user, properties);
+            moduleActionService.rollUpModule(courseWithModule, properties);
+            frontendClient.clearLearningCaches(properties.getLearnerId(), properties.getCourseId());
         }
     }
 
