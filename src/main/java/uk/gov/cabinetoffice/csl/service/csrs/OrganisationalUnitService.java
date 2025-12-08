@@ -149,7 +149,6 @@ public class OrganisationalUnitService {
         }
         civilServantRegistryClient.patchOrganisationalUnit(organisationalUnitId, organisationalUnitDto);
         OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
-        organisationalUnit.setCode(organisationalUnitDto.getCode());
         boolean requiresRebuild = false;
         if (!organisationalUnit.getParentIdSafe().equals(organisationalUnitDto.getParentIdSafe())) {
             requiresRebuild = true;
@@ -170,16 +169,24 @@ public class OrganisationalUnitService {
                     });
         }
 
-        if (!(organisationalUnit.getAbbreviationSafe().equals(organisationalUnitDto.getAbbreviationSafe())
-                || organisationalUnit.getName().equals(organisationalUnitDto.getName()))) {
+        boolean requiresUpdateRegisteredLearnerReportData = !organisationalUnit.getName().equals(organisationalUnitDto.getName());
+
+        if (
+                !organisationalUnit.getAbbreviationSafe().equals(organisationalUnitDto.getAbbreviationSafe()) ||
+                !organisationalUnit.getName().equals(organisationalUnitDto.getName()) ||
+                !organisationalUnit.getCode().equals(organisationalUnitDto.getCode())
+        ) {
             requiresRebuild = true;
             organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
             organisationalUnit.setName(organisationalUnitDto.getName());
+            organisationalUnit.setCode(organisationalUnitDto.getCode());
         }
 
         if (requiresRebuild) {
             List<OrganisationalUnit> updatedOrganisationalUnits = organisationalUnitMap.rebuildHierarchy(organisationalUnit);
-            updateReportingData(updatedOrganisationalUnits);
+            if (requiresUpdateRegisteredLearnerReportData) {
+                updateReportingData(updatedOrganisationalUnits);
+            }
         }
 
         organisationalUnitMapCache.put(organisationalUnitMap);
