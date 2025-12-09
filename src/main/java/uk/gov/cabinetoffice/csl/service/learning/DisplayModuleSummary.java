@@ -16,19 +16,10 @@ public class DisplayModuleSummary {
     private int inProgressCount = 0;
     private int requiredCompletedCount = 0;
     private int requiredForCompletionCount = 0;
+    private State status;
 
     public LocalDateTime getCompletionDate() {
         return getStatus() == State.COMPLETED ? completionDate : null;
-    }
-
-    public State getStatus() {
-        State status = State.NULL;
-        if (requiredCompletedCount == requiredForCompletionCount) {
-            status = State.COMPLETED;
-        } else if (inProgressCount > 0 || requiredCompletedCount > 0) {
-            status = State.IN_PROGRESS;
-        }
-        return status;
     }
 
 }
