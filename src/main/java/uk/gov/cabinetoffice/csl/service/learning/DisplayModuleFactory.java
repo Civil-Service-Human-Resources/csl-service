@@ -51,7 +51,7 @@ public class DisplayModuleFactory {
         }
 
         LocalDateTime completionDate = null;
-        State state = inProgressCount == 0 ? State.NULL : State.IN_PROGRESS;
+        State state = (inProgressCount + requiredCompletedCount) == 0 ? State.NULL : State.IN_PROGRESS;
         if (learningRecordCourse != null) {
             completionDate = learningRecordCourse.getCompletionDate();
             if(completionDate != null) {
