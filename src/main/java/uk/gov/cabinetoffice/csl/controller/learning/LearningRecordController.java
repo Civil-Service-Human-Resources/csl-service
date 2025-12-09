@@ -23,13 +23,7 @@ public class LearningRecordController {
     @ResponseBody
     public LearningRecord getLearningRecordForUser() {
         String loggedInUserId = userAuthService.getUsername();
-        return getLearningRecordForUser(loggedInUserId);
-    }
-
-    @GetMapping("/{userId}")
-    @ResponseBody
-    public LearningRecord getLearningRecordForUser(@PathVariable String userId) {
-        LearningRecord learningRecord = learningRecordService.getLearningRecord(userId);
+        LearningRecord learningRecord = learningRecordService.getLearningRecord(loggedInUserId);
         return learningRecord;
     }
 
