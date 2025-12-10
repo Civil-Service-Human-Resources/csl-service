@@ -11,12 +11,15 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayAudience;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayCourse;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayModule;
+import uk.gov.cabinetoffice.csl.domain.learning.learningRecord.LearningRecord;
+import uk.gov.cabinetoffice.csl.domain.learning.learningRecord.LearningRecordCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -25,8 +28,9 @@ public class RequiredLearningDisplayCourseFactory implements IDisplayCourseFacto
 
     private final DisplayModuleFactory displayModuleFactory;
     private final DisplayAudienceFactory displayAudienceFactory;
+    private final LearningRecordService learningRecordService;
 
-    public DisplayCourse generateDetailedDisplayCourse(Course course, User user, @Nullable CourseRecord courseRecord) {
+    public DisplayCourse generateDetailedDisplayCourse(Course course, User user, @Nullable CourseRecord courseRecord, LearningRecordCourse userLearningRecordCourse) {
         if (courseRecord != null) {
             Map<String, ModuleRecord> moduleRecordMap = courseRecord.getModuleRecordsAsMap();
             if (moduleRecordMap.isEmpty()) {
@@ -38,7 +42,8 @@ public class RequiredLearningDisplayCourseFactory implements IDisplayCourseFacto
                 ModuleRecord moduleRecord = moduleRecordMap.get(m.getId());
                 return displayModuleFactory.generateDisplayModule(m, moduleRecord, learningPeriod);
             }).toList();
-            DisplayModuleSummary moduleSummary = displayModuleFactory.generateDisplayModuleSummary(modules);
+
+            DisplayModuleSummary moduleSummary = displayModuleFactory.generateDisplayModuleSummary(modules, userLearningRecordCourse);
             return DisplayCourse.build(course, modules, moduleSummary, displayAudience, courseRecord.getLastUpdated());
         }
         return generateDetailedDisplayCourse(course, user);

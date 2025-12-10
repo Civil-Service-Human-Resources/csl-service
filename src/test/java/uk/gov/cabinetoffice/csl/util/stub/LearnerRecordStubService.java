@@ -195,6 +195,7 @@ public class LearnerRecordStubService {
                 .withQueryParam("userId", equalTo(query.getUserId()))
                 .withQueryParam("size", equalTo("50"))
                 .withQueryParam("page", equalTo(page.toString()));
+
         if (query.getEventTypes() != null) {
             mappingBuilder.withQueryParam("eventTypes", equalTo(String.join(",", query.getEventTypes())));
         }
