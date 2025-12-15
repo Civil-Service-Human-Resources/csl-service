@@ -24,10 +24,10 @@ public class BookingService {
         this.learnerRecordClient = learnerRecordClient;
     }
 
-    public void createBooking(String learnerUid, CourseWithModuleWithEvent courseWithModuleWithEvent,
-                              BookEventDto dto) {
+    public BookingDto createBooking(String learnerUid, CourseWithModuleWithEvent courseWithModuleWithEvent,
+                                    BookEventDto dto) {
         BookingDto booking = dtoFactory.createBooking(learnerUid, courseWithModuleWithEvent, dto);
-        learnerRecordClient.bookEvent(courseWithModuleWithEvent.getEvent().getId(), booking);
+        return learnerRecordClient.bookEvent(courseWithModuleWithEvent.getEvent().getId(), booking);
     }
 
     public BookingDto approveBookingWithId(String eventId, String bookingId) {

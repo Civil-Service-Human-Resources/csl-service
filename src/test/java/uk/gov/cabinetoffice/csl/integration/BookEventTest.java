@@ -55,6 +55,7 @@ public class BookEventTest extends IntegrationTestBase {
                 .event(URI.create(String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
                 .status(BookingStatus.CONFIRMED)
                 .learner(userId)
+                .bookingReference("ABC12")
                 .learnerEmail(userEmail)
                 .learnerName("testName").build();
         String expectedModuleRecordPOST = """
@@ -87,6 +88,36 @@ public class BookEventTest extends IntegrationTestBase {
         cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
         cslStubService.stubCreateModuleRecords(courseId, moduleId, course, userId, expectedModuleRecordPOST, expectedModuleRecordPOSTResponse);
+        cslStubService.getNotificationServiceStubService().sendEmail("BOOKING_CONFIRMED",
+                """
+                        {
+                            "recipient" : "userEmail@email.com",
+                            "personalisation" : {
+                              "accessibility" : "access1,access2",
+                              "courseLocation" : "London",
+                              "courseTitle" : "Test Course",
+                              "learnerName" : "userEmail@email.com",
+                              "courseDate" : "01 Jan 2023",
+                              "bookingReference" : "ABC12"
+                            }
+                        }
+                        """);
+        cslStubService.getNotificationServiceStubService().sendEmail("BOOKING_CONFIRMED_LINE_MANAGER",
+                """
+                        {
+                            "recipient" : "lineManager@email.com",
+                            "personalisation" : {
+                              "courseLocation" : "London",
+                              "bookingReference" : "ABC12",
+                              "recipient" : "lineManager@email.com",
+                              "courseDate" : "01 Jan 2023",
+                              "learnerEmail" : "userEmail@email.com",
+                              "learnerName" : "Learner",
+                              "courseTitle" : "Test Course",
+                              "cost" : "0"
+                            }
+                        }
+                        """);
         BookEventDto inputDto = new BookEventDto(List.of("access1", "access2"), "");
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
         mockMvc.perform(post(url)
@@ -105,6 +136,7 @@ public class BookEventTest extends IntegrationTestBase {
                 .event(URI.create(String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
                 .status(BookingStatus.REQUESTED)
                 .learner(userId)
+                .bookingReference("ABC12")
                 .poNumber("poNumber123")
                 .learnerEmail(userEmail)
                 .learnerName("testName").build();
@@ -140,6 +172,36 @@ public class BookEventTest extends IntegrationTestBase {
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
         cslStubService.stubCreateModuleRecords(courseId, moduleId, course, userId, expectedModuleRecordPOST, expectedModuleRecordPOSTResponse);
         cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
+        cslStubService.getNotificationServiceStubService().sendEmail("BOOKING_REQUESTED",
+                """
+                        {
+                            "recipient" : "userEmail@email.com",
+                            "personalisation" : {
+                              "accessibility" : "access1",
+                              "courseLocation" : "London",
+                              "courseTitle" : "Test Course",
+                              "learnerName" : "userEmail@email.com",
+                              "courseDate" : "01 Jan 2023",
+                              "bookingReference" : "ABC12"
+                            }
+                        }
+                        """);
+        cslStubService.getNotificationServiceStubService().sendEmail("BOOKING_REQUEST_LINE_MANAGER",
+                """
+                        {
+                            "recipient" : "lineManager@email.com",
+                            "personalisation" : {
+                              "courseLocation" : "London",
+                              "bookingReference" : "ABC12",
+                              "recipient" : "lineManager@email.com",
+                              "courseDate" : "01 Jan 2023",
+                              "learnerEmail" : "userEmail@email.com",
+                              "learnerName" : "Learner",
+                              "courseTitle" : "Test Course",
+                              "cost" : "5"
+                            }
+                        }
+                        """);
         BookEventDto inputDto = new BookEventDto(List.of("access1"), "poNumber123");
         String url = String.format("/courses/%s/modules/%s/events/%s/create_booking", courseId, moduleId, eventId);
         mockMvc.perform(post(url)

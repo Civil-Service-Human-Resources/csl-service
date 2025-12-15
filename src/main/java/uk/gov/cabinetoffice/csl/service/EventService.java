@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.learnerRecord.ILearnerRecordClient;
 import uk.gov.cabinetoffice.csl.controller.model.*;
+import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.IModuleAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ModuleRecordActionFactory;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.UserToModuleAction;
@@ -18,7 +19,9 @@ import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueServi
 import uk.gov.cabinetoffice.csl.service.notification.INotificationService;
 import uk.gov.cabinetoffice.csl.service.notification.NotificationFactory;
 import uk.gov.cabinetoffice.csl.service.notification.messages.IEmail;
+import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,6 +29,7 @@ import java.util.List;
 @AllArgsConstructor
 public class EventService {
 
+    private final UserDetailsService userDetailsService;
     private final ModuleRecordActionFactory moduleRecordActionFactory;
     private final ModuleActionService moduleActionService;
     private final NotificationFactory notificationFactory;
@@ -35,11 +39,22 @@ public class EventService {
     private final LearningCatalogueService learningCatalogueService;
 
     public EventResponse bookEvent(String userId, String courseId, String moduleId, String eventId, BookEventDto dto) {
+        User user = userDetailsService.getUserWithUid(userId);
         CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
-        bookingService.createBooking(userId, courseWithModuleWithEvent, dto);
+        BookingDto booking = bookingService.createBooking(userId, courseWithModuleWithEvent, dto);
         Event event = courseWithModuleWithEvent.getEvent();
-        IModuleAction actionType = courseWithModuleWithEvent.getModule().isFree() ? moduleRecordActionFactory.getApproveBookingAction(event) : moduleRecordActionFactory.getRegisterEventAction(event);
-        return processCourseRecordActionWithResponse(courseWithModuleWithEvent, new UserToModuleAction(userId, actionType));
+        IModuleAction actionType;
+        List<IEmail> emails = new ArrayList<>();
+        if (booking.getStatus().equals(BookingStatus.CONFIRMED)) {
+            actionType = moduleRecordActionFactory.getApproveBookingAction(event);
+            emails.addAll(notificationFactory.getNotifyUserAndLineManagerOfCreatedBookingMessage(courseWithModuleWithEvent, user, booking));
+        } else {
+            actionType = moduleRecordActionFactory.getRegisterEventAction(event);
+            emails.addAll(notificationFactory.getNotifyUserAndLineManagerOfRequestedBookingMessage(courseWithModuleWithEvent, user, booking));
+        }
+        EventResponse respose = processCourseRecordActionWithResponse(courseWithModuleWithEvent, new UserToModuleAction(userId, actionType));
+        notificationService.sendEmails(emails);
+        return respose;
     }
 
     public EventResponse cancelBooking(String userId, String courseId, String moduleId, String eventId, CancelBookingDto dto) {
