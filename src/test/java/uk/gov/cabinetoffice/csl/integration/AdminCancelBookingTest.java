@@ -52,7 +52,7 @@ public class AdminCancelBookingTest extends IntegrationTestBase {
                 """;
         String event = String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId);
         String bookingDtoJsonResponse = String.format("""
-                {"event": "%s", "status":"Cancelled", "learner": "%s",
+                {"event": "%s", "status":"Cancelled", "learner": "%s", "bookingReference": "ABCDE",
                 "learnerEmail": "%s", "learnerName":"testName", "cancellationReason": "the booking has not been paid"}
                 """, event, userId, userEmail);
         String getModuleRecordsResponse = """
@@ -92,6 +92,36 @@ public class AdminCancelBookingTest extends IntegrationTestBase {
         cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         cslStubService.getLearnerRecord().updateBookingWithId(eventId, bookingId, expectedCancellationJsonInput, bookingDtoJsonResponse);
         cslStubService.stubUpdateModuleRecord(course, moduleId, userId, getModuleRecordsResponse, expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
+        cslStubService.getNotificationServiceStubService().sendEmail("CANCEL_BOOKING",
+                """
+                        {
+                          "recipient": "userEmail@email.com",
+                          "personalisation": {
+                            "courseDate": "01 Jan 2023",
+                            "courseLocation": "London",
+                            "courseTitle": "Test Course",
+                            "accessibility": "",
+                            "cancellationReason": "the booking has not been paid",
+                            "bookingReference": "ABCDE"
+                          }
+                        }
+                        """);
+        cslStubService.getNotificationServiceStubService().sendEmail("BOOKING_CANCELLED_LINE_MANAGER",
+                """
+                        {
+                         "recipient" : "lineManager@email.com",
+                         "personalisation" : {
+                           "recipient" : "lineManager@email.com",
+                           "courseDate" : "01 Jan 2023",
+                           "learnerEmail" : "userEmail@email.com",
+                           "learnerName" : "Learner",
+                           "courseTitle" : "Test Course",
+                           "cost" : "0",
+                           "courseLocation" : "London",
+                           "bookingReference" : "ABCDE"
+                         }
+                        }
+                        """);
         String inputJson = """
                 {"reason": "PAYMENT"}
                 """;
