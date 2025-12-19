@@ -7,6 +7,7 @@ import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.client.model.PagedResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IHttpClient {
     <T, R> T executeRequest(RequestEntity<R> request, Class<T> responseClass);
@@ -16,4 +17,6 @@ public interface IHttpClient {
     <R> DownloadableFile executeFileDownloadRequest(RequestEntity<R> request);
 
     <T, R extends PagedResponse<T>> List<T> getPaginatedRequest(Class<R> pagedResponseClass, UriComponentsBuilder url, Integer maxPageSize);
+    
+    <T, R> Map<String, T> executeMapRequest(RequestEntity<R> request, ParameterizedTypeReference<Map<String, T>> parameterizedTypeReference);
 }

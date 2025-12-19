@@ -26,7 +26,7 @@ public class BookingService {
 
     public BookingDto createBooking(String learnerUid, CourseWithModuleWithEvent courseWithModuleWithEvent,
                                     BookEventDto dto) {
-        BookingDto booking = dtoFactory.createBooking(learnerUid, courseWithModuleWithEvent, dto);
+        BookingDto booking = dtoFactory.createBooking(learnerUid, courseWithModuleWithEvent.getModule(), dto);
         return learnerRecordClient.bookEvent(courseWithModuleWithEvent.getEvent().getId(), booking);
     }
 

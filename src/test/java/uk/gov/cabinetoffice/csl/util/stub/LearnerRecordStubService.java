@@ -180,6 +180,16 @@ public class LearnerRecordStubService {
         );
     }
 
+    public StubMapping createInvite(String eventId, String expectedInviteDto) {
+        return stubFor(
+                WireMock.post(urlPathEqualTo(String.format("/learner_record_api/event/%s/invitee", eventId)))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .withRequestBody(equalToJson(expectedInviteDto))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json"))
+        );
+    }
+
     public StubMapping getBookings(String eventId, String response) {
         return stubFor(
                 WireMock.get(urlPathEqualTo(String.format("/learner_record_api/event/%s/booking", eventId)))

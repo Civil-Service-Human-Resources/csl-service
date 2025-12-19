@@ -24,12 +24,15 @@ public class NotificationService implements INotificationService {
         this.utilService = utilService;
     }
 
+    @Override
+    public void sendEmail(IEmail email) {
+        String uid = utilService.generateUUID();
+        String name = emailNameMap.getTemplate(email.getEmailNotification());
+        MessageDto messageDto = new MessageDto(uid, email.getRecipient(), email.getPersonalisation());
+        notificationServiceClient.sendEmail(name, messageDto);
+    }
+
     public void sendEmails(Collection<IEmail> emails) {
-        emails.forEach(email -> {
-            String uid = utilService.generateUUID();
-            String name = emailNameMap.getTemplate(email.getEmailNotification());
-            MessageDto messageDto = new MessageDto(uid, email.getRecipient(), email.getPersonalisation());
-            notificationServiceClient.sendEmail(name, messageDto);
-        });
+        emails.forEach(this::sendEmail);
     }
 }

@@ -21,4 +21,14 @@ public class IdentityAPIServiceStubService {
         );
     }
 
+    public StubMapping getIdentityWithEmail(String userEmail, String identityDtoResponse) {
+        return stubFor(
+                WireMock.get(urlPathEqualTo("/identity/api/identities"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .withQueryParam("emailAddress", equalTo(userEmail))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(identityDtoResponse))
+        );
+    }
 }

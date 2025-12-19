@@ -17,9 +17,7 @@ import java.time.Instant;
 public class BookingDto {
     private Integer id;
     private String learner;
-    private String learnerEmail;
-    private String learnerName;
-    private URI event;
+    private String eventUid;
     private BookingStatus status;
     private Instant bookingTime = Instant.now();
     private Instant confirmationTime;
@@ -28,7 +26,5 @@ public class BookingDto {
     private String poNumber;
     private String bookingReference;
     private String accessibilityOptions = "";
-    private String lineManagerEmail;
-    private String lineManagerName;
     private BookingCancellationReason cancellationReason;
 }

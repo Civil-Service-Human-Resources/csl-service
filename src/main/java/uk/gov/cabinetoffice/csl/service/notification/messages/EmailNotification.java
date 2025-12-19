@@ -11,6 +11,9 @@ public enum EmailNotification {
     BOOKING_CONFIRMED("notifyLearnerBookingConfirmed"),
     BOOKING_REQUEST_LINE_MANAGER("notifyBookingRequestLineManager"),
     BOOKING_REQUESTED("notifyLearnerBookingRequested"),
+    BOOKING_CANCELLED_LINE_MANAGER("notifyBookingCancelledLineManager"),
+    CANCEL_BOOKING("notifyLearnerCancelBooking"),
+    INVITE_LEARNER("notifyLearnerInviteLearner"),
     ;
 
     private final String configName;

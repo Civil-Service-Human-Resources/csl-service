@@ -17,6 +17,7 @@ import uk.gov.cabinetoffice.csl.domain.error.GenericServerException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @AllArgsConstructor
@@ -91,5 +92,10 @@ public class HttpClient implements IHttpClient {
             log.error(msg);
             throw e;
         }
+
+    }
+
+    public <T, R> Map<String, T> executeMapRequest(RequestEntity<R> request, ParameterizedTypeReference<Map<String, T>> ptr) {
+        return executeTypeReferenceRequest(request, ptr);
     }
 }

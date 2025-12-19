@@ -14,7 +14,6 @@ import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.math.BigDecimal;
-import java.net.URI;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,12 +51,10 @@ public class BookEventTest extends IntegrationTestBase {
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         BookingDto dto = BookingDto.builder()
                 .accessibilityOptions("access1,access2")
-                .event(URI.create(String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
+                .eventUid(eventId)
                 .status(BookingStatus.CONFIRMED)
                 .learner(userId)
-                .bookingReference("ABC12")
-                .learnerEmail(userEmail)
-                .learnerName("testName").build();
+                .bookingReference("ABC12").build();
         String expectedModuleRecordPOST = """
                 [{
                     "userId": "userId",
@@ -81,9 +78,8 @@ public class BookEventTest extends IntegrationTestBase {
                 }]}
                 """;
         String expectedBookingJsonInput = String.format("""
-                        {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
-                        "accessibilityOptions": "%s", "status": "%s"}
-                        """, dto.getEvent(), userId, userEmail, testDataService.getLearnerFirstName(), "2023-01-01T10:00:00Z", "access1,access2",
+                        {"learner":"%s", "bookingTime":"%s", "accessibilityOptions": "%s", "status": "%s"}
+                        """, userId, "2023-01-01T10:00:00Z", "access1,access2",
                 "Confirmed");
         cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         cslStubService.getLearnerRecord().bookEvent(eventId, expectedBookingJsonInput, dto);
@@ -133,17 +129,14 @@ public class BookEventTest extends IntegrationTestBase {
         course.getModule(moduleId).setModuleType(ModuleType.facetoface);
         BookingDto dto = BookingDto.builder()
                 .accessibilityOptions("access1")
-                .event(URI.create(String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId)))
+                .eventUid(eventId)
                 .status(BookingStatus.REQUESTED)
                 .learner(userId)
                 .bookingReference("ABC12")
-                .poNumber("poNumber123")
-                .learnerEmail(userEmail)
-                .learnerName("testName").build();
+                .poNumber("poNumber123").build();
         String expectedBookingJsonInput = String.format("""
-                        {"event": "%s", "learner":"%s", "learnerEmail":"%s", "learnerName":"%s", "bookingTime":"%s",
-                        "accessibilityOptions": "%s", "status": "%s", "poNumber":"%s"}
-                        """, dto.getEvent(), userId, userEmail, testDataService.getLearnerFirstName(), "2023-01-01T10:00:00Z", "access1",
+                        {"learner":"%s", "bookingTime":"%s", "accessibilityOptions": "%s", "status": "%s", "poNumber":"%s"}
+                        """, userId, "2023-01-01T10:00:00Z", "access1",
                 "Requested", "poNumber123");
         String expectedModuleRecordPOST = """
                 [{

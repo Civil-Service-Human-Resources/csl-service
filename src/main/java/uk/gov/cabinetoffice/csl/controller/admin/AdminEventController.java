@@ -4,11 +4,9 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.cabinetoffice.csl.controller.model.BookingResponse;
-import uk.gov.cabinetoffice.csl.controller.model.CancelBookingDto;
-import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
-import uk.gov.cabinetoffice.csl.controller.model.CancelEventResponse;
+import uk.gov.cabinetoffice.csl.controller.model.*;
 import uk.gov.cabinetoffice.csl.service.EventService;
+import uk.gov.cabinetoffice.csl.service.InviteService;
 
 @Slf4j
 @RestController
@@ -16,6 +14,7 @@ import uk.gov.cabinetoffice.csl.service.EventService;
 public class AdminEventController {
 
     private final EventService eventService;
+    private final InviteService inviteService;
 
     @PostMapping(path = "/admin/courses/{courseId}/modules/{moduleId}/events/{eventId}/cancel", produces = "application/json")
     @ResponseBody
@@ -43,5 +42,14 @@ public class AdminEventController {
                                           @PathVariable("eventId") String eventId,
                                           @PathVariable("bookingId") String bookingId) {
         return eventService.approveBookingWithBookingId(courseId, moduleId, eventId, bookingId);
+    }
+
+    @PostMapping(path = "/admin/courses/{courseId}/modules/{moduleId}/events/{eventId}/invite", produces = "application/json")
+    @ResponseBody
+    public void inviteLearnerToEvent(@PathVariable("courseId") String courseId,
+                                     @PathVariable("moduleId") String moduleId,
+                                     @PathVariable("eventId") String eventId,
+                                     @Valid @RequestBody EmailAddressDto emailAddressDto) {
+        inviteService.inviteLearnerToEvent(courseId, moduleId, eventId, emailAddressDto);
     }
 }

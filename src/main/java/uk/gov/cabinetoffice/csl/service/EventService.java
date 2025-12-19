@@ -22,7 +22,10 @@ import uk.gov.cabinetoffice.csl.service.notification.messages.IEmail;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -75,16 +78,23 @@ public class EventService {
     }
 
     public BookingResponse cancelBookingWithBookingId(String courseId, String moduleId, String eventId, String bookingId, CancelBookingDto cancelBookingDto) {
+        CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
         BookingDto dto = bookingService.cancelBookingWithId(eventId, bookingId, cancelBookingDto.getReason());
+        User user = userDetailsService.getUserWithUid(dto.getLearner());
         cancelBooking(dto.getLearner(), courseId, moduleId, eventId);
+        List<IEmail> emails = notificationFactory.getNotifyUserAndLineManagerOfCancelledBookingMessage(courseWithModuleWithEvent, user, dto);
+        notificationService.sendEmails(emails);
         return new BookingResponse(bookingId, dto.getLearner());
     }
 
     public BookingResponse approveBookingWithBookingId(String courseId, String moduleId, String eventId, String bookingId) {
         CourseWithModuleWithEvent courseWithModuleWithEvent = learningCatalogueService.getCourseWithModuleWithEvent(courseId, moduleId, eventId);
         BookingDto dto = bookingService.approveBookingWithId(eventId, bookingId);
+        User user = userDetailsService.getUserWithUid(dto.getLearner());
         UserToModuleAction action = new UserToModuleAction(dto.getLearner(), moduleRecordActionFactory.getApproveBookingAction(courseWithModuleWithEvent.getEvent()));
         processCourseRecordActionWithResponse(courseWithModuleWithEvent, action);
+        List<IEmail> emails = notificationFactory.getNotifyUserAndLineManagerOfCreatedBookingMessage(courseWithModuleWithEvent, user, dto);
+        notificationService.sendEmails(emails);
         return new BookingResponse(bookingId, dto.getLearner());
     }
 
@@ -116,8 +126,12 @@ public class EventService {
         learningCatalogueService.cancelEvent(courseWithModuleWithEvent, cancelEventDto);
         learnerRecordClient.updateEvent(eventId, new EventStatusDto(EventStatus.CANCELLED, cancelEventDto.getReason()));
         cancelBookings(activeBookings, courseWithModuleWithEvent);
-        List<IEmail> emails = notificationFactory.getNotifyUserOfCancelledEventMessage(courseWithModuleWithEvent, activeBookings, cancelEventDto.getReason());
+        Map<String, String> uidsToEmails = new HashMap<>();
+        userDetailsService.fetchByUids(activeBookings.stream().map(BookingDto::getLearner).collect(Collectors.toList()))
+                .forEach((uid, identityDto) -> uidsToEmails.put(uid, identityDto.getUsername()));
+        List<IEmail> emails = notificationFactory.getNotifyUserOfCancelledEventMessage(courseWithModuleWithEvent, uidsToEmails, activeBookings, cancelEventDto.getReason());
         notificationService.sendEmails(emails);
         return new CancelEventResponse(courseId, moduleId, eventId, activeBookings.stream().map(BookingDto::getLearner).toList());
     }
+
 }

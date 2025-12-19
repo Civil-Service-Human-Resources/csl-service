@@ -89,6 +89,7 @@ public class AdminCancelBookingTest extends IntegrationTestBase {
                     "bookingStatus": "Cancelled"
                 }]}
                 """;
+        cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         cslStubService.getLearnerRecord().updateBookingWithId(eventId, bookingId, expectedCancellationJsonInput, bookingDtoJsonResponse);
         cslStubService.stubUpdateModuleRecord(course, moduleId, userId, getModuleRecordsResponse, expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
         String inputJson = """

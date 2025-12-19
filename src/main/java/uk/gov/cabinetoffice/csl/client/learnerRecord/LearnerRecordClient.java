@@ -14,6 +14,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.BulkCreateOutput;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.FailedResource;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventStatusDto;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.invite.InviteDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 
@@ -182,6 +183,14 @@ public class LearnerRecordClient implements ILearnerRecordClient {
         log.debug("Updating module records '{}'", input);
         RequestEntity<List<ModuleRecord>> request = RequestEntity.put(String.format("%s/bulk", configParams.getModuleRecordsUrl())).body(input);
         return httpClient.executeRequest(request, ModuleRecords.class).getModuleRecords();
+    }
+
+    @Override
+    public void createInvite(String eventId, InviteDto invite) {
+        log.info("inviting user {} to event {}", invite, eventId);
+        String url = String.format("%s/%s/invitee", configParams.getEventsUrl(), eventId);
+        RequestEntity<InviteDto> request = RequestEntity.post(url).body(invite);
+        httpClient.executeRequest(request, Void.class);
     }
 
 }
