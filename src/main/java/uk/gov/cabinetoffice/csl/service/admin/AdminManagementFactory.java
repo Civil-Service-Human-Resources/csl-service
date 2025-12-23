@@ -8,6 +8,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.invite.InviteDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Venue;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 
 import java.util.List;
@@ -24,7 +25,9 @@ public class AdminManagementFactory {
         Course course = courseWithModuleWithEvent.getCourse();
         Module module = courseWithModuleWithEvent.getModule();
         Event event = courseWithModuleWithEvent.getEvent();
-        return new EventOverview(event.getId(), event.getVenue().getLocation(), event.getDateRangesAsStrings(), event.getStatus(),
+        Venue venue = event.getVenue();
+        venue.setAvailability(venue.getCapacity() - eventDto.getActiveBookings().size());
+        return new EventOverview(event.getId(), event.getVenue(), event.getDateRangesAsStrings(), event.getStatus(),
                 event.getCancellationReason(), module.getId(), module.getTitle(), course.getId(), course.getTitle(), course.getStatus(),
                 eventDto.getInvites().stream().map(InviteDto::getLearnerEmail).toList(), bookings);
     }

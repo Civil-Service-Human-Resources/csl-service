@@ -74,7 +74,7 @@ public class TestDataService {
                         LocalTime.of(10, 0, 0)
                 )
         ));
-        event.setVenue(new Venue("London", "London", 10, 5));
+        event.setVenue(new Venue("London", "1 London Road", 10, 5));
         return event;
     }
 

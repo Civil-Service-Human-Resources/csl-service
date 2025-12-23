@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Venue;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventCancellationReason;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 
@@ -15,7 +16,7 @@ import java.util.Collection;
 public class EventOverview {
 
     private String id;
-    private String venue;
+    private Venue venue;
     private Collection<String> dates;
     private EventStatus status;
     private EventCancellationReason cancellationReason;
