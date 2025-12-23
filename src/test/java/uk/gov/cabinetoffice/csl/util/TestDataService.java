@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
 import uk.gov.cabinetoffice.csl.domain.rustici.Learner;
@@ -65,6 +66,7 @@ public class TestDataService {
     public Event generateEvent() {
         Event event = new Event();
         event.setId(eventId);
+        event.setStatus(EventStatus.ACTIVE);
         event.setDateRanges(List.of(
                 new DateRange(
                         LocalDate.of(2023, 1, 1),
@@ -122,6 +124,7 @@ public class TestDataService {
                 new uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course();
         course.setId(courseId);
         course.setTitle(courseTitle);
+        course.setStatus(CourseStatus.PUBLISHED);
         if (withModule) {
             Module m = generateModule();
             if (withEvent) {

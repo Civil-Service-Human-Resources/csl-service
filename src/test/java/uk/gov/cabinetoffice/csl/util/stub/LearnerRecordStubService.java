@@ -221,4 +221,13 @@ public class LearnerRecordStubService {
         );
     }
 
+    public StubMapping findEvent(String eventId, Boolean includeActiveBookings,
+                                 Boolean includeInvites, String response) {
+        return stubFor(WireMock.get(urlPathEqualTo("/learner_record_api/event/" + eventId))
+                .withQueryParam("includeActiveBookings", equalTo(includeActiveBookings.toString()))
+                .withQueryParam("includeInvites", equalTo(includeInvites.toString()))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(response)));
+    }
 }

@@ -61,6 +61,14 @@ public class UserDetailsService {
                 .orElseThrow(() -> new NotFoundException(String.format("User with email %s was not found", email)));
     }
 
+    public Map<String, String> fetchEmailsByUids(List<String> uids) {
+        return fetchByUids(uids).entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().getUsername()
+                ));
+    }
+
     public Map<String, Identity> fetchByUids(List<String> uids) {
         Map<String, Identity> identitiesMap = new HashMap<>();
         List<List<String>> batchedUids = IntStream.iterate(0, i -> i + identityMapMaxBatchSize)

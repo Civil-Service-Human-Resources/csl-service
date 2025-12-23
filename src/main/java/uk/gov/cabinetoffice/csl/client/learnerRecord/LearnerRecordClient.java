@@ -62,7 +62,7 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     @Override
     public BookingDto updateBookingWithId(String eventId, String bookingId, BookingDto bookingDto) {
         log.debug("Updating booking {} with data {}", bookingId, bookingDto);
-        String url = String.format("%s/%s%s/%s", configParams.getEventsUrl(), eventId, configParams.getBookingsUrl(), bookingId);
+        String url = configParams.getBookingUrl(eventId, bookingId);
         RequestEntity<BookingDto> request = RequestEntity.patch(url).body(bookingDto);
         return httpClient.executeRequest(request, BookingDto.class);
     }
@@ -70,8 +70,19 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     @Override
     public EventDto updateEvent(String eventId, EventStatusDto dto) {
         log.debug("Updating event {} with data {}", eventId, dto);
-        String url = String.format("%s/%s", configParams.getEventsUrl(), eventId);
+        String url = configParams.getEventUrl(eventId);
         RequestEntity<EventStatusDto> request = RequestEntity.patch(url).body(dto);
+        return httpClient.executeRequest(request, EventDto.class);
+    }
+
+    @Override
+    public EventDto getEvent(String eventId, boolean includeActiveBookings, boolean includeInvites) {
+        log.debug("Fetching event with uid {}", eventId);
+        String url = configParams.getEventUrl(eventId);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(url)
+                .queryParam("includeActiveBookings", includeActiveBookings)
+                .queryParam("includeInvites", includeInvites);
+        RequestEntity<Void> request = RequestEntity.get(uriBuilder.toUriString()).build();
         return httpClient.executeRequest(request, EventDto.class);
     }
 

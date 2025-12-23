@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.invite.InviteDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventCancellationReason;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 
@@ -20,5 +21,6 @@ public class EventDto {
     private EventStatus status;
     private EventCancellationReason cancellationReason;
     private Integer activeBookingCount;
-    private List<BookingDto> bookings;
+    private List<BookingDto> activeBookings;
+    private List<InviteDto> invites;
 }
