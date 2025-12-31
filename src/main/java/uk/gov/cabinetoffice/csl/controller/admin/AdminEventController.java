@@ -10,13 +10,14 @@ import uk.gov.cabinetoffice.csl.service.InviteService;
 
 @Slf4j
 @AllArgsConstructor
-@RestController("/admin")
+@RestController
+@RequestMapping("/admin/courses")
 public class AdminEventController {
 
     private final EventService eventService;
     private final InviteService inviteService;
 
-    @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/events/{eventId}/cancel", produces = "application/json")
+    @PostMapping(path = "/{courseId}/modules/{moduleId}/events/{eventId}/cancel", produces = "application/json")
     @ResponseBody
     public CancelEventResponse cancelEvent(@PathVariable("courseId") String courseId,
                                            @PathVariable("moduleId") String moduleId,
@@ -25,7 +26,7 @@ public class AdminEventController {
         return eventService.cancelEvent(courseId, moduleId, eventId, cancelEventDto);
     }
 
-    @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/events/{eventId}/bookings/{bookingId}/cancel_booking", produces = "application/json")
+    @PostMapping(path = "/{courseId}/modules/{moduleId}/events/{eventId}/bookings/{bookingId}/cancel_booking", produces = "application/json")
     @ResponseBody
     public BookingResponse bookEvent(@PathVariable("courseId") String courseId,
                                      @PathVariable("moduleId") String moduleId,
@@ -35,7 +36,7 @@ public class AdminEventController {
         return eventService.cancelBookingWithBookingId(courseId, moduleId, eventId, bookingId, cancelBookingDto);
     }
 
-    @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/events/{eventId}/bookings/{bookingId}/approve_booking", produces = "application/json")
+    @PostMapping(path = "/{courseId}/modules/{moduleId}/events/{eventId}/bookings/{bookingId}/approve_booking", produces = "application/json")
     @ResponseBody
     public BookingResponse approveBooking(@PathVariable("courseId") String courseId,
                                           @PathVariable("moduleId") String moduleId,
@@ -44,7 +45,7 @@ public class AdminEventController {
         return eventService.approveBookingWithBookingId(courseId, moduleId, eventId, bookingId);
     }
 
-    @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/events/{eventId}/invite", produces = "application/json")
+    @PostMapping(path = "/{courseId}/modules/{moduleId}/events/{eventId}/invite", produces = "application/json")
     @ResponseBody
     public void inviteLearnerToEvent(@PathVariable("courseId") String courseId,
                                      @PathVariable("moduleId") String moduleId,
