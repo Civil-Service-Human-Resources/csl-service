@@ -3,10 +3,8 @@ package uk.gov.cabinetoffice.csl.controller.admin.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Venue;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventCancellationReason;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 
 import java.util.Collection;
 
@@ -18,7 +16,7 @@ public class EventOverview {
     private String id;
     private Venue venue;
     private Collection<String> dates;
-    private EventStatus status;
+    private String status;
     private EventCancellationReason cancellationReason;
 
     private String moduleId;
@@ -26,7 +24,7 @@ public class EventOverview {
 
     private String courseId;
     private String courseTitle;
-    private CourseStatus courseStatus;
+    private String courseStatus;
 
     private Collection<String> invitedEmails;
 
