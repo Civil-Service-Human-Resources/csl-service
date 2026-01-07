@@ -221,11 +221,11 @@ public class LearnerRecordStubService {
         );
     }
 
-    public StubMapping findEvent(String eventId, Boolean includeActiveBookings,
-                                 Boolean includeInvites, String response) {
+    public StubMapping findEvent(String eventId, Boolean getActiveBookings,
+                                 Boolean getInvites, String response) {
         return stubFor(WireMock.get(urlPathEqualTo("/learner_record_api/event/" + eventId))
-                .withQueryParam("includeActiveBookings", equalTo(includeActiveBookings.toString()))
-                .withQueryParam("includeInvites", equalTo(includeInvites.toString()))
+                .withQueryParam("getActiveBookings", equalTo(getActiveBookings.toString()))
+                .withQueryParam("getInvites", equalTo(getInvites.toString()))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(response)));
