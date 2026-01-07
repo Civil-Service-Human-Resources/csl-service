@@ -28,7 +28,7 @@ public class AdminManagementFactory {
         Venue venue = event.getVenue();
         venue.setAvailability(venue.getCapacity() - eventDto.getActiveBookings().size());
         return new EventOverview(event.getId(), event.getVenue(), event.getDateRangesAsStrings(), event.getStatus().getValue(),
-                event.getCancellationReason(), module.getId(), module.getTitle(), course.getId(), course.getTitle(), course.getStatus().getName(),
+                event.getCancellationReason().getValue(), module.getId(), module.getTitle(), course.getId(), course.getTitle(), course.getStatus().getName(),
                 eventDto.getInvites().stream().map(InviteDto::getLearnerEmail).toList(), bookings);
     }
 }
