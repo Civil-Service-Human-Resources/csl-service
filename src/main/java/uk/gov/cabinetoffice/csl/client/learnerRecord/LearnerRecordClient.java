@@ -76,11 +76,11 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     }
 
     @Override
-    public EventDto getEvent(String eventId, boolean getActiveBookings, boolean getInvites) {
+    public EventDto getEvent(String eventId, boolean getBookings, boolean getInvites) {
         log.debug("Fetching event with uid {}", eventId);
         String url = configParams.getEventUrl(eventId);
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(url)
-                .queryParam("getActiveBookings", getActiveBookings)
+                .queryParam("getBookings", getBookings)
                 .queryParam("getInvites", getInvites);
         RequestEntity<Void> request = RequestEntity.get(uriBuilder.toUriString()).build();
         return httpClient.executeRequest(request, EventDto.class);

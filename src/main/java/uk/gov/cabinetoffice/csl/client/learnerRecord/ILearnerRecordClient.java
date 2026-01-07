@@ -19,7 +19,7 @@ public interface ILearnerRecordClient {
 
     EventDto updateEvent(String eventId, EventStatusDto dto);
 
-    EventDto getEvent(String eventId, boolean getActiveBookings, boolean getInvites);
+    EventDto getEvent(String eventId, boolean getBookings, boolean getInvites);
 
     List<BookingDto> getBookings(String eventId);
 
