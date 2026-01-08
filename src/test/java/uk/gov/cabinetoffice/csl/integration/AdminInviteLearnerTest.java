@@ -64,4 +64,18 @@ public class AdminInviteLearnerTest extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful());
     }
 
+    @Test
+    public void testAdminInviteLearnerNotFound() throws Exception {
+        cslStubService.getIdentityAPIServiceStubService().getIdentityWithEmailNotFound(testDataService.getUserEmail());
+        String url = String.format("/admin/courses/%s/modules/%s/events/%s/invite", testDataService.getCourseId(), testDataService.getModuleId(), testDataService.getEventId());
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "learnerEmail": "%s"
+                                }
+                                """))
+                .andExpect(status().isNotFound());
+    }
+
 }

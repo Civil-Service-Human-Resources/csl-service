@@ -35,6 +35,16 @@ public class IdentityAPIServiceStubService {
         );
     }
 
+    public StubMapping getIdentityWithEmailNotFound(String userEmail) {
+        return stubFor(
+                WireMock.get(urlPathEqualTo("/identity/api/identities"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .withQueryParam("emailAddress", equalTo(userEmail))
+                        .willReturn(aResponse()
+                                .withStatus(404))
+        );
+    }
+
     public StubMapping getIdentityMap(Collection<String> userIds, String response) {
         MappingBuilder request =
                 WireMock.get(urlPathEqualTo("/identity/api/identities/map-for-uids"))
