@@ -47,19 +47,22 @@ public class AdminManagementTest extends IntegrationTestBase {
                             "id": 1,
                             "learner": "learner1",
                             "status": "Requested",
-                            "bookingReference": "ABC12"
+                            "bookingReference": "ABC12",
+                            "poNumber": "PO123"
                         },
                         {
                             "id": 2,
                             "learner": "learner2",
                             "status": "Confirmed",
-                            "bookingReference": "DEF12"
+                            "bookingReference": "DEF12",
+                            "poNumber": "PO456"
                         },
                         {
                             "id": 3,
                             "learner": "learner3",
                             "status": "Confirmed",
-                            "bookingReference": "GHI12"
+                            "bookingReference": "GHI12",
+                            "poNumber": "PO789"
                         }
                     ],
                     "invites": [
@@ -106,9 +109,11 @@ public class AdminManagementTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.bookings[0].reference").value("ABC12"))
                 .andExpect(jsonPath("$.bookings[0].learnerEmail").value("learner1@email.com"))
                 .andExpect(jsonPath("$.bookings[0].status").value("Requested"))
+                .andExpect(jsonPath("$.bookings[0].poNumber").value("PO123"))
                 .andExpect(jsonPath("$.bookings[1].id").value("2"))
                 .andExpect(jsonPath("$.bookings[1].reference").value("DEF12"))
                 .andExpect(jsonPath("$.bookings[1].learnerEmail").value("learner2@email.com"))
-                .andExpect(jsonPath("$.bookings[1].status").value("Confirmed"));
+                .andExpect(jsonPath("$.bookings[1].status").value("Confirmed"))
+                .andExpect(jsonPath("$.bookings[1].poNumber").value("PO456"));
     }
 }

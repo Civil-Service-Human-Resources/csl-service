@@ -19,7 +19,8 @@ public class AdminManagementFactory {
 
     public EventOverview createEventOverview(CourseWithModuleWithEvent courseWithModuleWithEvent, EventDto eventDto, Map<String, String> uidsToEmails) {
         List<BookingOverview> bookings = eventDto.getActiveBookings()
-                .stream().map(b -> new BookingOverview(b.getId(), b.getBookingReference(), uidsToEmails.get(b.getLearner()), b.getStatus()))
+                .stream().map(b -> new BookingOverview(b.getId(), b.getBookingReference(),
+                        uidsToEmails.get(b.getLearner()), b.getStatus(), b.getPoNumber()))
                 .filter(b -> b.getLearnerEmail() != null)
                 .toList();
         Course course = courseWithModuleWithEvent.getCourse();
