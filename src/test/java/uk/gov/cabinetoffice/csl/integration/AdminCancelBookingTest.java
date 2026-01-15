@@ -98,9 +98,9 @@ public class AdminCancelBookingTest extends IntegrationTestBase {
                           "recipient": "userEmail@email.com",
                           "personalisation": {
                             "courseDate": "01 Jan 2023",
+                            "learnerName": "Learner",
                             "courseLocation": "London",
                             "courseTitle": "Test Course",
-                            "accessibility": "",
                             "cancellationReason": "the booking has not been paid",
                             "bookingReference": "ABCDE"
                           }

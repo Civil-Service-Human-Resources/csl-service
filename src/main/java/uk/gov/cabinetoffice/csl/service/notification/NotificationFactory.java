@@ -50,7 +50,7 @@ public class NotificationFactory {
         String eventTime = event.getStartTimeAsString();
         String eventLocation = event.getVenue().getLocation();
         return List.of(
-                new CancelBookingMessageParams(user.getEmail(), booking.getCancellationReason().getValue(), booking.getAccessibilityOptions(), booking.getBookingReference(),
+                new CancelBookingMessageParams(user.getEmail(), booking.getCancellationReason().getValue(), user.getName(), booking.getBookingReference(),
                         course.getTitle(), eventTime, eventLocation),
                 new CancelBookingLMMessageParams(user.getLineManagerEmail(), user.getName(), user.getEmail(),
                         course.getTitle(), eventTime, eventLocation,

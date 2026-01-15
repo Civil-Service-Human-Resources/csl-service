@@ -9,16 +9,16 @@ public class CancelBookingMessageParams implements IEmail {
 
     private final String recipient;
     private final String cancellationReason;
-    private final String accessibility;
+    private final String learnerName;
     private final String bookingReference;
     private final String courseTitle;
     private final String courseDate;
     private final String courseLocation;
 
-    public CancelBookingMessageParams(String recipient, String cancellationReason, String accessibility, String bookingReference, String courseTitle, String courseDate, String courseLocation) {
+    public CancelBookingMessageParams(String recipient, String cancellationReason, String learnerName, String bookingReference, String courseTitle, String courseDate, String courseLocation) {
         this.recipient = recipient;
         this.cancellationReason = cancellationReason;
-        this.accessibility = accessibility;
+        this.learnerName = learnerName;
         this.bookingReference = bookingReference;
         this.courseTitle = courseTitle;
         this.courseDate = courseDate;
@@ -33,11 +33,11 @@ public class CancelBookingMessageParams implements IEmail {
     @Override
     public Map<String, String> getPersonalisation() {
         return Map.of(
-                "cancellationReason", cancellationReason,
                 "courseTitle", courseTitle,
+                "learnerName", learnerName,
+                "cancellationReason", cancellationReason,
                 "courseDate", courseDate,
                 "courseLocation", courseLocation,
-                "accessibility", accessibility,
                 "bookingReference", bookingReference
         );
     }
