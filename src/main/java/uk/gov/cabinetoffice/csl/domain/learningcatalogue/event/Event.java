@@ -14,7 +14,9 @@ import uk.gov.cabinetoffice.csl.util.Cacheable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -40,6 +42,10 @@ public class Event implements IChildLearningResource, Cacheable {
     @JsonIgnore
     public List<LocalDate> getDateRangesAsDates() {
         return getDateRanges().stream().map(DateRange::getDate).sorted(LocalDate::compareTo).toList();
+    }
+
+    public Collection<String> getDateRangesAsStrings() {
+        return getDateRanges().stream().map(DateRange::getAsDateString).collect(Collectors.toList());
     }
 
     @JsonIgnore
@@ -75,4 +81,5 @@ public class Event implements IChildLearningResource, Cacheable {
     public String getCacheableId() {
         return id;
     }
+
 }

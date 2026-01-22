@@ -14,6 +14,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.BulkCreateOutput;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.bulk.FailedResource;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventStatusDto;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.invite.InviteDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 
@@ -61,7 +62,7 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     @Override
     public BookingDto updateBookingWithId(String eventId, String bookingId, BookingDto bookingDto) {
         log.debug("Updating booking {} with data {}", bookingId, bookingDto);
-        String url = String.format("%s/%s%s/%s", configParams.getEventsUrl(), eventId, configParams.getBookingsUrl(), bookingId);
+        String url = configParams.getBookingUrl(eventId, bookingId);
         RequestEntity<BookingDto> request = RequestEntity.patch(url).body(bookingDto);
         return httpClient.executeRequest(request, BookingDto.class);
     }
@@ -69,8 +70,19 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     @Override
     public EventDto updateEvent(String eventId, EventStatusDto dto) {
         log.debug("Updating event {} with data {}", eventId, dto);
-        String url = String.format("%s/%s", configParams.getEventsUrl(), eventId);
+        String url = configParams.getEventUrl(eventId);
         RequestEntity<EventStatusDto> request = RequestEntity.patch(url).body(dto);
+        return httpClient.executeRequest(request, EventDto.class);
+    }
+
+    @Override
+    public EventDto getEvent(String eventId, boolean getBookings, boolean getInvites) {
+        log.debug("Fetching event with uid {}", eventId);
+        String url = configParams.getEventUrl(eventId);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(url)
+                .queryParam("getBookings", getBookings)
+                .queryParam("getInvites", getInvites);
+        RequestEntity<Void> request = RequestEntity.get(uriBuilder.toUriString()).build();
         return httpClient.executeRequest(request, EventDto.class);
     }
 
@@ -182,6 +194,14 @@ public class LearnerRecordClient implements ILearnerRecordClient {
         log.debug("Updating module records '{}'", input);
         RequestEntity<List<ModuleRecord>> request = RequestEntity.put(String.format("%s/bulk", configParams.getModuleRecordsUrl())).body(input);
         return httpClient.executeRequest(request, ModuleRecords.class).getModuleRecords();
+    }
+
+    @Override
+    public void createInvite(String eventId, InviteDto invite) {
+        log.info("inviting user {} to event {}", invite, eventId);
+        String url = String.format("%s/%s/invitee", configParams.getEventsUrl(), eventId);
+        RequestEntity<InviteDto> request = RequestEntity.post(url).body(invite);
+        httpClient.executeRequest(request, Void.class);
     }
 
 }

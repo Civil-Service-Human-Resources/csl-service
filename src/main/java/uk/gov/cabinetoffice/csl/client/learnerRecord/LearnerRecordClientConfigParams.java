@@ -15,4 +15,12 @@ public class LearnerRecordClientConfigParams {
     private final String moduleRecordsUrl;
     private final Integer moduleRecordBatchSize;
     private final String learnerRecordEventsUrl;
+
+    public String getEventUrl(String eventUid) {
+        return String.format("%s/%s", eventsUrl, eventUid);
+    }
+
+    public String getBookingUrl(String eventUid, String bookingId) {
+        return String.format("%s%s/%s", getEventUrl(eventUid), getBookingsUrl(), bookingId);
+    }
 }

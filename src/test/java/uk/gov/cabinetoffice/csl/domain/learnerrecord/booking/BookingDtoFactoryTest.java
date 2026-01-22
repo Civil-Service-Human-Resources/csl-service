@@ -8,15 +8,11 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cabinetoffice.csl.controller.model.BookEventDto;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModuleWithEvent;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 
 import java.math.BigDecimal;
-import java.net.URI;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -36,9 +32,7 @@ public class BookingDtoFactoryTest {
 
     @BeforeEach
     public void setup() {
-        bookingDtoFactory = new BookingDtoFactory("catalogue_url",
-                Clock.fixed(Instant.parse("2023-01-01T10:00:00.000Z"), ZoneId.of("Europe/London")),
-                userDetailsService);
+        bookingDtoFactory = new BookingDtoFactory(Clock.fixed(Instant.parse("2023-01-01T10:00:00.000Z"), ZoneId.of("Europe/London")));
         reset();
     }
 
@@ -47,18 +41,12 @@ public class BookingDtoFactoryTest {
         Course course = testDataService.generateCourse(true, true);
         Module module = course.getModules().stream().findFirst().get();
         module.setCost(BigDecimal.valueOf(0L));
-        Event event = module.getEvents().stream().findFirst().get();
-        CourseWithModuleWithEvent courseWithModuleWithEvent = new CourseWithModuleWithEvent(
-                new CourseWithModule(course, module), event
-        );
         User user = testDataService.generateUser();
         when(userDetailsService.getUserWithUid("learnerUID")).thenReturn(user);
         BookEventDto bookEventDto = new BookEventDto();
-        BookingDto dto = bookingDtoFactory.createBooking("learnerUID", courseWithModuleWithEvent, bookEventDto);
+        BookingDto dto = bookingDtoFactory.createBooking("learnerUID", module, bookEventDto);
 
-        assertEquals(dto.getEvent(), URI.create("catalogue_url/courses/courseId/modules/moduleId/events/eventId"));
         assertEquals("learnerUID", dto.getLearner());
-        assertEquals("userEmail@email.com", dto.getLearnerEmail());
         assertEquals("", dto.getAccessibilityOptions());
         assertEquals(BookingStatus.CONFIRMED, dto.getStatus());
     }
@@ -68,19 +56,13 @@ public class BookingDtoFactoryTest {
         Course course = testDataService.generateCourse(true, true);
         Module module = course.getModules().stream().findFirst().get();
         module.setCost(BigDecimal.valueOf(5L));
-        Event event = module.getEvents().stream().findFirst().get();
-        CourseWithModuleWithEvent courseWithModuleWithEvent = new CourseWithModuleWithEvent(
-                new CourseWithModule(course, module), event
-        );
         User user = testDataService.generateUser();
         when(userDetailsService.getUserWithUid("learnerUID")).thenReturn(user);
         BookEventDto bookEventDto = new BookEventDto();
         bookEventDto.setAccessibilityOptions(List.of("accessibilityOption1", "accessibilityOption2"));
-        BookingDto dto = bookingDtoFactory.createBooking("learnerUID", courseWithModuleWithEvent, bookEventDto);
+        BookingDto dto = bookingDtoFactory.createBooking("learnerUID", module, bookEventDto);
 
-        assertEquals(dto.getEvent(), URI.create("catalogue_url/courses/courseId/modules/moduleId/events/eventId"));
         assertEquals("learnerUID", dto.getLearner());
-        assertEquals("userEmail@email.com", dto.getLearnerEmail());
         assertEquals("accessibilityOption1,accessibilityOption2", dto.getAccessibilityOptions());
         assertEquals(BookingStatus.REQUESTED, dto.getStatus());
     }

@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientResponseException;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
+import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
 import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationRequest;
@@ -34,10 +34,8 @@ public class RusticiEngineClient implements IRusticiEngineClient {
             String url = String.format(registrationLaunchLinkUrl, registrationId);
             RequestEntity<LaunchLinkRequest> request = RequestEntity.post(url).body(launchLinkRequest);
             return client.executeRequest(request, LaunchLink.class);
-        } catch (RestClientResponseException e) {
-            if (e.getStatusCode().value() == 404) {
-                log.debug("Registration '{}' doesn't exist.", registrationId);
-            }
+        } catch (NotFoundException e) {
+            log.debug("Registration '{}' doesn't exist.", registrationId);
             return null;
         }
     }

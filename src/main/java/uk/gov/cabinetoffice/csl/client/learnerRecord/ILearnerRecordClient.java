@@ -4,6 +4,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventStatusDto;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.invite.InviteDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 
 import java.util.List;
@@ -17,6 +18,8 @@ public interface ILearnerRecordClient {
     BookingDto updateBookingWithId(String eventId, String bookingId, BookingDto bookingDto);
 
     EventDto updateEvent(String eventId, EventStatusDto dto);
+
+    EventDto getEvent(String eventId, boolean getBookings, boolean getInvites);
 
     List<BookingDto> getBookings(String eventId);
 
@@ -33,4 +36,6 @@ public interface ILearnerRecordClient {
     List<ModuleRecord> getModuleRecords(GetModuleRecordParams query);
 
     List<ModuleRecord> updateModuleRecords(List<ModuleRecord> input);
+
+    void createInvite(String eventId, InviteDto invite);
 }
