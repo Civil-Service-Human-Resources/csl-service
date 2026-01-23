@@ -36,7 +36,7 @@ public class LearningPlanService {
         this.learningPlanFactory = learningPlanFactory;
     }
 
-    public LearningPlan getLearningPlan(String uid) {
+    public LearningPlan getLearningPlan(String uid, Boolean homepageCompleteLearningPlanCourses) {
         User user = userDetailsService.getUserWithUid(uid);
         List<String> requiredLearning = learningCatalogueService.getRequiredLearningIdsForDepartments(user.getDepartmentCodes());
         Map<String, LearnerRecordEvent> latestEventForCourseMap = new HashMap<>();

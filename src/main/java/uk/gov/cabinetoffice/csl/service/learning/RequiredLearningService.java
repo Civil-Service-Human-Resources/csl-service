@@ -49,7 +49,7 @@ public class RequiredLearningService {
         return requiredLearningFactory.buildDetailedLearning(requiredLearning, courseRecords, user);
     }
 
-    public RequiredLearning getRequiredLearning(String uid) {
+    public RequiredLearning getRequiredLearning(String uid, Boolean homepageCompleteRequiredCourses) {
         User user = userDetailsService.getUserWithUid(uid);
         List<Course> requiredLearning = learningCatalogueService.getRequiredLearningForDepartments(user.getDepartmentCodes())
                 .stream().filter(Course::shouldBeDisplayed).toList();
