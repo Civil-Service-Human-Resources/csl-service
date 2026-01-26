@@ -50,17 +50,33 @@ public class RequiredLearningService {
     }
 
     public RequiredLearning getRequiredLearning(String uid, Boolean homepageCompleteRequiredCourses) {
+        // 1. Get user details from CSRS
         User user = userDetailsService.getUserWithUid(uid);
+
+        // 2. Get required learnings from elasticsearch for user's department
         List<Course> requiredLearning = learningCatalogueService.getRequiredLearningForDepartments(user.getDepartmentCodes())
                 .stream().filter(Course::shouldBeDisplayed).toList();
+
+        // 3. Get most recent completion event date from the user's learner record event
         Map<String, LocalDateTime> completionDates = learnerRecordDataUtils
                 .getCompletionDatesForCourses(uid, requiredLearning.stream().map(Course::getId).toList());
+
         List<RequiredLearningCourse> requiredLearningCourses = new ArrayList<>();
         List<ModuleRecordResourceId> moduleRecordIdsToFetch = new ArrayList<>();
+        Map<String, List<String>> requiredModuleIdsForCompletion = new HashMap<>();
+
+        // 4. Iterate over the required learning and if the learning period is present
+        // then use it to find the start and end date of the learning period
         requiredLearning.forEach(course -> course.getLearningPeriodForUser(user)
                 .ifPresent(lp -> {
                     LocalDateTime completionDate = completionDates.get(course.getId());
+
                     if (completionDate == null || lp.getStartDateAsDateTime().isAfter(completionDate)) {
+                        // 5. If the completion event date for the course is not present
+                        // or the learning period start date after the completion date
+                        // then set the course status as NULL
+                        // and add it to the requiredLearningCourses list to display on homepage
+                        // also add all required moduleIds which need to be completed into moduleRecordIdsToFetch
                         RequiredLearningCourse requiredLearningCourse = new RequiredLearningCourse(
                                 course.getId(), course.getTitle(), course.getShortDescription(),
                                 course.getCourseType(), course.getDurationInSeconds(), course.getModules().size(),
@@ -68,18 +84,65 @@ public class RequiredLearningService {
                         requiredLearningCourses.add(requiredLearningCourse);
                         moduleRecordIdsToFetch.addAll(course.getRequiredModuleIdsForCompletion().stream()
                                 .map(id -> new ModuleRecordResourceId(uid, id)).toList());
+                        requiredModuleIdsForCompletion.put(course.getId(), course.getRequiredModuleIdsForCompletion());
                     }
                 }));
+
         if (!moduleRecordIdsToFetch.isEmpty()) {
+            // 6. If required moduleIds exist then get the moduleRecords from the user's learner record
             Map<String, ModuleRecordCollection> moduleRecords = learnerRecordDataUtils.getModuleRecordsForCourses(
                     requiredLearningCourses.stream().map(RequiredLearningCourse::getId).toList(), moduleRecordIdsToFetch);
-            requiredLearningCourses
-                    .forEach(course -> {
-                        if (moduleRecords.get(course.getId()).getLatestUpdatedDate().isAfter(course.getLearningPeriod().getStartDateAsDateTime())) {
-                            course.setStatus(State.IN_PROGRESS);
-                        }
-                    });
+
+            // 7. If the latest update date of the module for the user is after the start date of the learning period
+            // then set the course status as IN_PROGRESS
+//            requiredLearningCourses
+//                    .forEach(course -> {
+//                        if (moduleRecords.get(course.getId()).getLatestUpdatedDate().isAfter(course.getLearningPeriod().getStartDateAsDateTime())) {
+//                            course.setStatus(State.IN_PROGRESS);
+//                        }
+//                    });
+            for (RequiredLearningCourse requiredLearningCourse : requiredLearningCourses) {
+                ModuleRecordCollection moduleRecordsCollection = moduleRecords.get(requiredLearningCourse.getId());
+                if (moduleRecordsCollection.getLatestUpdatedDate()
+                        .isAfter(requiredLearningCourse.getLearningPeriod().getStartDateAsDateTime())) {
+                    requiredLearningCourse.setStatus(State.IN_PROGRESS);
+                }
+
+                String id = requiredLearningCourse.getId();
+                List<String> requiredModuleIdsForCompletionForTheCourse = requiredModuleIdsForCompletion.get(id);
+                List<String> requiredModuleIdsLeftForCompletionForTheCourse = moduleRecordsCollection.getRequiredIdsLeftForCompletion(requiredModuleIdsForCompletionForTheCourse);
+
+                log.warn("requiredLearningCourseId: {}, " +
+                        "requiredModuleIds: {}, " +
+                        "requiredModuleIdsLeftForCompletion: {}",
+                        requiredLearningCourse.getId(),
+                        requiredModuleIdsForCompletionForTheCourse,
+                        requiredModuleIdsLeftForCompletionForTheCourse);
+                log.warn("requiredLearningCourseId: {}, " +
+                        "requiredLearningCourseStatus: {}, " +
+                        "Total required modules: {}, " +
+                        "Required modules left for completion: {}, " +
+                        "Required modules completed: {}",
+                        requiredLearningCourse.getId(),
+                        requiredLearningCourse.getStatus(),
+                        requiredModuleIdsForCompletionForTheCourse.size(),
+                        requiredModuleIdsLeftForCompletionForTheCourse.size(),
+                        requiredModuleIdsForCompletionForTheCourse.size() - requiredModuleIdsLeftForCompletionForTheCourse.size());
+
+                // 8. Check if all the required modules are completed
+                // and completion event is missing
+                // and homepageCompleteRequiredCourses is true
+                // then set the course status to COMPLETED
+                // and remove it from the requiredLearningCourses list
+                // and create the completion event using the latest module completion date in the learner DB
+                // and create the entry in the completion reporting DB
+                // and write the log entry for auto-completion
+//                if () {
+//                }
+            }
         }
+
+        // 9. requiredLearningCourses are sorted and returned by wrapping in a response object
         RequiredLearning requiredLearningResponse = new RequiredLearning(uid, requiredLearningCourses);
         requiredLearningResponse.sortCourses();
         return requiredLearningResponse;
