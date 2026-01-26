@@ -1,10 +1,7 @@
 package uk.gov.cabinetoffice.csl.domain.learning.requiredLearning;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlanCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
@@ -15,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class RequiredLearningCourse extends LearningPlanCourse {
 
     public RequiredLearningCourse(String id, String title, String shortDescription, String type, Integer duration,
