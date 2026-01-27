@@ -502,6 +502,129 @@ public class RequiredLearningTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testGetRequiredLearningCompletedButShowingInProgressStatusDueToMissingCompletionEvent() throws Exception {
+        String eventsResponse = """
+                {
+                    "content": [
+                    ],
+                    "totalPages": 1
+                }
+                """;
+        String moduleRecords = """
+                {
+                    "moduleRecords": [
+                        {
+                            "id": 1,
+                            "uid": "module1",
+                            "userId": "userId",
+                            "courseId": "course1",
+                            "moduleId": "module1",
+                            "moduleTitle": "module1",
+                            "moduleType": "link",
+                            "duration": 3600,
+                            "state": "COMPLETED",
+                            "completionDate": "2025-01-01T10:00:00",
+                            "createdAt": "2025-01-01T10:00:00",
+                            "updatedAt": "2025-01-01T10:00:00"
+                        },
+                        {
+                            "id": 2,
+                            "uid": "module2",
+                            "userId": "userId",
+                            "courseId": "course1",
+                            "moduleId": "module2",
+                            "moduleTitle": "module2",
+                            "moduleType": "elearning",
+                            "duration": 3600,
+                            "state": "COMPLETED",
+                            "completionDate": "2022-06-01T10:00:00",
+                            "createdAt": "2025-01-01T10:00:00",
+                            "updatedAt": "2025-01-01T10:00:00"
+                        }
+                    ]
+                }
+                """;
+        cslStubService.getLearningCatalogue().getMandatoryLearningMap(depToCourseRequiredLearningCourseMultipleModules);
+        cslStubService.getLearningCatalogue().getCourses(List.of("course1"), courseMultipleModules);
+        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
+        cslStubService.getLearnerRecord().getLearnerRecordEvents(0,
+                LearnerRecordEventQuery.builder().userId("userId")
+                        .resourceIds(List.of("course1"))
+                        .eventTypes(List.of("COMPLETE_COURSE")).build(), eventsResponse);
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2"), moduleRecords);
+        mockMvc.perform(get("/learning/required?HOMEPAGE_COMPLETE_REQUIRED_COURSES=false")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.userId").value("userId"))
+                .andExpect(jsonPath("$.courses.length()").value(1))
+                .andExpect(jsonPath("$.courses[0].id").value("course1"))
+                .andExpect(jsonPath("$.courses[0].title").value("Course 1"))
+                .andExpect(jsonPath("$.courses[0].shortDescription").value("Short description of course 1"))
+                .andExpect(jsonPath("$.courses[0].type").value("blended"))
+                .andExpect(jsonPath("$.courses[0].duration").value(3600))
+                .andExpect(jsonPath("$.courses[0].moduleCount").value(3))
+                .andExpect(jsonPath("$.courses[0].status").value("IN_PROGRESS"))
+                .andExpect(jsonPath("$.courses[0].dueBy").value("2024-06-01"));
+    }
+
+    @Test
+    public void testGetRequiredLearningUpdateCompletedStatusForMissingCompletionEvent() throws Exception {
+        String eventsResponse = """
+                {
+                    "content": [],
+                    "totalPages": 1
+                }
+                """;
+        String moduleRecords = """
+                {
+                    "moduleRecords": [
+                        {
+                            "id": 1,
+                            "uid": "module1",
+                            "userId": "userId",
+                            "courseId": "course1",
+                            "moduleId": "module1",
+                            "moduleTitle": "module1",
+                            "moduleType": "link",
+                            "duration": 3600,
+                            "state": "COMPLETED",
+                            "completionDate": "2025-01-01T10:00:00",
+                            "createdAt": "2025-01-01T10:00:00",
+                            "updatedAt": "2025-01-01T10:00:00"
+                        },
+                        {
+                            "id": 2,
+                            "uid": "module2",
+                            "userId": "userId",
+                            "courseId": "course1",
+                            "moduleId": "module2",
+                            "moduleTitle": "module2",
+                            "moduleType": "elearning",
+                            "duration": 3600,
+                            "state": "COMPLETED",
+                            "completionDate": "2022-06-01T10:00:00",
+                            "createdAt": "2025-01-01T10:00:00",
+                            "updatedAt": "2025-01-01T10:00:00"
+                        }
+                    ]
+                }
+                """;
+        cslStubService.getLearningCatalogue().getMandatoryLearningMap(depToCourseRequiredLearningCourseMultipleModules);
+        cslStubService.getLearningCatalogue().getCourses(List.of("course1"), courseMultipleModules);
+        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
+        cslStubService.getLearnerRecord().getLearnerRecordEvents(0,
+                LearnerRecordEventQuery.builder().userId("userId")
+                        .resourceIds(List.of("course1"))
+                        .eventTypes(List.of("COMPLETE_COURSE")).build(), eventsResponse);
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2"), moduleRecords);
+        mockMvc.perform(get("/learning/required?HOMEPAGE_COMPLETE_REQUIRED_COURSES=true")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.userId").value("userId"))
+                .andExpect(jsonPath("$.courses.length()").value(0));
+    }
+
+    @Test
     public void testGetRequiredLearningBasicNotCompleted() throws Exception {
         String eventsResponse = """
                 {
