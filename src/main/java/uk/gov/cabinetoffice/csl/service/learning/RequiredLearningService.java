@@ -50,7 +50,7 @@ public class RequiredLearningService {
     }
 
     public RequiredLearning getRequiredLearning(String uid, Boolean homepageCompleteRequiredCourses) {
-        log.warn("homepageCompleteRequiredCourses: {}, ", homepageCompleteRequiredCourses);
+        log.warn("homepageCompleteRequiredCourses: {}", homepageCompleteRequiredCourses);
 
         // 1. Get user details from CSRS
         User user = userDetailsService.getUserWithUid(uid);
@@ -89,7 +89,7 @@ public class RequiredLearningService {
                         requiredModuleIdsForCompletion.put(course.getId(), course.getRequiredModuleIdsForCompletion());
                     }
                 }));
-        log.warn("requiredLearningCourses-1: {}, ", requiredLearningCourses);
+        log.warn("requiredLearningCourses-1: {}", requiredLearningCourses);
 
         if (!moduleRecordIdsToFetch.isEmpty()) {
             // 6. If required moduleIds exist then get the moduleRecords from the user's learner record
@@ -110,20 +110,16 @@ public class RequiredLearningService {
                 List<String> requiredModuleIdsLeftForCompletionForTheCourse = moduleRecordsCollection.getRequiredIdsLeftForCompletion(requiredModuleIdsForCompletionForTheCourse);
 
                 log.warn("requiredLearningCourseId: {}, " +
-                        "requiredModuleIds: {}, " +
-                        "requiredModuleIdsLeftForCompletion: {}",
-                        requiredLearningCourseId,
-                        requiredModuleIdsForCompletionForTheCourse,
-                        requiredModuleIdsLeftForCompletionForTheCourse);
-                log.warn("requiredLearningCourseId: {}, " +
                         "requiredLearningCourseStatus: {}, " +
-                        "Total required modules: {}, " +
-                        "Required modules left for completion: {}, " +
+                        "Total required modules: {}, moduleIds: {}, " +
+                        "Required modules left for completion: {}, moduleIds: {}, " +
                         "Required modules completed: {}",
                         requiredLearningCourseId,
                         requiredLearningCourse.getStatus(),
                         requiredModuleIdsForCompletionForTheCourse.size(),
+                        requiredModuleIdsForCompletionForTheCourse,
                         requiredModuleIdsLeftForCompletionForTheCourse.size(),
+                        requiredModuleIdsLeftForCompletionForTheCourse,
                         requiredModuleIdsForCompletionForTheCourse.size() - requiredModuleIdsLeftForCompletionForTheCourse.size());
 
                 // 8. Check if homepageCompleteRequiredCourses is true
@@ -138,19 +134,21 @@ public class RequiredLearningService {
                 if (homepageCompleteRequiredCourses
                     && completionDate == null
                     && requiredModuleIdsLeftForCompletionForTheCourse.isEmpty()) {
-                    log.warn("requiredLearningCourseId: {}, This course status should be marked as COMPLETED",
-                            requiredLearningCourseId);
+                    log.warn("requiredLearningCourseId: {}, This course status should be marked as COMPLETED. " +
+                                    "requiredLearningCourse: {}. moduleRecordsCollection: {}",
+                            requiredLearningCourseId, requiredLearningCourse, moduleRecordsCollection);
                     requiredLearningCourses.remove(requiredLearningCourse);
                     requiredLearningCourse.setStatus(State.COMPLETED);
                     // TODO: Create the completion event and the completion report entry
                 }
             }
         }
-        log.warn("requiredLearningCourses-2: {}, ", requiredLearningCourses);
+        log.warn("requiredLearningCourses-2: {}", requiredLearningCourses);
 
         // 9. requiredLearningCourses are sorted and returned by wrapping in a response object
         RequiredLearning requiredLearningResponse = new RequiredLearning(uid, requiredLearningCourses);
         requiredLearningResponse.sortCourses();
+        log.warn("requiredLearningResponse: {}", requiredLearningResponse);
         return requiredLearningResponse;
     }
 
