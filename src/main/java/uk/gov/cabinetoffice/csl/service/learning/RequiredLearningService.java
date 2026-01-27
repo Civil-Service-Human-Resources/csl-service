@@ -22,10 +22,7 @@ import uk.gov.cabinetoffice.csl.service.learningResources.course.CourseRecordSer
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,7 +60,7 @@ public class RequiredLearningService {
         Map<String, LocalDateTime> completionDates = learnerRecordDataUtils
                 .getCompletionDatesForCourses(uid, requiredLearning.stream().map(Course::getId).toList());
 
-        List<RequiredLearningCourse> requiredLearningCourses = new ArrayList<>();
+        Map<String, RequiredLearningCourse> requiredLearningCourses = new HashMap<>();
         List<ModuleRecordResourceId> moduleRecordIdsToFetch = new ArrayList<>();
         Map<String, List<String>> requiredModuleIdsForCompletion = new HashMap<>();
 
@@ -83,7 +80,7 @@ public class RequiredLearningService {
                                 course.getId(), course.getTitle(), course.getShortDescription(),
                                 course.getCourseType(), course.getDurationInSeconds(), course.getModules().size(),
                                 course.getCost(), State.NULL, lp);
-                        requiredLearningCourses.add(requiredLearningCourse);
+                        requiredLearningCourses.put(requiredLearningCourse.getId(), requiredLearningCourse);
                         moduleRecordIdsToFetch.addAll(course.getRequiredModuleIdsForCompletion().stream()
                                 .map(id -> new ModuleRecordResourceId(uid, id)).toList());
                         requiredModuleIdsForCompletion.put(course.getId(), course.getRequiredModuleIdsForCompletion());
@@ -94,18 +91,22 @@ public class RequiredLearningService {
         if (!moduleRecordIdsToFetch.isEmpty()) {
             // 6. If required moduleIds exist then get the moduleRecords from the user's learner record
             Map<String, ModuleRecordCollection> moduleRecords = learnerRecordDataUtils.getModuleRecordsForCourses(
-                    requiredLearningCourses.stream().map(RequiredLearningCourse::getId).toList(), moduleRecordIdsToFetch);
+                    new ArrayList<>(requiredLearningCourses.keySet()), moduleRecordIdsToFetch);
 
             // 7. If the latest update date of the module for the user is after the start date of the learning period
             // then set the course status as IN_PROGRESS
-            for (RequiredLearningCourse requiredLearningCourse : requiredLearningCourses) {
-                ModuleRecordCollection moduleRecordsCollection = moduleRecords.get(requiredLearningCourse.getId());
+            Iterator<Map.Entry<String, RequiredLearningCourse>> requiredLearningCourseEntryIterator = requiredLearningCourses.entrySet().iterator();
+            while (requiredLearningCourseEntryIterator.hasNext()) {
+                Map.Entry<String, RequiredLearningCourse> requiredLearningCourseEntry = requiredLearningCourseEntryIterator.next();
+                String requiredLearningCourseId = requiredLearningCourseEntry.getKey();
+                RequiredLearningCourse requiredLearningCourse = requiredLearningCourseEntry.getValue();
+                ModuleRecordCollection moduleRecordsCollection = moduleRecords.get(requiredLearningCourseId);
+
                 if (moduleRecordsCollection.getLatestUpdatedDate()
                         .isAfter(requiredLearningCourse.getLearningPeriod().getStartDateAsDateTime())) {
                     requiredLearningCourse.setStatus(State.IN_PROGRESS);
                 }
 
-                String requiredLearningCourseId = requiredLearningCourse.getId();
                 List<String> requiredModuleIdsForCompletionForTheCourse = requiredModuleIdsForCompletion.get(requiredLearningCourseId);
                 List<String> requiredModuleIdsLeftForCompletionForTheCourse = moduleRecordsCollection.getRequiredIdsLeftForCompletion(requiredModuleIdsForCompletionForTheCourse);
 
@@ -134,19 +135,22 @@ public class RequiredLearningService {
                 if (homepageCompleteRequiredCourses
                     && completionDate == null
                     && requiredModuleIdsLeftForCompletionForTheCourse.isEmpty()) {
-                    log.warn("requiredLearningCourseId: {}, This course status should be marked as COMPLETED. " +
-                                    "requiredLearningCourse: {}. moduleRecordsCollection: {}",
+                    log.warn("requiredLearningCourseId: {}, requiredLearningCourse: {}, moduleRecordsCollection: {}." +
+                                    "This course status should be marked as COMPLETED.",
                             requiredLearningCourseId, requiredLearningCourse, moduleRecordsCollection);
-                    requiredLearningCourses.remove(requiredLearningCourse);
+                    requiredLearningCourseEntryIterator.remove(); // safe removal from Map
                     requiredLearningCourse.setStatus(State.COMPLETED);
-                    // TODO: Create the completion event and the completion report entry
+                    log.warn("requiredLearningCourseId: {}, requiredLearningCourse: {}. " +
+                            "This course status is updated to COMPLETED and it is removed from the homepage course list. ",
+                            requiredLearningCourseId, requiredLearningCourse);
+                    // TODO: 9. Create the completion event and the completion report entry
                 }
             }
         }
         log.warn("requiredLearningCourses-2: {}", requiredLearningCourses);
 
-        // 9. requiredLearningCourses are sorted and returned by wrapping in a response object
-        RequiredLearning requiredLearningResponse = new RequiredLearning(uid, requiredLearningCourses);
+        // 10. requiredLearningCourses are sorted and returned by wrapping in a response object
+        RequiredLearning requiredLearningResponse = new RequiredLearning(uid, new ArrayList<>(requiredLearningCourses.values()));
         requiredLearningResponse.sortCourses();
         log.warn("requiredLearningResponse: {}", requiredLearningResponse);
         return requiredLearningResponse;
