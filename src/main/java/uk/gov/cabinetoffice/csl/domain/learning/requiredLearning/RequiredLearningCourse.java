@@ -12,7 +12,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 public class RequiredLearningCourse extends LearningPlanCourse {
 
     public RequiredLearningCourse(String id, String title, String shortDescription, String type, Integer duration,
