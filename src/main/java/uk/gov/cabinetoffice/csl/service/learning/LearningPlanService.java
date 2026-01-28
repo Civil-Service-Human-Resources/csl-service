@@ -65,7 +65,7 @@ public class LearningPlanService {
                         LearnerRecordEvent latestEvent = latestEventForCourseMap.get(courseId);
                         if (!(latestEvent != null && latestEvent.getActionType().equals(REMOVE_FROM_LEARNING_PLAN)
                                 && latestEvent.getEventTimestamp().isAfter(requiredModuleRecords.getLatestUpdatedDate()))) {
-                            requiredModuleRecords.getBookedEventModule()
+                            requiredModuleRecords.getModuleRecord()
                                     .ifPresentOrElse(moduleRecord -> {
                                         if (!moduleRecord.equalsStates(State.SKIPPED, State.COMPLETED)) {
                                             learningPlanFactory.getBookedLearningPlanCourse(course, requiredModuleRecords)

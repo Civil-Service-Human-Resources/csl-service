@@ -51,6 +51,7 @@ public class RequiredLearningService {
 
         // 1. Get user details from CSRS
         User user = userDetailsService.getUserWithUid(uid);
+        log.warn("user.getName(): {}", user.getName());
 
         // 2. Get required learnings from elasticsearch for user's department
         List<Course> requiredLearning = learningCatalogueService.getRequiredLearningForDepartments(user.getDepartmentCodes())
@@ -135,13 +136,13 @@ public class RequiredLearningService {
                 if (homepageCompleteRequiredCourses
                     && completionDate == null
                     && requiredModuleIdsLeftForCompletionForTheCourse.isEmpty()) {
-                    log.warn("requiredLearningCourseId: {}, requiredLearningCourse: {}, moduleRecordsCollection: {}." +
-                                    "This course status should be marked as COMPLETED.",
+                    log.warn("requiredLearningCourseId: {}, requiredLearningCourse: {}, moduleRecordsCollection: {}. " +
+                            "This course status should be marked as COMPLETED.",
                             requiredLearningCourseId, requiredLearningCourse, moduleRecordsCollection);
                     requiredLearningCourseEntryIterator.remove(); // safe removal from Map
                     requiredLearningCourse.setStatus(State.COMPLETED);
                     log.warn("requiredLearningCourseId: {}, requiredLearningCourse: {}. " +
-                            "This course status is updated to COMPLETED and it is removed from the homepage course list. ",
+                            "This course status is updated to COMPLETED and it is removed from the homepage course list.",
                             requiredLearningCourseId, requiredLearningCourse);
                     // TODO: 9. Create the completion event and the completion report entry
                 }
