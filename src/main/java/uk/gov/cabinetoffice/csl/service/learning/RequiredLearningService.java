@@ -11,10 +11,13 @@ import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.ActionResult;
 import uk.gov.cabinetoffice.csl.domain.learning.Learning;
 import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearning;
 import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearningCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.service.ActionResultService;
+import uk.gov.cabinetoffice.csl.service.CourseActionService;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
@@ -36,6 +39,8 @@ public class RequiredLearningService {
     private final OrganisationalUnitService organisationalUnitService;
     private final UserDetailsService userDetailsService;
     private final LearningFactory<RequiredLearningDisplayCourseFactory> requiredLearningFactory;
+    private final CourseActionService courseActionService;
+    private final ActionResultService actionResultService;
 
     public Learning getDetailedRequiredLearning(String userId) {
         User user = userDetailsService.getUserWithUid(userId);
@@ -144,7 +149,25 @@ public class RequiredLearningService {
                     log.warn("requiredLearningCourseId: {}, requiredLearningCourse: {}. " +
                             "This course status is updated to COMPLETED and it is removed from the homepage course list.",
                             requiredLearningCourseId, requiredLearningCourse);
-                    // TODO: 9. Create the completion event and the completion report entry
+                    Course course = requiredLearning.stream()
+                            .filter(c -> requiredLearningCourseId.equals(c.getId()))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("Course not found for id: " + requiredLearningCourseId));
+                    LocalDateTime latestModuleCompletionDate = moduleRecordsCollection.getLatestCompletionDate();
+                    log.warn("requiredLearningCourseId: {}, latestModuleCompletionDate: {} course: {}. " +
+                                    "latestModuleCompletionDate and course for the course to be marked as COMPLETED.",
+                            requiredLearningCourseId, latestModuleCompletionDate, course);
+                    // 9. Create the completion event and the completion report entry
+                    log.warn("requiredLearningCourseId: {}. Preparing the actionResult to mark the course as COMPLETED.",
+                            requiredLearningCourseId);
+                    // TODO: Uncomment the following lines after updating the Integration test:
+                    // RequiredLearningTest.testGetRequiredLearningUpdateCompletedStatusForMissingCompletionEvent()
+//                    ActionResult actionResult = courseActionService.completeCourse(course, user, latestModuleCompletionDate);
+//                    log.warn("requiredLearningCourseId: {}, actionResult: {}. actionResult about to be processed for the course to mark it as COMPLETED.",
+//                            requiredLearningCourseId, actionResult);
+//                    actionResultService.processResults(actionResult);
+//                    log.warn("requiredLearningCourseId: {}, actionResult: {}. actionResult is processed for the course to mark it as COMPLETED.",
+//                            requiredLearningCourseId, actionResult);
                 }
             }
         }
