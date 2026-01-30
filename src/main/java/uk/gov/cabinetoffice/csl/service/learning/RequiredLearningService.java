@@ -11,17 +11,15 @@ import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.ActionResult;
 import uk.gov.cabinetoffice.csl.domain.learning.Learning;
 import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearning;
 import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearningCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
-import uk.gov.cabinetoffice.csl.service.ActionResultService;
-import uk.gov.cabinetoffice.csl.service.CourseActionService;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.learningResources.course.CourseRecordService;
+import uk.gov.cabinetoffice.csl.service.user.CourseCompletionService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 import java.time.LocalDateTime;
@@ -39,8 +37,7 @@ public class RequiredLearningService {
     private final OrganisationalUnitService organisationalUnitService;
     private final UserDetailsService userDetailsService;
     private final LearningFactory<RequiredLearningDisplayCourseFactory> requiredLearningFactory;
-    private final CourseActionService courseActionService;
-    private final ActionResultService actionResultService;
+    private final CourseCompletionService courseCompletionService;
 
     public Learning getDetailedRequiredLearning(String userId) {
         User user = userDetailsService.getUserWithUid(userId);
@@ -52,11 +49,10 @@ public class RequiredLearningService {
     }
 
     public RequiredLearning getRequiredLearning(String uid, Boolean homepageCompleteRequiredCourses) {
-        log.warn("homepageCompleteRequiredCourses: {}", homepageCompleteRequiredCourses);
+        log.info("homepageCompleteRequiredCourses: {}", homepageCompleteRequiredCourses);
 
         // 1. Get user details from CSRS
         User user = userDetailsService.getUserWithUid(uid);
-        log.warn("user.getName(): {}", user.getName());
 
         // 2. Get required learnings from elasticsearch for user's department
         List<Course> requiredLearning = learningCatalogueService.getRequiredLearningForDepartments(user.getDepartmentCodes())
@@ -92,7 +88,6 @@ public class RequiredLearningService {
                         requiredModuleIdsForCompletion.put(course.getId(), course.getRequiredModuleIdsForCompletion());
                     }
                 }));
-        log.warn("requiredLearningCourses-1: {}", requiredLearningCourses);
 
         if (!moduleRecordIdsToFetch.isEmpty()) {
             // 6. If required moduleIds exist then get the moduleRecords from the user's learner record
@@ -115,18 +110,6 @@ public class RequiredLearningService {
 
                 List<String> requiredModuleIdsForCompletionForTheCourse = requiredModuleIdsForCompletion.get(requiredLearningCourseId);
                 List<String> requiredModuleIdsLeftForCompletionForTheCourse = moduleRecordsCollection.getRequiredIdsLeftForCompletion(requiredModuleIdsForCompletionForTheCourse);
-                log.warn("requiredLearningCourseId: {}, " +
-                        "requiredLearningCourseStatus: {}, " +
-                        "Total required modules: {}, moduleIds: {}, " +
-                        "Required modules left for completion: {}, moduleIds: {}, " +
-                        "Required modules completed: {}",
-                        requiredLearningCourseId,
-                        requiredLearningCourse.getStatus(),
-                        requiredModuleIdsForCompletionForTheCourse.size(),
-                        requiredModuleIdsForCompletionForTheCourse,
-                        requiredModuleIdsLeftForCompletionForTheCourse.size(),
-                        requiredModuleIdsLeftForCompletionForTheCourse,
-                        requiredModuleIdsForCompletionForTheCourse.size() - requiredModuleIdsLeftForCompletionForTheCourse.size());
 
                 // 8. Check if homepageCompleteRequiredCourses is true
                 // and completion event is missing
@@ -140,41 +123,42 @@ public class RequiredLearningService {
                 if (homepageCompleteRequiredCourses
                     && completionDate == null
                     && requiredModuleIdsLeftForCompletionForTheCourse.isEmpty()) {
-                    log.warn("requiredLearningCourseId: {}, requiredLearningCourse: {}, moduleRecordsCollection: {}. " +
-                            "This course status should be marked as COMPLETED.",
-                            requiredLearningCourseId, requiredLearningCourse, moduleRecordsCollection);
-                    requiredLearningCourseEntryIterator.remove(); // safe removal from Map
+                    requiredLearningCourseEntryIterator.remove();
                     requiredLearningCourse.setStatus(State.COMPLETED);
-                    log.warn("requiredLearningCourseId: {}, requiredLearningCourse: {}. " +
-                            "This course status is updated to COMPLETED and it is removed from the homepage course list.",
-                            requiredLearningCourseId, requiredLearningCourse);
                     Course course = requiredLearning.stream()
                             .filter(c -> requiredLearningCourseId.equals(c.getId()))
                             .findFirst()
                             .orElseThrow(() -> new RuntimeException("Course not found for id: " + requiredLearningCourseId));
                     LocalDateTime latestModuleCompletionDate = moduleRecordsCollection.getLatestCompletionDate();
-                    log.warn("requiredLearningCourseId: {}, latestModuleCompletionDate: {} course: {}. " +
-                                    "latestModuleCompletionDate and course for the course to be marked as COMPLETED.",
-                            requiredLearningCourseId, latestModuleCompletionDate, course);
+
+                    log.info("All the required modules were completed in the current learning period for " +
+                             "the course (requiredLearningCourseId: {}) for " +
+                             "the user (userid: {}, email: {}) but " +
+                             "the completion event is missing therefore the status of this course is being " +
+                             "auto-marked as COMPLETED with the completion date same as the latestModuleCompletionDate: {} " +
+                             "Following are the requiredLearningCourse and moduleRecordsCollection details. " +
+                             "requiredLearningCourse: {}, moduleRecordsCollection: {}",
+                             requiredLearningCourseId, user.getId(), user.getEmail(), latestModuleCompletionDate,
+                             requiredLearningCourse, moduleRecordsCollection);
 
                     // 9. Create the completion event and the completion report entry
-                    log.warn("requiredLearningCourseId: {}. Preparing the actionResult to mark the course as COMPLETED.",
-                            requiredLearningCourseId);
-                    ActionResult actionResult = courseActionService.completeCourse(course, user, latestModuleCompletionDate);
-                    log.warn("requiredLearningCourseId: {}, actionResult: {}. actionResult about to be processed for the course to mark it as COMPLETED.",
-                            requiredLearningCourseId, actionResult);
-                    actionResultService.processResults(actionResult);
-                    log.warn("requiredLearningCourseId: {}, actionResult: {}. actionResult is processed for the course to mark it as COMPLETED.",
-                            requiredLearningCourseId, actionResult);
+                    courseCompletionService.completeCourse(course, user, latestModuleCompletionDate);
+                    log.info("Now the requiredLearningCourse (requiredLearningCourseId: {}) is auto-marked as COMPLETED " +
+                             "for the user (userid: {}, email: {}) " +
+                             "and the completion event is created with the completion date same as the latestModuleCompletionDate: {} " +
+                             "because all the required modules were completed in the current learning period. " +
+                             "Now the course is moved from the homepage mandatory courses list to the completed learner record. " +
+                             "Following are the requiredLearningCourse and moduleRecordsCollection details. " +
+                             "requiredLearningCourse: {}, moduleRecordsCollection: {}",
+                            requiredLearningCourseId, user.getId(), user.getEmail(), latestModuleCompletionDate,
+                            requiredLearningCourse, moduleRecordsCollection);
                 }
             }
         }
-        log.warn("requiredLearningCourses-2: {}", requiredLearningCourses);
 
         // 10. requiredLearningCourses are sorted and returned by wrapping in a response object
         RequiredLearning requiredLearningResponse = new RequiredLearning(uid, new ArrayList<>(requiredLearningCourses.values()));
         requiredLearningResponse.sortCourses();
-        log.warn("requiredLearningResponse: {}", requiredLearningResponse);
         return requiredLearningResponse;
     }
 
