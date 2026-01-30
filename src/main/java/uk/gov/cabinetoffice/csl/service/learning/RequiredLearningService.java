@@ -158,8 +158,9 @@ public class RequiredLearningService {
                 }
             }
         }
-        // 11. sort the requiredLearningCourses and return it by wrapping in a response object
+        // 11. Wrap the requiredLearningCourses in requiredLearningResponse object
         RequiredLearning requiredLearningResponse = new RequiredLearning(uid, new ArrayList<>(requiredLearningCourses.values()));
+        // 12. sort the requiredLearningCourses before returning
         requiredLearningResponse.sortCourses();
         return requiredLearningResponse;
     }
