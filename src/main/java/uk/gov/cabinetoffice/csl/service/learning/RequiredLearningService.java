@@ -115,7 +115,6 @@ public class RequiredLearningService {
 
                 List<String> requiredModuleIdsForCompletionForTheCourse = requiredModuleIdsForCompletion.get(requiredLearningCourseId);
                 List<String> requiredModuleIdsLeftForCompletionForTheCourse = moduleRecordsCollection.getRequiredIdsLeftForCompletion(requiredModuleIdsForCompletionForTheCourse);
-
                 log.warn("requiredLearningCourseId: {}, " +
                         "requiredLearningCourseStatus: {}, " +
                         "Total required modules: {}, moduleIds: {}, " +
@@ -157,17 +156,16 @@ public class RequiredLearningService {
                     log.warn("requiredLearningCourseId: {}, latestModuleCompletionDate: {} course: {}. " +
                                     "latestModuleCompletionDate and course for the course to be marked as COMPLETED.",
                             requiredLearningCourseId, latestModuleCompletionDate, course);
+
                     // 9. Create the completion event and the completion report entry
                     log.warn("requiredLearningCourseId: {}. Preparing the actionResult to mark the course as COMPLETED.",
                             requiredLearningCourseId);
-                    // TODO: Uncomment the following lines after updating the Integration test:
-                    // RequiredLearningTest.testGetRequiredLearningUpdateCompletedStatusForMissingCompletionEvent()
-//                    ActionResult actionResult = courseActionService.completeCourse(course, user, latestModuleCompletionDate);
-//                    log.warn("requiredLearningCourseId: {}, actionResult: {}. actionResult about to be processed for the course to mark it as COMPLETED.",
-//                            requiredLearningCourseId, actionResult);
-//                    actionResultService.processResults(actionResult);
-//                    log.warn("requiredLearningCourseId: {}, actionResult: {}. actionResult is processed for the course to mark it as COMPLETED.",
-//                            requiredLearningCourseId, actionResult);
+                    ActionResult actionResult = courseActionService.completeCourse(course, user, latestModuleCompletionDate);
+                    log.warn("requiredLearningCourseId: {}, actionResult: {}. actionResult about to be processed for the course to mark it as COMPLETED.",
+                            requiredLearningCourseId, actionResult);
+                    actionResultService.processResults(actionResult);
+                    log.warn("requiredLearningCourseId: {}, actionResult: {}. actionResult is processed for the course to mark it as COMPLETED.",
+                            requiredLearningCourseId, actionResult);
                 }
             }
         }
