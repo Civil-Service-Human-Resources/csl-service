@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
@@ -37,6 +38,10 @@ public class DateRange implements Serializable {
     @JsonSerialize(using = LocalTimeSerializer.class)
     @JsonDeserialize(using = LocalTimeDeserializer.class)
     LocalTime endTime;
+
+    public String getAsDateString() {
+        return this.date.format(DateTimeFormatter.ofPattern("dd MMM uuuu"));
+    }
 
     public Integer getDurationInSeconds() {
         return Math.toIntExact(SECONDS.between(startTime, endTime));

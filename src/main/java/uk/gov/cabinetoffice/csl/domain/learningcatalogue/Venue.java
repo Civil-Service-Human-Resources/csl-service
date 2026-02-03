@@ -16,4 +16,12 @@ public class Venue implements Serializable {
     private String address;
     private Integer capacity;
     private Integer minCapacity;
+    private Integer availability;
+
+    public Venue(String location, String address, Integer capacity, Integer minCapacity) {
+        this.location = location;
+        this.address = address;
+        this.capacity = capacity;
+        this.minCapacity = minCapacity;
+    }
 }

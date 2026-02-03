@@ -52,7 +52,8 @@ public class AdminApproveBookingTest extends IntegrationTestBase {
                 """;
         String event = String.format("http://localhost:9000/learning_catalogue/courses/%s/modules/%s/events/%s", courseId, moduleId, eventId);
         String bookingDtoJsonResponse = String.format("""
-                {"event": "%s", "status":"Confirmed", "learner": "%s", "learnerEmail": "%s", "learnerName":"%s"}
+                {"event": "%s", "status":"Confirmed", "learner": "%s", "learnerEmail": "%s", "learnerName":"%s",
+                "bookingReference": "ABCDE"}
                 """, event, userId, userEmail, testDataService.getLearnerFirstName());
         String getModuleRecordsResponse = """
                 {"moduleRecords": [{
@@ -90,6 +91,36 @@ public class AdminApproveBookingTest extends IntegrationTestBase {
                     "state": "APPROVED"
                 }]}
                 """;
+        cslStubService.getNotificationServiceStubService().sendEmail("BOOKING_CONFIRMED",
+                """
+                        {
+                            "recipient": "userEmail@email.com",
+                            "personalisation" : {
+                              "learnerName" : "userEmail@email.com",
+                              "courseTitle" : "Test Course",
+                              "courseLocation" : "London",
+                              "accessibility" : "",
+                              "bookingReference" : "ABCDE",
+                              "courseDate" : "01 Jan 2023"
+                            }
+                        }
+                        """);
+        cslStubService.getNotificationServiceStubService().sendEmail("BOOKING_CONFIRMED_LINE_MANAGER",
+                """
+                        {
+                            "recipient" : "lineManager@email.com",
+                            "personalisation" : {
+                              "recipient" : "lineManager@email.com",
+                              "courseDate" : "01 Jan 2023",
+                              "learnerEmail" : "userEmail@email.com",
+                              "learnerName" : "Learner",
+                              "courseTitle" : "Test Course",
+                              "cost" : "0",
+                              "courseLocation" : "London"
+                            }
+                        }
+                        """);
+        cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         cslStubService.getLearnerRecord().updateBookingWithId(eventId, bookingId, expectedCancellationJsonInput, bookingDtoJsonResponse);
         cslStubService.stubUpdateModuleRecord(course, moduleId, userId, getModuleRecordsResponse, expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
         String url = String.format("/admin/courses/%s/modules/%s/events/%s/bookings/%s/approve_booking", courseId, moduleId, eventId, bookingId);

@@ -154,6 +154,25 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 "cost": 0.0
             }]""";
 
+    String learnerRecordEventsResponseWithCourseWithOneContentResult = """
+                {
+                    "content": [
+                        {
+                            "eventTimestamp": "2025-12-09T10:00:00Z",
+                            "resourceId": "course1"
+                        }
+                    ],
+                    "totalPages": 1
+                }
+                """;
+
+    String learnerRecordEventsResponseWithNoContent = """
+                {
+                    "content": [],
+                    "totalPages": 1
+                }
+                """;
+
     @Test
     public void testGetRequiredLearningForUserNotStarted() throws Exception {
         String courseRecord = """
@@ -172,6 +191,10 @@ public class RequiredLearningTest extends IntegrationTestBase {
         cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
         cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1"), moduleRecords);
         cslStubService.getLearnerRecord().getLearnerRecords("userId", "course1", 0, courseRecord);
+        cslStubService.getLearnerRecord().getLearnerRecordEvents(0,
+                LearnerRecordEventQuery.builder().userId("userId")
+                        .eventTypes(List.of("COMPLETE_COURSE")).build(), learnerRecordEventsResponseWithNoContent);
+
         mockMvc.perform(get("/learning/required/detailed/userId")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
@@ -246,6 +269,10 @@ public class RequiredLearningTest extends IntegrationTestBase {
         cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
         cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2", "module3"), moduleRecords);
         cslStubService.getLearnerRecord().getLearnerRecords("userId", "course1", 0, courseRecord);
+        cslStubService.getLearnerRecord().getLearnerRecordEvents(0,
+                LearnerRecordEventQuery.builder().userId("userId")
+                        .eventTypes(List.of("COMPLETE_COURSE")).build(), learnerRecordEventsResponseWithNoContent);
+
         mockMvc.perform(get("/learning/required/detailed/userId")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
@@ -329,6 +356,10 @@ public class RequiredLearningTest extends IntegrationTestBase {
         cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
         cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2", "module3"), moduleRecords);
         cslStubService.getLearnerRecord().getLearnerRecords("userId", "course1", 0, courseRecord);
+        cslStubService.getLearnerRecord().getLearnerRecordEvents(0,
+                LearnerRecordEventQuery.builder().userId("userId")
+                        .eventTypes(List.of("COMPLETE_COURSE")).build(), learnerRecordEventsResponseWithNoContent);
+
         mockMvc.perform(get("/learning/required/detailed/userId")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
@@ -412,6 +443,9 @@ public class RequiredLearningTest extends IntegrationTestBase {
         cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
         cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2", "module3"), moduleRecords);
         cslStubService.getLearnerRecord().getLearnerRecords("userId", "course1", 0, courseRecord);
+        cslStubService.getLearnerRecord().getLearnerRecordEvents(0,
+                LearnerRecordEventQuery.builder().userId("userId")
+                        .eventTypes(List.of("COMPLETE_COURSE")).build(), learnerRecordEventsResponseWithNoContent);
         mockMvc.perform(get("/learning/required/detailed/userId")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())

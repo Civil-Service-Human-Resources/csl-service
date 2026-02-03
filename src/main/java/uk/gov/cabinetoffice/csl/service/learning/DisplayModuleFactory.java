@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayModule;
+import uk.gov.cabinetoffice.csl.domain.learning.learningRecord.LearningRecordCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 
@@ -30,8 +31,7 @@ public class DisplayModuleFactory {
                 module.isRequiredForCompletion(), null, null, State.NULL);
     }
 
-    public DisplayModuleSummary generateDisplayModuleSummary(Collection<DisplayModule> modules) {
-        LocalDateTime latestCompletionDate = null;
+    public DisplayModuleSummary generateDisplayModuleSummary(Collection<DisplayModule> modules, LearningRecordCourse learningRecordCourse) {
         int inProgressCount = 0;
         int requiredCompletedCount = 0;
         int requiredForCompletionCount = 0;
@@ -39,10 +39,6 @@ public class DisplayModuleFactory {
             if (displayModule.isRequiredForCompletion()) {
                 requiredForCompletionCount++;
                 if (displayModule.getStatus().equals(State.COMPLETED)) {
-                    LocalDateTime completionDate = Objects.requireNonNullElse(displayModule.getCompletionDate(), LocalDateTime.MIN);
-                    if (completionDate.isAfter(Objects.requireNonNullElse(latestCompletionDate, LocalDateTime.MIN))) {
-                        latestCompletionDate = completionDate;
-                    }
                     requiredCompletedCount++;
                 } else if (displayModule.getStatus().equals(State.IN_PROGRESS)) {
                     inProgressCount++;
@@ -53,7 +49,17 @@ public class DisplayModuleFactory {
                 }
             }
         }
-        return new DisplayModuleSummary(latestCompletionDate, inProgressCount, requiredCompletedCount, requiredForCompletionCount);
+
+        LocalDateTime completionDate = null;
+        State state = (inProgressCount + requiredCompletedCount) == 0 ? State.NULL : State.IN_PROGRESS;
+        if (learningRecordCourse != null) {
+            completionDate = learningRecordCourse.getCompletionDate();
+            if(completionDate != null) {
+                state = State.COMPLETED;
+            }
+        }
+
+        return new DisplayModuleSummary(completionDate, inProgressCount, requiredCompletedCount, requiredForCompletionCount, state);
     }
 
 }

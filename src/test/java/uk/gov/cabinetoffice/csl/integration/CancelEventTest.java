@@ -139,6 +139,18 @@ public class CancelEventTest extends IntegrationTestBase {
         cslStubService.stubUpdateModuleRecords(
                 List.of(new LearnerRecordResourceId(userId, moduleId), new LearnerRecordResourceId(userId2, moduleId)),
                 List.of(course), getModuleRecordsResponse, expectedModuleRecordPUT, expectedModuleRecordPUTResponse);
+        cslStubService.getIdentityAPIServiceStubService().getIdentityMap(List.of("userId", "userId2"),
+                """
+                        {
+                            "userId": {
+                                "username": "userId@email.com"
+                            },
+                            "userId2": {
+                                "username": "userId2@email.com"
+                            }
+                        }
+                        """
+        );
         cslStubService.getNotificationServiceStubService().sendEmail("NOTIFY_LEARNER_CANCELLED_EVENT",
                 """
                         {
