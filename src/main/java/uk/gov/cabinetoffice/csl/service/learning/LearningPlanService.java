@@ -69,12 +69,12 @@ public class LearningPlanService {
                                                     .ifPresent(bookedLearningPlanCourses::add);
                                         }
                                     }, () -> {
-                                        log.info("homepageCompleteLearningPlanCourses: {}", homepageCompleteLearningPlanCourses);
                                         State state = requiredModuleRecords.isEmpty() ? State.NULL : State.IN_PROGRESS;
                                         LocalDateTime latestModuleCompletionDate = requiredModuleRecords.getLatestCompletionDate();
                                         List<String> requiredModuleIdsForCompletion = courseToBeDisplayed.getRequiredModuleIdsForCompletion();
                                         List<String> requiredModuleIdsLeftForCompletion = requiredModuleRecords.getRequiredIdsLeftForCompletion(requiredModuleIdsForCompletion);
                                         if (requiredModuleIdsLeftForCompletion.isEmpty()) {
+                                            log.info("homepageCompleteLearningPlanCourses: {}", homepageCompleteLearningPlanCourses);
                                             if (homepageCompleteLearningPlanCourses) {
                                                 log.info("All the required modules were completed for " +
                                                         "the course (courseId: {}) in the learning plan for " +
@@ -85,8 +85,7 @@ public class LearningPlanService {
                                                         "courseToBeDisplayed: {}, moduleRecordsCollection: {}",
                                                         courseToBeDisplayed.getId(), user.getId(), user.getEmail(), latestModuleCompletionDate,
                                                         courseToBeDisplayed, requiredModuleRecords);
-                                                        //TODO: Uncomment the following line after collecting the app logs and DB data before auto-completing the course
-                                                        //courseCompletionService.completeCourse(courseToBeDisplayed, user, latestModuleCompletionDate);
+                                                        courseCompletionService.completeCourse(courseToBeDisplayed, user, latestModuleCompletionDate);
                                                 state = State.COMPLETED;
                                                 log.info("Now the course (courseId: {}) is auto-marked as COMPLETED for " +
                                                         "the user (userid: {}, email: {}), and " +
