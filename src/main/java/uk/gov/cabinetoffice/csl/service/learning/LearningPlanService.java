@@ -1,5 +1,7 @@
 package uk.gov.cabinetoffice.csl.service.learning;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
@@ -12,68 +14,105 @@ import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlanCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
+import uk.gov.cabinetoffice.csl.service.user.CourseCompletionService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction.REMOVE_FROM_LEARNING_PLAN;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class LearningPlanService {
 
     private final LearnerRecordDataUtils learnerRecordDataUtils;
     private final LearningCatalogueService learningCatalogueService;
     private final UserDetailsService userDetailsService;
     private final LearningPlanFactory learningPlanFactory;
-
-    public LearningPlanService(LearnerRecordDataUtils learnerRecordDataUtils, LearningCatalogueService learningCatalogueService, UserDetailsService userDetailsService, LearningPlanFactory learningPlanFactory) {
-        this.learnerRecordDataUtils = learnerRecordDataUtils;
-        this.learningCatalogueService = learningCatalogueService;
-        this.userDetailsService = userDetailsService;
-        this.learningPlanFactory = learningPlanFactory;
-    }
+    private final CourseCompletionService courseCompletionService;
 
     public LearningPlan getLearningPlan(String uid, Boolean homepageCompleteLearningPlanCourses) {
         User user = userDetailsService.getUserWithUid(uid);
         List<String> requiredLearning = learningCatalogueService.getRequiredLearningIdsForDepartments(user.getDepartmentCodes());
         Map<String, LearnerRecordEvent> latestEventForCourseMap = new HashMap<>();
-        List<String> courseIds = learnerRecordDataUtils.getNonCompleteCourseRecords(user.getId())
+        List<String> nonCompleteCourseRecordIds = learnerRecordDataUtils.getNonCompleteCourseRecords(user.getId())
                 .stream().filter(lr -> !requiredLearning.contains(lr.getResourceId()))
                 .peek(lr -> latestEventForCourseMap.put(lr.getResourceId(), lr.getLatestEvent()))
                 .map(LearnerRecord::getResourceId)
                 .toList();
-        Map<String, Course> courses = new HashMap<>();
+        Map<String, Course> coursesToBeDisplayed = new HashMap<>();
         List<ModuleRecordResourceId> moduleRecordIds = new ArrayList<>();
-        learningCatalogueService.getCourses(courseIds)
-                .forEach(course -> {
-                    if (course.shouldBeDisplayed()) {
-                        courses.put(course.getId(), course);
-                        List<ModuleRecordResourceId> courseModuleRecordIds = course.getRequiredModuleIdsForCompletion()
+        learningCatalogueService.getCourses(nonCompleteCourseRecordIds)
+                .forEach(nonCompleteCourse -> {
+                    if (nonCompleteCourse.shouldBeDisplayed()) {
+                        coursesToBeDisplayed.put(nonCompleteCourse.getId(), nonCompleteCourse);
+                        List<ModuleRecordResourceId> requiredModuleIdsForCompletion = nonCompleteCourse.getRequiredModuleIdsForCompletion()
                                 .stream().map(mId -> new ModuleRecordResourceId(uid, mId)).toList();
-                        moduleRecordIds.addAll(courseModuleRecordIds);
+                        moduleRecordIds.addAll(requiredModuleIdsForCompletion);
                     }
                 });
         List<LearningPlanCourse> learningPlanCourses = new ArrayList<>();
         List<BookedLearningPlanCourse> bookedLearningPlanCourses = new ArrayList<>();
-        learnerRecordDataUtils.getModuleRecordsForCourses(courseIds, moduleRecordIds)
+        learnerRecordDataUtils.getModuleRecordsForCourses(nonCompleteCourseRecordIds, moduleRecordIds)
                 .forEach((courseId, requiredModuleRecords) -> {
-                    Course course = courses.get(courseId);
-                    if (course != null) {
+                    Course courseToBeDisplayed = coursesToBeDisplayed.get(courseId);
+                    if (courseToBeDisplayed != null) {
                         LearnerRecordEvent latestEvent = latestEventForCourseMap.get(courseId);
                         if (!(latestEvent != null && latestEvent.getActionType().equals(REMOVE_FROM_LEARNING_PLAN)
                                 && latestEvent.getEventTimestamp().isAfter(requiredModuleRecords.getLatestUpdatedDate()))) {
                             requiredModuleRecords.getModuleRecord()
-                                    .ifPresentOrElse(moduleRecord -> {
-                                        if (!moduleRecord.equalsStates(State.SKIPPED, State.COMPLETED)) {
-                                            learningPlanFactory.getBookedLearningPlanCourse(course, requiredModuleRecords)
+                                    .ifPresentOrElse(requiredModuleRecord -> {
+                                        if (!requiredModuleRecord.equalsStates(State.SKIPPED, State.COMPLETED)) {
+                                            learningPlanFactory.getBookedLearningPlanCourse(courseToBeDisplayed, requiredModuleRecords)
                                                     .ifPresent(bookedLearningPlanCourses::add);
                                         }
                                     }, () -> {
+                                        log.info("homepageCompleteLearningPlanCourses: {}", homepageCompleteLearningPlanCourses);
                                         State state = requiredModuleRecords.isEmpty() ? State.NULL : State.IN_PROGRESS;
-                                        learningPlanCourses.add(learningPlanFactory.getLearningPlanCourse(course, state));
+                                        LocalDateTime latestModuleCompletionDate = requiredModuleRecords.getLatestCompletionDate();
+                                        List<String> requiredModuleIdsForCompletion = courseToBeDisplayed.getRequiredModuleIdsForCompletion();
+                                        List<String> requiredModuleIdsLeftForCompletion = requiredModuleRecords.getRequiredIdsLeftForCompletion(requiredModuleIdsForCompletion);
+                                        if (requiredModuleIdsLeftForCompletion.isEmpty()) {
+                                            if (homepageCompleteLearningPlanCourses) {
+                                                log.info("All the required modules were completed for " +
+                                                        "the course (courseId: {}) in the learning plan for " +
+                                                        "the user (userid: {}, email: {}), but " +
+                                                        "the completion event is missing therefore the status of this course is being " +
+                                                        "auto-marked as COMPLETED with the completion date same as the latestModuleCompletionDate: {}. " +
+                                                        "Following are the course and moduleRecordsCollection details. " +
+                                                        "courseToBeDisplayed: {}, moduleRecordsCollection: {}",
+                                                        courseToBeDisplayed.getId(), user.getId(), user.getEmail(), latestModuleCompletionDate,
+                                                        courseToBeDisplayed, requiredModuleRecords);
+                                                        //TODO: Uncomment the following line after collecting the app logs and DB data before auto-completing the course
+                                                        //courseCompletionService.completeCourse(courseToBeDisplayed, user, latestModuleCompletionDate);
+                                                state = State.COMPLETED;
+                                                log.info("Now the course (courseId: {}) is auto-marked as COMPLETED for " +
+                                                        "the user (userid: {}, email: {}), and " +
+                                                        "the completion event is created with the completion date same as the latestModuleCompletionDate: {} " +
+                                                        "because all the required modules were completed. " +
+                                                        "Now the course is moved from the learning plan on homepage to the completed learner record. " +
+                                                        "Following are the course and moduleRecordsCollection details. " +
+                                                        "courseToBeDisplayed: {}, moduleRecordsCollection: {}",
+                                                        courseToBeDisplayed.getId(), user.getId(), user.getEmail(), latestModuleCompletionDate,
+                                                        courseToBeDisplayed, requiredModuleRecords);
+                                            } else {
+                                                log.info("All the required modules were completed for " +
+                                                        "the course (courseId: {}) in the learning plan for " +
+                                                        "the user (userid: {}, email: {}), but " +
+                                                        "the completion event is missing therefore the status of this course should be " +
+                                                        "auto-marked as COMPLETED with the completion date same as the latestModuleCompletionDate: {}, but " +
+                                                        "the flag 'homepageCompleteLearningPlanCourses' is false therefore the course is not auto-marked as COMPLETED. " +
+                                                        "Following are the course and moduleRecordsCollection details. " +
+                                                        "courseToBeDisplayed: {}, moduleRecordsCollection: {}",
+                                                        courseToBeDisplayed.getId(), user.getId(), user.getEmail(), latestModuleCompletionDate,
+                                                        courseToBeDisplayed, requiredModuleRecords);
+                                            }
+                                        }
+                                        if (!state.equals(State.COMPLETED)) {
+                                            learningPlanCourses.add(learningPlanFactory.getLearningPlanCourse(courseToBeDisplayed, state));
+                                        }
                                     });
                         }
                     }
