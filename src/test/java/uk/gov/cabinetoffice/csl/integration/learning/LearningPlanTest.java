@@ -221,7 +221,7 @@ public class LearningPlanTest extends IntegrationTestBase {
             """;
 
     @Test
-    public void testGetLearningPlanWhenHomepageCompleteLearningPlanCoursesIsFalse() throws Exception {
+    public void testGetLearningPlan() throws Exception {
 
         String recordResponse = """
                 {
