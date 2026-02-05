@@ -102,7 +102,7 @@ public class LearningPlanService {
                                 "courseToBeDisplayed: {}, moduleRecordsCollection: {}",
                                 courseToBeDisplayed.getId(), user.getId(), user.getEmail(), latestModuleCompletionDate,
                                 courseToBeDisplayed, requiredModuleRecords);
-                                courseCompletionService.completeCourse(courseToBeDisplayed, user, latestModuleCompletionDate);
+                        courseCompletionService.completeCourse(courseToBeDisplayed, user, latestModuleCompletionDate);
                         state = State.COMPLETED;
                         log.info("Now the course (courseId: {}) is auto-marked as COMPLETED for " +
                                 "the user (userid: {}, email: {}), and " +
