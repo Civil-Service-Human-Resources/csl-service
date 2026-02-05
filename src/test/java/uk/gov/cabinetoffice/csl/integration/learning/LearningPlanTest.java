@@ -469,7 +469,7 @@ public class LearningPlanTest extends IntegrationTestBase {
                   ]
                 }""";
 
-        mockMvc.perform(get("/learning/plan?HOMEPAGE_COMPLETE_LEARNING_PLAN_COURSES=false")
+        mockMvc.perform(get("/learning/plan")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().json(expectedJson, true));
