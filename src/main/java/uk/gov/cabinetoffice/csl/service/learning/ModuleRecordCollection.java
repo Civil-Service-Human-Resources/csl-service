@@ -14,7 +14,7 @@ import java.util.Optional;
 @Setter
 public class ModuleRecordCollection extends ArrayList<ModuleRecord> {
 
-    private ModuleRecord bookedEventModule = null;
+    private ModuleRecord moduleRecord = null;
     private List<String> completedModules = new ArrayList<>();
     private LocalDateTime latestCompletionDate = LocalDateTime.MIN;
     private LocalDateTime latestUpdatedDate = LocalDateTime.MIN;
@@ -23,8 +23,8 @@ public class ModuleRecordCollection extends ArrayList<ModuleRecord> {
         return moduleIdsRequiredForCourseCompletion.stream().filter(id -> !completedModules.contains(id)).toList();
     }
 
-    public Optional<ModuleRecord> getBookedEventModule() {
-        return Optional.ofNullable(bookedEventModule);
+    public Optional<ModuleRecord> getModuleRecord() {
+        return Optional.ofNullable(moduleRecord);
     }
 
     private void addModule(ModuleRecord moduleRecord) {
@@ -37,8 +37,8 @@ public class ModuleRecordCollection extends ArrayList<ModuleRecord> {
         if (moduleRecord.getState().equals(State.COMPLETED)) {
             getCompletedModules().add(moduleRecord.getModuleId());
         }
-        if (moduleRecord.isEventModule() && getBookedEventModule().isEmpty()) {
-            setBookedEventModule(moduleRecord);
+        if (moduleRecord.isEventModule() && getModuleRecord().isEmpty()) {
+            setModuleRecord(moduleRecord);
         }
     }
 

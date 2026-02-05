@@ -3,11 +3,13 @@ package uk.gov.cabinetoffice.csl.domain.learning.learningPlan;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@ToString
 public class BookedLearningPlanCourse extends LearningPlanCourse {
 
     private EventModule eventModule;

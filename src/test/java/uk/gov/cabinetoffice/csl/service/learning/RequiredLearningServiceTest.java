@@ -104,7 +104,7 @@ class RequiredLearningServiceTest {
                 new ModuleRecordResourceId("userId", "m1"),
                 new ModuleRecordResourceId("userId", "m2")
         ))).thenReturn(Map.of("course2", moduleRecords));
-        RequiredLearning result = requiredLearningService.getRequiredLearning("userId");
+        RequiredLearning result = requiredLearningService.getRequiredLearning("userId", false);
         assertEquals(1, result.getCourses().size());
         assertEquals("course2", result.getCourses().get(0).getId());
         assertEquals("course 2", result.getCourses().get(0).getTitle());

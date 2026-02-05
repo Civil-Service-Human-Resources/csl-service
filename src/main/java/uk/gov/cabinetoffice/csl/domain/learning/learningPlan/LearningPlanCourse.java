@@ -1,15 +1,13 @@
 package uk.gov.cabinetoffice.csl.domain.learning.learningPlan;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class LearningPlanCourse {
     private String id;
     private String title;

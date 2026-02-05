@@ -22,13 +22,14 @@
               <entry key="APP_NAME" value="csl-service" />
               <entry key="CLIENT_ID" value="ChangeMe" />
               <entry key="CLIENT_SECRET" value="ChangeMe" />
-              <entry key="COURSE_CACHE_TTL_SECONDS" value="10000" />
+              <entry key="COURSE_CACHE_TTL_SECONDS" value="1" />
               <entry key="CSL_SERVICE_SECURITY_PASSWORD" value="ChangeMe" />
               <entry key="CSL_SERVICE_SECURITY_USERNAME" value="ChangeMe" />
               <entry key="CSRS_SERVICE_URL" value="http://localhost:9002" />
               <entry key="JMS_USE_SERVICEBUS" value="false" />
               <entry key="JWT_KEY" value="ChangeMe" />
               <entry key="LEARNER_RECORD_CACHE_TTL_SECONDS" value="1" />
+              <entry key="LEARNER_RECORD_EVENT_SOURCE_ID" value="ChangeMe" />
               <entry key="LEARNER_RECORD_SERVICE_URL" value="http://localhost:9000" />
               <entry key="LEARNING_CATALOGUE_SERVICE_URL" value="http://localhost:9001" />
               <entry key="MANAGEMENT_UI_BASE_URL" value="http://localhost:3005" />
@@ -58,7 +59,7 @@
               <entry key="SESSION_TIMEOUT" value="3600" />
               <entry key="SPRING_BOOT_VERSION" value="SpringBoot3.0" />
               <entry key="UK_GOV_CABINETOFFICE_LOGGING_LEVEL" value="DEBUG" />
-              <entry key="USER_CACHE_TTL_SECONDS" value="86400" />
+              <entry key="USER_CACHE_TTL_SECONDS" value="1" />
               <entry key="WEBSITES_PORT" value="9003" />
             </map>
           </option>

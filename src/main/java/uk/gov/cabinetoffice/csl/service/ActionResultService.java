@@ -23,12 +23,6 @@ public class ActionResultService {
     }
 
     public void processResults(ActionResult actionResult) {
-        if (!isEmpty(actionResult.getEmails())) {
-            notificationService.sendEmails(actionResult.getEmails());
-        }
-        if (!isEmpty(actionResult.getMessages())) {
-            messagingClient.sendMessages(actionResult.getMessages());
-        }
         if (!isEmpty(actionResult.getLearnerRecordResults())) {
             try {
                 learnerRecordService.applyModuleRecordUpdates(actionResult.getLearnerRecordResults());
@@ -38,6 +32,12 @@ public class ActionResultService {
                 learnerRecordService.bustLearnerRecordCache(actionResult.getLearnerRecordResults().getLearnerRecordIds().toArray(ITypedLearnerRecordResourceID[]::new));
                 throw e;
             }
+        }
+        if (!isEmpty(actionResult.getMessages())) {
+            messagingClient.sendMessages(actionResult.getMessages());
+        }
+        if (!isEmpty(actionResult.getEmails())) {
+            notificationService.sendEmails(actionResult.getEmails());
         }
     }
 }
