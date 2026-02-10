@@ -20,6 +20,7 @@ import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction.REMOVE_FROM_LEARNING_PLAN;
 
@@ -92,16 +93,25 @@ public class LearningPlanService {
                 List<String> requiredModuleIdsLeftForCompletion = requiredModuleRecords.getRequiredIdsLeftForCompletion(requiredModuleIdsForCompletion);
                 if (requiredModuleIdsLeftForCompletion.isEmpty()) {
                     log.info("homepageCompleteLearningPlanCourses: {}", homepageCompleteLearningPlanCourses);
+                    String requiredModuleRecordsDetails = "[" + requiredModuleRecords.stream()
+                            .map(m ->
+                                    "(ModuleId: " + m.getModuleId()
+                                    + ", Uid: " + m.getUid()
+                                    + ", CompletionDate: " + m.getCompletionDate()
+                                    + ", UpdatedDate: " + m.getUpdatedAt()
+                                    + ", Title: " + m.getModuleTitle()
+                                    + ")"
+                            ).collect(Collectors.joining(", ")) + "]";
                     if (homepageCompleteLearningPlanCourses) {
                         log.info("All the required modules were completed for " +
                                 "the course (courseId: {}) in the learning plan for " +
                                 "the user (userid: {}, email: {}), but " +
                                 "the completion event is missing therefore the status of this course is being " +
                                 "auto-marked as COMPLETED with the completion date same as the latestModuleCompletionDate: {}. " +
-                                "Following are the course and moduleRecordsCollection details. " +
-                                "courseToBeDisplayed: {}, moduleRecordsCollection: {}",
+                                "Following are the course and the required modules records details. " +
+                                "courseToBeDisplayed: {}, requiredModuleRecordsDetails: {}",
                                 courseToBeDisplayed.getId(), user.getId(), user.getEmail(), latestModuleCompletionDate,
-                                courseToBeDisplayed, requiredModuleRecords);
+                                courseToBeDisplayed, requiredModuleRecordsDetails);
                         courseCompletionService.completeCourse(courseToBeDisplayed, user, latestModuleCompletionDate);
                         state = State.COMPLETED;
                         log.info("Now the course (courseId: {}) is auto-marked as COMPLETED for " +
@@ -109,10 +119,10 @@ public class LearningPlanService {
                                 "the completion event is created with the completion date same as the latestModuleCompletionDate: {} " +
                                 "because all the required modules were completed. " +
                                 "Now the course is moved from the learning plan on homepage to the completed learner record. " +
-                                "Following are the course and moduleRecordsCollection details. " +
-                                "courseToBeDisplayed: {}, moduleRecordsCollection: {}",
+                                "Following are the course and the required modules records details. " +
+                                "courseToBeDisplayed: {}, requiredModuleRecordsDetails: {}",
                                 courseToBeDisplayed.getId(), user.getId(), user.getEmail(), latestModuleCompletionDate,
-                                courseToBeDisplayed, requiredModuleRecords);
+                                courseToBeDisplayed, requiredModuleRecordsDetails);
                     } else {
                         log.info("All the required modules were completed for " +
                                 "the course (courseId: {}) in the learning plan for " +
@@ -120,10 +130,10 @@ public class LearningPlanService {
                                 "the completion event is missing therefore the status of this course should be " +
                                 "auto-marked as COMPLETED with the completion date same as the latestModuleCompletionDate: {}, but " +
                                 "the flag 'homepageCompleteLearningPlanCourses' is false therefore the course is not auto-marked as COMPLETED. " +
-                                "Following are the course and moduleRecordsCollection details. " +
-                                "courseToBeDisplayed: {}, moduleRecordsCollection: {}",
+                                        "Following are the course and the required modules records details. " +
+                                        "courseToBeDisplayed: {}, requiredModuleRecordsDetails: {}",
                                 courseToBeDisplayed.getId(), user.getId(), user.getEmail(), latestModuleCompletionDate,
-                                courseToBeDisplayed, requiredModuleRecords);
+                                courseToBeDisplayed, requiredModuleRecordsDetails);
                     }
                 }
                 if (!state.equals(State.COMPLETED)) {
