@@ -29,9 +29,20 @@ public class RequiredLearningController {
     }
 
     @GetMapping
-    public RequiredLearning getRequiredLearning() {
+    public RequiredLearning getRequiredLearning(
+            @RequestParam(name = "HOMEPAGE_COMPLETE_REQUIRED_COURSES", defaultValue = "false")
+            Boolean homepageCompleteRequiredCourses) {
         String uid = userAuthService.getUsername();
-        return requiredLearningService.getRequiredLearning(uid);
+        return requiredLearningService.getRequiredLearning(uid, homepageCompleteRequiredCourses);
+    }
+
+    @GetMapping("/{uid}")
+    public RequiredLearning getRequiredLearningByUid(
+            @PathVariable("uid") String uid,
+            @RequestParam(name = "HOMEPAGE_COMPLETE_REQUIRED_COURSES", defaultValue = "false")
+            Boolean homepageCompleteRequiredCourses
+    ) {
+        return requiredLearningService.getRequiredLearning(uid, homepageCompleteRequiredCourses);
     }
 
     @GetMapping("/detailed/{userId}")
