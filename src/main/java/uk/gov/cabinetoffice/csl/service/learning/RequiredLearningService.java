@@ -92,22 +92,31 @@ public class RequiredLearningService {
                 Map.Entry<String, RequiredLearningCourse> requiredLearningCourseEntry = requiredLearningCourseEntryIterator.next();
                 String requiredLearningCourseId = requiredLearningCourseEntry.getKey();
                 RequiredLearningCourse requiredLearningCourse = requiredLearningCourseEntry.getValue();
-                ModuleRecordCollection moduleRecordsCollection = moduleRecords.get(requiredLearningCourseId);
+                ModuleRecordCollection requiredModuleRecords = moduleRecords.get(requiredLearningCourseId);
                 // 7. If the latest update date of the module for the user is after the start date of the learning period
                 // then set the course status as IN_PROGRESS
-                if (moduleRecordsCollection.getLatestUpdatedDate()
+                if (requiredModuleRecords.getLatestUpdatedDate()
                         .isAfter(requiredLearningCourse.getLearningPeriod().getStartDateAsDateTime())) {
                     requiredLearningCourse.setStatus(State.IN_PROGRESS);
                 }
                 List<String> requiredModuleIdsForCompletionForTheCourse = requiredModuleIdsForCompletion.get(requiredLearningCourseId);
-                List<String> requiredModuleIdsLeftForCompletionForTheCourse = moduleRecordsCollection.getRequiredIdsLeftForCompletion(requiredModuleIdsForCompletionForTheCourse);
-                LocalDateTime latestModuleCompletionDate = moduleRecordsCollection.getLatestCompletionDate();
+                List<String> requiredModuleIdsLeftForCompletionForTheCourse = requiredModuleRecords.getRequiredIdsLeftForCompletion(requiredModuleIdsForCompletionForTheCourse);
+                LocalDateTime latestRequiredModuleCompletionDate = requiredModuleRecords.getLatestCompletionDate();
                 LocalDateTime completionDate = completionDates.get(requiredLearningCourseId);
                 // 8. If the completion event is missing
                 // and all the required modules were completed
                 // then write the log entry for the course completion status
                 if (completionDate == null && requiredModuleIdsLeftForCompletionForTheCourse.isEmpty()) {
                     log.info("homepageCompleteRequiredCourses: {}", homepageCompleteRequiredCourses);
+                    String requiredModuleRecordsDetails = "[" + requiredModuleRecords.stream()
+                            .map(m ->
+                                    "(ModuleId: " + m.getModuleId()
+                                    + ", Uid: " + m.getUid()
+                                    + ", CompletionDate: " + m.getCompletionDate()
+                                    + ", UpdatedDate: " + m.getUpdatedAt()
+                                    + ", Title: " + m.getModuleTitle()
+                                    + ")"
+                            ).collect(Collectors.joining(", ")) + "]";
                     // 9. If the homepageCompleteRequiredCourses is true
                     // then remove it from the requiredLearningCourses list
                     // and set the course status to COMPLETED
@@ -125,21 +134,21 @@ public class RequiredLearningService {
                                 "the requiredLearningCourse (requiredLearningCourseId: {}) for " +
                                 "the user (userid: {}, email: {}), but " +
                                 "the completion event is missing therefore the status of this course is being " +
-                                "auto-marked as COMPLETED with the completion date same as the latestModuleCompletionDate: {}. " +
-                                "Following are the requiredLearningCourse and moduleRecordsCollection details. " +
-                                "requiredLearningCourse: {}, moduleRecordsCollection: {}",
-                                requiredLearningCourseId, user.getId(), user.getEmail(), latestModuleCompletionDate,
-                                requiredLearningCourse, moduleRecordsCollection);
-                        courseCompletionService.completeCourse(course, user, latestModuleCompletionDate);
+                                "auto-marked as COMPLETED with the completion date same as the latestRequiredModuleCompletionDate: {}. " +
+                                "Following are the required learning course and the required modules records details. " +
+                                "requiredLearningCourse: {}, requiredModuleRecordsDetails: {}",
+                                requiredLearningCourseId, user.getId(), user.getEmail(), latestRequiredModuleCompletionDate,
+                                requiredLearningCourse, requiredModuleRecordsDetails);
+                        courseCompletionService.completeCourse(course, user, latestRequiredModuleCompletionDate);
                         log.info("Now the requiredLearningCourse (requiredLearningCourseId: {}) is auto-marked as COMPLETED for " +
                                 "the user (userid: {}, email: {}), and " +
-                                "the completion event is created with the completion date same as the latestModuleCompletionDate: {} " +
+                                "the completion event is created with the completion date same as the latestRequiredModuleCompletionDate: {} " +
                                 "because all the required modules were completed in the current learning period. " +
                                 "Now the course is moved from the homepage mandatory courses list to the completed learner record. " +
-                                "Following are the requiredLearningCourse and moduleRecordsCollection details. " +
-                                "requiredLearningCourse: {}, moduleRecordsCollection: {}",
-                                requiredLearningCourseId, user.getId(), user.getEmail(), latestModuleCompletionDate,
-                                requiredLearningCourse, moduleRecordsCollection);
+                                "Following are the required learning course and the required modules records details. " +
+                                "requiredLearningCourse: {}, requiredModuleRecordsDetails: {}",
+                                requiredLearningCourseId, user.getId(), user.getEmail(), latestRequiredModuleCompletionDate,
+                                requiredLearningCourse, requiredModuleRecordsDetails);
                     } else {
                         // 10. If the homepageCompleteRequiredCourses is false
                         // then write the detailed logs
@@ -148,12 +157,12 @@ public class RequiredLearningService {
                                 "the course (requiredLearningCourseId: {}) for " +
                                 "the user (userid: {}, email: {}), but " +
                                 "the completion event is missing therefore the status of this course should be " +
-                                "auto-marked as COMPLETED with the completion date same as the latestModuleCompletionDate: {}, but " +
+                                "auto-marked as COMPLETED with the completion date same as the latestRequiredModuleCompletionDate: {}, but " +
                                 "the flag 'homepageCompleteRequiredCourses' is false therefore the course is not auto-marked as COMPLETED. " +
-                                "Following are the requiredLearningCourse and moduleRecordsCollection details. " +
-                                "requiredLearningCourse: {}, moduleRecordsCollection: {}",
-                                requiredLearningCourseId, user.getId(), user.getEmail(), latestModuleCompletionDate,
-                                requiredLearningCourse, moduleRecordsCollection);
+                                "Following are the required learning course and the required modules records details. " +
+                                "requiredLearningCourse: {}, requiredModuleRecordsDetails: {}",
+                                requiredLearningCourseId, user.getId(), user.getEmail(), latestRequiredModuleCompletionDate,
+                                requiredLearningCourse, requiredModuleRecordsDetails);
                     }
                 }
             }
