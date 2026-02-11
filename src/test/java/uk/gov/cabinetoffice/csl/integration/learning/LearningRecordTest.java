@@ -167,7 +167,6 @@ public class LearningRecordTest extends IntegrationTestBase {
 
     @Test
     public void testGetLearningRecord() throws Exception {
-
         String eventsResponse = """
                 {
                     "content": [
