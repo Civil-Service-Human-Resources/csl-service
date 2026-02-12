@@ -16,6 +16,14 @@ class ModuleRecordTest {
     );
 
     @Test
+    void getStateForLearningPeriodCompletedSameDay() {
+        ModuleRecord moduleRecord = new ModuleRecord();
+        moduleRecord.setState(State.COMPLETED);
+        moduleRecord.setCompletionDate(LocalDateTime.of(2024, 1, 1, 10, 0, 0));
+        assertEquals(State.NULL, moduleRecord.getStateForLearningPeriod(learningPeriod));
+    }
+
+    @Test
     void getStateForLearningPeriodCompleted() {
         ModuleRecord moduleRecord = new ModuleRecord();
         moduleRecord.setState(State.COMPLETED);
