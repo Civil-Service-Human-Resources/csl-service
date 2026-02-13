@@ -286,8 +286,8 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.courses[0].completedRequiredModules").value(1))
                 .andExpect(jsonPath("$.courses[0].audience.name").value("DWP"))
                 .andExpect(jsonPath("$.courses[0].audience.frequency").value("1 years, 0 months"))
-                .andExpect(jsonPath("$.courses[0].audience.learningPeriod.startDate").value("2023-06-01"))
-                .andExpect(jsonPath("$.courses[0].audience.learningPeriod.endDate").value("2024-06-01"))
+                .andExpect(jsonPath("$.courses[0].audience.learningPeriod.startDate").value("2022-06-01"))
+                .andExpect(jsonPath("$.courses[0].audience.learningPeriod.endDate").value("2023-06-01"))
                 .andExpect(jsonPath("$.courses[0].modules.length()").value(3))
                 .andExpect(jsonPath("$.courses[0].modules[0].moduleTitle").value("module1"))
                 .andExpect(jsonPath("$.courses[0].modules[0].description").value("module1"))
@@ -373,8 +373,8 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.courses[0].completedRequiredModules").value(0))
                 .andExpect(jsonPath("$.courses[0].audience.name").value("DWP"))
                 .andExpect(jsonPath("$.courses[0].audience.frequency").value("1 years, 0 months"))
-                .andExpect(jsonPath("$.courses[0].audience.learningPeriod.startDate").value("2023-06-01"))
-                .andExpect(jsonPath("$.courses[0].audience.learningPeriod.endDate").value("2024-06-01"))
+                .andExpect(jsonPath("$.courses[0].audience.learningPeriod.startDate").value("2022-06-01"))
+                .andExpect(jsonPath("$.courses[0].audience.learningPeriod.endDate").value("2023-06-01"))
                 .andExpect(jsonPath("$.courses[0].modules.length()").value(3))
                 .andExpect(jsonPath("$.courses[0].modules[0].moduleTitle").value("module1"))
                 .andExpect(jsonPath("$.courses[0].modules[0].description").value("module1"))
@@ -417,9 +417,9 @@ public class RequiredLearningTest extends IntegrationTestBase {
                             "moduleType": "link",
                             "duration": 3600,
                             "state": "COMPLETED",
-                            "completionDate": "2022-06-01T10:00:00",
-                            "createdAt": "2022-06-01T10:00:00",
-                            "updatedAt": "2022-06-01T10:00:00"
+                            "completionDate": "2022-01-01T10:00:00",
+                            "createdAt": "2022-01-01T10:00:00",
+                            "updatedAt": "2022-01-01T10:00:00"
                         },
                         {
                             "id": 2,
@@ -431,9 +431,9 @@ public class RequiredLearningTest extends IntegrationTestBase {
                             "moduleType": "elearning",
                             "duration": 3600,
                             "state": "COMPLETED",
-                            "completionDate": "2022-06-01T10:00:00",
-                            "createdAt": "2022-06-01T10:00:00",
-                            "updatedAt": "2022-06-01T10:00:00"
+                            "completionDate": "2022-01-01T10:00:00",
+                            "createdAt": "2022-01-01T10:00:00",
+                            "updatedAt": "2022-01-01T10:00:00"
                         }
                     ]
                 }
@@ -459,8 +459,8 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.courses[0].completedRequiredModules").value(0))
                 .andExpect(jsonPath("$.courses[0].audience.name").value("DWP"))
                 .andExpect(jsonPath("$.courses[0].audience.frequency").value("1 years, 0 months"))
-                .andExpect(jsonPath("$.courses[0].audience.learningPeriod.startDate").value("2023-06-01"))
-                .andExpect(jsonPath("$.courses[0].audience.learningPeriod.endDate").value("2024-06-01"))
+                .andExpect(jsonPath("$.courses[0].audience.learningPeriod.startDate").value("2022-06-01"))
+                .andExpect(jsonPath("$.courses[0].audience.learningPeriod.endDate").value("2023-06-01"))
                 .andExpect(jsonPath("$.courses[0].modules.length()").value(3))
                 .andExpect(jsonPath("$.courses[0].modules[0].moduleTitle").value("module1"))
                 .andExpect(jsonPath("$.courses[0].modules[0].description").value("module1"))
@@ -507,7 +507,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 {
                     "content": [
                         {
-                            "eventTimestamp": "2022-06-01T10:00:00Z",
+                            "eventTimestamp": "2022-01-01T10:00:00Z",
                             "resourceId": "course1"
                         }
                     ],
@@ -527,9 +527,9 @@ public class RequiredLearningTest extends IntegrationTestBase {
                             "moduleType": "link",
                             "duration": 3600,
                             "state": "COMPLETED",
-                            "completionDate": "2022-06-01T10:00:00",
-                            "createdAt": "2022-06-01T10:00:00",
-                            "updatedAt": "2022-06-01T10:00:00"
+                            "completionDate": "2022-01-01T10:00:00Z",
+                            "createdAt": "2022-01-01T10:00:00Z",
+                            "updatedAt": "2022-01-01T10:00:00Z"
                         },
                         {
                             "id": 2,
@@ -541,9 +541,9 @@ public class RequiredLearningTest extends IntegrationTestBase {
                             "moduleType": "elearning",
                             "duration": 3600,
                             "state": "COMPLETED",
-                            "completionDate": "2022-06-01T10:00:00",
-                            "createdAt": "2022-06-01T10:00:00",
-                            "updatedAt": "2022-06-01T10:00:00"
+                            "completionDate": "2022-01-01T10:00:00Z",
+                            "createdAt": "2022-01-01T10:00:00Z",
+                            "updatedAt": "2022-01-01T10:00:00Z"
                         }
                     ]
                 }
@@ -568,16 +568,16 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.courses[0].duration").value(3600))
                 .andExpect(jsonPath("$.courses[0].moduleCount").value(3))
                 .andExpect(jsonPath("$.courses[0].status").value("NULL"))
-                .andExpect(jsonPath("$.courses[0].dueBy").value("2024-06-01"));
+                .andExpect(jsonPath("$.courses[0].dueBy").value("2023-06-01"));
     }
 
     @Test
-    public void testGetRequiredLearningBasicInProgress() throws Exception {
+    public void testRequiredLearningEndpointReturnsCourse1AsInProgressIfCompletedOnPreviousLearningPeriod() throws Exception {
         String eventsResponse = """
                 {
                     "content": [
                         {
-                            "eventTimestamp": "2022-06-01T10:00:00Z",
+                            "eventTimestamp": "2022-01-01T10:00:00Z",
                             "resourceId": "course1"
                         }
                     ],
@@ -597,9 +597,9 @@ public class RequiredLearningTest extends IntegrationTestBase {
                             "moduleType": "link",
                             "duration": 3600,
                             "state": "COMPLETED",
-                            "completionDate": "2023-07-10T10:00:00",
-                            "createdAt": "2023-05-01T10:00:00",
-                            "updatedAt": "2023-07-10T10:00:00"
+                            "completionDate": "2022-06-01T10:00:00Z",
+                            "createdAt": "2022-06-01T10:00:00Z",
+                            "updatedAt": "2022-06-01T10:00:00Z"
                         },
                         {
                             "id": 2,
@@ -611,9 +611,9 @@ public class RequiredLearningTest extends IntegrationTestBase {
                             "moduleType": "elearning",
                             "duration": 3600,
                             "state": "COMPLETED",
-                            "completionDate": "2023-05-01T10:00:00",
-                            "createdAt": "2023-05-01T10:00:00",
-                            "updatedAt": "2023-05-01T10:00:00"
+                            "completionDate": "2022-06-01T10:00:00Z",
+                            "createdAt": "2022-06-01T10:00:00Z",
+                            "updatedAt": "2022-06-01T10:00:00Z"
                         }
                     ]
                 }
@@ -638,7 +638,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.courses[0].duration").value(3600))
                 .andExpect(jsonPath("$.courses[0].moduleCount").value(3))
                 .andExpect(jsonPath("$.courses[0].status").value("IN_PROGRESS"))
-                .andExpect(jsonPath("$.courses[0].dueBy").value("2024-06-01"));
+                .andExpect(jsonPath("$.courses[0].dueBy").value("2023-06-01"));
     }
 
     @Test
