@@ -24,9 +24,19 @@ public class LearningPeriodFactory {
             LocalDateTime now = LocalDateTime.now(clock);
             log.debug(String.format("Time now is: %s", now));
             LocalDateTime endDate = requiredByAsDateTime;
-            while (endDate.isBefore(now)) {
-                endDate = endDate.plus(frequency);
+
+            if (endDate.isAfter(now)) {
+                while (endDate.isAfter(now)){
+                    endDate = endDate.minus(frequency);
+                }
             }
+
+            if (endDate.isBefore(now)) {
+                while (endDate.isBefore(now)) {
+                    endDate = endDate.plus(frequency);
+                }
+            }
+
             LocalDateTime startDate = endDate.minus(frequency);
             log.debug(String.format("Start date is %s, end date is %s", startDate, endDate));
             return new LearningPeriod(startDate.toLocalDate(), endDate.toLocalDate());
