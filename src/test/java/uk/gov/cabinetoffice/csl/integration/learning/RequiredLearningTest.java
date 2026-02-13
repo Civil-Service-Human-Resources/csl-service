@@ -564,7 +564,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.courses[0].duration").value(3600))
                 .andExpect(jsonPath("$.courses[0].moduleCount").value(3))
                 .andExpect(jsonPath("$.courses[0].status").value("IN_PROGRESS"))
-                .andExpect(jsonPath("$.courses[0].dueBy").value("2024-06-01"));
+                .andExpect(jsonPath("$.courses[0].dueBy").value("2023-06-01"));
     }
 
     @Test
@@ -775,9 +775,9 @@ public class RequiredLearningTest extends IntegrationTestBase {
                             "moduleType": "link",
                             "duration": 3600,
                             "state": "COMPLETED",
-                            "completionDate": "2022-06-01T10:00:00Z",
-                            "createdAt": "2022-06-01T10:00:00Z",
-                            "updatedAt": "2022-06-01T10:00:00Z"
+                            "completionDate": "2022-06-02T10:00:00Z",
+                            "createdAt": "2022-06-02T10:00:00Z",
+                            "updatedAt": "2022-06-02T10:00:00Z"
                         },
                         {
                             "id": 2,
@@ -789,9 +789,9 @@ public class RequiredLearningTest extends IntegrationTestBase {
                             "moduleType": "elearning",
                             "duration": 3600,
                             "state": "COMPLETED",
-                            "completionDate": "2022-06-01T10:00:00Z",
-                            "createdAt": "2022-06-01T10:00:00Z",
-                            "updatedAt": "2022-06-01T10:00:00Z"
+                            "completionDate": "2022-06-02T10:00:00Z",
+                            "createdAt": "2022-06-02T10:00:00Z",
+                            "updatedAt": "2022-06-02T10:00:00Z"
                         }
                     ]
                 }
