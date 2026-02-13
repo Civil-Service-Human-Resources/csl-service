@@ -167,24 +167,23 @@ public class LearningRecordTest extends IntegrationTestBase {
 
     @Test
     public void testGetLearningRecord() throws Exception {
-
         String eventsResponse = """
                 {
                     "content": [
                         {
-                            "eventTimestamp": "2025-01-01T00:00:00Z",
-                            "resourceId": "course1"
-                        },
-                        {
-                            "eventTimestamp": "2026-01-01T00:00:00Z",
+                            "eventTimestamp": "2022-01-01T00:00:00Z",
                             "resourceId": "course1"
                         },
                         {
                             "eventTimestamp": "2023-01-01T00:00:00Z",
+                            "resourceId": "course1"
+                        },
+                        {
+                            "eventTimestamp": "2022-01-01T00:00:00Z",
                             "resourceId": "course2"
                         },
                         {
-                            "eventTimestamp": "2025-01-01T00:00:00Z",
+                            "eventTimestamp": "2023-01-01T00:00:00Z",
                             "resourceId": "course3"
                         }
                     ],
@@ -207,12 +206,12 @@ public class LearningRecordTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.requiredLearningRecord.completedCourses[0].title").value("Course 1"))
                 .andExpect(jsonPath("$.requiredLearningRecord.completedCourses[0].type").value("link"))
                 .andExpect(jsonPath("$.requiredLearningRecord.completedCourses[0].duration").value(30))
-                .andExpect(jsonPath("$.requiredLearningRecord.completedCourses[0].completionDate").value("2026-01-01T00:00:00"))
+                .andExpect(jsonPath("$.requiredLearningRecord.completedCourses[0].completionDate").value("2023-01-01T00:00:00"))
                 .andExpect(jsonPath("$.otherLearning[0].id").value("course3"))
                 .andExpect(jsonPath("$.otherLearning[0].title").value("Course 3"))
                 .andExpect(jsonPath("$.otherLearning[0].type").value("face-to-face"))
                 .andExpect(jsonPath("$.otherLearning[0].duration").value(7200))
-                .andExpect(jsonPath("$.otherLearning[0].completionDate").value("2025-01-01T00:00:00"));
+                .andExpect(jsonPath("$.otherLearning[0].completionDate").value("2023-01-01T00:00:00"));
 
     }
 }
