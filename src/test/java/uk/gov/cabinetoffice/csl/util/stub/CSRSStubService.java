@@ -178,4 +178,25 @@ public class CSRSStubService {
                                 .withBody(response))
         );
     }
+
+    public StubMapping getSkillsMetadata(Integer size, Boolean synced, String response) {
+        return stubFor(
+                WireMock.get(urlPathEqualTo("/csrs/skills-metadata"))
+                        .withQueryParam("isSynced", equalTo(synced.toString()))
+                        .withQueryParam("page", equalTo("0"))
+                        .withQueryParam("size", equalTo(size.toString()))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
+    public StubMapping syncSkillsMetadata(String syncMetadataInput) {
+        return stubFor(
+                WireMock.post(urlPathEqualTo("/csrs/skills-metadata/sync-uids"))
+                        .withRequestBody(equalToJson(syncMetadataInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+        );
+    }
 }

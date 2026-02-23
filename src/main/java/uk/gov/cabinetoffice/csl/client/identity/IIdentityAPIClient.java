@@ -13,4 +13,6 @@ public interface IIdentityAPIClient {
     Optional<Identity> getIdentityWithEmail(String email);
 
     Map<String, Identity> fetchByUids(List<String> uids);
+
+    Map<String, String> getUidToEmailMap(List<String> uids);
 }

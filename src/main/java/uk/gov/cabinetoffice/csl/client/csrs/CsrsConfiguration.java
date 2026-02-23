@@ -31,6 +31,10 @@ public class CsrsConfiguration {
     private final String grades;
     @NotNull
     private final String serviceUrl;
+    @NotNull
+    private final String skillsMetadataUrl;
+    @NotNull
+    private final String syncSkillsMetadataUrl;
 
     public String getCivilServantProfileUrl(String uid) {
         return String.format("%s/resource/%s/profile", civilServants, uid);

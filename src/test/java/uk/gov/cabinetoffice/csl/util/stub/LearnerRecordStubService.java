@@ -230,4 +230,14 @@ public class LearnerRecordStubService {
                         .withHeader("Content-Type", "application/json")
                         .withBody(response)));
     }
+
+    public StubMapping searchLearnerRecords(String expectedLearnerRecordSearchInput, Integer page, Integer size, String learnerRecordResponse) {
+        return stubFor(WireMock.post(urlPathEqualTo("/learner_record_api/learner_records/search"))
+                .withRequestBody(equalToJson(expectedLearnerRecordSearchInput, true, true))
+                .withQueryParam("size", equalTo(size.toString()))
+                .withQueryParam("page", equalTo(page.toString()))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(learnerRecordResponse)));
+    }
 }

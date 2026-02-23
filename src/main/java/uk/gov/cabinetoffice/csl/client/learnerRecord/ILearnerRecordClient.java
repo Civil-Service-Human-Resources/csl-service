@@ -7,7 +7,9 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventStatusDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.invite.InviteDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface ILearnerRecordClient {
 
@@ -38,4 +40,6 @@ public interface ILearnerRecordClient {
     List<ModuleRecord> updateModuleRecords(List<ModuleRecord> input);
 
     void createInvite(String eventId, InviteDto invite);
+
+    LearnerRecordCollection searchLearnerRecords(Set<String> learnerIds, LocalDateTime lastUpdatedGte);
 }

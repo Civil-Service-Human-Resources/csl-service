@@ -56,4 +56,13 @@ public class IdentityAPIServiceStubService {
                         .withBody(response));
         return stubFor(request);
     }
+
+    public StubMapping getUidToEmailMap(String input, String uidToEmailMapResponse) {
+        return stubFor(WireMock.post(urlPathEqualTo("/identity/api/identities/map-uids-to-emails"))
+                .withRequestBody(equalToJson(input, true, true))
+                .withHeader("Authorization", equalTo("Bearer token"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(uidToEmailMapResponse)));
+    }
 }

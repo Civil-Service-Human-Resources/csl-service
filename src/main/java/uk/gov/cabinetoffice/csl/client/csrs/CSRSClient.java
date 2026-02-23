@@ -9,10 +9,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.ParallelHttpClient;
+import uk.gov.cabinetoffice.csl.client.identity.UidRequest;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.CreateDomainDto;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.DeleteDomainDto;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
+import uk.gov.cabinetoffice.csl.domain.csrs.record.CivilServantSkillsMetadataPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
 import java.util.List;
@@ -121,6 +123,19 @@ public class CSRSClient implements ICSRSClient {
             organisationalUnitDto.setParent(csrsConfiguration.getOrganisationalUnitResourceUrl(organisationalUnitDto.getParentId()));
         }
         return httpClient.executeRequest(RequestEntity.post(url).body(organisationalUnitDto), OrganisationalUnit.class);
+    }
+
+    @Override
+    public CivilServantSkillsMetadataPagedResponse getSkillsCivilServants(Integer size, boolean isSynced) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(csrsConfiguration.getSkillsMetadataUrl());
+        uriBuilder.queryParam("size", size).queryParam("page", 0).queryParam("isSynced", isSynced);
+        RequestEntity<Void> request = RequestEntity.get(uriBuilder.build().toUriString()).build();
+        return httpClient.executeRequest(request, CivilServantSkillsMetadataPagedResponse.class);
+    }
+
+    @Override
+    public void syncSkillsMetadata(UidRequest request) {
+        httpClient.executeRequest(RequestEntity.post(csrsConfiguration.getSyncSkillsMetadataUrl()).body(request), Void.class);
     }
 
     @Override

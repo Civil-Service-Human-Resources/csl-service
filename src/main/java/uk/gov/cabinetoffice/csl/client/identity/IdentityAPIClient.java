@@ -25,6 +25,8 @@ public class IdentityAPIClient implements IIdentityAPIClient {
     private String identitiesUrl;
     @Value("${identity.UidMapUrl}")
     private String uidMapUrl;
+    @Value("${identity.UidToEmailMapUrl}")
+    private String uidToEmailMapUrl;
 
     public IdentityAPIClient(@Qualifier("identityOAuthHttpClient") IHttpClient oauthClient) {
         this.oauthClient = oauthClient;
@@ -48,6 +50,13 @@ public class IdentityAPIClient implements IIdentityAPIClient {
     public Map<String, Identity> fetchByUids(List<String> uids) {
         String url = String.format("%s?uids=%s", uidMapUrl, String.join(",", uids));
         RequestEntity<Void> request = RequestEntity.get(url).build();
+        return oauthClient.executeMapRequest(request, new ParameterizedTypeReference<>() {
+        });
+    }
+
+    @Override
+    public Map<String, String> getUidToEmailMap(List<String> uids) {
+        RequestEntity<UidRequest> request = RequestEntity.post(uidToEmailMapUrl).body(new UidRequest(uids));
         return oauthClient.executeMapRequest(request, new ParameterizedTypeReference<>() {
         });
     }

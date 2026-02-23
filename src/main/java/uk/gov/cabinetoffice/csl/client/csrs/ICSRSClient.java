@@ -1,9 +1,11 @@
 package uk.gov.cabinetoffice.csl.client.csrs;
 
+import uk.gov.cabinetoffice.csl.client.identity.UidRequest;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.CreateDomainDto;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.DeleteDomainDto;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
+import uk.gov.cabinetoffice.csl.domain.csrs.record.CivilServantSkillsMetadataPagedResponse;
 import uk.gov.cabinetoffice.csl.util.IFetchClient;
 
 import java.util.List;
@@ -36,4 +38,7 @@ public interface ICSRSClient extends IFetchClient<OrganisationalUnitMap> {
 
     OrganisationalUnit createOrganisationalUnit(OrganisationalUnitDto organisationalUnitDto);
 
+    CivilServantSkillsMetadataPagedResponse getSkillsCivilServants(Integer size, boolean isSynced);
+
+    void syncSkillsMetadata(UidRequest request);
 }
