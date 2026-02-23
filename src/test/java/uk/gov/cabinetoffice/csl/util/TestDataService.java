@@ -8,6 +8,8 @@ import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedRespo
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.LearnerRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
@@ -24,6 +26,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction.COMPLETE_COURSE;
 
 @Service
 @Getter
@@ -251,5 +255,18 @@ public class TestDataService {
         organisationalUnits.add(organisationalUnits9);
 
         return organisationalUnits;
+    }
+
+    public LearnerRecord generateLearnerRecord(String uid, String courseId, LocalDateTime createdTimestamp, LocalDateTime completedTimestamp) {
+        LearnerRecord learnerRecord = new LearnerRecord();
+        learnerRecord.setResourceId(courseId);
+        learnerRecord.setLearnerId(uid);
+        learnerRecord.setCreatedTimestamp(createdTimestamp);
+        if (completedTimestamp != null) {
+            LearnerRecordEvent learnerRecordEvent = new LearnerRecordEvent();
+            learnerRecordEvent.setEventTimestamp(completedTimestamp);
+            learnerRecordEvent.setActionType(COMPLETE_COURSE);
+        }
+        return learnerRecord;
     }
 }
