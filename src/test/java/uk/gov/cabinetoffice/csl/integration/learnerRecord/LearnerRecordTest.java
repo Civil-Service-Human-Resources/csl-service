@@ -49,7 +49,7 @@ public class LearnerRecordTest extends IntegrationTestBase {
                     }
                 """;
 
-        cslStubService.getCsrsStubService().getSkillsMetadata(5, true, skillsMetadataResponse);
+        cslStubService.getCsrsStubService().getSkillsMetadata(5, "2022-12-31T10:00", skillsMetadataResponse);
 
         String input = """
                     {
@@ -64,14 +64,15 @@ public class LearnerRecordTest extends IntegrationTestBase {
                         "uid2": "uid2@email.com",
                         "uid3": "uid3@email.com",
                         "uid4": "uid4@email.com",
-                        "uid5": "uid5@email.com"
+                        "uid5": "uid5@email.com",
+                        "uid6": "uid6@email.com"
                     }
                 """;
         cslStubService.getIdentityAPIServiceStubService().getUidToEmailMap(input, uidToEmailMapResponse);
 
         String expectedLearnerRecordSearchInput = """
                 {
-                    "learnerIds": ["uid1", "uid2", "uid3", "uid4", "uid5"],
+                    "learnerIds": ["uid1", "uid2", "uid3", "uid4", "uid5", "uid6"],
                     "createdTimestampGte": "2023-01-01T10:00:00",
                     "updatedTimestampGte": "2023-01-01T10:00:00",
                     "eventTypes" : [ "COMPLETE_COURSE" ]
@@ -198,7 +199,7 @@ public class LearnerRecordTest extends IntegrationTestBase {
         String syncMetadataInput = """
                     {
                         "uids": [
-                            "uid1", "uid2", "uid3", "uid4", "uid5"
+                            "uid1", "uid2", "uid3", "uid4", "uid5", "uid6"
                         ]
                     }
                 """;

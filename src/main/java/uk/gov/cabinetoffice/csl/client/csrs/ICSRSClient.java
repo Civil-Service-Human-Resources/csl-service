@@ -8,6 +8,7 @@ import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.CivilServantSkillsMetadataPagedResponse;
 import uk.gov.cabinetoffice.csl.util.IFetchClient;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ICSRSClient extends IFetchClient<OrganisationalUnitMap> {
@@ -38,7 +39,7 @@ public interface ICSRSClient extends IFetchClient<OrganisationalUnitMap> {
 
     OrganisationalUnit createOrganisationalUnit(OrganisationalUnitDto organisationalUnitDto);
 
-    CivilServantSkillsMetadataPagedResponse getSkillsCivilServants(Integer size, boolean isSynced);
+    CivilServantSkillsMetadataPagedResponse getSkillsCivilServants(Integer size, LocalDateTime syncTimestampLte);
 
     void syncSkillsMetadata(UidRequest request);
 }

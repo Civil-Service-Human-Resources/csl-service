@@ -37,7 +37,8 @@ class SkillsLearnerRecordFactoryTest {
                 testDataService.generateLearnerRecord("uid4", "course3", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid4", "course4", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid5", "course1", dummyDate, dummyDate),
-                testDataService.generateLearnerRecord("uid6", "course1", dummyDate, dummyDate)
+                testDataService.generateLearnerRecord("uid6", "course1", dummyDate, dummyDate),
+                testDataService.generateLearnerRecord("uid11", "course1", dummyDate, dummyDate)
         );
         SkillsLearnerRecordResponse response = factory.buildResponse(uidsToEmails, new LearnerRecordCollection(learnerRecords), 23);
         // 8 Records in the response
@@ -45,11 +46,11 @@ class SkillsLearnerRecordFactoryTest {
         // 6 Users in the response
         assertEquals(6, response.getUserCount());
         // 13 Remaining users to be synced in total (23 total users - 10 users processed)
-        assertEquals(13, response.getRemainingUsers());
+        assertEquals(12, response.getRemainingUsers());
         List<String> uids = new ArrayList<>(response.getUids());
         Collections.sort(uids);
         // List of the 10 UIDs that were processed in total
-        assertEquals(List.of("uid0", "uid1", "uid2", "uid3", "uid4", "uid5", "uid6", "uid7", "uid8", "uid9"), uids);
+        assertEquals(List.of("uid0", "uid1", "uid11", "uid2", "uid3", "uid4", "uid5", "uid6", "uid7", "uid8", "uid9"), uids);
     }
 
     @Test

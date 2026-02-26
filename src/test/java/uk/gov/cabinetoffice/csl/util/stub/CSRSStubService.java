@@ -179,10 +179,10 @@ public class CSRSStubService {
         );
     }
 
-    public StubMapping getSkillsMetadata(Integer size, Boolean synced, String response) {
+    public StubMapping getSkillsMetadata(Integer size, String syncTimestampLte, String response) {
         return stubFor(
                 WireMock.get(urlPathEqualTo("/csrs/skills-metadata"))
-                        .withQueryParam("isSynced", equalTo(synced.toString()))
+                        .withQueryParam("syncTimestampLte", equalTo(syncTimestampLte))
                         .withQueryParam("page", equalTo("0"))
                         .withQueryParam("size", equalTo(size.toString()))
                         .withHeader("Authorization", equalTo("Bearer token"))
@@ -195,7 +195,7 @@ public class CSRSStubService {
     public StubMapping syncSkillsMetadata(String syncMetadataInput) {
         return stubFor(
                 WireMock.post(urlPathEqualTo("/csrs/skills-metadata/sync-uids"))
-                        .withRequestBody(equalToJson(syncMetadataInput, true, true))
+                        .withRequestBody(equalToJson(syncMetadataInput, true, false))
                         .withHeader("Authorization", equalTo("Bearer token"))
         );
     }

@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Period;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -21,5 +23,7 @@ public class GetSkillsLearnerRecordsParams {
 
     @NotNull
     private SkillsSyncMode mode;
+
+    private Period frequency;
 
 }

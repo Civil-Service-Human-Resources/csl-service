@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.controller.learnerRecord;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,7 @@ public class LearnerRecordController {
     }
 
     @GetMapping("/skills")
-    public SkillsLearnerRecordResponse getSkillsLearnerRecords(GetSkillsLearnerRecordsParams params) {
+    public SkillsLearnerRecordResponse getSkillsLearnerRecords(@Valid GetSkillsLearnerRecordsParams params) {
         return service.getSkillsLearnerRecords(params);
     }
 

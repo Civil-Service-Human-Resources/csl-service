@@ -36,8 +36,8 @@ public class CivilServantRegistryService {
         civilServantRegistryClient.patchCivilServantOrganisation(organisationalUnitIdDTO);
     }
 
-    public CivilServantSkillsMetadataCollection getCivilServantSkillsMetadata(Integer size, boolean isSynced) {
-        CivilServantSkillsMetadataPagedResponse resp = civilServantRegistryClient.getSkillsCivilServants(size, isSynced);
+    public CivilServantSkillsMetadataCollection getCivilServantSkillsMetadata(Integer size, LocalDateTime syncTimestampLte) {
+        CivilServantSkillsMetadataPagedResponse resp = civilServantRegistryClient.getSkillsCivilServants(size, syncTimestampLte);
         Integer totalUids = resp.getTotalElements();
         List<String> uids = new ArrayList<>();
         LocalDateTime minLastSyncDate = null;

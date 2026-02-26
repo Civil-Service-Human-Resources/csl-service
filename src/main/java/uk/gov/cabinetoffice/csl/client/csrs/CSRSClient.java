@@ -17,6 +17,7 @@ import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.CivilServantSkillsMetadataPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.csrs.record.OrganisationalUnitsPagedResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -126,9 +127,9 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public CivilServantSkillsMetadataPagedResponse getSkillsCivilServants(Integer size, boolean isSynced) {
+    public CivilServantSkillsMetadataPagedResponse getSkillsCivilServants(Integer size, LocalDateTime syncTimestampLte) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(csrsConfiguration.getSkillsMetadataUrl());
-        uriBuilder.queryParam("size", size).queryParam("page", 0).queryParam("isSynced", isSynced);
+        uriBuilder.queryParam("size", size).queryParam("page", 0).queryParam("syncTimestampLte", syncTimestampLte);
         RequestEntity<Void> request = RequestEntity.get(uriBuilder.build().toUriString()).build();
         return httpClient.executeRequest(request, CivilServantSkillsMetadataPagedResponse.class);
     }

@@ -56,19 +56,19 @@ public class SkillsLearnerRecordFactory {
         // Break when there isn't enough space in the response for anymore records. These records can be processed in the next call
         Integer processedCount = 0;
         for (String learnerId : learnerRecordMap.keySet()) {
+            Collection<LearnerRecord> learnerRecords = learnerRecordMap.get(learnerId);
+            if (recordsProcessed + learnerRecords.size() > totalRecordsInResponse) {
+                log.info("{} record slots left whereas learner record size is {}, skipping", totalRecordsInResponse - recordsProcessed, learnerRecords.size());
+                continue;
+            }
+            log.debug("Processing user {} ({} records)", learnerId, learnerRecords.size());
             String email = uidsToEmails.get(learnerId);
             if (email != null) {
-                Collection<LearnerRecord> learnerRecords = learnerRecordMap.get(learnerId);
-                if (recordsProcessed + learnerRecords.size() > totalRecordsInResponse) {
-                    log.info("{} record slots left whereas learner record size is {}, skipping", totalRecordsInResponse - recordsProcessed, learnerRecords.size());
-                    continue;
-                }
-                log.debug("Processing user {} ({} records)", learnerId, learnerRecords.size());
                 skillsLearnerRecords.addAll(learnerRecordsToSkillsLearnerRecord(email, learnerRecords));
                 recordsProcessed += learnerRecords.size();
-                learnerIdsProcessed.add(learnerId);
                 processedCount++;
             }
+            learnerIdsProcessed.add(learnerId);
             uidsToEmails.remove(learnerId);
             if (skillsLearnerRecords.size() == totalRecordsInResponse) {
                 break;
