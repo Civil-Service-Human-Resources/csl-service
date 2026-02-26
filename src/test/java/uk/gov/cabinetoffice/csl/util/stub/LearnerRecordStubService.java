@@ -233,7 +233,7 @@ public class LearnerRecordStubService {
 
     public StubMapping searchLearnerRecords(String expectedLearnerRecordSearchInput, Integer page, Integer size, String learnerRecordResponse) {
         return stubFor(WireMock.post(urlPathEqualTo("/learner_record_api/learner_records/search"))
-                .withRequestBody(equalToJson(expectedLearnerRecordSearchInput, true, true))
+                .withRequestBody(equalToJson(expectedLearnerRecordSearchInput, true, false))
                 .withQueryParam("size", equalTo(size.toString()))
                 .withQueryParam("page", equalTo(page.toString()))
                 .willReturn(aResponse()

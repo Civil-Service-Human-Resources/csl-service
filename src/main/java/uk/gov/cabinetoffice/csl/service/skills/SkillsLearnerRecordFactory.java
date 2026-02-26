@@ -29,15 +29,20 @@ public class SkillsLearnerRecordFactory {
         if (latestEvent != null && latestEvent.getActionType().equals(CourseRecordAction.COMPLETE_COURSE)) {
             completionDate = learnerRecord.getLatestEvent().getEventTimestamp().toLocalDate();
         }
-        boolean isCompleted = completionDate != null;
-        Integer progress = isCompleted ? 100 : 0;
-        return new SkillsLearnerRecord(emailAddress, learnerRecord.getResourceId(), progress,
-                isCompleted, "", 0, learnerRecord.getCreatedTimestamp().toLocalDate(),
-                completionDate);
+        if (completionDate != null) {
+            return new SkillsLearnerRecord(emailAddress, learnerRecord.getResourceId(), 100,
+                    true, "", 0, learnerRecord.getCreatedTimestamp().toLocalDate(),
+                    completionDate);
+        } else {
+            log.info("Record {} / {} was returned as a completed record but does not have a completion event. Skipping", learnerRecord.getLearnerId(), learnerRecord.getResourceId());
+            return null;
+        }
     }
 
     public List<SkillsLearnerRecord> learnerRecordsToSkillsLearnerRecord(String emailAddress, Collection<LearnerRecord> learnerRecords) {
-        return learnerRecords.stream().map(lr -> this.learnerRecordToSkillsLearnerRecord(emailAddress, lr)).toList();
+        return learnerRecords.stream()
+                .map(lr -> this.learnerRecordToSkillsLearnerRecord(emailAddress, lr))
+                .filter(Objects::nonNull).toList();
     }
 
     public SkillsLearnerRecordResponse buildResponse(Map<String, String> uidsToEmails, LearnerRecordCollection courseRecords,

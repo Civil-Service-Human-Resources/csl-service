@@ -13,5 +13,6 @@ public class LearnerRecordSearch {
     private LocalDateTime createdTimestampGte;
     private LocalDateTime updatedTimestampGte;
     private Collection<String> learnerIds;
+    private Collection<String> eventTypes;
 
 }

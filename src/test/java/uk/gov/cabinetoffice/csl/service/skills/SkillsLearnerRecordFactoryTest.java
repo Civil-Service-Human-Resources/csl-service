@@ -30,14 +30,14 @@ class SkillsLearnerRecordFactoryTest {
     @Test
     void shouldBuildResponseWithLearnerRecords() {
         List<LearnerRecord> learnerRecords = List.of(
-                testDataService.generateLearnerRecord("uid0", "course1", dummyDate, null),
+                testDataService.generateLearnerRecord("uid0", "course1", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid0", "course2", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid2", "course1", dummyDate, dummyDate),
-                testDataService.generateLearnerRecord("uid3", "course2", dummyDate, null),
+                testDataService.generateLearnerRecord("uid3", "course2", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid4", "course3", dummyDate, dummyDate),
-                testDataService.generateLearnerRecord("uid4", "course4", dummyDate, null),
+                testDataService.generateLearnerRecord("uid4", "course4", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid5", "course1", dummyDate, dummyDate),
-                testDataService.generateLearnerRecord("uid6", "course1", dummyDate, null)
+                testDataService.generateLearnerRecord("uid6", "course1", dummyDate, dummyDate)
         );
         SkillsLearnerRecordResponse response = factory.buildResponse(uidsToEmails, new LearnerRecordCollection(learnerRecords), 23);
         // 8 Records in the response
@@ -55,20 +55,20 @@ class SkillsLearnerRecordFactoryTest {
     @Test
     void shouldBuildResponseWithLearnerRecordsTooManyRecords() {
         List<LearnerRecord> learnerRecords = List.of(
-                testDataService.generateLearnerRecord("uid0", "course1", dummyDate, null),
+                testDataService.generateLearnerRecord("uid0", "course1", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid0", "course2", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid2", "course1", dummyDate, dummyDate),
-                testDataService.generateLearnerRecord("uid3", "course2", dummyDate, null),
+                testDataService.generateLearnerRecord("uid3", "course2", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid4", "course3", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid0", "course3", dummyDate, dummyDate),
-                testDataService.generateLearnerRecord("uid4", "course4", dummyDate, null),
+                testDataService.generateLearnerRecord("uid4", "course4", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid5", "course1", dummyDate, dummyDate),
-                testDataService.generateLearnerRecord("uid6", "course1", dummyDate, null),
+                testDataService.generateLearnerRecord("uid6", "course1", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid6", "course2", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid6", "course3", dummyDate, dummyDate),
-                testDataService.generateLearnerRecord("uid6", "course4", dummyDate, null),
+                testDataService.generateLearnerRecord("uid6", "course4", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid6", "course5", dummyDate, dummyDate),
-                testDataService.generateLearnerRecord("uid6", "course6", dummyDate, null)
+                testDataService.generateLearnerRecord("uid6", "course6", dummyDate, dummyDate)
         );
         SkillsLearnerRecordResponse response = factory.buildResponse(uidsToEmails, new LearnerRecordCollection(learnerRecords), 23);
         // 10 Records in the response

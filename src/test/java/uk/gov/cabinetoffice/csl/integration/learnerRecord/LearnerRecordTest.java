@@ -73,7 +73,8 @@ public class LearnerRecordTest extends IntegrationTestBase {
                 {
                     "learnerIds": ["uid1", "uid2", "uid3", "uid4", "uid5"],
                     "createdTimestampGte": "2023-01-01T10:00:00",
-                    "updatedTimestampGte": "2023-01-01T10:00:00"
+                    "updatedTimestampGte": "2023-01-01T10:00:00",
+                    "eventTypes" : [ "COMPLETE_COURSE" ]
                 }
                 """;
         String learnerRecordResponse = """

@@ -17,8 +17,11 @@ import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.NullableObjectCache;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction.COMPLETE_COURSE;
 
 @Slf4j
 @Service
@@ -185,4 +188,8 @@ public class LearnerRecordService {
                 }).toList();
     }
 
+    public LearnerRecordCollection searchCompletedLearnerRecords(Set<String> learnerIds, LocalDateTime minLastSyncDate) {
+        LearnerRecordSearch searchParams = new LearnerRecordSearch(minLastSyncDate, minLastSyncDate, learnerIds, List.of(COMPLETE_COURSE.getName()));
+        return new LearnerRecordCollection(this.client.searchLearnerRecords(searchParams));
+    }
 }

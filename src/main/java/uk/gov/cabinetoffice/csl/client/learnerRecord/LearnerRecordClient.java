@@ -18,10 +18,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.invite.InviteDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -207,11 +205,10 @@ public class LearnerRecordClient implements ILearnerRecordClient {
     }
 
     @Override
-    public LearnerRecordCollection searchLearnerRecords(Set<String> learnerIds, LocalDateTime lastUpdatedGte) {
+    public List<LearnerRecord> searchLearnerRecords(LearnerRecordSearch searchParams) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(configParams.getLearnerRecordsSearchUrl());
-        LearnerRecordSearch searchParams = new LearnerRecordSearch(lastUpdatedGte, lastUpdatedGte, learnerIds);
-        return new LearnerRecordCollection(httpClient.postPaginatedRequest(LearnerRecordPagedResponse.class, searchParams, uriBuilder, configParams.getLearnerRecordsMaxPageSize())
-                .stream().map(learnerRecordFactory::transformLearnerRecord).toList());
+        return httpClient.postPaginatedRequest(LearnerRecordPagedResponse.class, searchParams, uriBuilder, configParams.getLearnerRecordsMaxPageSize())
+                .stream().map(learnerRecordFactory::transformLearnerRecord).toList();
     }
 
 }

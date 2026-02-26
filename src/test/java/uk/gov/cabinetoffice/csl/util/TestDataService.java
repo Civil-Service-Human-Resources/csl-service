@@ -266,6 +266,7 @@ public class TestDataService {
             LearnerRecordEvent learnerRecordEvent = new LearnerRecordEvent();
             learnerRecordEvent.setEventTimestamp(completedTimestamp);
             learnerRecordEvent.setActionType(COMPLETE_COURSE);
+            learnerRecord.setLatestEvent(learnerRecordEvent);
         }
         return learnerRecord;
     }
