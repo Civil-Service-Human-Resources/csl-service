@@ -7,6 +7,10 @@ public class LearnerRecordCollection extends ArrayList<LearnerRecord> {
 
     public static final Comparator<Collection<LearnerRecord>> COMPARATOR_NUMBER_OF_RECORDS_DESC = Comparator.comparingInt((Collection<LearnerRecord> c) -> c.size()).reversed();
 
+    public LearnerRecordCollection() {
+        super();
+    }
+
     public LearnerRecordCollection(Collection<? extends LearnerRecord> c) {
         super(c);
     }

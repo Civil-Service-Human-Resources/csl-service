@@ -15,6 +15,7 @@ import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -47,12 +48,20 @@ public class SkillsRecordService {
         } else {
             log.info("Getting all skills users that have not been synced");
         }
+        Map<String, String> uidsToEmails = new HashMap<>();
+        LearnerRecordCollection learnerRecords = new LearnerRecordCollection();
         CivilServantSkillsMetadataCollection metadata = civilServantRegistryService.getCivilServantSkillsMetadata(params.getSize(), lastSyncTimestampLte);
-        Map<String, String> uidsToEmails = identityAPIClient.getUidToEmailMap(metadata.getUids());
-        LearnerRecordCollection learnerRecords = learnerRecordService.searchCompletedLearnerRecords(uidsToEmails.keySet(), metadata.getMinLastSyncDate());
-        SkillsLearnerRecordResponse resp = skillsLearnerRecordFactory.buildResponse(uidsToEmails, learnerRecords, metadata.getTotalUids());
-        civilServantRegistryService.syncSkillsMetadata(resp.getUids());
-        return resp;
+        if (!metadata.getUids().isEmpty()) {
+            uidsToEmails = identityAPIClient.getUidToEmailMap(metadata.getUids());
+        }
+        if (!uidsToEmails.isEmpty()) {
+            learnerRecords = learnerRecordService.searchCompletedLearnerRecords(uidsToEmails.keySet(), metadata.getMinLastSyncDate());
+        }
+        SkillsLearnerRecordResponse response = skillsLearnerRecordFactory.buildResponse(metadata, uidsToEmails, learnerRecords);
+        if (!response.getUids().isEmpty()) {
+            civilServantRegistryService.syncSkillsMetadata(response.getUids());
+        }
+        return response;
     }
 
 }

@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.service.skills;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.cabinetoffice.csl.domain.csrs.CivilServantSkillsMetadataCollection;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordCollection;
 import uk.gov.cabinetoffice.csl.domain.skills.SkillsLearnerRecordResponse;
@@ -19,12 +20,18 @@ class SkillsLearnerRecordFactoryTest {
 
     private final LocalDateTime dummyDate = LocalDateTime.of(2025, 1, 1, 10, 0);
 
-    Map<String, String> uidsToEmails = new HashMap<>();
+    private final List<String> uids = new ArrayList<>();
 
     {
         for (int i = 0; i < 10; i++) {
-            uidsToEmails.put("uid" + i, "email" + i + "@email.com");
+            uids.add("uid" + i);
         }
+    }
+
+    Map<String, String> uidsToEmails = new HashMap<>();
+
+    {
+        uids.forEach(uid -> uidsToEmails.put(uid, "email" + uid + "@email.com"));
     }
 
     @Test
@@ -40,12 +47,13 @@ class SkillsLearnerRecordFactoryTest {
                 testDataService.generateLearnerRecord("uid6", "course1", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid11", "course1", dummyDate, dummyDate)
         );
-        SkillsLearnerRecordResponse response = factory.buildResponse(uidsToEmails, new LearnerRecordCollection(learnerRecords), 23);
+        CivilServantSkillsMetadataCollection civilServantSkillsMetadataCollection = new CivilServantSkillsMetadataCollection(uids, dummyDate, 23);
+        SkillsLearnerRecordResponse response = factory.buildResponse(civilServantSkillsMetadataCollection, uidsToEmails, new LearnerRecordCollection(learnerRecords));
         // 8 Records in the response
         assertEquals(8, response.getRecordCount());
         // 6 Users in the response
         assertEquals(6, response.getUserCount());
-        // 13 Remaining users to be synced in total (23 total users - 10 users processed)
+        // 12 Remaining users to be synced in total (23 total users - 11 users processed)
         assertEquals(12, response.getRemainingUsers());
         List<String> uids = new ArrayList<>(response.getUids());
         Collections.sort(uids);
@@ -71,7 +79,8 @@ class SkillsLearnerRecordFactoryTest {
                 testDataService.generateLearnerRecord("uid6", "course5", dummyDate, dummyDate),
                 testDataService.generateLearnerRecord("uid6", "course6", dummyDate, dummyDate)
         );
-        SkillsLearnerRecordResponse response = factory.buildResponse(uidsToEmails, new LearnerRecordCollection(learnerRecords), 23);
+        CivilServantSkillsMetadataCollection civilServantSkillsMetadataCollection = new CivilServantSkillsMetadataCollection(uids, dummyDate, 23);
+        SkillsLearnerRecordResponse response = factory.buildResponse(civilServantSkillsMetadataCollection, uidsToEmails, new LearnerRecordCollection(learnerRecords));
         // 10 Records in the response
         assertEquals(10, response.getRecordCount());
         // 4 Users in the response
@@ -84,5 +93,23 @@ class SkillsLearnerRecordFactoryTest {
         // uid0 and uid3 are in the learner records but were not processed due to the limit. So leave them
         // for the next process
         assertEquals(List.of("uid0", "uid1", "uid5", "uid6", "uid7", "uid8", "uid9"), uids);
+    }
+
+    @Test
+    public void testEmptyFields() {
+        CivilServantSkillsMetadataCollection civilServantSkillsMetadataCollection = new CivilServantSkillsMetadataCollection(uids, dummyDate, 320);
+        SkillsLearnerRecordResponse response = factory.buildResponse(civilServantSkillsMetadataCollection, new HashMap<>(), new LearnerRecordCollection());
+        // 0 Records in the response
+        assertEquals(0, response.getRecordCount());
+        // 0 Users in the response
+        assertEquals(0, response.getUserCount());
+        // 310 Remaining users to be synced in total (320 total users - 10 not found in identity service or learner record)
+        assertEquals(310, response.getRemainingUsers());
+        List<String> uids = new ArrayList<>(response.getUids());
+        Collections.sort(uids);
+        // List of the 8 UIDs (4 users processed + 4 not found in learner records) that were processed in total
+        // uid0 and uid3 are in the learner records but were not processed due to the limit. So leave them
+        // for the next process
+        assertEquals(List.of("uid0", "uid1", "uid2", "uid3", "uid4", "uid5", "uid6", "uid7", "uid8", "uid9"), uids);
     }
 }

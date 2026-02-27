@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @Getter
 @Setter
@@ -15,12 +15,28 @@ import java.util.List;
 @AllArgsConstructor
 public class SkillsLearnerRecordResponse {
 
-    private List<SkillsLearnerRecord> results;
-    private Integer recordCount;
-    private Integer userCount;
-    private Integer remainingUsers;
-
+    private Collection<SkillsLearnerRecord> results = new ArrayList<>();
+    private Integer userCount = 0;
+    private Integer remainingUsers = 0;
     @JsonIgnore
     private Collection<String> uids;
+    
+    public Integer getRecordCount() {
+        return results.size();
+    }
+
+    public void addUserRecords(String learnerId, Collection<SkillsLearnerRecord> userRecords) {
+        results.addAll(userRecords);
+        if (!userRecords.isEmpty()) {
+            userCount++;
+        }
+        uids.add(learnerId);
+        remainingUsers--;
+    }
+
+    public void addUnprocessedUsers(Collection<String> uids) {
+        this.uids.addAll(uids);
+        remainingUsers = remainingUsers - uids.size();
+    }
 
 }
