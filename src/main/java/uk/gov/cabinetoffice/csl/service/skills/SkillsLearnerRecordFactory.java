@@ -10,6 +10,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordCollect
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.domain.skills.SkillsLearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.skills.SkillsLearnerRecordResponse;
+import uk.gov.cabinetoffice.csl.domain.skills.UserLearnerRecordCollection;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -35,14 +36,14 @@ public class SkillsLearnerRecordFactory {
                     true, "", 0, learnerRecord.getCreatedTimestamp().toLocalDate(),
                     completionDate);
         } else {
-            log.info("Record {} / {} was returned as a completed record but does not have a completion event. Skipping", learnerRecord.getLearnerId(), learnerRecord.getResourceId());
+            log.warn("Record {} / {} was returned as a completed record but does not have a completion event. Skipping", learnerRecord.getLearnerId(), learnerRecord.getResourceId());
             return null;
         }
     }
 
-    public List<SkillsLearnerRecord> learnerRecordsToSkillsLearnerRecord(String emailAddress, Collection<LearnerRecord> learnerRecords) {
-        return learnerRecords.stream()
-                .map(lr -> this.learnerRecordToSkillsLearnerRecord(emailAddress, lr))
+    public List<SkillsLearnerRecord> learnerRecordsToSkillsLearnerRecord(UserLearnerRecordCollection learner) {
+        return learner.getLearnerRecords().stream()
+                .map(lr -> this.learnerRecordToSkillsLearnerRecord(learner.getEmail(), lr))
                 .filter(Objects::nonNull).toList();
     }
 
@@ -54,30 +55,29 @@ public class SkillsLearnerRecordFactory {
             response.addUnprocessedUsers(metadata.getUids());
             return response;
         }
-        Map<String, Collection<LearnerRecord>> learnerRecordMap = courseRecords.getOrderedMapByUser(LearnerRecordCollection.COMPARATOR_NUMBER_OF_RECORDS_DESC);
-        // Order learner records by user record count descending
-        // Process users in order, starting with users that have the largest records.
-        // Break when there isn't enough space in the response for anymore records.
-        for (String learnerId : learnerRecordMap.keySet()) {
-            Collection<LearnerRecord> learnerRecords = learnerRecordMap.get(learnerId);
-            if (response.getRecordCount() + learnerRecords.size() > totalRecordsInResponse) {
-                log.info("{} record slots left whereas learner record size is {}, skipping", totalRecordsInResponse - response.getRecordCount(), learnerRecords.size());
-                continue;
-            }
-            log.debug("Processing user {} ({} records)", learnerId, learnerRecords.size());
-            String email = uidsToEmails.get(learnerId);
-            Collection<SkillsLearnerRecord> records = new ArrayList<>();
-            if (email != null) {
-                records = learnerRecordsToSkillsLearnerRecord(email, learnerRecords);
-            }
-            response.addUserRecords(learnerId, records);
-            uidsToEmails.remove(learnerId);
-            if (Objects.equals(response.getRecordCount(), totalRecordsInResponse)) {
-                break;
-            }
+
+        List<UserLearnerRecordCollection> learners = new ArrayList<>();
+        Map<String, Collection<LearnerRecord>> mappedRecords = courseRecords.getOrderedMapByUser(LearnerRecordCollection.COMPARATOR_NUMBER_OF_RECORDS_DESC);
+        for (String uid : metadata.getUids()) {
+            String email = uidsToEmails.get(uid);
+            Collection<LearnerRecord> learnerRecords = mappedRecords.getOrDefault(uid, List.of());
+            learners.add(new UserLearnerRecordCollection(uid, email, learnerRecords));
         }
-        // Add the UIDs that did not have any learner records associated with them
-        response.addUnprocessedUsers(uidsToEmails.keySet().stream().filter(uid -> !learnerRecordMap.containsKey(uid)).toList());
+
+        for (UserLearnerRecordCollection user : learners) {
+            List<String> msgParts = new ArrayList<>(List.of(String.format("Processed user %s", user.getUid())));
+            if (user.getEmail() != null) {
+                msgParts.add(String.format("email is %s, %s records", user.getEmail(), user.getLearnerRecords().size()));
+                if (response.getRecordCount() + user.getLearnerRecords().size() > totalRecordsInResponse) {
+                    msgParts.add(String.format("skipped as there were %s record slots left", totalRecordsInResponse - response.getRecordCount()));
+                } else {
+                    Collection<SkillsLearnerRecord> records = learnerRecordsToSkillsLearnerRecord(user);
+                    response.addUserRecords(records);
+                }
+            }
+            log.debug(String.join(", ", msgParts));
+            response.addProcessedUid(user.getUid());
+        }
         log.info("Processed {} users and {} learner records. There are {} users remaining", response.getUids().size(), response.getRecordCount(), response.getRemainingUsers());
         return response;
     }

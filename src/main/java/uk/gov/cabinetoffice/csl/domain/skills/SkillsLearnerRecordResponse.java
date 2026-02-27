@@ -20,23 +20,24 @@ public class SkillsLearnerRecordResponse {
     private Integer remainingUsers = 0;
     @JsonIgnore
     private Collection<String> uids;
-    
+
     public Integer getRecordCount() {
         return results.size();
     }
 
-    public void addUserRecords(String learnerId, Collection<SkillsLearnerRecord> userRecords) {
+    public void addUserRecords(Collection<SkillsLearnerRecord> userRecords) {
         results.addAll(userRecords);
         if (!userRecords.isEmpty()) {
             userCount++;
         }
-        uids.add(learnerId);
-        remainingUsers--;
     }
 
     public void addUnprocessedUsers(Collection<String> uids) {
-        this.uids.addAll(uids);
-        remainingUsers = remainingUsers - uids.size();
+        uids.forEach(this::addProcessedUid);
     }
 
+    public void addProcessedUid(String uid) {
+        uids.add(uid);
+        remainingUsers--;
+    }
 }
