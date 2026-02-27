@@ -1,10 +1,7 @@
 package uk.gov.cabinetoffice.csl.controller.learning;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlan;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 import uk.gov.cabinetoffice.csl.service.learning.LearningPlanService;
@@ -24,9 +21,19 @@ public class LearningPlanController {
 
     @GetMapping
     @ResponseBody
-    public LearningPlan getLearningPlanForUser() {
-        return learningPlanService.getLearningPlan(userAuthService.getUsername());
+    public LearningPlan getLearningPlanForUser(
+            @RequestParam(name = "HOMEPAGE_COMPLETE_LEARNING_PLAN_COURSES", defaultValue = "false")
+            Boolean homepageCompleteLearningPlanCourses) {
+        return learningPlanService.getLearningPlan(userAuthService.getUsername(), homepageCompleteLearningPlanCourses);
     }
 
+    @GetMapping("/{uid}")
+    public LearningPlan getLearningPlanByUid(
+            @PathVariable("uid") String uid,
+            @RequestParam(name = "HOMEPAGE_COMPLETE_LEARNING_PLAN_COURSES", defaultValue = "false")
+            Boolean homepageCompleteLearningPlanCourses
+    ) {
+        return learningPlanService.getLearningPlan(uid, homepageCompleteLearningPlanCourses);
+    }
 }
 

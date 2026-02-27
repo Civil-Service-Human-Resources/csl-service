@@ -53,4 +53,17 @@ class LearningPeriodFactoryTest {
         assertEquals(LocalDate.of(2023, 6, 10), result.getEndDate());
     }
 
+    @Test
+    public void testBuildLearningPeriodReturnsCorrectLearningPeriodIfRequiredLearningIsInTheFuture(){
+        Clock clock = Clock.fixed(Instant.parse("2025-01-01T10:00:00.000Z"), ZoneId.of("Europe/London"));
+        LearningPeriodFactory learningPeriodFactory = new LearningPeriodFactory(clock);
+        Audience audience = new Audience();
+        audience.setFrequency("P1Y");
+        audience.setRequiredBy(LocalDate.of(2026, 3, 31));
+        LearningPeriod result = learningPeriodFactory.buildLearningPeriod(audience);
+
+        assertEquals(LocalDate.of(2024, 3, 31), result.getStartDate());
+        assertEquals(LocalDate.of(2025, 3, 31), result.getEndDate());
+    }
+
 }

@@ -30,7 +30,7 @@ public class LearningPlanFactory {
     }
 
     public Optional<BookedLearningPlanCourse> getBookedLearningPlanCourse(Course course, ModuleRecordCollection moduleRecordCollection) {
-        return moduleRecordCollection.getBookedEventModule().map(moduleRecord -> {
+        return moduleRecordCollection.getModuleRecord().map(moduleRecord -> {
             Optional<BookedLearningPlanCourse> bookedLearningPlanCourse = Optional.empty();
             Module module = course.getModule(moduleRecord.getModuleId());
             Event event = module.getEvent(moduleRecord.getEventId());
