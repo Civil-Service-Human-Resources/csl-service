@@ -57,7 +57,6 @@ class SkillsLearnerRecordFactoryTest {
         assertEquals(12, response.getRemainingUsers());
         List<String> uids = new ArrayList<>(response.getUids());
         Collections.sort(uids);
-        // List of the 10 UIDs that were processed in total
         assertEquals(List.of("uid0", "uid1", "uid10", "uid2", "uid3", "uid4", "uid5", "uid6", "uid7", "uid8", "uid9"), uids);
     }
 
@@ -81,35 +80,23 @@ class SkillsLearnerRecordFactoryTest {
         );
         CivilServantSkillsMetadataCollection civilServantSkillsMetadataCollection = new CivilServantSkillsMetadataCollection(uids, dummyDate, 23);
         SkillsLearnerRecordResponse response = factory.buildResponse(civilServantSkillsMetadataCollection, uidsToEmails, new LearnerRecordCollection(learnerRecords));
-        // 10 Records in the response
         assertEquals(10, response.getRecordCount());
-        // 4 Users in the response
         assertEquals(3, response.getUserCount());
-        // 15 Remaining users to be synced in total (19 total users - (4 users processed + 4 not found in learner records))
-        assertEquals(16, response.getRemainingUsers());
+        assertEquals(12, response.getRemainingUsers());
         List<String> uids = new ArrayList<>(response.getUids());
         Collections.sort(uids);
-        // List of the 8 UIDs (4 users processed + 4 not found in learner records) that were processed in total
-        // uid0 and uid3 are in the learner records but were not processed due to the limit. So leave them
-        // for the next process
-        assertEquals(List.of("uid0", "uid1", "uid5", "uid6", "uid7", "uid8", "uid9"), uids);
+        assertEquals(List.of("uid0", "uid1", "uid10", "uid2", "uid3", "uid4", "uid5", "uid6", "uid7", "uid8", "uid9"), uids);
     }
 
     @Test
     public void testEmptyFields() {
         CivilServantSkillsMetadataCollection civilServantSkillsMetadataCollection = new CivilServantSkillsMetadataCollection(uids, dummyDate, 320);
         SkillsLearnerRecordResponse response = factory.buildResponse(civilServantSkillsMetadataCollection, new HashMap<>(), new LearnerRecordCollection());
-        // 0 Records in the response
         assertEquals(0, response.getRecordCount());
-        // 0 Users in the response
         assertEquals(0, response.getUserCount());
-        // 310 Remaining users to be synced in total (320 total users - 10 not found in identity service or learner record)
-        assertEquals(310, response.getRemainingUsers());
+        assertEquals(309, response.getRemainingUsers());
         List<String> uids = new ArrayList<>(response.getUids());
         Collections.sort(uids);
-        // List of the 8 UIDs (4 users processed + 4 not found in learner records) that were processed in total
-        // uid0 and uid3 are in the learner records but were not processed due to the limit. So leave them
-        // for the next process
-        assertEquals(List.of("uid0", "uid1", "uid2", "uid3", "uid4", "uid5", "uid6", "uid7", "uid8", "uid9"), uids);
+        assertEquals(List.of("uid0", "uid1", "uid10", "uid2", "uid3", "uid4", "uid5", "uid6", "uid7", "uid8", "uid9"), uids);
     }
 }

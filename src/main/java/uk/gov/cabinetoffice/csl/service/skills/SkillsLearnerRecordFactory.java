@@ -14,6 +14,7 @@ import uk.gov.cabinetoffice.csl.domain.skills.UserLearnerRecordCollection;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -55,15 +56,16 @@ public class SkillsLearnerRecordFactory {
             response.addUnprocessedUsers(metadata.getUids());
             return response;
         }
-
-        List<UserLearnerRecordCollection> learners = new ArrayList<>();
-        Map<String, Collection<LearnerRecord>> mappedRecords = courseRecords.getOrderedMapByUser(LearnerRecordCollection.COMPARATOR_NUMBER_OF_RECORDS_DESC);
-        for (String uid : metadata.getUids()) {
-            String email = uidsToEmails.get(uid);
-            Collection<LearnerRecord> learnerRecords = mappedRecords.getOrDefault(uid, List.of());
-            learners.add(new UserLearnerRecordCollection(uid, email, learnerRecords));
-        }
-
+        Map<String, Collection<LearnerRecord>> learnerRecordMap = courseRecords.stream().collect(Collectors.toMap(LearnerRecord::getLearnerId, lr -> new ArrayList<>(List.of(lr)), (collection, collection2) -> {
+            collection.addAll(collection2);
+            return collection;
+        }));
+        List<UserLearnerRecordCollection> learners = metadata.getUids().stream().map(uid -> {
+                    String email = uidsToEmails.get(uid);
+                    Collection<LearnerRecord> learnerRecords = learnerRecordMap.getOrDefault(uid, List.of());
+                    return new UserLearnerRecordCollection(uid, email, learnerRecords);
+                }).sorted(Comparator.comparingInt((UserLearnerRecordCollection c) -> c.getLearnerRecords().size()).reversed())
+                .toList();
         for (UserLearnerRecordCollection user : learners) {
             List<String> msgParts = new ArrayList<>(List.of(String.format("Processed user %s", user.getUid())));
             if (user.getEmail() != null) {
@@ -75,7 +77,7 @@ public class SkillsLearnerRecordFactory {
                     response.addUserRecords(records);
                 }
             }
-            log.debug(String.join(", ", msgParts));
+            log.info(String.join(", ", msgParts));
             response.addProcessedUid(user.getUid());
         }
         log.info("Processed {} users and {} learner records. There are {} users remaining", response.getUids().size(), response.getRecordCount(), response.getRemainingUsers());

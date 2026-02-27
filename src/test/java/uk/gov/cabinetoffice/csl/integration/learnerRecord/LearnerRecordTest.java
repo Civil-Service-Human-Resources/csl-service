@@ -8,6 +8,7 @@ import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class LearnerRecordTest extends IntegrationTestBase {
@@ -128,72 +129,6 @@ public class LearnerRecordTest extends IntegrationTestBase {
                                     "source": "csl_source_id"
                                 }
                             }
-                        },
-                        {
-                            "resourceId": "courseId",
-                            "learnerId": "uid2",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "createdTimestamp" : "2024-01-01T10:00:00",
-                            "latestEvent": {
-                                "learnerId": "uid2",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2024-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "courseId",
-                            "learnerId": "uid4",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "createdTimestamp" : "2025-01-01T10:00:00",
-                            "latestEvent": {
-                                "learnerId": "uid4",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2025-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "courseId",
-                            "learnerId": "uid5",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "createdTimestamp" : "2024-05-01T10:00:00",
-                            "latestEvent": {
-                                "learnerId": "uid5",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2024-05-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
                         }
                     ],
                     "totalPages": 1
@@ -212,7 +147,19 @@ public class LearnerRecordTest extends IntegrationTestBase {
                         .queryParam("mode", "DELTA")
                         .queryParam("size", "5")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is2xxSuccessful());
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.results.length()").value(2))
+                .andExpect(jsonPath("$.results[0].emailAddress").value("uid1@email.com"))
+                .andExpect(jsonPath("$.results[0].contentId").value("courseId"))
+                .andExpect(jsonPath("$.results[0].enrollmentDate").value("2023-01-01"))
+                .andExpect(jsonPath("$.results[0].completionDate").value("2023-01-01"))
+                .andExpect(jsonPath("$.results[1].emailAddress").value("uid1@email.com"))
+                .andExpect(jsonPath("$.results[1].contentId").value("courseId2"))
+                .andExpect(jsonPath("$.results[1].enrollmentDate").value("2023-05-01"))
+                .andExpect(jsonPath("$.results[1].completionDate").value("2023-05-01"))
+                .andExpect(jsonPath("$.userCount").value(1))
+                .andExpect(jsonPath("$.remainingUsers").value(339))
+                .andExpect(jsonPath("$.recordCount").value(2));
     }
 
     @Test
@@ -271,7 +218,11 @@ public class LearnerRecordTest extends IntegrationTestBase {
                         .queryParam("mode", "DELTA")
                         .queryParam("size", "5")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is2xxSuccessful());
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.results.length()").value(0))
+                .andExpect(jsonPath("$.userCount").value(0))
+                .andExpect(jsonPath("$.remainingUsers").value(340))
+                .andExpect(jsonPath("$.recordCount").value(0));
     }
 
     @Test
@@ -352,6 +303,10 @@ public class LearnerRecordTest extends IntegrationTestBase {
                         .queryParam("mode", "DELTA")
                         .queryParam("size", "5")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is2xxSuccessful());
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.results.length()").value(0))
+                .andExpect(jsonPath("$.userCount").value(0))
+                .andExpect(jsonPath("$.remainingUsers").value(340))
+                .andExpect(jsonPath("$.recordCount").value(0));
     }
 }
