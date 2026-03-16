@@ -97,6 +97,12 @@ public class LearnerRecordClient implements ILearnerRecordClient {
 
     @Override
     public List<LearnerRecord> getLearnerRecords(LearnerRecordQuery query) {
+        UriComponentsBuilder uriBuilder = createUriBuilder(query);
+        return httpClient.getPaginatedRequest(LearnerRecordPagedResponse.class, uriBuilder, configParams.getLearnerRecordsMaxPageSize())
+                .stream().map(learnerRecordFactory::transformLearnerRecord).toList();
+    }
+
+    private UriComponentsBuilder createUriBuilder(LearnerRecordQuery query) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(configParams.getLearnerRecordsUrl());
         if (!isEmpty(query.getLearnerRecordTypes())) {
             uriBuilder.queryParam("learnerRecordTypes", query.getLearnerRecordTypes());
@@ -110,8 +116,24 @@ public class LearnerRecordClient implements ILearnerRecordClient {
         if (!isEmpty(query.getLearnerIds())) {
             uriBuilder.queryParam("learnerIds", query.getLearnerIds());
         }
-        return httpClient.getPaginatedRequest(LearnerRecordPagedResponse.class, uriBuilder, configParams.getLearnerRecordsMaxPageSize())
-                .stream().map(learnerRecordFactory::transformLearnerRecord).toList();
+        return uriBuilder;
+    }
+
+    @Override
+    public LearnerRecordPagedResponse getLearnerRecordPage(LearnerRecordQuery query, int page, int size) {
+        UriComponentsBuilder uriBuilder = createUriBuilder(query);
+        if (!isEmpty(query.getNotResourceIds())) {
+            uriBuilder.queryParam("notResourceIds", query.getNotResourceIds());
+        }
+        uriBuilder.queryParam("page", page);
+        uriBuilder.queryParam("size", size);
+
+        RequestEntity<Void> request = RequestEntity.get(uriBuilder.build().toUriString()).build();
+        LearnerRecordPagedResponse response = httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {});
+        if (response.getContent() != null) {
+            response.setContent(response.getContent().stream().map(learnerRecordFactory::transformLearnerRecord).toList());
+        }
+        return response;
     }
 
     @Override

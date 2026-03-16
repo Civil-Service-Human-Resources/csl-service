@@ -185,4 +185,7 @@ public class LearnerRecordService {
                 }).toList();
     }
 
+    public LearnerRecordPagedResponse getLearnerRecordPage(LearnerRecordQuery query, int page, int size) {
+        return client.getLearnerRecordPage(query, page, size);
+    }
 }
