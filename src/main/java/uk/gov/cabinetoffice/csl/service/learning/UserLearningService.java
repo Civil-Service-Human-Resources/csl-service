@@ -28,7 +28,7 @@ public class UserLearningService {
     private final LearningCatalogueService learningCatalogueService;
     private final LearnerRecordService learnerRecordService;
 
-    public UserLearningResponse getLearning(String uid, int page, int size) {
+    public UserLearningResponse getOptionalLearningRecord(String uid, int page, int size) {
         User user = userDetailsService.getUserWithUid(uid);
         List<String> requiredLearningIds = learningCatalogueService.getRequiredLearningIdsForDepartments(user.getDepartmentCodes());
 

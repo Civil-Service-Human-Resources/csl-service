@@ -17,9 +17,9 @@ public class UserLearningController {
     private final UserLearningService userLearningService;
 
     @GetMapping("/{uid}")
-    public UserLearningResponse getLearning(@PathVariable String uid,
-                                            @RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(defaultValue = "20") int size) {
-        return userLearningService.getLearning(uid, page, size);
+    public UserLearningResponse getOptionalLearningRecord(@PathVariable String uid,
+                                                          @RequestParam(defaultValue = "0") int page,
+                                                          @RequestParam(defaultValue = "20") int size) {
+        return userLearningService.getOptionalLearningRecord(uid, page, size);
     }
 }
