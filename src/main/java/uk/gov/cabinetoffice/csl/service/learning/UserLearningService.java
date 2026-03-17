@@ -48,8 +48,8 @@ public class UserLearningService {
 
         List<UserLearningCourse> learningCourses = records.stream().map(record -> {
             UserLearningCourse c = new UserLearningCourse();
-            c.setResourceId(courseTitles.getOrDefault(record.getResourceId(), record.getResourceId()));
-            c.setTitle(courseTitles.getOrDefault(record.getResourceId(), "CourseTitleNotFoundFor: " + record.getResourceId()));
+            c.setResourceId(record.getResourceId());
+            c.setTitle(courseTitles.getOrDefault(record.getResourceId(), "Course title not found for resourceId: " + record.getResourceId()));
 
             LearnerRecordEvent latestEvent = record.getLatestEvent();
             if (latestEvent != null && CourseRecordAction.COMPLETE_COURSE.equals(latestEvent.getActionType())) {
