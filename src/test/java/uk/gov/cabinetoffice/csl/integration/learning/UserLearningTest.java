@@ -102,7 +102,7 @@ public class UserLearningTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.learning[0].status").value("Completed"))
                 .andExpect(jsonPath("$.learning[0].completionDate").value("1 Jan 2026"))
                 .andExpect(jsonPath("$.learning[1].title").value("B Course 3"))
-                .andExpect(jsonPath("$.learning[1].status").value("In progress"))
+                .andExpect(jsonPath("$.learning[1].status").value(""))
                 .andExpect(jsonPath("$.learning[1].completionDate").isEmpty())
                 .andExpect(jsonPath("$.totalResults").value(2))
                 .andExpect(jsonPath("$.page").value(0))

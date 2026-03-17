@@ -5,20 +5,20 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.model.UserLearningCourse;
 import uk.gov.cabinetoffice.csl.controller.model.UserLearningResponse;
 import uk.gov.cabinetoffice.csl.domain.User;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +27,7 @@ public class UserLearningService {
     private final UserDetailsService userDetailsService;
     private final LearningCatalogueService learningCatalogueService;
     private final LearnerRecordService learnerRecordService;
+    private final LearnerRecordDataUtils learnerRecordDataUtils;
 
     public UserLearningResponse getOptionalLearningRecord(String uid, int page, int size) {
         User user = userDetailsService.getUserWithUid(uid);
@@ -41,6 +42,11 @@ public class UserLearningService {
 
         List<LearnerRecord> records = response.getContent() == null ? List.of() : response.getContent();
         List<String> courseIds = records.stream().map(LearnerRecord::getResourceId).toList();
+
+        List<ModuleRecordResourceId> moduleRecordResourceIds = new ArrayList<>();
+        learningCatalogueService.getCourses(courseIds).forEach(course -> course.getModules().forEach(
+                module -> moduleRecordResourceIds.add(new ModuleRecordResourceId(uid, module.getId()))));
+        Map<String, ModuleRecordCollection> moduleRecordsForCourses = learnerRecordDataUtils.getModuleRecordsForCourses(courseIds, moduleRecordResourceIds);
 
         Map<String, String> courseTitles = courseIds.isEmpty() ? Map.of() : learningCatalogueService.getCourseIdToTitleMap(courseIds);
 
@@ -57,6 +63,10 @@ public class UserLearningService {
                 c.setCompletionDate(latestEvent.getEventTimestamp().format(formatter));
             } else {
                 c.setStatus("In progress");
+                ModuleRecordCollection moduleRecords = moduleRecordsForCourses.get(c.getResourceId());
+                if(moduleRecords.isEmpty()){
+                    c.setStatus("");
+                }
             }
             return c;
         }).sorted(Comparator.comparing(UserLearningCourse::getTitle, String.CASE_INSENSITIVE_ORDER)).toList();
