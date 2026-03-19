@@ -146,6 +146,7 @@ public class LearnerRecordTest extends IntegrationTestBase {
         mockMvc.perform(get("/learner-records/skills")
                         .queryParam("mode", "DELTA")
                         .queryParam("size", "5")
+                        .queryParam("frequency", "P1Y")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.results.length()").value(2))

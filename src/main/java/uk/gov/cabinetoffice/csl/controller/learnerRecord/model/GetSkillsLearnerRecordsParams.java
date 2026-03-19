@@ -18,8 +18,8 @@ import java.time.Period;
 public class GetSkillsLearnerRecordsParams {
 
     @Min(1)
-    @Max(200)
-    private Integer size = 200;
+    @Max(1000)
+    private Integer size = 1000;
 
     @NotNull
     private SkillsSyncMode mode;
