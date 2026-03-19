@@ -143,4 +143,16 @@ public class OrganisationalUnitMap extends HashMap<Long, OrganisationalUnit> {
         return organisationalUnit;
     }
 
+    public List<OrganisationalUnit> getWithCode(String organisationCode, boolean includeChildren) {
+        List<OrganisationalUnit> organisationalUnits = new ArrayList<>();
+        values().stream().filter(o -> o.getCode().equals(organisationCode)).findFirst()
+                .ifPresent(o -> {
+                    organisationalUnits.add(o);
+                    if (includeChildren) {
+                        List<OrganisationalUnit> childOrgs = getMultiple(o.getChildIds(), includeChildren);
+                        organisationalUnits.addAll(childOrgs);
+                    }
+                });
+        return organisationalUnits;
+    }
 }

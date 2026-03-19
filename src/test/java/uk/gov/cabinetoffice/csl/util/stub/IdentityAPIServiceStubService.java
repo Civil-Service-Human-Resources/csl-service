@@ -65,4 +65,5 @@ public class IdentityAPIServiceStubService {
                         .withHeader("Content-Type", "application/json")
                         .withBody(uidToEmailMapResponse)));
     }
+    
 }

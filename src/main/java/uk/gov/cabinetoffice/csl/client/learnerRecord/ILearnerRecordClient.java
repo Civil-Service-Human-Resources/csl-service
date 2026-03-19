@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.client.learnerRecord;
 
+import org.springframework.data.domain.Pageable;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventDto;
@@ -40,4 +41,6 @@ public interface ILearnerRecordClient {
     void createInvite(String eventId, InviteDto invite);
 
     List<LearnerRecord> searchLearnerRecords(LearnerRecordSearch searchParams);
+
+    LearnerRecordPagedResponse searchLearnerRecords(LearnerRecordSearch searchParams, Pageable pageableParams);
 }

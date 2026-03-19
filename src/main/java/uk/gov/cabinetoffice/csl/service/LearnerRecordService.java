@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.learnerRecord.GetModuleRecordParams;
 import uk.gov.cabinetoffice.csl.client.learnerRecord.ILearnerRecordClient;
@@ -191,5 +192,10 @@ public class LearnerRecordService {
     public LearnerRecordCollection searchCompletedLearnerRecords(Set<String> learnerIds, LocalDateTime minLastSyncDate) {
         LearnerRecordSearch searchParams = new LearnerRecordSearch(minLastSyncDate, minLastSyncDate, learnerIds, List.of(COMPLETE_COURSE.getName()));
         return new LearnerRecordCollection(this.client.searchLearnerRecords(searchParams));
+    }
+
+    public LearnerRecordPagedResponse searchCompletedLearnerRecords(Set<String> learnerIds, LocalDateTime minLastSyncDate, Pageable pageParams) {
+        LearnerRecordSearch searchParams = new LearnerRecordSearch(minLastSyncDate, minLastSyncDate, learnerIds, List.of(COMPLETE_COURSE.getName()));
+        return this.client.searchLearnerRecords(searchParams, pageParams);
     }
 }

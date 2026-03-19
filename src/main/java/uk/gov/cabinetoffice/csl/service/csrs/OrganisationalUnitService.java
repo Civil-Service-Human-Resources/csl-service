@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
+import uk.gov.cabinetoffice.csl.domain.error.ForbiddenException;
 import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
@@ -173,8 +174,8 @@ public class OrganisationalUnitService {
 
         if (
                 !organisationalUnit.getAbbreviationSafe().equals(organisationalUnitDto.getAbbreviationSafe()) ||
-                !organisationalUnit.getName().equals(organisationalUnitDto.getName()) ||
-                !organisationalUnit.getCode().equals(organisationalUnitDto.getCode())
+                        !organisationalUnit.getName().equals(organisationalUnitDto.getName()) ||
+                        !organisationalUnit.getCode().equals(organisationalUnitDto.getCode())
         ) {
             requiresRebuild = true;
             organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
@@ -244,4 +245,14 @@ public class OrganisationalUnitService {
         return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, false);
     }
 
+    public Set<String> getAllowlistedDomainsWithOrgCode(String organisationCode, boolean cascade) {
+        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
+        List<OrganisationalUnit> organisationalUnits = organisationalUnitMap.getWithCode(organisationCode, cascade);
+        if (organisationalUnits.isEmpty()) {
+            throw new ForbiddenException(String.format("Invalid organisation code provided '%s'", organisationCode));
+        }
+        return organisationalUnits.stream()
+                .flatMap(o -> o.getDomains().stream())
+                .map(Domain::getDomain).collect(Collectors.toSet());
+    }
 }

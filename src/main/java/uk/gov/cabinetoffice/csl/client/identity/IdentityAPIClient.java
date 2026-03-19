@@ -55,8 +55,8 @@ public class IdentityAPIClient implements IIdentityAPIClient {
     }
 
     @Override
-    public Map<String, String> getUidToEmailMap(List<String> uids) {
-        RequestEntity<UidRequest> request = RequestEntity.post(uidToEmailMapUrl).body(new UidRequest(uids));
+    public Map<String, String> getUidToEmailMap(List<String> uids, List<String> emails) {
+        RequestEntity<UidToEmailRequest> request = RequestEntity.post(uidToEmailMapUrl).body(new UidToEmailRequest(uids, emails));
         return oauthClient.executeMapRequest(request, new ParameterizedTypeReference<>() {
         });
     }

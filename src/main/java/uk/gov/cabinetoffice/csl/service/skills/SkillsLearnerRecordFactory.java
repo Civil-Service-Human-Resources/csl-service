@@ -8,7 +8,9 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecord
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordCollection;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.skills.SkillsLearnerRecord;
+import uk.gov.cabinetoffice.csl.domain.skills.SkillsLearnerRecordPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.skills.SkillsLearnerRecordResponse;
 import uk.gov.cabinetoffice.csl.domain.skills.UserLearnerRecordCollection;
 
@@ -84,4 +86,10 @@ public class SkillsLearnerRecordFactory {
         return response;
     }
 
+    public SkillsLearnerRecordPagedResponse buildResponse(LearnerRecordPagedResponse resp, Map<String, String> uidsToEmails) {
+        List<SkillsLearnerRecord> skillsLearnerRecords = resp.getContent()
+                .stream().map(lr -> this.learnerRecordToSkillsLearnerRecord(uidsToEmails.get(lr.getLearnerId()), lr))
+                .toList();
+        return new SkillsLearnerRecordPagedResponse(skillsLearnerRecords, resp.isLast(), resp.getNumber(), resp.getTotalPages(), resp.getTotalElements(), resp.getSize());
+    }
 }

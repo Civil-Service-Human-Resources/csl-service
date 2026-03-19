@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.client.learnerRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -209,6 +210,17 @@ public class LearnerRecordClient implements ILearnerRecordClient {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(configParams.getLearnerRecordsSearchUrl());
         return httpClient.postPaginatedRequest(LearnerRecordPagedResponse.class, searchParams, uriBuilder, configParams.getLearnerRecordsMaxPageSize())
                 .stream().map(learnerRecordFactory::transformLearnerRecord).toList();
+    }
+
+    @Override
+    public LearnerRecordPagedResponse searchLearnerRecords(LearnerRecordSearch searchParams, Pageable pageableParams) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(configParams.getLearnerRecordsSearchUrl())
+                .queryParam("page", pageableParams.getPageNumber())
+                .queryParam("size", pageableParams.getPageSize());
+        RequestEntity<LearnerRecordSearch> request = RequestEntity.post(uriBuilder.toUriString()).body(searchParams);
+        LearnerRecordPagedResponse resp = httpClient.executeRequest(request, LearnerRecordPagedResponse.class);
+        resp.setContent(resp.getContent().stream().map(learnerRecordFactory::transformLearnerRecord).toList());
+        return resp;
     }
 
 }
