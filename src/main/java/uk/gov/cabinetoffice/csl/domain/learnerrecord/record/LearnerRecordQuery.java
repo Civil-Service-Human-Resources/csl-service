@@ -15,5 +15,6 @@ public class LearnerRecordQuery {
     private Set<String> learnerIds;
     private String uid;
     private boolean getChildRecords;
+    private List<String> notResourceIds;
 
 }
