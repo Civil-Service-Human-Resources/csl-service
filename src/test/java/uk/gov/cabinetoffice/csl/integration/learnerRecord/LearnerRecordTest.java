@@ -380,4 +380,29 @@ public class LearnerRecordTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.totalElements").value(2))
                 .andExpect(jsonPath("$.size").value(2));
     }
+
+    @Test
+    public void testSearchLearnerRecordInvalidOrgCode() throws Exception {
+
+        OrganisationalUnitsPagedResponse organisationalUnitsPagedResponse = testDataService.generateOrganisationalUnitsPagedResponse();
+        cslStubService.getCsrsStubService().getOrganisations(organisationalUnitsPagedResponse);
+
+        mockMvc.perform(post("/learner-records/search")
+                        .queryParam("page", "0")
+                        .queryParam("size", "50")
+                        .header("orgCode", "FAKEORG")
+                        .content("""
+                                    {
+                                        "emails": [
+                                            "test1@domain2.com", "test2@domain2.com", "test3@domain2.com", "test4@domain2.com", "test5@domain2.com",
+                                             "test6@domain3.com"
+                                        ],
+                                        "completedDateGte": "2023-01-01T10:00:00"
+                                    }
+                                """)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.title").value("Forbidden exception"))
+                .andExpect(jsonPath("$.detail").value("Invalid organisation code provided 'FAKEORG'"));
+    }
 }
