@@ -64,7 +64,7 @@ public class LearnerRecordTest extends IntegrationTestBase {
                         "uids": [
                             "uid1", "uid2", "uid3", "uid4", "uid5", "uid6"
                         ],
-                        "emails": []
+                        "emails": null
                     }
                 """;
         String uidToEmailMapResponse = """
@@ -177,7 +177,7 @@ public class LearnerRecordTest extends IntegrationTestBase {
                         "uids": [
                             "uid1", "uid2", "uid3", "uid4", "uid5", "uid6"
                         ],
-                        "emails": []
+                        "emails": null
                     }
                 """;
         String uidToEmailMapResponse = """
@@ -213,7 +213,7 @@ public class LearnerRecordTest extends IntegrationTestBase {
                         "uids": [
                             "uid1", "uid2", "uid3", "uid4", "uid5", "uid6"
                         ],
-                        "emails": []
+                        "emails": null
                     }
                 """;
         String uidToEmailMapResponse = """
@@ -272,7 +272,7 @@ public class LearnerRecordTest extends IntegrationTestBase {
                         "emails": [
                             "test1@domain2.com", "test2@domain2.com", "test3@domain2.com", "test4@domain2.com", "test5@domain2.com"
                         ],
-                        "uids": []
+                        "uids": null
                     }
                 """;
         String emailToUidMapResponse = """

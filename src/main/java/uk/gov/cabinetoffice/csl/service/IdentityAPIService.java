@@ -22,10 +22,10 @@ public class IdentityAPIService {
     }
 
     public Map<String, String> getUidsToEmailsMapWithUids(List<String> uids) {
-        return this.identityAPIClient.getUidToEmailMap(uids, List.of());
+        return this.identityAPIClient.getUidToEmailMap(uids, null);
     }
 
     public Map<String, String> getUidsToEmailsMapWithEmails(List<String> emails) {
-        return this.identityAPIClient.getUidToEmailMap(List.of(), emails);
+        return this.identityAPIClient.getUidToEmailMap(null, emails);
     }
 }
