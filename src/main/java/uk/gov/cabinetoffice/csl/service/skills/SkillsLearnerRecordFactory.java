@@ -89,6 +89,7 @@ public class SkillsLearnerRecordFactory {
     public SkillsLearnerRecordPagedResponse buildResponse(LearnerRecordPagedResponse resp, Map<String, String> uidsToEmails) {
         List<SkillsLearnerRecord> skillsLearnerRecords = resp.getContent()
                 .stream().map(lr -> this.learnerRecordToSkillsLearnerRecord(uidsToEmails.get(lr.getLearnerId()), lr))
+                .filter(Objects::nonNull)
                 .toList();
         return new SkillsLearnerRecordPagedResponse(skillsLearnerRecords, resp.isLast(), resp.getNumber(), resp.getTotalPages(), resp.getTotalElements(), resp.getSize());
     }
