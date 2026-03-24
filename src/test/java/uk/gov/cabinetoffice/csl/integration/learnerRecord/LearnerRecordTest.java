@@ -98,6 +98,22 @@ public class LearnerRecordTest extends IntegrationTestBase {
                                 "type": "COURSE"
                             },
                             "createdTimestamp" : "2023-01-01T10:00:00",
+                            "events": [
+                                {
+                                    "learnerId": "uid1",
+                                    "resourceId": "courseId2",
+                                    "eventType": {
+                                        "eventType": "COMPLETE_COURSE",
+                                        "learnerRecordType": {
+                                            "type": "COURSE"
+                                        }
+                                    },
+                                    "eventTimestamp" : "2023-01-01T10:00:00",
+                                    "eventSource": {
+                                        "source": "csl_source_id"
+                                    }
+                                }
+                            ],
                             "latestEvent": {
                                 "learnerId": "uid1",
                                 "resourceId": "courseId",
@@ -120,6 +136,22 @@ public class LearnerRecordTest extends IntegrationTestBase {
                                 "type": "COURSE"
                             },
                             "createdTimestamp" : "2023-05-01T10:00:00",
+                            "events": [
+                                {
+                                    "learnerId": "uid1",
+                                    "resourceId": "courseId2",
+                                    "eventType": {
+                                        "eventType": "COMPLETE_COURSE",
+                                        "learnerRecordType": {
+                                            "type": "COURSE"
+                                        }
+                                    },
+                                    "eventTimestamp" : "2023-05-01T10:00:00",
+                                    "eventSource": {
+                                        "source": "csl_source_id"
+                                    }
+                                }
+                            ],
                             "latestEvent": {
                                 "learnerId": "uid1",
                                 "resourceId": "courseId2",
@@ -307,6 +339,22 @@ public class LearnerRecordTest extends IntegrationTestBase {
                                 "type": "COURSE"
                             },
                             "createdTimestamp" : "2023-01-01T10:00:00",
+                            "events": [
+                                {
+                                    "learnerId": "uid1",
+                                    "resourceId": "courseId2",
+                                    "eventType": {
+                                        "eventType": "COMPLETE_COURSE",
+                                        "learnerRecordType": {
+                                            "type": "COURSE"
+                                        }
+                                    },
+                                    "eventTimestamp" : "2023-01-01T10:00:00",
+                                    "eventSource": {
+                                        "source": "csl_source_id"
+                                    }
+                                }
+                            ],
                             "latestEvent": {
                                 "learnerId": "test1",
                                 "resourceId": "courseId",
@@ -329,6 +377,22 @@ public class LearnerRecordTest extends IntegrationTestBase {
                                 "type": "COURSE"
                             },
                             "createdTimestamp" : "2023-05-01T10:00:00",
+                            "events": [
+                                {
+                                    "learnerId": "uid1",
+                                    "resourceId": "courseId2",
+                                    "eventType": {
+                                        "eventType": "COMPLETE_COURSE",
+                                        "learnerRecordType": {
+                                            "type": "COURSE"
+                                        }
+                                    },
+                                    "eventTimestamp" : "2023-05-01T10:00:00",
+                                    "eventSource": {
+                                        "source": "csl_source_id"
+                                    }
+                                }
+                            ],
                             "latestEvent": {
                                 "learnerId": "test1",
                                 "resourceId": "courseId2",

@@ -186,7 +186,12 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                         "events" : [{
                             "learnerId": "userId",
                             "resourceId": "courseId",
-                            "eventType": "COMPLETE_COURSE",
+                            "eventType": {
+                                "eventType": "COMPLETE_COURSE",
+                                "learnerRecordType": {
+                                    "type": "COURSE"
+                                }
+                            },
                             "eventTimestamp" : "2023-01-01T10:00:00",
                             "eventSource": {"source": "csl_source_id"}
                         }]
@@ -273,7 +278,12 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                         "events" : [{
                             "learnerId": "userId",
                             "resourceId": "courseId",
-                            "eventType": "COMPLETE_COURSE",
+                            "eventType": {
+                                "eventType": "COMPLETE_COURSE",
+                                "learnerRecordType": {
+                                    "type": "COURSE"
+                                }
+                            },
                             "eventTimestamp" : "2023-01-01T10:00:00",
                             "eventSource": {"source": "csl_source_id"}
                         }]

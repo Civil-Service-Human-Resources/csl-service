@@ -190,12 +190,12 @@ public class LearnerRecordService {
     }
 
     public LearnerRecordCollection searchCompletedLearnerRecords(Set<String> learnerIds, LocalDateTime minLastSyncDate) {
-        LearnerRecordSearch searchParams = new LearnerRecordSearch(minLastSyncDate, minLastSyncDate, learnerIds, List.of(COMPLETE_COURSE.getName()));
+        LearnerRecordSearch searchParams = new LearnerRecordSearch(minLastSyncDate, minLastSyncDate, learnerIds, List.of(COMPLETE_COURSE.getName()), true);
         return new LearnerRecordCollection(this.client.searchLearnerRecords(searchParams));
     }
 
     public LearnerRecordPagedResponse searchCompletedLearnerRecords(Set<String> learnerIds, LocalDateTime minLastSyncDate, Pageable pageParams) {
-        LearnerRecordSearch searchParams = new LearnerRecordSearch(minLastSyncDate, minLastSyncDate, learnerIds, List.of(COMPLETE_COURSE.getName()));
+        LearnerRecordSearch searchParams = new LearnerRecordSearch(minLastSyncDate, minLastSyncDate, learnerIds, List.of(COMPLETE_COURSE.getName()), true);
         return this.client.searchLearnerRecords(searchParams, pageParams);
     }
 }

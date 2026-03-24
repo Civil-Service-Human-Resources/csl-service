@@ -61,7 +61,12 @@ public class RemoveCourseFromSuggestionsTest extends IntegrationTestBase {
                         "events" : [{
                             "learnerId": "userId",
                             "resourceId": "courseId",
-                            "eventType": "REMOVE_FROM_SUGGESTIONS",
+                            "eventType": {
+                                "eventType": "REMOVE_FROM_SUGGESTIONS",
+                                "learnerRecordType": {
+                                    "type": "COURSE"
+                                }
+                            },
                             "eventTimestamp" : "2023-01-01T10:00:00",
                             "eventSource": {"source": "csl_source_id"}
                         }]
