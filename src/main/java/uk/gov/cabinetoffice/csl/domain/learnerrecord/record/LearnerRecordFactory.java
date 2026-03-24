@@ -6,6 +6,9 @@ import uk.gov.cabinetoffice.csl.domain.LearningResourceType;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.ILearnerRecordActionType;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @Slf4j
 public class LearnerRecordFactory {
@@ -14,6 +17,13 @@ public class LearnerRecordFactory {
         LearnerRecordEvent latestEvent = learnerRecord.getLatestEvent();
         if (latestEvent != null) {
             learnerRecord.setLatestEvent(applyLearnerRecordEventData(latestEvent));
+        }
+        if (learnerRecord.getEvents() != null) {
+            List<LearnerRecordEvent> newEvents = new ArrayList<>();
+            for (LearnerRecordEvent event : learnerRecord.getEvents()) {
+                newEvents.add(applyLearnerRecordEventData(event));
+            }
+            learnerRecord.setEvents(newEvents);
         }
         return learnerRecord;
     }

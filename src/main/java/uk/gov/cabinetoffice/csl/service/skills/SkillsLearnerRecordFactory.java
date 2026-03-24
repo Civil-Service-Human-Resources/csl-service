@@ -4,10 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServantSkillsMetadataCollection;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordCollection;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.skills.SkillsLearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.skills.SkillsLearnerRecordPagedResponse;
@@ -29,11 +27,9 @@ public class SkillsLearnerRecordFactory {
     }
 
     public SkillsLearnerRecord learnerRecordToSkillsLearnerRecord(String emailAddress, LearnerRecord learnerRecord) {
-        LocalDate completionDate = null;
-        LearnerRecordEvent latestEvent = learnerRecord.getLatestEvent();
-        if (latestEvent != null && latestEvent.getActionType().equals(CourseRecordAction.COMPLETE_COURSE)) {
-            completionDate = learnerRecord.getLatestEvent().getEventTimestamp().toLocalDate();
-        }
+        LocalDate completionDate = learnerRecord.getEvents()
+                .stream().min((o1, o2) -> o2.getEventTimestamp().compareTo(o1.getEventTimestamp()))
+                .map(e -> e.getEventTimestamp().toLocalDate()).orElse(null);
         if (completionDate != null) {
             return new SkillsLearnerRecord(emailAddress, learnerRecord.getResourceId(), 100,
                     true, "", 0, learnerRecord.getCreatedTimestamp().toLocalDate(),

@@ -84,7 +84,8 @@ public class LearnerRecordTest extends IntegrationTestBase {
                     "learnerIds": ["uid1", "uid2", "uid3", "uid4", "uid5", "uid6"],
                     "createdTimestampGte": "2023-01-01T10:00:00",
                     "updatedTimestampGte": "2023-01-01T10:00:00",
-                    "eventTypes" : [ "COMPLETE_COURSE" ]
+                    "eventTypes" : [ "COMPLETE_COURSE" ],
+                    "includeEvents": true
                 }
                 """;
         String learnerRecordResponse = """
@@ -232,7 +233,8 @@ public class LearnerRecordTest extends IntegrationTestBase {
                     "learnerIds": ["uid1", "uid2", "uid3", "uid4", "uid5"],
                     "createdTimestampGte": "2023-01-01T10:00:00",
                     "updatedTimestampGte": "2023-01-01T10:00:00",
-                    "eventTypes" : [ "COMPLETE_COURSE" ]
+                    "eventTypes" : [ "COMPLETE_COURSE" ],
+                    "includeEvents": true
                 }
                 """;
         String learnerRecordResponse = """
@@ -291,7 +293,8 @@ public class LearnerRecordTest extends IntegrationTestBase {
                     "learnerIds": ["test1", "test2", "test3", "test4", "test5"],
                     "createdTimestampGte": "2023-01-01T10:00:00",
                     "updatedTimestampGte": "2023-01-01T10:00:00",
-                    "eventTypes" : [ "COMPLETE_COURSE" ]
+                    "eventTypes" : [ "COMPLETE_COURSE" ],
+                    "includeEvents": true
                 }
                 """;
         String learnerRecordResponse = """

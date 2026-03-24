@@ -11,6 +11,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.TypedLearnerRecordResour
 import uk.gov.cabinetoffice.csl.util.Cacheable;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -23,6 +25,7 @@ public class LearnerRecord implements Cacheable {
     private String learnerId;
     private Long parentId;
     private LocalDateTime createdTimestamp;
+    private List<LearnerRecordEvent> events;
     private Integer eventCount;
     private LearnerRecordEvent latestEvent;
 
@@ -40,4 +43,7 @@ public class LearnerRecord implements Cacheable {
         return recordType.getResourceType();
     }
 
+    public List<LearnerRecordEvent> getEvents() {
+        return events == null ? new ArrayList<>() : events;
+    }
 }
