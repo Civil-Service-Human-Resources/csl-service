@@ -36,7 +36,8 @@ public class RequiredLearningService {
     private final LearningCatalogueService learningCatalogueService;
     private final OrganisationalUnitService organisationalUnitService;
     private final UserDetailsService userDetailsService;
-    private final LearningFactory<RequiredLearningDisplayCourseFactory> requiredLearningFactory;
+    private final LearningFactory learningFactory;
+    private final RequiredLearningDisplayCourseFactory requiredLearningDisplayCourseFactory;
     private final CourseCompletionService courseCompletionService;
 
     public Learning getDetailedRequiredLearning(String userId) {
@@ -45,7 +46,7 @@ public class RequiredLearningService {
         List<String> courseIds = requiredLearning.stream().map(Course::getCacheableId).toList();
         Map<String, CourseRecord> courseRecords = courseRecordService.getCourseRecords(userId, courseIds)
                 .stream().collect(Collectors.toMap(CourseRecord::getCourseId, c -> c));
-        return requiredLearningFactory.buildDetailedLearning(requiredLearning, courseRecords, user);
+        return learningFactory.buildDetailedLearning(requiredLearningDisplayCourseFactory, requiredLearning, courseRecords, user);
     }
 
     public RequiredLearning getRequiredLearning(String uid, Boolean homepageCompleteRequiredCourses) {

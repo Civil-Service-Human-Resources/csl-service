@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventQuery;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
 import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -107,5 +109,119 @@ public class UserLearningTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.totalResults").value(2))
                 .andExpect(jsonPath("$.page").value(0))
                 .andExpect(jsonPath("$.size").value(20));
+    }
+
+    @Test
+    public void testGetDetailedLearning() throws Exception {
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
+
+        String courses = """
+            [
+              {
+                "id": "course1",
+                "title": "Course 1",
+                "shortDescription": "Course 1 short description",
+                "description": "Course 1 description",
+                "modules": [
+                  {
+                    "type": "link",
+                    "url": "https://www.gov.uk/",
+                    "id": "module1",
+                    "title": "Module 1",
+                    "description": "Module 1 description",
+                    "optional": false,
+                    "moduleType": "link",
+                    "cost": 0.0
+                  }
+                ],
+                "audiences": [],
+                "visibility": "PUBLIC",
+                "status": "Published",
+                "cost": 0.0
+              }
+            ]
+            """;
+
+        cslStubService.getLearningCatalogue().getCourses(List.of("course1"), courses);
+
+        cslStubService.getLearningCatalogue().getMandatoryLearningMap("""
+            {
+                "departmentCodeMap": {
+                    "CO": []
+                }
+            }
+            """);
+
+        cslStubService.getLearnerRecord().getLearnerRecordEvents(0, LearnerRecordEventQuery.builder().userId("userId").eventTypes(List.of("COMPLETE_COURSE")).build(), """
+            {
+                "content": [
+                    {
+                        "eventTimestamp": "2026-01-01T10:00:00Z",
+                        "resourceId": "course1"
+                    }
+                ],
+                "totalPages": 1
+            }
+            """);
+
+        String learnerRecordsResponse = """
+            {
+                "content": [
+                    {
+                        "resourceId": "course1",
+                        "learnerId": "userId",
+                        "recordType": {
+                            "type": "COURSE"
+                        },
+                        "latestEvent": {
+                            "learnerId": "userId",
+                            "resourceId": "course1",
+                            "eventType": {
+                                "eventType": "COMPLETE_COURSE",
+                                "learnerRecordType": {
+                                    "type": "COURSE"
+                                }
+                            },
+                            "eventTimestamp": "2026-01-01T10:00:00Z",
+                            "eventSource": {
+                                "source": "csl_source_id"
+                            }
+                        }
+                    }
+                ],
+                "totalPages": 1
+            }
+            """;
+
+        LearnerRecordQuery query = LearnerRecordQuery.builder()
+                .learnerIds(Set.of("userId"))
+                .resourceIds(Set.of("course1"))
+                .build();
+
+        cslStubService.getLearnerRecord().getLearnerRecords(query, 0, learnerRecordsResponse);
+
+        String moduleRecordResponse = """
+                {
+                    "moduleRecords": [
+                        {
+                            "userId": "userId",
+                            "moduleId": "module1",
+                            "state": "COMPLETED",
+                            "updatedAt": "2025-01-01T09:00:00",
+                            "courseId": "course1"
+                        }
+                    ]
+                }""";
+
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1"), moduleRecordResponse);
+
+        mockMvc.perform(get("/learning/detailed/userId?courseIds=course1").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.courses.length()").value(1))
+                .andExpect(jsonPath("$.courses[0].courseId").value("course1"))
+                .andExpect(jsonPath("$.courses[0].courseTitle").value("Course 1"))
+                .andExpect(jsonPath("$.courses[0].status").value("COMPLETED"))
+                .andExpect(jsonPath("$.courses[0].audience").doesNotExist());
     }
 }

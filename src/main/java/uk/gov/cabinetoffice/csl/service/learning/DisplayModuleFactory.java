@@ -12,14 +12,13 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Objects;
 
 @Service
 @Slf4j
 public class DisplayModuleFactory {
 
     public DisplayModule generateDisplayModule(Module module, @Nullable ModuleRecord moduleRecord, @Nullable LearningPeriod learningPeriod) {
-        if (moduleRecord == null || learningPeriod == null) {
+        if (moduleRecord == null) {
             return generateDisplayModule(module);
         }
         return new DisplayModule(module.getId(), module.getTitle(), module.getDescription(), module.getModuleType().getName(), !module.isOptional(),

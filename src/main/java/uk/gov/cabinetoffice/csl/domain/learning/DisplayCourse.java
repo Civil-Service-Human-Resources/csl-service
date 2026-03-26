@@ -19,15 +19,14 @@ public class DisplayCourse {
     private final LocalDateTime lastUpdated;
     private final LocalDateTime completionDate;
     private final State status;
-    private final DisplayAudience audience;
     private final Collection<DisplayModule> modules;
     private final Integer requiredModules;
     private final Integer completedRequiredModules;
 
-    public static DisplayCourse build(Course course, Collection<DisplayModule> modules, DisplayModuleSummary moduleSummary, DisplayAudience audience,
+    public static DisplayCourse build(Course course, Collection<DisplayModule> modules, DisplayModuleSummary moduleSummary,
                                       LocalDateTime lastUpdated) {
         return new DisplayCourse(course.getCacheableId(), course.getTitle(), course.getShortDescription(), lastUpdated,
-                moduleSummary.getCompletionDate(), moduleSummary.getStatus(), audience,
+                moduleSummary.getCompletionDate(), moduleSummary.getStatus(),
                 modules, moduleSummary.getRequiredForCompletionCount(), moduleSummary.getRequiredCompletedCount());
     }
 
