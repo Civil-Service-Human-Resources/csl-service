@@ -7,7 +7,10 @@ import uk.gov.cabinetoffice.csl.controller.model.UserLearningResponse;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingStatus;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordPagedResponse;
@@ -69,11 +72,12 @@ public class UserLearningService {
                 c.setStatus("Completed");
                 c.setCompletionDate(latestEvent.getEventTimestamp().format(formatter));
             } else {
-                c.setStatus("In progress");
                 ModuleRecordCollection moduleRecords = moduleRecordsForCourses.get(c.getResourceId());
-                if(moduleRecords.isEmpty()){
-                    c.setStatus("");
-                }
+                String status = (moduleRecords != null && moduleRecords.stream()
+                        .filter(Objects::nonNull)
+                        .anyMatch(this::isInProgress))
+                        ? "In progress" : "";
+                c.setStatus(status);
             }
             return c;
         }).sorted(Comparator.comparing(UserLearningCourse::getTitle, String.CASE_INSENSITIVE_ORDER)).toList();
@@ -93,5 +97,14 @@ public class UserLearningService {
         Map<String, CourseRecord> courseRecords = courseRecordService.getCourseRecords(uid, courseIds)
                 .stream().collect(Collectors.toMap(CourseRecord::getCourseId, c -> c));
         return learningFactory.buildDetailedLearning(displayCourseFactory, courses, courseRecords, user);
+    }
+
+    private boolean isInProgress(ModuleRecord r) {
+        return r.getBookingStatus() == BookingStatus.REQUESTED ||
+                r.getBookingStatus() == BookingStatus.CONFIRMED ||
+                r.getState() == State.APPROVED ||
+                r.getState() == State.COMPLETED ||
+                r.getState() == State.IN_PROGRESS ||
+                r.getState() == State.REGISTERED;
     }
 }
