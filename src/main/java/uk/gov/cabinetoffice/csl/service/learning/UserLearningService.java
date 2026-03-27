@@ -5,20 +5,25 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.model.UserLearningCourse;
 import uk.gov.cabinetoffice.csl.controller.model.UserLearningResponse;
 import uk.gov.cabinetoffice.csl.domain.User;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
+import uk.gov.cabinetoffice.csl.domain.learning.Learning;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
+import uk.gov.cabinetoffice.csl.service.learningResources.course.CourseRecordService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +33,9 @@ public class UserLearningService {
     private final LearningCatalogueService learningCatalogueService;
     private final LearnerRecordService learnerRecordService;
     private final LearnerRecordDataUtils learnerRecordDataUtils;
+    private final CourseRecordService courseRecordService;
+    private final LearningFactory learningFactory;
+    private final DisplayCourseFactory displayCourseFactory;
 
     public UserLearningResponse getOptionalLearningRecord(String uid, int page, int size) {
         User user = userDetailsService.getUserWithUid(uid);
@@ -55,18 +63,19 @@ public class UserLearningService {
         List<UserLearningCourse> learningCourses = records.stream().map(record -> {
             UserLearningCourse c = new UserLearningCourse();
             c.setResourceId(record.getResourceId());
-            c.setTitle(courseTitles.getOrDefault(record.getResourceId(), "Course title not found for resourceId: " + record.getResourceId()));
+            c.setTitle(courseTitles.getOrDefault(record.getResourceId(), "Course details not found for resourceId: " + record.getResourceId()));
 
             LearnerRecordEvent latestEvent = record.getLatestEvent();
             if (latestEvent != null && CourseRecordAction.COMPLETE_COURSE.equals(latestEvent.getActionType())) {
                 c.setStatus("Completed");
                 c.setCompletionDate(latestEvent.getEventTimestamp().format(formatter));
             } else {
-                c.setStatus("In progress");
                 ModuleRecordCollection moduleRecords = moduleRecordsForCourses.get(c.getResourceId());
-                if(moduleRecords.isEmpty()){
-                    c.setStatus("");
-                }
+                String status = (moduleRecords != null && moduleRecords.stream()
+                        .filter(Objects::nonNull)
+                        .anyMatch( r -> r.getState() == State.IN_PROGRESS || r.getState() == State.COMPLETED))
+                        ? "In progress" : "";
+                c.setStatus(status);
             }
             return c;
         }).sorted(Comparator.comparing(UserLearningCourse::getTitle, String.CASE_INSENSITIVE_ORDER)).toList();
@@ -78,5 +87,13 @@ public class UserLearningService {
         res.setTotalResults(response.getTotalElements() != null ? response.getTotalElements() : 0);
 
         return res;
+    }
+
+    public Learning getDetailedLearning(String uid, List<String> courseIds) {
+        User user = userDetailsService.getUserWithUid(uid);
+        List<Course> courses = learningCatalogueService.getCourses(courseIds);
+        Map<String, CourseRecord> courseRecords = courseRecordService.getCourseRecords(uid, courseIds)
+                .stream().collect(Collectors.toMap(CourseRecord::getCourseId, c -> c));
+        return learningFactory.buildDetailedLearning(displayCourseFactory, courses, courseRecords, user);
     }
 }
