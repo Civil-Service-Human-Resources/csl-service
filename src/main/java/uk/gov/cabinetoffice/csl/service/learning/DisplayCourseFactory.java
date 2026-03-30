@@ -7,10 +7,13 @@ import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
+import uk.gov.cabinetoffice.csl.domain.learning.DisplayAudience;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayCourse;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayModule;
+import uk.gov.cabinetoffice.csl.domain.learning.RequiredDisplayCourse;
 import uk.gov.cabinetoffice.csl.domain.learning.learningRecord.LearningRecordCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +24,7 @@ import java.util.Map;
 public class DisplayCourseFactory implements IDisplayCourseFactory {
 
     private final DisplayModuleFactory displayModuleFactory;
+    private final DisplayAudienceFactory displayAudienceFactory;
 
     @Override
     public DisplayCourse generateDetailedDisplayCourse(Course course, User user, @Nullable CourseRecord courseRecord, LearningRecordCourse userLearningRecordCourse) {
@@ -29,12 +33,16 @@ public class DisplayCourseFactory implements IDisplayCourseFactory {
             if (moduleRecordMap.isEmpty()) {
                 return generateDetailedDisplayCourse(course, user);
             }
+            DisplayAudience displayAudience = displayAudienceFactory.generateDisplayAudience(course, user);
+            LearningPeriod learningPeriod = displayAudience == null ? null : displayAudience.getLearningPeriod();
             Collection<DisplayModule> modules = course.getModules().stream().map(m -> {
                 ModuleRecord moduleRecord = moduleRecordMap.get(m.getId());
-                return displayModuleFactory.generateDisplayModule(m, moduleRecord, null);
+                return displayModuleFactory.generateDisplayModule(m, moduleRecord, learningPeriod);
             }).toList();
-
             DisplayModuleSummary moduleSummary = displayModuleFactory.generateDisplayModuleSummary(modules, userLearningRecordCourse);
+            if (displayAudience != null) {
+                return RequiredDisplayCourse.build(course, modules, moduleSummary, displayAudience, courseRecord.getLastUpdated());
+            }
             return DisplayCourse.build(course, modules, moduleSummary, courseRecord.getLastUpdated());
         }
         return generateDetailedDisplayCourse(course, user);
@@ -43,6 +51,11 @@ public class DisplayCourseFactory implements IDisplayCourseFactory {
     @Override
     public DisplayCourse generateDetailedDisplayCourse(Course course, User user) {
         List<DisplayModule> modules = course.getModules().stream().map(displayModuleFactory::generateDisplayModule).toList();
+        DisplayAudience displayAudience = displayAudienceFactory.generateDisplayAudience(course, user);
+        if (displayAudience != null) {
+            return new RequiredDisplayCourse(course.getCacheableId(), course.getTitle(), course.getShortDescription(), null, null,
+                    State.NULL, modules, course.getRequiredModulesForCompletion().size(), 0, displayAudience);
+        }
         return new DisplayCourse(course.getCacheableId(), course.getTitle(), course.getShortDescription(), null, null,
                 State.NULL, modules, course.getRequiredModulesForCompletion().size(), 0);
     }

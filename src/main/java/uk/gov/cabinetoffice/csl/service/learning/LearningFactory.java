@@ -22,8 +22,9 @@ import java.util.Optional;
 public class LearningFactory {
 
     private final LearningRecordService learningRecordService;
+    private final IDisplayCourseFactory displayCourseFactory;
 
-    public Learning buildDetailedLearning(IDisplayCourseFactory displayCourseFactory, List<Course> courses, Map<String, CourseRecord> courseRecords,
+    public Learning buildDetailedLearning(List<Course> courses, Map<String, CourseRecord> courseRecords,
                                           User user) {
 
         LearningRecord learningRecord = learningRecordService.getLearningRecord(user.getId());

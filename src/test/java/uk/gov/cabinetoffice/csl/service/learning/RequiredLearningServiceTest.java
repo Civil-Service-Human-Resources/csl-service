@@ -45,7 +45,7 @@ class RequiredLearningServiceTest {
     @Mock
     private LearningFactory learningFactory;
     @Mock
-    private RequiredLearningDisplayCourseFactory requiredLearningDisplayCourseFactory;
+    private DisplayCourseFactory displayCourseFactory;
     @Mock
     private CourseCompletionService courseCompletionService;
 

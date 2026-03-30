@@ -28,6 +28,9 @@ class DisplayCourseFactoryTest {
     @Mock
     private DisplayModuleFactory displayModuleFactory;
 
+    @Mock
+    private DisplayAudienceFactory displayAudienceFactory;
+
     @InjectMocks
     private DisplayCourseFactory displayCourseFactory;
 

@@ -35,7 +35,6 @@ public class UserLearningService {
     private final LearnerRecordDataUtils learnerRecordDataUtils;
     private final CourseRecordService courseRecordService;
     private final LearningFactory learningFactory;
-    private final DisplayCourseFactory displayCourseFactory;
 
     public UserLearningResponse getOptionalLearningRecord(String uid, int page, int size) {
         User user = userDetailsService.getUserWithUid(uid);
@@ -94,6 +93,6 @@ public class UserLearningService {
         List<Course> courses = learningCatalogueService.getCourses(courseIds);
         Map<String, CourseRecord> courseRecords = courseRecordService.getCourseRecords(uid, courseIds)
                 .stream().collect(Collectors.toMap(CourseRecord::getCourseId, c -> c));
-        return learningFactory.buildDetailedLearning(displayCourseFactory, courses, courseRecords, user);
+        return learningFactory.buildDetailedLearning(courses, courseRecords, user);
     }
 }
