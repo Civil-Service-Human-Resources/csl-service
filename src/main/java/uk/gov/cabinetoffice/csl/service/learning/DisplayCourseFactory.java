@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.service.learning;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DisplayCourseFactory implements IDisplayCourseFactory {
 
@@ -38,6 +40,7 @@ public class DisplayCourseFactory implements IDisplayCourseFactory {
                 ModuleRecord moduleRecord = moduleRecordMap.get(m.getId());
                 return displayModuleFactory.generateDisplayModule(m, moduleRecord, learningPeriod);
             }).toList();
+
             DisplayModuleSummary moduleSummary = displayModuleFactory.generateDisplayModuleSummary(modules, userLearningRecordCourse);
             return DisplayCourse.build(course, modules, moduleSummary, displayAudience, courseRecord.getLastUpdated());
         }
@@ -51,4 +54,5 @@ public class DisplayCourseFactory implements IDisplayCourseFactory {
         return new DisplayCourse(course.getCacheableId(), course.getTitle(), course.getShortDescription(), null, null,
                 State.NULL, displayAudience, modules, course.getRequiredModulesForCompletion().size(), 0);
     }
+
 }

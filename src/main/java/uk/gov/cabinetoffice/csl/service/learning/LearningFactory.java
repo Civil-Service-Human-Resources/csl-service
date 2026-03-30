@@ -28,7 +28,6 @@ public class LearningFactory {
                                           User user) {
 
         LearningRecord learningRecord = learningRecordService.getLearningRecord(user.getId());
-
         List<LearningRecordCourse> userCompletedCourses = new ArrayList<>();
         if (learningRecord.getRequiredLearningRecord() != null && learningRecord.getRequiredLearningRecord().getCompletedCourses() != null) {
             userCompletedCourses.addAll(learningRecord.getRequiredLearningRecord().getCompletedCourses());
@@ -49,6 +48,7 @@ public class LearningFactory {
             if (completedCourse.isPresent()) {
                 userLearningRecordCourse = completedCourse.get();
             }
+
 
             return displayCourseFactory.generateDetailedDisplayCourse(c, user, courseRecord, userLearningRecordCourse);
         }).toList();
