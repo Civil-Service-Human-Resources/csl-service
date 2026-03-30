@@ -155,24 +155,24 @@ public class RequiredLearningTest extends IntegrationTestBase {
             }]""";
 
     String learnerRecordEventsResponseWithCourseWithOneContentResult = """
-                {
-                    "content": [
-                        {
-                            "eventTimestamp": "2025-12-09T10:00:00Z",
-                            "resourceId": "course1"
-                        }
-                    ],
-                    "totalPages": 1
-                }
-                """;
+            {
+                "content": [
+                    {
+                        "eventTimestamp": "2025-12-09T10:00:00Z",
+                        "resourceId": "course1"
+                    }
+                ],
+                "totalPages": 1
+            }
+            """;
 
     String learnerRecordEventsResponseWithNoContent = """
-                {
-                    "content": [],
-                    "totalPages": 1
-                }
-                """;
-
+            {
+                "content": [],
+                "totalPages": 1
+            }
+            """;
+    
     @Test
     public void testGetRequiredLearningForUserNotStarted() throws Exception {
         String courseRecord = """
@@ -629,6 +629,123 @@ public class RequiredLearningTest extends IntegrationTestBase {
                     "resourceId": "course1",
                     "eventType": "COMPLETE_COURSE",
                     "eventTimestamp" : "2025-01-01T10:00:00",
+                    "eventSource": "csl_source_id"
+                }]
+                """;
+        String createLearnerRecordEventsResponse = """
+                {
+                    "successfulResources": [{
+                        "learnerId": "userId",
+                        "resourceId": "course1",
+                        "eventType": {
+                            "eventType": "COMPLETE_COURSE",
+                            "learnerRecordType": {
+                                "type": "COURSE"
+                            }
+                        },
+                        "eventTimestamp" : "2025-01-01T10:00:00",
+                        "eventSource": {"source": "csl_source_id"}
+                    }],
+                    "failedResources": []
+                }
+                """;
+        String courseCompletionEmailMessage = """
+                {
+                    "recipient" : "lineManager@email.com",
+                    "personalisation": {
+                        "learnerEmailAddress" : "userEmail@email.com",
+                        "learner" : "Learner",
+                        "courseTitle" : "Course 1",
+                        "manager": "Manager"
+                    }
+                }
+                """;
+
+        cslStubService.getLearningCatalogue().getMandatoryLearningMap(depToCourseRequiredLearningCourseMultipleModules);
+        cslStubService.getLearningCatalogue().getCourses(List.of("course1"), courseMultipleModules);
+        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
+        cslStubService.getLearnerRecord().getLearnerRecordEvents(0,
+                LearnerRecordEventQuery.builder().userId("userId")
+                        .resourceIds(List.of("course1"))
+                        .eventTypes(List.of("COMPLETE_COURSE")).build(), learnerRecordEvents);
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2"), moduleRecords);
+        cslStubService.getLearnerRecord().getLearnerRecords("userId", "course1", 0, courseRecords);
+        cslStubService.getLearnerRecord().createLearnerRecordEvent(learnerRecords, createLearnerRecordEventsResponse);
+        cslStubService.getNotificationServiceStubService().sendEmail("NOTIFY_LINE_MANAGER_COMPLETED_LEARNING", courseCompletionEmailMessage);
+        mockMvc.perform(get("/learning/required?HOMEPAGE_COMPLETE_REQUIRED_COURSES=true")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.userId").value("userId"))
+                .andExpect(jsonPath("$.courses.length()").value(0));
+    }
+
+    @Test
+    public void testGetRequiredLearningUpdateCompletedStatusForExistingCompletion() throws Exception {
+        String learnerRecordEvents = """
+                {
+                    "content": [
+                        {
+                            "eventTimestamp": "2022-03-31T13:00:21Z",
+                            "resourceId": "course1"
+                        }
+                    ],
+                    "totalPages": 1
+                }
+                """;
+        String moduleRecords = """
+                {
+                    "moduleRecords": [
+                        {
+                            "id": 1,
+                            "uid": "module1",
+                            "userId": "userId",
+                            "courseId": "course1",
+                            "moduleId": "module1",
+                            "moduleTitle": "module1",
+                            "moduleType": "link",
+                            "duration": 3600,
+                            "state": "COMPLETED",
+                            "completionDate": "2023-01-01T10:00:00",
+                            "createdAt": "2021-01-01T10:00:00",
+                            "updatedAt": "2021-01-01T10:00:00"
+                        },
+                        {
+                            "id": 2,
+                            "uid": "module2",
+                            "userId": "userId",
+                            "courseId": "course1",
+                            "moduleId": "module2",
+                            "moduleTitle": "module2",
+                            "moduleType": "elearning",
+                            "duration": 3600,
+                            "state": "COMPLETED",
+                            "completionDate": "2023-06-01T10:00:00",
+                            "createdAt": "2021-01-01T10:00:00",
+                            "updatedAt": "2021-01-01T10:00:00"
+                        }
+                    ]
+                }
+                """;
+        String courseRecords = """
+                {
+                    "content": [
+                        {
+                            "resourceId": "course1",
+                            "learnerId": "userId",
+                            "recordType": {
+                                "type": "COURSE"
+                            }
+                        }
+                    ],
+                    "totalPages": 1
+                }
+                """;
+        String learnerRecords = """
+                [{
+                    "learnerId": "userId",
+                    "resourceId": "course1",
+                    "eventType": "COMPLETE_COURSE",
+                    "eventTimestamp" : "2023-06-01T10:00:00",
                     "eventSource": "csl_source_id"
                 }]
                 """;
