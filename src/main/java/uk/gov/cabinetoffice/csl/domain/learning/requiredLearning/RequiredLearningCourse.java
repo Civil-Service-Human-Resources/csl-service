@@ -30,4 +30,9 @@ public class RequiredLearningCourse extends LearningPlanCourse {
         return learningPeriod.getEndDate();
     }
 
+    @JsonIgnore
+    public String getShortString() {
+        return String.format("[Id: '%s', Title: '%s', Learning period: '%s']", getId(), getTitle(), learningPeriod);
+    }
+
 }
