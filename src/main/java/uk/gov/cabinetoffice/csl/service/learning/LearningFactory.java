@@ -21,8 +21,8 @@ import java.util.Optional;
 @Slf4j
 public class LearningFactory {
 
-    private final LearningRecordService learningRecordService;
     private final IDisplayCourseFactory displayCourseFactory;
+    private final LearningRecordService learningRecordService;
 
     public Learning buildDetailedLearning(List<Course> courses, Map<String, CourseRecord> courseRecords,
                                           User user) {
