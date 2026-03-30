@@ -10,7 +10,6 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayAudience;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayCourse;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayModule;
-import uk.gov.cabinetoffice.csl.domain.learning.RequiredDisplayCourse;
 import uk.gov.cabinetoffice.csl.domain.learning.learningRecord.LearningRecordCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
@@ -40,10 +39,7 @@ public class DisplayCourseFactory implements IDisplayCourseFactory {
                 return displayModuleFactory.generateDisplayModule(m, moduleRecord, learningPeriod);
             }).toList();
             DisplayModuleSummary moduleSummary = displayModuleFactory.generateDisplayModuleSummary(modules, userLearningRecordCourse);
-            if (displayAudience != null) {
-                return RequiredDisplayCourse.build(course, modules, moduleSummary, displayAudience, courseRecord.getLastUpdated());
-            }
-            return DisplayCourse.build(course, modules, moduleSummary, courseRecord.getLastUpdated());
+            return DisplayCourse.build(course, modules, moduleSummary, displayAudience, courseRecord.getLastUpdated());
         }
         return generateDetailedDisplayCourse(course, user);
     }
@@ -52,11 +48,7 @@ public class DisplayCourseFactory implements IDisplayCourseFactory {
     public DisplayCourse generateDetailedDisplayCourse(Course course, User user) {
         List<DisplayModule> modules = course.getModules().stream().map(displayModuleFactory::generateDisplayModule).toList();
         DisplayAudience displayAudience = displayAudienceFactory.generateDisplayAudience(course, user);
-        if (displayAudience != null) {
-            return new RequiredDisplayCourse(course.getCacheableId(), course.getTitle(), course.getShortDescription(), null, null,
-                    State.NULL, modules, course.getRequiredModulesForCompletion().size(), 0, displayAudience);
-        }
         return new DisplayCourse(course.getCacheableId(), course.getTitle(), course.getShortDescription(), null, null,
-                State.NULL, modules, course.getRequiredModulesForCompletion().size(), 0);
+                State.NULL, displayAudience, modules, course.getRequiredModulesForCompletion().size(), 0);
     }
 }
