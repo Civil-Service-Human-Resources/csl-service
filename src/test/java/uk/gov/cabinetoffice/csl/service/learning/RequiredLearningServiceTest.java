@@ -21,6 +21,7 @@ import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -108,7 +109,7 @@ class RequiredLearningServiceTest {
         when(userDetailsService.getUserWithUid("userId")).thenReturn(user);
         when(learningCatalogueService.getRequiredLearningForDepartments(List.of("CO"))).thenReturn(List.of(course1, course2));
         when(learnerRecordDataUtils.getCompletionDatesForCourses("userId", List.of("course1", "course2"))).thenReturn(
-                Map.of("course1", courseCompletion1, "course2", courseCompletion2)
+                new HashMap<>(Map.of("course1", courseCompletion1, "course2", courseCompletion2))
         );
         ModuleRecordCollection moduleRecords = new ModuleRecordCollection();
         moduleRecords.addAll(List.of(moduleRecord1, moduleRecord2));
@@ -116,7 +117,7 @@ class RequiredLearningServiceTest {
         when(learnerRecordDataUtils.getModuleRecordsForCourses(List.of("course2"), List.of(
                 new ModuleRecordResourceId("userId", "m1"),
                 new ModuleRecordResourceId("userId", "m2")
-        ))).thenReturn(Map.of("course2", moduleRecords));
+        ))).thenReturn(new HashMap<>(Map.of("course2", moduleRecords)));
         RequiredLearning result = requiredLearningService.getRequiredLearning("userId", false);
         assertEquals(1, result.getCourses().size());
         assertEquals("course2", result.getCourses().get(0).getId());
