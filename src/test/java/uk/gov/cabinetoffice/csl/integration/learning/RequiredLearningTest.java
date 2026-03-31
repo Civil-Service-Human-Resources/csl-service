@@ -172,7 +172,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 "totalPages": 1
             }
             """;
-    
+
     @Test
     public void testGetRequiredLearningForUserNotStarted() throws Exception {
         String courseRecord = """
@@ -602,7 +602,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                             "moduleType": "elearning",
                             "duration": 3600,
                             "state": "COMPLETED",
-                            "completionDate": "2022-06-01T10:00:00",
+                            "completionDate": "2025-06-01T10:00:00",
                             "createdAt": "2025-01-01T10:00:00",
                             "updatedAt": "2025-01-01T10:00:00"
                         }
@@ -628,7 +628,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                     "learnerId": "userId",
                     "resourceId": "course1",
                     "eventType": "COMPLETE_COURSE",
-                    "eventTimestamp" : "2025-01-01T10:00:00",
+                    "eventTimestamp" : "2025-06-01T10:00:00",
                     "eventSource": "csl_source_id"
                 }]
                 """;
