@@ -98,11 +98,11 @@ public class RequiredLearningService {
                 Map.Entry<String, RequiredLearningCourse> requiredLearningCourseEntry = requiredLearningCourseEntryIterator.next();
                 String requiredLearningCourseId = requiredLearningCourseEntry.getKey();
                 RequiredLearningCourse requiredLearningCourse = requiredLearningCourseEntry.getValue();
+                LocalDateTime learningPeriodStart = requiredLearningCourse.getLearningPeriod().getStartDateAsDateTime();
                 ModuleRecordCollection requiredModuleRecords = moduleRecords.get(requiredLearningCourseId);
                 // 7. If the latest update date of the module for the user is after the start date of the learning period
                 // then set the course status as IN_PROGRESS
-                if (requiredModuleRecords.getLatestUpdatedDate()
-                        .isAfter(requiredLearningCourse.getLearningPeriod().getStartDateAsDateTime())) {
+                if (requiredModuleRecords.getLatestUpdatedDate().isAfter(learningPeriodStart)) {
                     requiredLearningCourse.setStatus(State.IN_PROGRESS);
                 }
                 List<String> requiredModuleIdsForCompletionForTheCourse = requiredModuleIdsForCompletion.get(requiredLearningCourseId);
@@ -112,7 +112,7 @@ public class RequiredLearningService {
                 // 8. If the completion event is missing
                 // and all the required modules were completed
                 // then write the log entry for the course completion status
-                if (completionDate == null && requiredModuleIdsLeftForCompletionForTheCourse.isEmpty()) {
+                if (completionDate == null && requiredModuleIdsLeftForCompletionForTheCourse.isEmpty() && requiredModuleRecords.getEarliestCompletionDate().isAfter(learningPeriodStart)) {
                     log.info("homepageCompleteRequiredCourses: {}", homepageCompleteRequiredCourses);
                     String requiredModuleRecordsDetails = "[" + requiredModuleRecords.stream()
                             .map(m ->
