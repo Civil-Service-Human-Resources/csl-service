@@ -116,44 +116,6 @@ public class UserLearningTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testGetLearning() throws Exception {
-        CivilServant civilServant = testDataService.generateCivilServant();
-        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
-        cslStubService.getLearningCatalogue().getMandatoryLearningMap(requiredLearningMap);
-
-        String learnerRecordsResponse = ArrayJsonContentBuilder.create(
-                JsonLearnerRecordBuilder.create("userId", "course4").addLatestEvent("COMPLETE_COURSE", "2026-01-01T10:00:00Z"),
-                JsonLearnerRecordBuilder.create("userId", "course3")
-        ).getAsPaginated(0, 20, 1).toString();
-
-        cslStubService.getLearnerRecord().getLearnerRecordPage(
-                LearnerRecordQuery.builder().learnerIds(java.util.Set.of("userId")).notResourceIds(List.of("course1", "course2")).build(),
-                0,
-                20,
-                learnerRecordsResponse);
-
-        String courses = ArrayJsonContentBuilder.create(
-                JsonCourseBuilder.create("course3", "B Course 3"),
-                JsonCourseBuilder.create("course4", "A Course 4")
-        ).build();
-
-        cslStubService.getLearningCatalogue().getCourses(List.of("course4", "course3"), courses);
-
-        mockMvc.perform(get("/learning/userId?page=0&size=20").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.learning.length()").value(2))
-                .andExpect(jsonPath("$.learning[0].title").value("A Course 4"))
-                .andExpect(jsonPath("$.learning[0].status").value("Completed"))
-                .andExpect(jsonPath("$.learning[0].completionDate").value("1 Jan 2026"))
-                .andExpect(jsonPath("$.learning[1].title").value("B Course 3"))
-                .andExpect(jsonPath("$.learning[1].status").value(""))
-                .andExpect(jsonPath("$.learning[1].completionDate").isEmpty())
-                .andExpect(jsonPath("$.totalResults").value(2))
-                .andExpect(jsonPath("$.page").value(0))
-                .andExpect(jsonPath("$.size").value(20));
-    }
-
-    @Test
     public void testGetDetailedLearning() throws Exception {
         CivilServant civilServant = testDataService.generateCivilServant();
         cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);

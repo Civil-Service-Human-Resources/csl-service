@@ -64,7 +64,7 @@ public class LearningFactory {
                 ModuleRecordCollection moduleRecords = moduleRecordsForCourses.get(record.getResourceId());
                 return buildNonCompletedUserLearningCourse(record, courseTitle, moduleRecords);
             }
-        }).sorted(Comparator.comparing(UserLearningCourse::getTitle, String.CASE_INSENSITIVE_ORDER)).toList();
+        }).toList();
     }
 
     public Learning buildDetailedLearning(List<Course> courses, Map<String, CourseRecord> courseRecords,
