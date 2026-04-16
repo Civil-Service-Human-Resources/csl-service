@@ -48,6 +48,15 @@ public class ArrayJsonContentBuilder<T extends BaseJsonBuilder> {
         return pagedRoot;
     }
 
+    public ObjectNode getAsSearchResults(int page, int size, int totalPages) {
+        ObjectNode pagedRoot = mapper.createObjectNode();
+        pagedRoot.putArray("results").addAll(this.get());
+        pagedRoot.put("page", page);
+        pagedRoot.put("size", size);
+        pagedRoot.put("totalResults", this.get().size());
+        return pagedRoot;
+    }
+
     public ObjectNode getAsObjectList(String key) {
         ObjectNode pagedRoot = mapper.createObjectNode();
         pagedRoot.putArray(key).addAll(this.get());

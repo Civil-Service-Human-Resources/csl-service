@@ -73,7 +73,7 @@ public class UserLearningTest extends IntegrationTestBase {
                         .addModule("link", "module2", "module 2", false, 0),
                 JsonCourseBuilder.create("course4", "Course 4")
                         .addModule("link", "module3", "module 3", false, 0)
-        ).getAsPaginated(0, 20, 1).toString();
+        ).getAsSearchResults(0, 20, 1).toString();
 
         SearchForCoursesParams params = SearchForCoursesParams.builder()
                 .query("course").courseIds(List.of("course3", "course4", "course5", "course6", "course7"))

@@ -2,7 +2,6 @@ package uk.gov.cabinetoffice.csl.service.learning;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.client.model.PagedResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.GetOptionalLearningRecordParams;
 import uk.gov.cabinetoffice.csl.controller.model.UserLearningCourse;
 import uk.gov.cabinetoffice.csl.controller.model.UserLearningResponse;
@@ -14,6 +13,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordPagedRe
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
 import uk.gov.cabinetoffice.csl.domain.learning.Learning;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseSearchResults;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
@@ -46,15 +46,15 @@ public class UserLearningService {
 
     private OtherLearningResult getSearchedRecords(LearnerRecordQuery query, GetOptionalLearningRecordParams params) {
         Collection<String> allLearningPlanCourseIds = learnerRecordService.getAllCourseIds(query);
-        PagedResponse<Course> filteredLearningPlanCourses = learningCatalogueService.searchWithinCourses(allLearningPlanCourseIds, params.getQ(), params.getPage(), params.getSize());
-        Collection<Course> courses = filteredLearningPlanCourses.getContent();
+        CourseSearchResults filteredLearningPlanCourses = learningCatalogueService.searchWithinCourses(allLearningPlanCourseIds, params.getQ(), params.getPage(), params.getSize());
+        Collection<Course> courses = filteredLearningPlanCourses.getResults();
         Collection<String> courseIds = courses.stream().map(Course::getId).toList();
         List<CourseRecordResourceId> courseRecordIds = new ArrayList<>();
         for (String learnerId : query.getLearnerIds()) {
             courseRecordIds.addAll(courseIds.stream().map(id -> new CourseRecordResourceId(learnerId, id)).toList());
         }
         Collection<LearnerRecord> records = learnerRecordService.getLearnerRecords(courseRecordIds);
-        return new OtherLearningResult(records, courses, courseIds, filteredLearningPlanCourses.getTotalElements());
+        return new OtherLearningResult(records, courses, courseIds, filteredLearningPlanCourses.getTotalResults().intValue());
     }
 
     public UserLearningResponse getOptionalLearningRecord(String uid, GetOptionalLearningRecordParams params) {

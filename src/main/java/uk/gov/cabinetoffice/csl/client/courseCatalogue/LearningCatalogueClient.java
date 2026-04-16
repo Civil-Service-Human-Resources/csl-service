@@ -55,10 +55,12 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
-    public CoursesPagedResponse searchForCourses(SearchForCoursesParams params, int page, int size) {
+    public CourseSearchResults searchForCourses(SearchForCoursesParams params, int page, int size) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(v2CourseSearch);
-        CoursesPagedResponse resp = httpClient.postPaginatedRequest(CoursesPagedResponse.class, params, uriBuilder, page, size);
-        resp.getContent().forEach(this::buildCourseData);
+        uriBuilder.replaceQueryParam("size", size).replaceQueryParam("page", page);
+        RequestEntity<SearchForCoursesParams> request = RequestEntity.post(uriBuilder.toUriString()).body(params);
+        CourseSearchResults resp = httpClient.executeRequest(request, CourseSearchResults.class);
+        resp.getResults().forEach(this::buildCourseData);
         return resp;
     }
 

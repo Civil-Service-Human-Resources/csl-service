@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
-import uk.gov.cabinetoffice.csl.client.model.PagedResponse;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
@@ -142,7 +141,7 @@ public class LearningCatalogueService {
         cache.put(course);
     }
 
-    public PagedResponse<Course> searchWithinCourses(Collection<String> allLearningPlanCourseIds, String q, int page, int size) {
+    public CourseSearchResults searchWithinCourses(Collection<String> allLearningPlanCourseIds, String q, int page, int size) {
         SearchForCoursesParams p = SearchForCoursesParams.builder()
                 .query(q)
                 .status(List.of(CourseStatus.PUBLISHED, CourseStatus.ARCHIVED))
