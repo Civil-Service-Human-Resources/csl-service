@@ -69,10 +69,10 @@ public class UserLearningTest extends IntegrationTestBase {
 
         String courses = ArrayJsonContentBuilder.create(
                 JsonCourseBuilder.create("course3", "Course 3")
-                        .addLinkModule("module1", "module 1", false, 0)
-                        .addLinkModule("module2", "module 2", false, 0),
+                        .addModule("link", "module1", "module 1", false, 0)
+                        .addModule("link", "module2", "module 2", false, 0),
                 JsonCourseBuilder.create("course4", "Course 4")
-                        .addLinkModule("module3", "module 3", false, 0)
+                        .addModule("link", "module3", "module 3", false, 0)
         ).getAsPaginated(0, 20, 1).toString();
 
         SearchForCoursesParams params = SearchForCoursesParams.builder()
@@ -160,7 +160,7 @@ public class UserLearningTest extends IntegrationTestBase {
 
         String courses = ArrayJsonContentBuilder.create(
                 JsonCourseBuilder.create("course1", "Course 1")
-                        .addLinkModule("module1", "Module 1", false, 0)
+                        .addModule("link", "module1", "Module 1", false, 0)
         ).build();
 
         cslStubService.getLearningCatalogue().getCourses(List.of("course1"), courses);

@@ -7,8 +7,12 @@ import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventQuery;
 import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
+import uk.gov.cabinetoffice.csl.util.data.ArrayJsonContentBuilder;
+import uk.gov.cabinetoffice.csl.util.data.catalogue.DateRangeJsonValues;
+import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonCourseBuilder;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,137 +37,21 @@ public class LearningRecordTest extends IntegrationTestBase {
             }
             """;
 
-    String courses = """
-            [{
-                              "id": "course1",
-                              "title": "Course 1",
-                              "shortDescription": "Course 1",
-                              "description": "Course 1",
-                              "modules": [
-                                      {
-                                              "type": "link",
-                                              "url": "https://www.gov.uk/",
-                                              "id": "module1",
-                                              "title": "module1",
-                                              "description": "module1",
-                                              "optional": false,
-                                              "moduleType": "link",
-                                              "duration": 30
-                                      }
-                              ],
-                              "audiences": [
-                                      {
-                                              "id": "DWP",
-                                              "name": "DWP",
-                                              "areasOfWork": [],
-                                              "departments": ["DWP"],
-                                              "grades": [],
-                                              "interests": [],
-                                              "requiredBy": "2024-01-01T00:00:00Z",
-                                              "frequency": "P1Y",
-                                              "type": "REQUIRED_LEARNING",
-                                              "eventId": null
-                                      },
-                                      {
-                                              "id": "HMRC",
-                                              "name": "HMRC",
-                                              "areasOfWork": [],
-                                              "departments": ["HMRC"],
-                                              "grades": [],
-                                              "interests": [],
-                                              "requiredBy": "2023-01-01T00:00:00Z",
-                                              "frequency": "P1Y",
-                                              "type": "REQUIRED_LEARNING",
-                                              "eventId": null
-                                      }
-                              ],
-                              "visibility": "PUBLIC",
-                              "status": "Published",
-                              "cost": 0.0
-                          },{
-                              "id": "course2",
-                              "title": "Course 2",
-                              "shortDescription": "Course 2",
-                              "description": "Course 2",
-                              "modules": [
-                                      {
-                                              "type": "link",
-                                              "url": "https://www.gov.uk/",
-                                              "id": "module1",
-                                              "title": "module1",
-                                              "description": "module1",
-                                              "optional": false,
-                                              "moduleType": "link"
-                                      },
-                                    {
-                                              "type": "file",
-                                              "url": "https://www.gov.uk/",
-                                              "id": "module2",
-                                              "title": "module2",
-                                              "description": "module2",
-                                              "optional": false,
-                                              "moduleType": "file"
-                                      }
-                              ],
-                              "audiences": [
-                                      {
-                                              "id": "aud1",
-                                              "name": "audience1",
-                                              "areasOfWork": [],
-                                              "departments": ["CO"],
-                                              "grades": [],
-                                              "interests": [],
-                                              "requiredBy": "2024-01-01T00:00:00Z",
-                                              "frequency": "P1Y",
-                                              "type": "REQUIRED_LEARNING",
-                                              "eventId": null
-                                      }
-                              ],
-                              "visibility": "PUBLIC",
-                              "status": "Published",
-                              "cost": 0.0
-                          },{
-                            "id": "course3",
-                            "title": "Course 3",
-                            "shortDescription": "Course 3",
-                            "description": "Course 3",
-                            "modules": [
-                                {
-                                  "type": "face-to-face",
-                                  "id": "module1",
-                                  "title": "module1",
-                                  "description": "module1",
-                                  "optional": false,
-                                  "moduleType": "face-to-face",
-                                  "events": [
-                                    {
-                                        "dateRanges": [
-                                            {
-                                                "startTime": "09:00",
-                                                "endTime": "11:00",
-                                                "date": "2025-01-01"
-                                            }
-                                        ]
-                                    }
-                                  ]
-            					}
-                            ],
-                            "audiences": [
-                                    {
-                                        "id": "aud1",
-                                        "name": "audience1",
-                                        "areasOfWork": [],
-                                        "departments": [],
-                                        "grades": [],
-                                        "interests": [],
-                                        "type": "OPEN",
-                                        "eventId": null
-                                    }
-                            ],
-                            "visibility": "PUBLIC",
-                            "status": "Published",
-                            "cost": 0.0
-                        }]""";
+    JsonCourseBuilder course1 = JsonCourseBuilder.create("course1", "Course 1")
+            .addLinkModule("module1", "module1", false, 30)
+            .addDepartmentRequiredLearning("DWP", "2024-01-01T00:00:00Z", "P1Y")
+            .addDepartmentRequiredLearning("HMRC", "2023-01-01T00:00:00Z", "P1Y");
+
+    JsonCourseBuilder course2 = JsonCourseBuilder.create("course2", "Course 2")
+            .addLinkModule("module1", "module1", false, 0)
+            .addFileModule("module2", "module2", false, 0)
+            .addDepartmentRequiredLearning("CO", "2024-01-01T00:00:00Z", "P1Y");
+
+    JsonCourseBuilder course3 = JsonCourseBuilder.create("course3", "Course 3")
+            .addFaceToFaceModule("module1", "module1", false, 0, "eventId", BigDecimal.valueOf(0L), new DateRangeJsonValues("09:00", "11:00", "2025-01-01"))
+            .createBlankAudience();
+
+    String courses = ArrayJsonContentBuilder.create(course1, course2, course3).build();
 
     @Test
     public void testGetLearningRecord() throws Exception {

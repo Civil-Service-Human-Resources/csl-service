@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.gov.cabinetoffice.csl.util.data.BaseJsonBuilder;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.math.BigDecimal;
 
 public class JsonCourseBuilder extends BaseJsonBuilder {
 
@@ -20,54 +19,61 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
         builder.root.put("id", courseId);
         builder.root.put("title", title);
         builder.root.put("description", title);
-        builder.root.put("shortDescription", title);
+        builder.root.put("shortDescription", String.format("%s short description", title));
+        builder.root.put("visibility", "PUBLIC");
+        builder.root.put("status", "Published");
         builder.root.putArray("audiences");
         builder.root.putArray("modules");
         return builder;
     }
 
-    private ObjectNode createAudience(String departmentCode, LocalDate requiredBy) {
+    private ObjectNode createRequiredAudience(String departmentCode, String requiredBy) {
         ArrayNode aud = getOrCreateArray("audiences");
         ObjectNode item = aud.addObject();
         item.putArray("departments").add(departmentCode);
-        item.put("requiredBy", requiredBy.format(DateTimeFormatter.ISO_DATE_TIME))
-                .put("item", "REQUIRED_LEARNING");
+        item.put("requiredBy", requiredBy)
+                .put("type", "REQUIRED_LEARNING");
         return item;
     }
 
-    public JsonCourseBuilder addDepartmentRequiredLearning(String departmentCode, LocalDate requiredBy) {
-        createAudience(departmentCode, requiredBy);
+    public JsonCourseBuilder createBlankAudience() {
+        ArrayNode aud = getOrCreateArray("audiences");
+        aud.addObject().put("type", "OPEN");
         return this;
     }
 
-    public JsonCourseBuilder addDepartmentRequiredLearning(String departmentCode, LocalDate requiredBy, String frequency) {
-        ObjectNode audience = createAudience(departmentCode, requiredBy);
+    public JsonCourseBuilder addDepartmentRequiredLearning(String departmentCode, String requiredBy) {
+        createRequiredAudience(departmentCode, requiredBy);
+        return this;
+    }
+
+    public JsonCourseBuilder addDepartmentRequiredLearning(String departmentCode, String requiredBy, String frequency) {
+        ObjectNode audience = createRequiredAudience(departmentCode, requiredBy);
         audience.put("frequency", frequency);
         return this;
     }
 
-    private ObjectNode createModule(String type, String id, String title, boolean optional, int duration) {
-        ArrayNode modules = getOrCreateArray("modules");
-        return modules.addObject()
-                .put("id", id)
-                .put("courseId", courseId)
-                .put("title", title)
-                .put("description", title)
-                .put("type", type)
-                .put("moduleType", type)
-                .put("duration", duration)
-                .put("optional", optional);
+    public JsonCourseBuilder addModule(String type, String id, String title, boolean optional, int duration) {
+        getOrCreateArray("modules").add(JsonModuleBuilder.create(type, id, courseId, title, optional, duration).get());
+        return this;
+    }
+
+    public JsonCourseBuilder addFaceToFaceModule(String id, String title, boolean optional, int duration,
+                                                 String eventId, BigDecimal cost, DateRangeJsonValues... dateRanges) {
+        getOrCreateArray("modules").add(JsonModuleBuilder.create("face-to-face", id, courseId, title, optional, duration)
+                .addEvent(eventId, cost, dateRanges).get());
+        return this;
     }
 
     public JsonCourseBuilder addLinkModule(String id, String title, boolean optional, int duration) {
-        createModule("link", id, title, optional, duration)
-                .put("link", "https://generic.com");
-        return this;
+        return this.addModule("link", id, title, optional, duration);
+    }
+
+    public JsonCourseBuilder addFileModule(String id, String title, boolean optional, int duration) {
+        return this.addModule("file", id, title, optional, duration);
     }
 
     public JsonCourseBuilder addElearningModule(String id, String title, boolean optional, int duration) {
-        createModule("elearning", id, title, optional, duration)
-                .put("link", "https://generic.com");
-        return this;
+        return this.addModule("elearning", id, title, optional, duration);
     }
 }

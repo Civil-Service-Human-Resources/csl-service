@@ -35,4 +35,9 @@ public class JsonModuleRecordBuilder extends BaseJsonBuilder {
         return this;
     }
 
+    public JsonModuleRecordBuilder addEvent(String eventId, String eventDate) {
+        root.put("eventId", eventId)
+                .put("eventDate", eventDate);
+        return this;
+    }
 }
