@@ -43,6 +43,25 @@ public class HttpClient implements IHttpClient {
     }
 
     @Override
+    public <I, T, R extends PagedResponse<T>> List<T> postPaginatedRequest(Class<R> pagedResponseClass, I body, UriComponentsBuilder url, Integer maxPageSize) {
+        List<T> results = new ArrayList<>();
+        int totalPages = 1;
+        for (int page = 0; page < totalPages; page++) {
+            R response = postPaginatedRequest(pagedResponseClass, body, url, 0, maxPageSize);
+            results.addAll(response.getContent());
+            totalPages = response.getTotalPages();
+        }
+        return results;
+    }
+
+    @Override
+    public <I, T, R extends PagedResponse<T>> R postPaginatedRequest(Class<R> pagedResponseClass, I body, UriComponentsBuilder url, Integer page, Integer size) {
+        url.replaceQueryParam("size", size).replaceQueryParam("page", page);
+        RequestEntity<I> request = RequestEntity.post(url.build().toUriString()).body(body);
+        return executeRequest(request, pagedResponseClass);
+    }
+
+    @Override
     public <T, R extends PagedResponse<T>> List<T> getPaginatedRequest(Class<R> pagedResponseClass, UriComponentsBuilder url, Integer maxPageSize) {
         List<T> results = new ArrayList<>();
         int totalPages = 1;

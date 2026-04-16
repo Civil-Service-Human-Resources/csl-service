@@ -8,9 +8,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseFactory;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.RequiredLearningMap;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 
@@ -27,6 +25,8 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     private String courses;
     @Value("${learningCatalogue.courseV2Url}")
     private String v2Courses;
+    @Value("${learningCatalogue.courseV2SearchUrl}")
+    private String v2CourseSearch;
     @Value("${learningCatalogue.courseBatchSize}")
     private Integer courseBatchSize;
     private final IHttpClient httpClient;
@@ -52,6 +52,14 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
                     });
                     return courses.stream();
                 }).map(this::buildCourseData).collect(Collectors.toList());
+    }
+
+    @Override
+    public CoursesPagedResponse searchForCourses(SearchForCoursesParams params, int page, int size) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(v2CourseSearch);
+        CoursesPagedResponse resp = httpClient.postPaginatedRequest(CoursesPagedResponse.class, params, uriBuilder, page, size);
+        resp.getContent().forEach(this::buildCourseData);
+        return resp;
     }
 
     @Override

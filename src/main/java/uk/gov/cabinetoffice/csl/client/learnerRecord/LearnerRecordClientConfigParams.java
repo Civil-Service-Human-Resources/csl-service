@@ -11,7 +11,9 @@ public class LearnerRecordClientConfigParams {
     private final String eventsUrl;
     private final String bookingsUrl;
     private final String learnerRecordsUrl;
+    private final String learnerRecordsResourceIdUrl;
     private final Integer learnerRecordsMaxPageSize;
+    private final Integer learnerRecordsResourceIdMaxPageSize;
     private final String moduleRecordsUrl;
     private final Integer moduleRecordBatchSize;
     private final String learnerRecordEventsUrl;

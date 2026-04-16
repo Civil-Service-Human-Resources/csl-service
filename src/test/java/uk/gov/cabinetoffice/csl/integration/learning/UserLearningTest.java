@@ -1,13 +1,21 @@
 package uk.gov.cabinetoffice.csl.integration.learning;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventQuery;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.SearchForCoursesParams;
 import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
+import uk.gov.cabinetoffice.csl.util.data.ArrayJsonContentBuilder;
+import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonCourseBuilder;
+import uk.gov.cabinetoffice.csl.util.data.learnerRecord.JsonLearnerRecordBuilder;
+import uk.gov.cabinetoffice.csl.util.data.learnerRecord.JsonModuleRecordBuilder;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.util.List;
@@ -25,56 +33,100 @@ public class UserLearningTest extends IntegrationTestBase {
     @Autowired
     private TestDataService testDataService;
 
-    @Test
-    public void testGetLearning() throws Exception {
-        CivilServant civilServant = testDataService.generateCivilServant();
-        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
-
-        String requiredLearningMap = """
+    String requiredLearningMap = """
             {
                 "departmentCodeMap": {
                     "CO": ["course1", "course2"]
                 }
             }
             """;
+
+    @Test
+    public void testSearchLearning() throws Exception {
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
         cslStubService.getLearningCatalogue().getMandatoryLearningMap(requiredLearningMap);
 
-        String learnerRecordsResponse = """
-            {
-                "content": [
-                    {
-                        "resourceId": "course4",
-                        "recordType": {
-                            "type": "COURSE"
-                        },
-                        "latestEvent": {
-                            "learnerId": "userId",
-                            "resourceId": "course4",
-                            "eventType": {
-                                "eventType": "COMPLETE_COURSE",
-                                "learnerRecordType": {
-                                    "type": "COURSE"
-                                }
-                            },
-                            "eventTimestamp": "2026-01-01T10:00:00Z",
-                            "eventSource": {
-                                "source": "csl_source_id"
-                            }
-                        }
-                    },
-                    {
-                        "resourceId": "course3",
-                        "recordType": {
-                            "type": "COURSE"
-                        }
-                    }
-                ],
-                "page": 0,
-                "size": 20,
-                "totalElements": 2,
-                "totalPages": 1
-            }
-            """;
+        String learningResourceIdsResponse = """
+                {
+                    "content": [
+                        "course3",
+                        "course4",
+                        "course5",
+                        "course6",
+                        "course7"
+                    ],
+                    "page": 0,
+                    "size": 200,
+                    "totalElements": 5,
+                    "totalPages": 1
+                }
+                """;
+
+        cslStubService.getLearnerRecord().getLearnerRecordResourceIds(
+                LearnerRecordQuery.builder().learnerIds(java.util.Set.of("userId")).notResourceIds(List.of("course1", "course2")).build(),
+                0,
+                200,
+                learningResourceIdsResponse);
+
+        String courses = ArrayJsonContentBuilder.create(
+                JsonCourseBuilder.create("course3", "Course 3")
+                        .addLinkModule("module1", "module 1", false, 0)
+                        .addLinkModule("module2", "module 2", false, 0),
+                JsonCourseBuilder.create("course4", "Course 4")
+                        .addLinkModule("module3", "module 3", false, 0)
+        ).getAsPaginated(0, 20, 1).toString();
+
+        SearchForCoursesParams params = SearchForCoursesParams.builder()
+                .query("course").courseIds(List.of("course3", "course4", "course5", "course6", "course7"))
+                .status(List.of(CourseStatus.PUBLISHED, CourseStatus.ARCHIVED)).build();
+
+        cslStubService.getLearningCatalogue().postSearchCourses(params, courses, 0, 20);
+
+        String learnerRecordsResponse = ArrayJsonContentBuilder.create(
+                JsonLearnerRecordBuilder.create("userId", "course4")
+                        .addLatestEvent("COMPLETE_COURSE", "2026-01-01T10:00:00Z"),
+                JsonLearnerRecordBuilder.create("userId", "course3")
+        ).getAsPaginated(0, 20, 1).toString();
+
+        cslStubService.getLearnerRecord().getLearnerRecords(
+                LearnerRecordQuery.builder().learnerIds(java.util.Set.of("userId")).resourceIds(Set.of("course4", "course3")).build(),
+                0,
+                learnerRecordsResponse);
+
+        String moduleRecordsResponse = ArrayJsonContentBuilder.create(
+                JsonModuleRecordBuilder.create("module1", "course3", "userId", "link", "2026-01-01T10:00:00Z")
+                        .addCompletionDate("2026-01-01T10:00:00Z", "2026-01-01T10:00:00Z").addState("COMPLETED"),
+                JsonModuleRecordBuilder.create("module3", "course4", "userId", "link", "2026-01-01T10:00:00Z")
+                        .addCompletionDate("2026-01-01T10:00:00Z", "2026-01-01T10:00:00Z").addState("COMPLETED")
+        ).getAsObjectList("moduleRecords").toString();
+
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2", "module3"), moduleRecordsResponse);
+
+        mockMvc.perform(get("/learning/userId?page=0&size=20&q=course").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.learning.length()").value(2))
+                .andExpect(jsonPath("$.learning[0].title").value("Course 3"))
+                .andExpect(jsonPath("$.learning[0].status").value("In progress"))
+                .andExpect(jsonPath("$.learning[0].completionDate").isEmpty())
+                .andExpect(jsonPath("$.learning[1].title").value("Course 4"))
+                .andExpect(jsonPath("$.learning[1].status").value("Completed"))
+                .andExpect(jsonPath("$.learning[1].completionDate").value("1 Jan 2026"))
+                .andExpect(jsonPath("$.totalResults").value(2))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(20));
+    }
+
+    @Test
+    public void testGetLearning() throws Exception {
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
+        cslStubService.getLearningCatalogue().getMandatoryLearningMap(requiredLearningMap);
+
+        String learnerRecordsResponse = ArrayJsonContentBuilder.create(
+                JsonLearnerRecordBuilder.create("userId", "course4").addLatestEvent("COMPLETE_COURSE", "2026-01-01T10:00:00Z"),
+                JsonLearnerRecordBuilder.create("userId", "course3")
+        ).getAsPaginated(0, 20, 1).toString();
 
         cslStubService.getLearnerRecord().getLearnerRecordPage(
                 LearnerRecordQuery.builder().learnerIds(java.util.Set.of("userId")).notResourceIds(List.of("course1", "course2")).build(),
@@ -82,18 +134,10 @@ public class UserLearningTest extends IntegrationTestBase {
                 20,
                 learnerRecordsResponse);
 
-        String courses = """
-            [
-              {
-                "id": "course3",
-                "title": "B Course 3"
-              },
-              {
-                "id": "course4",
-                "title": "A Course 4"
-              }
-            ]
-            """;
+        ArrayNode coursesArrayNode = new ObjectMapper().createArrayNode();
+        coursesArrayNode.addObject().setAll(JsonCourseBuilder.create("course3", "Course 3").get());
+        coursesArrayNode.addObject().setAll(JsonCourseBuilder.create("course3", "Course 3").get());
+        String courses = coursesArrayNode.toString();
 
         cslStubService.getLearningCatalogue().getCourses(List.of("course4", "course3"), courses);
 
@@ -116,83 +160,38 @@ public class UserLearningTest extends IntegrationTestBase {
         CivilServant civilServant = testDataService.generateCivilServant();
         cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
 
-        String courses = """
-            [
-              {
-                "id": "course1",
-                "title": "Course 1",
-                "shortDescription": "Course 1 short description",
-                "description": "Course 1 description",
-                "modules": [
-                  {
-                    "type": "link",
-                    "url": "https://www.gov.uk/",
-                    "id": "module1",
-                    "title": "Module 1",
-                    "description": "Module 1 description",
-                    "optional": false,
-                    "moduleType": "link",
-                    "cost": 0.0
-                  }
-                ],
-                "audiences": [],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-              }
-            ]
-            """;
+        String courses = ArrayJsonContentBuilder.create(
+                JsonCourseBuilder.create("course1", "Course 1")
+                        .addLinkModule("module1", "Module 1", false, 0)
+        ).build();
 
         cslStubService.getLearningCatalogue().getCourses(List.of("course1"), courses);
 
         cslStubService.getLearningCatalogue().getMandatoryLearningMap("""
-            {
-                "departmentCodeMap": {
-                    "CO": []
+                {
+                    "departmentCodeMap": {
+                        "CO": []
+                    }
                 }
-            }
-            """);
+                """);
 
         cslStubService.getLearnerRecord().getLearnerRecordEvents(0, LearnerRecordEventQuery.builder().userId("userId").eventTypes(List.of("COMPLETE_COURSE")).build(), """
-            {
-                "content": [
-                    {
-                        "eventTimestamp": "2026-01-01T10:00:00Z",
-                        "resourceId": "course1"
-                    }
-                ],
-                "totalPages": 1
-            }
-            """);
-
-        String learnerRecordsResponse = """
-            {
-                "content": [
-                    {
-                        "resourceId": "course1",
-                        "learnerId": "userId",
-                        "recordType": {
-                            "type": "COURSE"
-                        },
-                        "latestEvent": {
-                            "learnerId": "userId",
-                            "resourceId": "course1",
-                            "eventType": {
-                                "eventType": "COMPLETE_COURSE",
-                                "learnerRecordType": {
-                                    "type": "COURSE"
-                                }
-                            },
+                {
+                    "content": [
+                        {
                             "eventTimestamp": "2026-01-01T10:00:00Z",
-                            "eventSource": {
-                                "source": "csl_source_id"
-                            }
+                            "resourceId": "course1"
                         }
-                    }
-                ],
-                "totalPages": 1
-            }
-            """;
+                    ],
+                    "totalPages": 1
+                }
+                """);
+
+        String learnerRecordsResponse = ArrayJsonContentBuilder.create()
+                .addElements(
+                        JsonLearnerRecordBuilder.create("userId", "course1").addLatestEvent("COMPLETE_COURSE", "2026-01-01T10:00:00Z"),
+                        JsonLearnerRecordBuilder.create("userId", "course3")
+                ).getAsPaginated(0, 20, 1).toString();
 
         LearnerRecordQuery query = LearnerRecordQuery.builder()
                 .learnerIds(Set.of("userId"))
@@ -201,20 +200,12 @@ public class UserLearningTest extends IntegrationTestBase {
 
         cslStubService.getLearnerRecord().getLearnerRecords(query, 0, learnerRecordsResponse);
 
-        String moduleRecordResponse = """
-                {
-                    "moduleRecords": [
-                        {
-                            "userId": "userId",
-                            "moduleId": "module1",
-                            "state": "COMPLETED",
-                            "updatedAt": "2025-01-01T09:00:00",
-                            "courseId": "course1"
-                        }
-                    ]
-                }""";
+        String moduleRecordsResponse = ArrayJsonContentBuilder.create(
+                JsonModuleRecordBuilder.create("module1", "course1", "userId", "link", "2026-01-01T10:00:00Z")
+                        .addUpdatedAt("2025-01-01T09:00:00Z").addState("COMPLETED")
+        ).getAsObjectList("moduleRecords").toString();
 
-        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1"), moduleRecordResponse);
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1"), moduleRecordsResponse);
 
         mockMvc.perform(get("/learning/detailed/userId?courseIds=course1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())

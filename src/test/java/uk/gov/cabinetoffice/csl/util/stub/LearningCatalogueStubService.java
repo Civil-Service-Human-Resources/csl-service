@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.SearchForCoursesParams;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
 
@@ -61,6 +62,19 @@ public class LearningCatalogueStubService {
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
                                 .withBody(utils.toJson(expectedInput)))
+        );
+    }
+
+    public StubMapping postSearchCourses(SearchForCoursesParams params, String courses, Integer page, Integer size) {
+        return stubFor(
+                WireMock.post(urlPathEqualTo("/learning_catalogue/v2/courses/search"))
+                        .withQueryParam("size", equalTo(size.toString()))
+                        .withQueryParam("page", equalTo(page.toString()))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .withRequestBody(equalToJson(utils.toJson(params), true, true))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(courses))
         );
     }
 }
