@@ -29,41 +29,27 @@ public class LearningFactory {
     private final IDisplayCourseFactory displayCourseFactory;
     private final LearningRecordService learningRecordService;
 
-    private UserLearningCourse buildCompletedUserLearningCourse(LearnerRecord record, String courseTitle,
-                                                                LearnerRecordEvent completionEvent) {
-        UserLearningCourse c = new UserLearningCourse();
-        c.setResourceId(record.getResourceId());
-        c.setTitle(courseTitle);
-        c.setStatus("Completed");
-        c.setCompletionDate(completionEvent.getEventTimestamp().format(formatter));
-        return c;
-    }
-
-    private UserLearningCourse buildNonCompletedUserLearningCourse(LearnerRecord record, String courseTitle,
-                                                                   ModuleRecordCollection moduleRecords) {
-        UserLearningCourse c = new UserLearningCourse();
-        c.setResourceId(record.getResourceId());
-        c.setTitle(courseTitle);
-        c.setStatus("");
-        if (moduleRecords != null && moduleRecords.anyStateMatches(List.of(State.IN_PROGRESS, State.COMPLETED))) {
-            c.setStatus("In progress");
-        }
-        return c;
-    }
-
     public Collection<UserLearningCourse> buildUserLearning(Collection<LearnerRecord> records,
                                                             Map<String, ModuleRecordCollection> moduleRecordsForCourses,
                                                             Collection<Course> courses) {
-        Map<String, String> courseTitles = courses.stream().collect(Collectors.toMap(Course::getCacheableId, Course::getTitle));
-        return records.stream().map(record -> {
-            String courseTitle = courseTitles.getOrDefault(record.getResourceId(), "Course details not found for resourceId: " + record.getResourceId());
+        Map<String, LearnerRecord> recordMap = records.stream().collect(Collectors.toMap(LearnerRecord::getResourceId, lr -> lr));
+        return courses.stream().map(course -> {
+            UserLearningCourse c = new UserLearningCourse();
+            c.setResourceId(course.getId());
+            c.setTitle(course.getTitle());
+            c.setStatus("");
+            LearnerRecord record = recordMap.get(course.getId());
             LearnerRecordEvent latestEvent = record.getLatestEvent();
             if (latestEvent != null && CourseRecordAction.COMPLETE_COURSE.equals(latestEvent.getActionType())) {
-                return buildCompletedUserLearningCourse(record, courseTitle, latestEvent);
+                c.setStatus("Completed");
+                c.setCompletionDate(latestEvent.getEventTimestamp().format(formatter));
             } else {
                 ModuleRecordCollection moduleRecords = moduleRecordsForCourses.get(record.getResourceId());
-                return buildNonCompletedUserLearningCourse(record, courseTitle, moduleRecords);
+                if (moduleRecords != null && moduleRecords.anyStateMatches(List.of(State.IN_PROGRESS, State.COMPLETED))) {
+                    c.setStatus("In progress");
+                }
             }
+            return c;
         }).toList();
     }
 
