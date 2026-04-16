@@ -1,7 +1,5 @@
 package uk.gov.cabinetoffice.csl.integration.learning;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -134,10 +132,10 @@ public class UserLearningTest extends IntegrationTestBase {
                 20,
                 learnerRecordsResponse);
 
-        ArrayNode coursesArrayNode = new ObjectMapper().createArrayNode();
-        coursesArrayNode.addObject().setAll(JsonCourseBuilder.create("course3", "B Course 3").get());
-        coursesArrayNode.addObject().setAll(JsonCourseBuilder.create("course4", "A Course 4").get());
-        String courses = coursesArrayNode.toString();
+        String courses = ArrayJsonContentBuilder.create(
+                JsonCourseBuilder.create("course3", "B Course 3"),
+                JsonCourseBuilder.create("course4", "A Course 4")
+        ).build();
 
         cslStubService.getLearningCatalogue().getCourses(List.of("course4", "course3"), courses);
 
