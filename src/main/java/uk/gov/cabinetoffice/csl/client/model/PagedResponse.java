@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -22,24 +20,4 @@ public class PagedResponse<T> {
     protected Integer totalPages;
     protected Integer totalElements;
     protected Integer size;
-
-    public List<T> getContent() {
-        return Objects.requireNonNullElse(content, new ArrayList<>());
-    }
-    
-    public Integer getNumber() {
-        return Objects.requireNonNullElse(number, 0);
-    }
-
-    public Integer getTotalPages() {
-        return Objects.requireNonNullElse(totalPages, 0);
-    }
-
-    public Integer getTotalElements() {
-        return Objects.requireNonNullElse(totalElements, 0);
-    }
-
-    public Integer getSize() {
-        return Objects.requireNonNullElse(size, 0);
-    }
 }
