@@ -26,4 +26,20 @@ public class PagedResponse<T> {
     public List<T> getContent() {
         return Objects.requireNonNullElse(content, new ArrayList<>());
     }
+    
+    public Integer getNumber() {
+        return Objects.requireNonNullElse(number, 0);
+    }
+
+    public Integer getTotalPages() {
+        return Objects.requireNonNullElse(totalPages, 0);
+    }
+
+    public Integer getTotalElements() {
+        return Objects.requireNonNullElse(totalElements, 0);
+    }
+
+    public Integer getSize() {
+        return Objects.requireNonNullElse(size, 0);
+    }
 }
