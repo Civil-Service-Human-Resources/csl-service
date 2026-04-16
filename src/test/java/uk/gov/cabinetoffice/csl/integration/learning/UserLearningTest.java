@@ -135,8 +135,8 @@ public class UserLearningTest extends IntegrationTestBase {
                 learnerRecordsResponse);
 
         ArrayNode coursesArrayNode = new ObjectMapper().createArrayNode();
-        coursesArrayNode.addObject().setAll(JsonCourseBuilder.create("course3", "Course 3").get());
-        coursesArrayNode.addObject().setAll(JsonCourseBuilder.create("course3", "Course 3").get());
+        coursesArrayNode.addObject().setAll(JsonCourseBuilder.create("course3", "B Course 3").get());
+        coursesArrayNode.addObject().setAll(JsonCourseBuilder.create("course4", "A Course 4").get());
         String courses = coursesArrayNode.toString();
 
         cslStubService.getLearningCatalogue().getCourses(List.of("course4", "course3"), courses);
