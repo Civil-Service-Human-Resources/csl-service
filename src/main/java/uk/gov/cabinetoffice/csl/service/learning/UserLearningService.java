@@ -37,6 +37,10 @@ public class UserLearningService {
         User user = userDetailsService.getUserWithUid(uid);
         List<String> requiredLearningIds = learningCatalogueService.getRequiredLearningIdsForDepartments(user.getDepartmentCodes());
 
+        if (requiredLearningIds.isEmpty()) {
+            return new UserLearningResponse(List.of(), params.getPage(), params.getSize(), 0);
+        }
+
         LearnerRecordQuery query = LearnerRecordQuery.builder()
                 .learnerIds(Set.of(uid))
                 .notResourceIds(requiredLearningIds)
