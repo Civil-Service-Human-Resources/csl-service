@@ -36,17 +36,15 @@ public class UserLearningService {
     public UserLearningResponse getOptionalLearningRecord(String uid, GetOptionalLearningRecordParams params) {
         User user = userDetailsService.getUserWithUid(uid);
         List<String> requiredLearningIds = learningCatalogueService.getRequiredLearningIdsForDepartments(user.getDepartmentCodes());
-
-        if (requiredLearningIds.isEmpty()) {
-            return new UserLearningResponse(List.of(), params.getPage(), params.getSize(), 0);
-        }
-
         LearnerRecordQuery query = LearnerRecordQuery.builder()
                 .learnerIds(Set.of(uid))
                 .notResourceIds(requiredLearningIds)
                 .build();
 
         Collection<String> allLearningPlanCourseIds = learnerRecordService.getAllCourseIds(query);
+        if (allLearningPlanCourseIds.isEmpty()) {
+            return new UserLearningResponse(List.of(), params.getPage(), params.getSize(), 0);
+        }
         CourseSearchResults filteredLearningPlanCourses = learningCatalogueService.searchWithinCourses(allLearningPlanCourseIds, params.getQ(), params.getPage(), params.getSize());
         Collection<Course> courses = filteredLearningPlanCourses.getResults();
         Collection<String> courseIds = courses.stream().map(Course::getId).toList();
