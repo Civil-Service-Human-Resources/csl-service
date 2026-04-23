@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -55,9 +56,10 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
-    public CourseSearchResults searchForCourses(SearchForCoursesParams params, int page, int size) {
+    public CourseSearchResults searchForCourses(SearchForCoursesParams params, int page, int size, String sortBy, Sort.Direction sortDirection) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(v2CourseSearch);
-        uriBuilder.replaceQueryParam("size", size).replaceQueryParam("page", page);
+        uriBuilder.replaceQueryParam("size", size).replaceQueryParam("page", page)
+                .replaceQueryParam("sort.field", sortBy).replaceQueryParam("sort.direction", sortDirection.name());
         RequestEntity<SearchForCoursesParams> request = RequestEntity.post(uriBuilder.toUriString()).body(params);
         CourseSearchResults resp = httpClient.executeRequest(request, CourseSearchResults.class);
         resp.getResults().forEach(this::buildCourseData);

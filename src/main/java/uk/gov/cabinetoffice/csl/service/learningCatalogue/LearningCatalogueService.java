@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.service.learningCatalogue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
@@ -147,6 +148,6 @@ public class LearningCatalogueService {
                 .status(List.of(CourseStatus.PUBLISHED, CourseStatus.ARCHIVED))
                 .courseIds(allLearningPlanCourseIds)
                 .build();
-        return client.searchForCourses(p, page, size);
+        return client.searchForCourses(p, page, size, "title", Sort.Direction.ASC);
     }
 }

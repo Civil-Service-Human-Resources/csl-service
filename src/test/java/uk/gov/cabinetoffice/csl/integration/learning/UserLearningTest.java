@@ -79,7 +79,7 @@ public class UserLearningTest extends IntegrationTestBase {
                 .query("course").courseIds(List.of("course3", "course4", "course5", "course6", "course7"))
                 .status(List.of(CourseStatus.PUBLISHED, CourseStatus.ARCHIVED)).build();
 
-        cslStubService.getLearningCatalogue().postSearchCourses(params, courses, 0, 20);
+        cslStubService.getLearningCatalogue().postSearchCourses(params, courses, 0, 20, "title", "ASC");
 
         String learnerRecordsResponse = ArrayJsonContentBuilder.create(
                 JsonLearnerRecordBuilder.create("userId", "course4")

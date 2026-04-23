@@ -65,13 +65,15 @@ public class LearningCatalogueStubService {
         );
     }
 
-    public StubMapping postSearchCourses(SearchForCoursesParams params, String courses, Integer page, Integer size) {
+    public StubMapping postSearchCourses(SearchForCoursesParams params, String courses, Integer page, Integer size, String sortBy, String sortDirection) {
         return stubFor(
                 WireMock.post(urlPathEqualTo("/learning_catalogue/v2/courses/search"))
                         .withQueryParam("size", equalTo(size.toString()))
                         .withQueryParam("page", equalTo(page.toString()))
+                        .withQueryParam("sort.field", equalTo(sortBy))
+                        .withQueryParam("sort.direction", equalTo(sortDirection))
                         .withHeader("Authorization", equalTo("Bearer token"))
-                        .withRequestBody(equalToJson(utils.toJson(params), true, true))
+                        .withRequestBody(equalToJson(utils.toJson(params), true, false))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
                                 .withBody(courses))
