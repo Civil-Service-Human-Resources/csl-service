@@ -7,6 +7,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
+import uk.gov.cabinetoffice.csl.client.model.StringPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecords;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.booking.BookingDto;
@@ -18,6 +19,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.invite.InviteDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -116,24 +118,32 @@ public class LearnerRecordClient implements ILearnerRecordClient {
         if (!isEmpty(query.getLearnerIds())) {
             uriBuilder.queryParam("learnerIds", query.getLearnerIds());
         }
+        if (!isEmpty(query.getNotResourceIds())) {
+            uriBuilder.queryParam("notResourceIds", query.getNotResourceIds());
+        }
         return uriBuilder;
     }
 
     @Override
     public LearnerRecordPagedResponse getLearnerRecordPage(LearnerRecordQuery query, int page, int size) {
         UriComponentsBuilder uriBuilder = createUriBuilder(query);
-        if (!isEmpty(query.getNotResourceIds())) {
-            uriBuilder.queryParam("notResourceIds", query.getNotResourceIds());
-        }
         uriBuilder.queryParam("page", page);
         uriBuilder.queryParam("size", size);
 
         RequestEntity<Void> request = RequestEntity.get(uriBuilder.build().toUriString()).build();
-        LearnerRecordPagedResponse response = httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {});
+        LearnerRecordPagedResponse response = httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
+        });
         if (response.getContent() != null) {
             response.setContent(response.getContent().stream().map(learnerRecordFactory::transformLearnerRecord).toList());
         }
         return response;
+    }
+
+    @Override
+    public Collection<String> getLearnerRecordResourceIds(LearnerRecordQuery query) {
+        UriComponentsBuilder uriBuilder = createUriBuilder(query);
+        uriBuilder.replacePath(configParams.getLearnerRecordsResourceIdUrl());
+        return httpClient.getPaginatedRequest(StringPagedResponse.class, uriBuilder, configParams.getLearnerRecordsResourceIdMaxPageSize());
     }
 
     @Override

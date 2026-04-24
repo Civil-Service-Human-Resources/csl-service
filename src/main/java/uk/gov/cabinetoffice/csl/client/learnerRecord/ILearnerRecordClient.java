@@ -7,6 +7,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.event.EventStatusDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.invite.InviteDto;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.*;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ILearnerRecordClient {
@@ -40,4 +41,6 @@ public interface ILearnerRecordClient {
     void createInvite(String eventId, InviteDto invite);
 
     LearnerRecordPagedResponse getLearnerRecordPage(LearnerRecordQuery query, int page, int size);
+
+    Collection<String> getLearnerRecordResourceIds(LearnerRecordQuery query);
 }

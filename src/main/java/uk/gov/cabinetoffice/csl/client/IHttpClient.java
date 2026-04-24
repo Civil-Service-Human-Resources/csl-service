@@ -17,6 +17,6 @@ public interface IHttpClient {
     <R> DownloadableFile executeFileDownloadRequest(RequestEntity<R> request);
 
     <T, R extends PagedResponse<T>> List<T> getPaginatedRequest(Class<R> pagedResponseClass, UriComponentsBuilder url, Integer maxPageSize);
-    
+
     <T, R> Map<String, T> executeMapRequest(RequestEntity<R> request, ParameterizedTypeReference<Map<String, T>> parameterizedTypeReference);
 }

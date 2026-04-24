@@ -2,26 +2,23 @@ package uk.gov.cabinetoffice.csl.service.learning;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.controller.learning.model.GetOptionalLearningRecordParams;
 import uk.gov.cabinetoffice.csl.controller.model.UserLearningCourse;
 import uk.gov.cabinetoffice.csl.controller.model.UserLearningResponse;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.CourseRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.CourseRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
-import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
 import uk.gov.cabinetoffice.csl.domain.learning.Learning;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseSearchResults;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.learningResources.course.CourseRecordService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,56 +33,29 @@ public class UserLearningService {
     private final CourseRecordService courseRecordService;
     private final LearningFactory learningFactory;
 
-    public UserLearningResponse getOptionalLearningRecord(String uid, int page, int size) {
+    public UserLearningResponse getOptionalLearningRecord(String uid, GetOptionalLearningRecordParams params) {
         User user = userDetailsService.getUserWithUid(uid);
         List<String> requiredLearningIds = learningCatalogueService.getRequiredLearningIdsForDepartments(user.getDepartmentCodes());
-
         LearnerRecordQuery query = LearnerRecordQuery.builder()
                 .learnerIds(Set.of(uid))
                 .notResourceIds(requiredLearningIds)
                 .build();
 
-        LearnerRecordPagedResponse response = learnerRecordService.getLearnerRecordPage(query, page, size);
-
-        List<LearnerRecord> records = response.getContent() == null ? List.of() : response.getContent();
-        List<String> courseIds = records.stream().map(LearnerRecord::getResourceId).toList();
-
-        List<ModuleRecordResourceId> moduleRecordResourceIds = new ArrayList<>();
-        learningCatalogueService.getCourses(courseIds).forEach(course -> course.getModules().forEach(
-                module -> moduleRecordResourceIds.add(new ModuleRecordResourceId(uid, module.getId()))));
-        Map<String, ModuleRecordCollection> moduleRecordsForCourses = learnerRecordDataUtils.getModuleRecordsForCourses(courseIds, moduleRecordResourceIds);
-
-        Map<String, String> courseTitles = courseIds.isEmpty() ? Map.of() : learningCatalogueService.getCourseIdToTitleMap(courseIds);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM uuuu");
-
-        List<UserLearningCourse> learningCourses = records.stream().map(record -> {
-            UserLearningCourse c = new UserLearningCourse();
-            c.setResourceId(record.getResourceId());
-            c.setTitle(courseTitles.getOrDefault(record.getResourceId(), "Course details not found for resourceId: " + record.getResourceId()));
-
-            LearnerRecordEvent latestEvent = record.getLatestEvent();
-            if (latestEvent != null && CourseRecordAction.COMPLETE_COURSE.equals(latestEvent.getActionType())) {
-                c.setStatus("Completed");
-                c.setCompletionDate(latestEvent.getEventTimestamp().format(formatter));
-            } else {
-                ModuleRecordCollection moduleRecords = moduleRecordsForCourses.get(c.getResourceId());
-                String status = (moduleRecords != null && moduleRecords.stream()
-                        .filter(Objects::nonNull)
-                        .anyMatch( r -> r.getState() == State.IN_PROGRESS || r.getState() == State.COMPLETED))
-                        ? "In progress" : "";
-                c.setStatus(status);
-            }
-            return c;
-        }).sorted(Comparator.comparing(UserLearningCourse::getTitle, String.CASE_INSENSITIVE_ORDER)).toList();
-
-        UserLearningResponse res = new UserLearningResponse();
-        res.setLearning(learningCourses);
-        res.setPage(response.getNumber() != null ? response.getNumber() : page);
-        res.setSize(response.getSize() != null ? response.getSize() : size);
-        res.setTotalResults(response.getTotalElements() != null ? response.getTotalElements() : 0);
-
-        return res;
+        Collection<String> allLearningPlanCourseIds = learnerRecordService.getAllCourseIds(query);
+        if (allLearningPlanCourseIds.isEmpty()) {
+            return new UserLearningResponse(List.of(), params.getPage(), params.getSize(), 0);
+        }
+        CourseSearchResults filteredLearningPlanCourses = learningCatalogueService.searchWithinCourses(allLearningPlanCourseIds, params.getQ(), params.getPage(), params.getSize());
+        Collection<Course> courses = filteredLearningPlanCourses.getResults();
+        Collection<String> courseIds = courses.stream().map(Course::getId).toList();
+        List<CourseRecordResourceId> courseRecordIds = new ArrayList<>();
+        for (String learnerId : query.getLearnerIds()) {
+            courseRecordIds.addAll(courseIds.stream().map(id -> new CourseRecordResourceId(learnerId, id)).toList());
+        }
+        Collection<LearnerRecord> records = learnerRecordService.getLearnerRecords(courseRecordIds);
+        Map<String, ModuleRecordCollection> moduleRecordsForCourses = learnerRecordDataUtils.getModuleRecordsForCourses(uid, courses);
+        Collection<UserLearningCourse> userCourses = learningFactory.buildUserLearning(records, moduleRecordsForCourses, courses);
+        return new UserLearningResponse(userCourses, params.getPage(), params.getSize(), filteredLearningPlanCourses.getTotalResults());
     }
 
     public Learning getDetailedLearning(String uid, List<String> courseIds) {

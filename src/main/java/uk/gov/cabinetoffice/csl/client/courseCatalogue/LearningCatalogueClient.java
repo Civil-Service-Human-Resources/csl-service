@@ -4,13 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseFactory;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.RequiredLearningMap;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 
@@ -27,6 +26,8 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     private String courses;
     @Value("${learningCatalogue.courseV2Url}")
     private String v2Courses;
+    @Value("${learningCatalogue.courseV2SearchUrl}")
+    private String v2CourseSearch;
     @Value("${learningCatalogue.courseBatchSize}")
     private Integer courseBatchSize;
     private final IHttpClient httpClient;
@@ -52,6 +53,17 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
                     });
                     return courses.stream();
                 }).map(this::buildCourseData).collect(Collectors.toList());
+    }
+
+    @Override
+    public CourseSearchResults searchForCourses(SearchForCoursesParams params, int page, int size, String sortBy, Sort.Direction sortDirection) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(v2CourseSearch);
+        uriBuilder.replaceQueryParam("size", size).replaceQueryParam("page", page)
+                .replaceQueryParam("sort.field", sortBy).replaceQueryParam("sort.direction", sortDirection.name());
+        RequestEntity<SearchForCoursesParams> request = RequestEntity.post(uriBuilder.toUriString()).body(params);
+        CourseSearchResults resp = httpClient.executeRequest(request, CourseSearchResults.class);
+        resp.getResults().forEach(this::buildCourseData);
+        return resp;
     }
 
     @Override
