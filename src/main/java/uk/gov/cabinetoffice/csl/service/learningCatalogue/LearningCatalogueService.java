@@ -142,12 +142,12 @@ public class LearningCatalogueService {
         cache.put(course);
     }
 
-    public CourseSearchResults searchWithinCourses(Collection<String> allLearningPlanCourseIds, String q, int page, int size) {
+    public CourseSearchResults searchWithinCourses(Collection<String> allLearningPlanCourseIds, String q, int page, int size, Sort.Direction sort) {
         SearchForCoursesParams p = SearchForCoursesParams.builder()
                 .query(q)
                 .status(List.of(CourseStatus.PUBLISHED, CourseStatus.ARCHIVED))
                 .courseIds(allLearningPlanCourseIds)
                 .build();
-        return client.searchForCourses(p, page, size, "title", Sort.Direction.ASC);
+        return client.searchForCourses(p, page, size, "title", sort);
     }
 }

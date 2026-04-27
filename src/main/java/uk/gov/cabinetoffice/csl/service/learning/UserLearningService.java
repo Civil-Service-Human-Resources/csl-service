@@ -45,7 +45,7 @@ public class UserLearningService {
         if (allLearningPlanCourseIds.isEmpty()) {
             return new UserLearningResponse(List.of(), params.getPage(), params.getSize(), 0);
         }
-        CourseSearchResults filteredLearningPlanCourses = learningCatalogueService.searchWithinCourses(allLearningPlanCourseIds, params.getQ(), params.getPage(), params.getSize());
+        CourseSearchResults filteredLearningPlanCourses = learningCatalogueService.searchWithinCourses(allLearningPlanCourseIds, params.getQ(), params.getPage(), params.getSize(), params.getSort());
         Collection<Course> courses = filteredLearningPlanCourses.getResults();
         Collection<String> courseIds = courses.stream().map(Course::getId).toList();
         List<CourseRecordResourceId> courseRecordIds = new ArrayList<>();
