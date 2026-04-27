@@ -79,4 +79,14 @@ public class LearningCatalogueStubService {
                                 .withBody(courses))
         );
     }
+
+    public StubMapping getAudienceMetadataMap(String response) {
+        return stubFor(
+                WireMock.get(urlPathEqualTo("/learning_catalogue/v2/courses/audience-attribute-map"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
 }

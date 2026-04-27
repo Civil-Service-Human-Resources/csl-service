@@ -3,10 +3,13 @@ package uk.gov.cabinetoffice.csl.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
 import uk.gov.cabinetoffice.csl.domain.csrs.BasicOrganisationalUnit;
+import uk.gov.cabinetoffice.csl.domain.csrs.Interest;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -25,6 +28,8 @@ public class User implements Serializable {
     private String professionName;
     private Integer gradeId;
     private String gradeName;
+    private Collection<AreaOfWork> otherAreasOfWork;
+    private Collection<Interest> interests;
     private String lineManagerName;
     private String lineManagerEmail;
     private ArrayList<BasicOrganisationalUnit> departmentHierarchy = new ArrayList<>();
@@ -43,4 +48,10 @@ public class User implements Serializable {
         return isNotBlank(lineManagerEmail) && isNotBlank(lineManagerName);
     }
 
+    public Collection<AreaOfWork> getAllAreasOfWork() {
+        Collection<AreaOfWork> aows = new ArrayList<>();
+        aows.add(new AreaOfWork(professionId.longValue(), professionName));
+        aows.addAll(otherAreasOfWork);
+        return aows;
+    }
 }
