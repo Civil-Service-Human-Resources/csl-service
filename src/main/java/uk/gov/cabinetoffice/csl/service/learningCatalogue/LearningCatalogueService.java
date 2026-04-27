@@ -26,6 +26,7 @@ public class LearningCatalogueService {
 
     private final ObjectCache<Course> cache;
     private final RequiredLearningMapCache requiredLearningMapCache;
+    private final CourseAudienceMetadataMapCache courseAudienceMetadataMapCache;
     private final ILearningCatalogueClient client;
 
     public CourseWithModule getCourseWithModule(String courseId, String moduleId) {
@@ -85,6 +86,15 @@ public class LearningCatalogueService {
             log.error("Failed to retrieve courses from cache, falling back to API");
             return client.getCourses(courseIds);
         }
+    }
+
+    public CourseAudienceMetadataMap getCourseAudienceMetadataMap() {
+        CourseAudienceMetadataMap map = courseAudienceMetadataMapCache.get();
+        if (map == null) {
+            map = client.getAudienceMetadataCourseIds();
+            courseAudienceMetadataMapCache.put(map);
+        }
+        return map;
     }
 
     private RequiredLearningMap getRequiredLearningMap() {

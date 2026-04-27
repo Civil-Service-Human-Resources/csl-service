@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlanCourse;
 
 import java.util.Collection;
 
@@ -12,9 +11,9 @@ import java.util.Collection;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SuggestedLearningSection {
+public class PartialSuggestedLearningSection {
 
     private String title;
-    private Collection<LearningPlanCourse> courses;
+    private Collection<String> courseIds;
 
 }

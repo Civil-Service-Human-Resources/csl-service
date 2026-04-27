@@ -152,5 +152,4 @@ public class OrganisationalUnit implements Serializable {
                 .append("formattedNameWithoutAbbreviation", formattedNameWithoutAbbreviation)
                 .toString();
     }
-
 }
