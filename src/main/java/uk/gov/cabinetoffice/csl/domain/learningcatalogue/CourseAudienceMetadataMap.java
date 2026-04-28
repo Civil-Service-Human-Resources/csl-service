@@ -21,18 +21,15 @@ public class CourseAudienceMetadataMap implements Serializable {
     private Map<String, Collection<String>> areasOfWork;
     private Map<String, Collection<String>> interests;
 
-    private record MapToMetadata(Map<String, Collection<String>> map, Collection<String> userMetadata) {
-    }
-
     public LinkedHashMap<String, Collection<String>> filterForUser(User user, Collection<String> learningRecordIds) {
         List<String> courseIds = new ArrayList<>(learningRecordIds);
         LinkedHashMap<String, Collection<String>> map = new LinkedHashMap<>();
         map.put(user.getOrganisationName(), new ArrayList<>());
-        List.of(
-                new MapToMetadata(departments, user.getDepartmentCodes()),
-                new MapToMetadata(areasOfWork, user.getAllAreasOfWork().stream().map(AreaOfWork::getName).toList()),
-                new MapToMetadata(interests, user.getInterests().stream().map(Interest::getName).toList())
-        ).forEach(stringCollectionMap -> filterMetadataMap(stringCollectionMap.map, stringCollectionMap.userMetadata, courseIds)
+        Map.of(
+                departments, user.getDepartmentCodes(),
+                areasOfWork, user.getAllAreasOfWork().stream().map(AreaOfWork::getName).toList(),
+                interests, user.getInterests().stream().map(Interest::getName).toList()
+        ).forEach((metadataMap, userMetadata) -> filterMetadataMap(metadataMap, userMetadata, courseIds)
                 .forEach((s, strings) -> {
                     map.put(s, strings);
                     courseIds.addAll(strings);
