@@ -7,6 +7,7 @@ import lombok.Setter;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
 import uk.gov.cabinetoffice.csl.domain.csrs.Interest;
+import uk.gov.cabinetoffice.csl.util.TuplePair;
 
 import java.io.Serializable;
 import java.util.*;
@@ -25,11 +26,11 @@ public class CourseAudienceMetadataMap implements Serializable {
         List<String> courseIds = new ArrayList<>(learningRecordIds);
         LinkedHashMap<String, Collection<String>> map = new LinkedHashMap<>();
         map.put(user.getOrganisationName(), new ArrayList<>());
-        Map.of(
-                departments, user.getDepartmentCodes(),
-                areasOfWork, user.getAllAreasOfWork().stream().map(AreaOfWork::getName).toList(),
-                interests, user.getInterests().stream().map(Interest::getName).toList()
-        ).forEach((metadataMap, userMetadata) -> filterMetadataMap(metadataMap, userMetadata, courseIds)
+        List.of(
+                new TuplePair<>(departments, user.getDepartmentCodes()),
+                new TuplePair<>(areasOfWork, user.getAllAreasOfWork().stream().map(AreaOfWork::getName).toList()),
+                new TuplePair<>(interests, user.getInterests().stream().map(Interest::getName).toList())
+        ).forEach((metadataList) -> filterMetadataMap(metadataList.a(), metadataList.b(), courseIds)
                 .forEach((s, strings) -> {
                     map.put(s, strings);
                     courseIds.addAll(strings);
