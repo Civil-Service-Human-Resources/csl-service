@@ -139,6 +139,7 @@ public class LearningCatalogueService {
                 " key: {}.", courseId);
         this.cache.evict(courseId);
         requiredLearningMapCache.evict();
+        courseAudienceMetadataMapCache.evict();
     }
 
     public void cancelEvent(CourseWithModuleWithEvent data, CancelEventDto cancelEventDto) {
