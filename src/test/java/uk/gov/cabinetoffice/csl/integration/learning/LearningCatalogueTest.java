@@ -14,6 +14,7 @@ import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class LearningCatalogueTest extends IntegrationTestBase {
@@ -97,7 +98,7 @@ public class LearningCatalogueTest extends IntegrationTestBase {
                         .addModule("link", "module5", "module 5", false, 0)
                         .addModule("link", "module6", "module 6", false, 0)
                         .addModule("link", "module7", "module 7", false, 0),
-                JsonCourseBuilder.create("course9", "Course 10")
+                JsonCourseBuilder.create("course9", "Course 9")
                         .addModule("link", "module8", "module 8", false, 0),
                 JsonCourseBuilder.create("course10", "Course 10")
                         .addModule("link", "module9", "module 9", false, 0)
@@ -107,7 +108,93 @@ public class LearningCatalogueTest extends IntegrationTestBase {
 
         mockMvc.perform(get("/learning/catalogue/suggestions")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is2xxSuccessful());
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {
+                            "suggestions": [
+                                {
+                                    "title": "Cabinet Office",
+                                    "courses": [
+                                        {
+                                            "id": "course1",
+                                            "title": "Course 1",
+                                            "shortDescription": "Course 1 short description",
+                                            "type": "blended",
+                                            "duration": 0,
+                                            "moduleCount": 2,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        },
+                                        {
+                                            "id": "course8",
+                                            "title": "Course 8",
+                                            "shortDescription": "Course 8 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "title": "DDaT",
+                                    "courses": [
+                                        {
+                                            "id": "course7",
+                                            "title": "Course 7",
+                                            "shortDescription": "Course 7 short description",
+                                            "type": "blended",
+                                            "duration": 0,
+                                            "moduleCount": 3,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "title": "Analysis",
+                                    "courses": [
+                                        {
+                                            "id": "course2",
+                                            "title": "Course 2",
+                                            "shortDescription": "Course 2 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "title": "EU",
+                                    "courses": [
+                                        {
+                                            "id": "course10",
+                                            "title": "Course 10",
+                                            "shortDescription": "Course 10 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        },
+                                        {
+                                            "id": "course9",
+                                            "title": "Course 9",
+                                            "shortDescription": "Course 9 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                        """, true));
     }
 
 }

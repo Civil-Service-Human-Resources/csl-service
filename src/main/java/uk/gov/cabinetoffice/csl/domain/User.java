@@ -34,6 +34,10 @@ public class User implements Serializable {
     private String lineManagerEmail;
     private ArrayList<BasicOrganisationalUnit> departmentHierarchy = new ArrayList<>();
 
+    public String getOrganisationName() {
+        return departmentHierarchy.get(0).getName();
+    }
+
     public String getFormattedOrganisationName() {
         return IntStream.range(0, departmentHierarchy.size())
                 .mapToObj(i -> departmentHierarchy.get(departmentHierarchy.size() - 1 - i))

@@ -27,7 +27,7 @@ public class CourseAudienceMetadataMap implements Serializable {
     public LinkedHashMap<String, Collection<String>> filterForUser(User user, Collection<String> learningRecordIds) {
         List<String> courseIds = new ArrayList<>(learningRecordIds);
         LinkedHashMap<String, Collection<String>> map = new LinkedHashMap<>();
-        map.put(user.getFormattedOrganisationName(), new ArrayList<>());
+        map.put(user.getOrganisationName(), new ArrayList<>());
         List.of(
                 new MapToMetadata(departments, user.getDepartmentCodes()),
                 new MapToMetadata(areasOfWork, user.getAllAreasOfWork().stream().map(AreaOfWork::getName).toList()),
@@ -38,7 +38,7 @@ public class CourseAudienceMetadataMap implements Serializable {
                     courseIds.addAll(strings);
                 }));
         user.getDepartmentCodes().forEach(dep -> {
-            map.get(user.getFormattedOrganisationName()).addAll(map.getOrDefault(dep, List.of()));
+            map.get(user.getOrganisationName()).addAll(map.getOrDefault(dep, List.of()));
             map.remove(dep);
         });
         return map;
@@ -49,10 +49,8 @@ public class CourseAudienceMetadataMap implements Serializable {
         metadata.forEach(m -> Optional.ofNullable(map.get(m))
                 .ifPresent(courseIds -> {
                     courseIds = courseIds.stream().filter(courseId -> !courseIdsFilter.contains(courseId)).toList();
-                    if (!courseIds.isEmpty()) {
-                        result.put(m, courseIds);
-                        courseIdsFilter.addAll(courseIds);
-                    }
+                    result.put(m, courseIds);
+                    courseIdsFilter.addAll(courseIds);
                 }));
         return result;
     }
