@@ -44,9 +44,10 @@ public class SuggestedLearningService {
         LinkedList<SuggestedLearningSection> allSections = new LinkedList<>();
         filteredCourseIds.forEach((sectionName, courseIds) -> {
             Collection<LearningPlanCourse> courses = courseIds.stream()
-                    .limit(sectionSize)
                     .map(cId -> learningPlanFactory.getLearningPlanCourse(courseMap.get(cId), State.NULL))
-                    .sorted(Comparator.comparing(LearningPlanCourse::getTitle, String::compareToIgnoreCase)).toList();
+                    .sorted(Comparator.comparing(LearningPlanCourse::getTitle, String::compareToIgnoreCase))
+                    .limit(sectionSize)
+                    .toList();
             allSections.add(new SuggestedLearningSection(sectionName, courses));
         });
         return new SuggestedLearning(allSections);
