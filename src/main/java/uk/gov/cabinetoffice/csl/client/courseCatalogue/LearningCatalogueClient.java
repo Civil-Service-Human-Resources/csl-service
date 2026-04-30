@@ -74,6 +74,13 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
+    public CourseAudienceMetadataMap getAudienceMetadataCourseIds() {
+        String url = String.format("%s/audience-attribute-map", v2Courses);
+        RequestEntity<Void> request = RequestEntity.get(url).build();
+        return httpClient.executeRequest(request, CourseAudienceMetadataMap.class);
+    }
+
+    @Override
     public Event updateEvent(String courseId, String moduleId, Event event) {
         String url = String.format("%s/%s/modules/%s/events/%s", courses, courseId, moduleId, event.getId());
         RequestEntity<Event> request = RequestEntity.put(url).body(event);

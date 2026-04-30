@@ -26,6 +26,7 @@ public class LearningCatalogueService {
 
     private final ObjectCache<Course> cache;
     private final RequiredLearningMapCache requiredLearningMapCache;
+    private final CourseAudienceMetadataMapCache courseAudienceMetadataMapCache;
     private final ILearningCatalogueClient client;
 
     public CourseWithModule getCourseWithModule(String courseId, String moduleId) {
@@ -87,6 +88,15 @@ public class LearningCatalogueService {
         }
     }
 
+    public CourseAudienceMetadataMap getCourseAudienceMetadataMap() {
+        CourseAudienceMetadataMap map = courseAudienceMetadataMapCache.get();
+        if (map == null) {
+            map = client.getAudienceMetadataCourseIds();
+            courseAudienceMetadataMapCache.put(map);
+        }
+        return map;
+    }
+
     private RequiredLearningMap getRequiredLearningMap() {
         RequiredLearningMap map = requiredLearningMapCache.get();
         if (map == null) {
@@ -129,6 +139,7 @@ public class LearningCatalogueService {
                 " key: {}.", courseId);
         this.cache.evict(courseId);
         requiredLearningMapCache.evict();
+        courseAudienceMetadataMapCache.evict();
     }
 
     public void cancelEvent(CourseWithModuleWithEvent data, CancelEventDto cancelEventDto) {

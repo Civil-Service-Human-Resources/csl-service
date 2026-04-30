@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,6 +19,8 @@ public class CivilServant {
     private Grade grade;
     private OrganisationalUnit organisationalUnit;
     private AreaOfWork profession;
+    private Collection<AreaOfWork> otherAreasOfWork;
+    private Collection<Interest> interests;
     private String lineManagerEmail;
     private String lineManagerName;
 
