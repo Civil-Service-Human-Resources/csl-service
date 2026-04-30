@@ -230,4 +230,32 @@ public class LearnerRecordStubService {
                         .withHeader("Content-Type", "application/json")
                         .withBody(response)));
     }
+
+    public StubMapping getLearnerRecordPage(LearnerRecordQuery query, Integer page, Integer size, String response) {
+        MappingBuilder mappingBuilder = WireMock.get(urlPathEqualTo("/learner_record_api/learner_records"))
+                .withQueryParam("size", equalTo(size.toString()))
+                .withQueryParam("page", equalTo(page.toString()));
+        if (query.getLearnerIds() != null && !query.getLearnerIds().isEmpty()) {
+            mappingBuilder.withQueryParam("learnerIds", including(query.getLearnerIds().toArray(String[]::new)));
+        }
+        if (query.getResourceIds() != null && !query.getResourceIds().isEmpty()) {
+            mappingBuilder.withQueryParam("resourceIds", including(query.getResourceIds().toArray(String[]::new)));
+        }
+        if (query.getLearnerRecordTypes() != null && !query.getLearnerRecordTypes().isEmpty()) {
+            mappingBuilder.withQueryParam("learnerRecordTypes", including(query.getLearnerRecordTypes().toArray(String[]::new)));
+        }
+        if (query.getNotEventTypes() != null && !query.getNotEventTypes().isEmpty()) {
+            mappingBuilder.withQueryParam("notEventTypes", including(query.getNotEventTypes().toArray(String[]::new)));
+        }
+        if (query.getNotResourceIds() != null && !query.getNotResourceIds().isEmpty()) {
+            mappingBuilder.withQueryParam("notResourceIds", including(query.getNotResourceIds().toArray(String[]::new)));
+        }
+        return stubFor(
+                mappingBuilder
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
 }

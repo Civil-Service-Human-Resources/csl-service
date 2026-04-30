@@ -13,7 +13,10 @@ import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearnin
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordDataUtils;
+import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
+import uk.gov.cabinetoffice.csl.service.learningResources.course.CourseRecordService;
+import uk.gov.cabinetoffice.csl.service.user.CourseCompletionService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
 import java.time.LocalDate;
@@ -31,11 +34,21 @@ import static org.mockito.Mockito.when;
 class RequiredLearningServiceTest {
 
     @Mock
+    private CourseRecordService courseRecordService;
+    @Mock
     private LearnerRecordDataUtils learnerRecordDataUtils;
     @Mock
     private LearningCatalogueService learningCatalogueService;
     @Mock
+    private OrganisationalUnitService organisationalUnitService;
+    @Mock
     private UserDetailsService userDetailsService;
+    @Mock
+    private LearningFactory learningFactory;
+    @Mock
+    private DisplayCourseFactory displayCourseFactory;
+    @Mock
+    private CourseCompletionService courseCompletionService;
 
     @InjectMocks
     private RequiredLearningService requiredLearningService;

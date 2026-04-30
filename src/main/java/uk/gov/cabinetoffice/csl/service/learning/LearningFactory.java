@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.domain.learning.learningRecord.LearningRecord;
 import uk.gov.cabinetoffice.csl.domain.learning.learningRecord.LearningRecordCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,15 +19,22 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class LearningFactory<F extends IDisplayCourseFactory> {
+public class LearningFactory {
 
-    private final F displayCourseFactory;
+    private final IDisplayCourseFactory displayCourseFactory;
     private final LearningRecordService learningRecordService;
 
     public Learning buildDetailedLearning(List<Course> courses, Map<String, CourseRecord> courseRecords,
                                           User user) {
 
-        List<LearningRecordCourse> userCompletedCourses = learningRecordService.getLearningRecord(user.getId()).getRequiredLearningRecord().getCompletedCourses();
+        LearningRecord learningRecord = learningRecordService.getLearningRecord(user.getId());
+        List<LearningRecordCourse> userCompletedCourses = new ArrayList<>();
+        if (learningRecord.getRequiredLearningRecord() != null && learningRecord.getRequiredLearningRecord().getCompletedCourses() != null) {
+            userCompletedCourses.addAll(learningRecord.getRequiredLearningRecord().getCompletedCourses());
+        }
+        if (learningRecord.getOtherLearning() != null) {
+            userCompletedCourses.addAll(learningRecord.getOtherLearning());
+        }
 
         List<DisplayCourse> displayCourses = courses.stream().map(c -> {
             CourseRecord courseRecord = courseRecords.get(c.getCacheableId());

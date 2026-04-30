@@ -11,7 +11,6 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayAudience;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayCourse;
 import uk.gov.cabinetoffice.csl.domain.learning.DisplayModule;
-import uk.gov.cabinetoffice.csl.domain.learning.learningRecord.LearningRecord;
 import uk.gov.cabinetoffice.csl.domain.learning.learningRecord.LearningRecordCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
@@ -19,17 +18,16 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class RequiredLearningDisplayCourseFactory implements IDisplayCourseFactory {
+public class DisplayCourseFactory implements IDisplayCourseFactory {
 
     private final DisplayModuleFactory displayModuleFactory;
     private final DisplayAudienceFactory displayAudienceFactory;
-    private final LearningRecordService learningRecordService;
 
+    @Override
     public DisplayCourse generateDetailedDisplayCourse(Course course, User user, @Nullable CourseRecord courseRecord, LearningRecordCourse userLearningRecordCourse) {
         if (courseRecord != null) {
             Map<String, ModuleRecord> moduleRecordMap = courseRecord.getModuleRecordsAsMap();
@@ -49,6 +47,7 @@ public class RequiredLearningDisplayCourseFactory implements IDisplayCourseFacto
         return generateDetailedDisplayCourse(course, user);
     }
 
+    @Override
     public DisplayCourse generateDetailedDisplayCourse(Course course, User user) {
         List<DisplayModule> modules = course.getModules().stream().map(displayModuleFactory::generateDisplayModule).toList();
         DisplayAudience displayAudience = displayAudienceFactory.generateDisplayAudience(course, user);

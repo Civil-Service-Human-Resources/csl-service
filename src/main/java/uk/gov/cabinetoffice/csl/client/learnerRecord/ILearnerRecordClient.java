@@ -38,4 +38,6 @@ public interface ILearnerRecordClient {
     List<ModuleRecord> updateModuleRecords(List<ModuleRecord> input);
 
     void createInvite(String eventId, InviteDto invite);
+
+    LearnerRecordPagedResponse getLearnerRecordPage(LearnerRecordQuery query, int page, int size);
 }
