@@ -15,6 +15,8 @@ public class GetSuggestedLearningParams {
 
     @Max(10)
     @Min(1)
-    private Integer size = 6;
+    private Integer size;
+
+    private boolean excludeLearningPlanCourses = false;
 
 }

@@ -27,7 +27,7 @@ public class LearningCatalogueController {
     @ResponseBody
     @GetMapping("suggestions/{uid}")
     public SuggestedLearning getSuggestedLearning(@PathVariable String uid, GetSuggestedLearningParams params) {
-        return suggestedLearningService.getSuggestedLearningForUser(uid, params.getSize());
+        return suggestedLearningService.getSuggestedLearningForUser(uid, params);
     }
 
 }
