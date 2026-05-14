@@ -1,20 +1,27 @@
 package uk.gov.cabinetoffice.csl.controller.learning;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.learning.model.GetSuggestedLearningParams;
 import uk.gov.cabinetoffice.csl.controller.learning.model.SuggestedLearning;
+import uk.gov.cabinetoffice.csl.controller.model.PagedResults;
+import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlanCourse;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
-import uk.gov.cabinetoffice.csl.service.learning.SuggestedLearningService;
+import uk.gov.cabinetoffice.csl.service.learning.CSLCatalogueService;
 
 @RestController
 @RequestMapping("learning/catalogue")
 public class LearningCatalogueController {
 
-    private final SuggestedLearningService suggestedLearningService;
+    private final CSLCatalogueService cslCatalogueService;
     private final IUserAuthService userAuthService;
 
-    public LearningCatalogueController(SuggestedLearningService suggestedLearningService, IUserAuthService userAuthService) {
-        this.suggestedLearningService = suggestedLearningService;
+    public LearningCatalogueController(CSLCatalogueService suggestedLearningService, IUserAuthService userAuthService) {
+        this.cslCatalogueService = suggestedLearningService;
         this.userAuthService = userAuthService;
     }
 
@@ -27,7 +34,14 @@ public class LearningCatalogueController {
     @ResponseBody
     @GetMapping("suggestions/{uid}")
     public SuggestedLearning getSuggestedLearning(@PathVariable String uid, GetSuggestedLearningParams params) {
-        return suggestedLearningService.getSuggestedLearningForUser(uid, params);
+        return cslCatalogueService.getSuggestedLearningForUser(uid, params);
+    }
+
+    @ResponseBody
+    @GetMapping("a-z/{letter}")
+    public PagedResults<LearningPlanCourse> getLearningTitleStartsWith(@PathVariable @Valid @Pattern(regexp = "^[a-zA-Z]$", message = "Title must be exactly one alphabet character") String letter,
+                                                                       @PageableDefault(size = 20, direction = Sort.Direction.ASC) Pageable pageableParams) {
+        return cslCatalogueService.getCoursesForLetter(userAuthService.getUsername(), letter, pageableParams);
     }
 
 }

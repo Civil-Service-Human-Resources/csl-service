@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.service.learningCatalogue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
@@ -160,5 +161,10 @@ public class LearningCatalogueService {
                 .courseIds(allLearningPlanCourseIds)
                 .build();
         return client.searchForCourses(p, page, size, "title", sort);
+    }
+
+    public CourseSearchResults getCoursesForLetter(String startsWith, Pageable pageableParams) {
+        SearchForCoursesParams p = SearchForCoursesParams.builder().titleStartsWith(startsWith).build();
+        return client.searchForCourses(p, pageableParams.getPageNumber(), pageableParams.getPageSize(), "title", Sort.Direction.ASC);
     }
 }

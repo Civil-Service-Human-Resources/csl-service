@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.SearchForCoursesParams;
 import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.data.ArrayJsonContentBuilder;
@@ -330,6 +331,84 @@ public class LearningCatalogueTest extends IntegrationTestBase {
                                     ]
                                 }
                             ]
+                        }
+                        """, true));
+    }
+
+    @Test
+    public void testGetCourseAtoZ() throws Exception {
+
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
+        cslStubService.getLearnerRecord().getLearnerRecordResourceIds(
+                LearnerRecordQuery.builder().learnerIds(java.util.Set.of("userId")).build(),
+                0,
+                200,
+                learningResourceIdsResponse);
+        cslStubService.getLearningCatalogue().getMandatoryLearningMap("""
+                {
+                    "departmentCodeMap": {
+                        "CO": ["acourse1", "acourse5"]
+                    }
+                }
+                """);
+
+        String courses = ArrayJsonContentBuilder.create(
+                JsonCourseBuilder.create("acourse1", "A Course 1")
+                        .addModule("link", "module1", "module 1", false, 0)
+                        .addModule("link", "module2", "module 2", false, 0),
+                JsonCourseBuilder.create("acourse2", "A Course 2")
+                        .addModule("link", "module4", "module 4", false, 0),
+                JsonCourseBuilder.create("acourse8", "A Course 8")
+                        .addModule("link", "module3", "module 3", false, 0)
+        ).getAsSearchResults(0, 20, 1).toString();
+
+        SearchForCoursesParams params = SearchForCoursesParams.builder()
+                .titleStartsWith("a")
+                .build();
+
+        cslStubService.getLearningCatalogue().postSearchCourses(params, courses, 0, 20, "title", "ASC");
+
+        mockMvc.perform(get("/learning/catalogue/a-z/a")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {
+                          "results": [
+                            {
+                              "id": "acourse1",
+                              "title": "A Course 1",
+                              "shortDescription": "A Course 1 short description",
+                              "type": "blended",
+                              "duration": 0,
+                              "moduleCount": 2,
+                              "costInPounds": 0,
+                              "status": "IN_PROGRESS"
+                            },
+                            {
+                              "id": "acourse2",
+                              "title": "A Course 2",
+                              "shortDescription": "A Course 2 short description",
+                              "type": "link",
+                              "duration": 0,
+                              "moduleCount": 1,
+                              "costInPounds": 0,
+                              "status": "NULL"
+                            },
+                            {
+                              "id": "acourse8",
+                              "title": "A Course 8",
+                              "shortDescription": "A Course 8 short description",
+                              "type": "link",
+                              "duration": 0,
+                              "moduleCount": 1,
+                              "costInPounds": 0,
+                              "status": "NULL"
+                            }
+                          ],
+                          "page": 0,
+                          "size": 20,
+                          "totalResults": 3
                         }
                         """, true));
     }

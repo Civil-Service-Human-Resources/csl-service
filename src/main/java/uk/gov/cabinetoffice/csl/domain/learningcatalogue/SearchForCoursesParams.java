@@ -23,4 +23,15 @@ public class SearchForCoursesParams {
     Collection<String> departments;
     Collection<String> areasOfWork;
     Collection<String> interests;
+
+    String titleStartsWith;
+
+    // This is used to override the default Lombok setter
+    @SuppressWarnings("unused")
+    public static class SearchForCoursesParamsBuilder {
+        public SearchForCoursesParamsBuilder titleStartsWith(String titleStartsWith) {
+            this.titleStartsWith = titleStartsWith.trim();
+            return this;
+        }
+    }
 }
