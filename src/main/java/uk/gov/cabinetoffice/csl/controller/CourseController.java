@@ -36,11 +36,5 @@ public class CourseController {
         ActionWithId action = actionWithIdFactory.create(courseId, userAuthService.getUsername(), CourseRecordAction.MOVE_TO_LEARNING_PLAN);
         return courseActionService.performCourseAction(action);
     }
-
-    @PostMapping("/{courseId}/remove_from_suggestions")
-    @ResponseBody
-    public CourseResponse removeCourseSuggestions(@PathVariable("courseId") String courseId) {
-        ActionWithId action = actionWithIdFactory.create(courseId, userAuthService.getUsername(), CourseRecordAction.REMOVE_FROM_SUGGESTIONS);
-        return courseActionService.performCourseAction(action);
-    }
+    
 }
