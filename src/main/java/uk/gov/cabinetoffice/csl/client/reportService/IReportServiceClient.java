@@ -6,10 +6,9 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.AddReportRequestResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.GetReportRequestsResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.ReportType;
-import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.Aggregation;
-import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
-import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionWithOrganisationAggregation;
+import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.*;
 import uk.gov.cabinetoffice.csl.domain.reportservice.reportRequest.ReportRequest;
+import uk.gov.cabinetoffice.csl.service.report.params.GetCourseCompletionAggregationParams;
 import uk.gov.cabinetoffice.csl.service.report.params.IOrganisationalReportRequestParams;
 
 import java.util.List;
@@ -28,4 +27,5 @@ public interface IReportServiceClient {
 
     DownloadableFile downloadExportReport(ReportType reportType, String slug);
 
+    CourseAggregationResponse<CourseAggregation> getCourseCompletionAggregationsForCourse(GetCourseCompletionAggregationParams params);
 }

@@ -12,10 +12,9 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.AddReportRequestResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.GetReportRequestsResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.ReportType;
-import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.Aggregation;
-import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionAggregation;
-import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseCompletionWithOrganisationAggregation;
+import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.*;
 import uk.gov.cabinetoffice.csl.domain.reportservice.reportRequest.ReportRequest;
+import uk.gov.cabinetoffice.csl.service.report.params.GetCourseCompletionAggregationParams;
 import uk.gov.cabinetoffice.csl.service.report.params.IOrganisationalReportRequestParams;
 
 import java.util.List;
@@ -76,5 +75,12 @@ public class ReportServiceClient implements IReportServiceClient {
         String url = String.format("%s/downloads/%s", config.getReportRequestUrl(reportType), slug);
         RequestEntity<Void> request = RequestEntity.get(url).build();
         return httpClient.executeFileDownloadRequest(request);
+    }
+
+    @Override
+    public CourseAggregationResponse<CourseAggregation> getCourseCompletionAggregationsForCourse(GetCourseCompletionAggregationParams params) {
+        RequestEntity<GetCourseCompletionAggregationParams> req = RequestEntity.post(config.getCourseCompletionsAggregationsForCourseUrl()).body(params);
+        return httpClient.executeTypeReferenceRequest(req, new ParameterizedTypeReference<>() {
+        });
     }
 }
