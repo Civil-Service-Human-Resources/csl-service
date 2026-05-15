@@ -89,13 +89,18 @@ public class CSLCatalogueService {
                 .resourceIds(courseAggregationsForAreaOfWork.getAggregations().stream().map(ICourseAggregation::getCourseId).collect(Collectors.toSet())).build());
         Map<String, Course> courses = learningCatalogueService.getCourseIdToCourseMap(courseAggregationsForAreaOfWork.getAggregations().stream().map(ICourseAggregation::getCourseId).toList());
         LinkedList<LearningPlanCourse> orderedResults = new LinkedList<>();
-        courseAggregationsForAreaOfWork.getAggregations().forEach(a -> Optional.ofNullable(courses.get(a.getCourseId()))
-                .ifPresent(c -> {
-                    if (c.getStatus().equals(CourseStatus.PUBLISHED) && c.getVisibility().equals(CourseVisibility.PUBLIC)) {
-                        State state = courseIds.contains(c.getId()) ? State.IN_PROGRESS : State.NULL;
-                        orderedResults.add(learningPlanFactory.getLearningPlanCourse(c, state));
-                    }
-                }));
+        for (CourseAggregation aggregation : courseAggregationsForAreaOfWork.getAggregations()) {
+            Optional.ofNullable(courses.get(aggregation.getCourseId()))
+                    .ifPresent(c -> {
+                        if (c.getStatus().equals(CourseStatus.PUBLISHED) && c.getVisibility().equals(CourseVisibility.PUBLIC)) {
+                            State state = courseIds.contains(c.getId()) ? State.IN_PROGRESS : State.NULL;
+                            orderedResults.add(learningPlanFactory.getLearningPlanCourse(c, state));
+                        }
+                    });
+            if (orderedResults.size() == params.getMaxResults()) {
+                break;
+            }
+        }
         return new Results<>(orderedResults);
     }
 
