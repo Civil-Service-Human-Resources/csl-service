@@ -1,7 +1,5 @@
 package uk.gov.cabinetoffice.csl.controller.learning;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -38,8 +36,8 @@ public class LearningCatalogueController {
     }
 
     @ResponseBody
-    @GetMapping("a-z/{letter}")
-    public PagedResults<LearningPlanCourse> getLearningTitleStartsWith(@PathVariable @Valid @Pattern(regexp = "^[a-zA-Z]$", message = "Title must be exactly one alphabet character") String letter,
+    @GetMapping("a-z/{letter:^[a-zA-Z]$}")
+    public PagedResults<LearningPlanCourse> getLearningTitleStartsWith(@PathVariable String letter,
                                                                        @PageableDefault(size = 20, direction = Sort.Direction.ASC) Pageable pageableParams) {
         return cslCatalogueService.getCoursesForLetter(userAuthService.getUsername(), letter, pageableParams);
     }

@@ -413,4 +413,12 @@ public class LearningCatalogueTest extends IntegrationTestBase {
                         """, true));
     }
 
+    @Test
+    public void testGetCourseAtoZInvalid() throws Exception {
+
+        mockMvc.perform(get("/learning/catalogue/a-z/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
 }
