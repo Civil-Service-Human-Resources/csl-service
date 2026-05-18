@@ -1,15 +1,18 @@
 package uk.gov.cabinetoffice.csl.service.learning;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.learning.model.GetSuggestedLearningParams;
 import uk.gov.cabinetoffice.csl.controller.learning.model.SuggestedLearning;
 import uk.gov.cabinetoffice.csl.controller.learning.model.SuggestedLearningSection;
+import uk.gov.cabinetoffice.csl.controller.model.PagedResults;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
 import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlanCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseAudienceMetadataMap;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseSearchResults;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
@@ -20,14 +23,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class SuggestedLearningService {
+public class CSLCatalogueService {
 
     private final LearningCatalogueService learningCatalogueService;
     private final UserDetailsService userDetailsService;
     private final LearnerRecordService learnerRecordService;
     private final LearningPlanFactory learningPlanFactory;
 
-    public SuggestedLearningService(LearningCatalogueService learningCatalogueService, UserDetailsService userDetailsService, LearnerRecordService learnerRecordService, LearningPlanFactory learningPlanFactory) {
+    public CSLCatalogueService(LearningCatalogueService learningCatalogueService, UserDetailsService userDetailsService, LearnerRecordService learnerRecordService, LearningPlanFactory learningPlanFactory) {
         this.learningCatalogueService = learningCatalogueService;
         this.userDetailsService = userDetailsService;
         this.learnerRecordService = learnerRecordService;
@@ -36,8 +39,7 @@ public class SuggestedLearningService {
 
     public SuggestedLearning getSuggestedLearningForUser(String uid, GetSuggestedLearningParams params) {
         User user = userDetailsService.getUserWithUid(uid);
-        LearnerRecordQuery query = LearnerRecordQuery.builder().learnerIds(Set.of(uid)).build();
-        Collection<String> allCourseIds = learnerRecordService.getAllCourseIds(query);
+        Collection<String> allCourseIds = learnerRecordService.getAllCourseIds(LearnerRecordQuery.builder().learnerIds(Set.of(uid)).build());
         CourseAudienceMetadataMap courseAudienceMetadataMap = learningCatalogueService.getCourseAudienceMetadataMap();
         Map<String, Collection<String>> filteredCourseIds = courseAudienceMetadataMap.filterForUser(user, params.isExcludeLearningPlanCourses() ? allCourseIds : List.of());
         Map<String, Course> courseMap = learningCatalogueService.getCourses(filteredCourseIds.values().stream().flatMap(Collection::stream).toList())
@@ -58,5 +60,20 @@ public class SuggestedLearningService {
             allSections.add(new SuggestedLearningSection(sectionName, courses));
         });
         return new SuggestedLearning(allSections);
+    }
+
+    public PagedResults<LearningPlanCourse> getCoursesForLetter(String uid, String startsWith, Pageable pageableParams) {
+        CourseSearchResults coursesForLetter = learningCatalogueService.getCoursesForLetter(startsWith, pageableParams);
+        User user = userDetailsService.getUserWithUid(uid);
+        List<String> requiredLearningIds = learningCatalogueService.getRequiredLearningIdsForDepartments(user.getDepartmentCodes());
+        Collection<String> courseIds = learnerRecordService.getAllCourseIds(LearnerRecordQuery.builder().learnerIds(Set.of(uid))
+                .resourceIds(coursesForLetter.getResults().stream().map(Course::getId).collect(Collectors.toSet())).build());
+        courseIds.addAll(requiredLearningIds);
+        LinkedList<LearningPlanCourse> orderedCourses = new LinkedList<>();
+        coursesForLetter.getResults().forEach(c -> {
+            State state = courseIds.contains(c.getId()) ? State.IN_PROGRESS : State.NULL;
+            orderedCourses.add(learningPlanFactory.getLearningPlanCourse(c, state));
+        });
+        return new PagedResults<>(orderedCourses, coursesForLetter.getPage(), coursesForLetter.getSize(), coursesForLetter.getTotalResults().intValue());
     }
 }
