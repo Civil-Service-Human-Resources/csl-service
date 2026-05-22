@@ -9,8 +9,10 @@ import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
-import uk.gov.cabinetoffice.csl.util.ObjectCache;
+import uk.gov.cabinetoffice.csl.util.IUtilService;
+import uk.gov.cabinetoffice.csl.util.TtlObjectCache;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +24,10 @@ import static org.mockito.Mockito.*;
 public class LearningCatalogueServiceTest {
 
     @Mock
-    private ObjectCache<Course> cache;
+    private IUtilService utilService;
+
+    @Mock
+    private TtlObjectCache<Course> cache;
     @Mock
     private ILearningCatalogueClient client;
 
@@ -51,6 +56,7 @@ public class LearningCatalogueServiceTest {
 
     @Test
     void getCoursesWithPartialCacheHit() {
+        when(utilService.getDurationUntilTomorrow(ChronoUnit.SECONDS)).thenReturn(1L);
         Course course1 = new Course();
         course1.setId("course1");
         Course course2 = new Course();
@@ -68,6 +74,6 @@ public class LearningCatalogueServiceTest {
         assertEquals("course1", result.get(0).getCacheableId());
         assertEquals("course2", result.get(1).getCacheableId());
         assertEquals("cache-miss-course3", result.get(2).getCacheableId());
-        verify(cache, atLeastOnce()).put(course3);
+        verify(cache, atLeastOnce()).put(course3, 1L);
     }
 }

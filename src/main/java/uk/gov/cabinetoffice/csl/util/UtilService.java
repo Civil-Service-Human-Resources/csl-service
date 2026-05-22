@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -23,6 +25,13 @@ public class UtilService implements IUtilService {
     @Override
     public LocalDateTime getNowDateTime() {
         return LocalDateTime.now(clock);
+    }
+
+    @Override
+    public Long getDurationUntilTomorrow(TemporalUnit unit) {
+        LocalDateTime now = getNowDateTime();
+        LocalDateTime tomorrowStart = now.toLocalDate().plusDays(1).atStartOfDay();
+        return Duration.between(now, tomorrowStart).get(unit);
     }
 
     @Override
