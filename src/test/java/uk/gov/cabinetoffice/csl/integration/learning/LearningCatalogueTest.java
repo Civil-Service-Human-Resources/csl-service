@@ -414,6 +414,97 @@ public class LearningCatalogueTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testGetCoursePopularByAreaOfWork() throws Exception {
+
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
+        cslStubService.getLearnerRecord().getLearnerRecordResourceIds(
+                LearnerRecordQuery.builder().learnerIds(java.util.Set.of("userId")).build(),
+                0,
+                200,
+                learningResourceIdsResponse);
+        cslStubService.getReportServiceStubService().getCourseCompletionAggregationsForCourses("""
+                        {
+                            "from": "2026-01-01T10:00:00",
+                            "to": "2026-06-01T10:00:00",
+                            "professionIds": [3],
+                            "excludeIds": ["course5", "course1"],
+                            "size": 20
+                        }
+                        """,
+                """
+                        {
+                            "aggregations": [
+                                {"courseId": "course2", "count": 10},
+                                {"courseId": "course4", "count": 7},
+                                {"courseId": "course6", "count": 4}
+                            ]
+                        }
+                        """);
+        cslStubService.getLearningCatalogue().getMandatoryLearningMap("""
+                {
+                    "departmentCodeMap": {
+                        "CO": ["course1", "course5"]
+                    }
+                }
+                """);
+
+        String courses = ArrayJsonContentBuilder.create(
+                JsonCourseBuilder.create("course2", "Course 2")
+                        .addModule("link", "module1", "module 1", false, 0)
+                        .addModule("link", "module2", "module 2", false, 0),
+                JsonCourseBuilder.create("course4", "Course 4")
+                        .addModule("link", "module4", "module 4", false, 0),
+                JsonCourseBuilder.create("course6", "Course 6")
+                        .addModule("link", "module3", "module 3", false, 0)
+        ).build();
+
+        cslStubService.getLearningCatalogue().getCourses(List.of("course2", "course4", "course6"), courses);
+
+        mockMvc.perform(get("/learning/catalogue/popular/area-of-work")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("from", "2026-01-01T10:00:00")
+                        .param("to", "2026-06-01T10:00:00"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {
+                          "results": [
+                            {
+                              "id": "course2",
+                              "title": "Course 2",
+                              "shortDescription": "Course 2 short description",
+                              "type": "blended",
+                              "duration": 0,
+                              "moduleCount": 2,
+                              "costInPounds": 0,
+                              "status": "NULL"
+                            },
+                            {
+                              "id": "course4",
+                              "title": "Course 4",
+                              "shortDescription": "Course 4 short description",
+                              "type": "link",
+                              "duration": 0,
+                              "moduleCount": 1,
+                              "costInPounds": 0,
+                              "status": "IN_PROGRESS"
+                            },
+                            {
+                              "id": "course6",
+                              "title": "Course 6",
+                              "shortDescription": "Course 6 short description",
+                              "type": "link",
+                              "duration": 0,
+                              "moduleCount": 1,
+                              "costInPounds": 0,
+                              "status": "NULL"
+                            }
+                          ]
+                        }
+                        """, true));
+    }
+
+    @Test
     public void testGetCourseAtoZInvalid() throws Exception {
 
         mockMvc.perform(get("/learning/catalogue/a-z/1")

@@ -2,19 +2,22 @@ package uk.gov.cabinetoffice.csl.service.learning;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.controller.learning.model.GetPopularCoursesParams;
 import uk.gov.cabinetoffice.csl.controller.learning.model.GetSuggestedLearningParams;
 import uk.gov.cabinetoffice.csl.controller.learning.model.SuggestedLearning;
 import uk.gov.cabinetoffice.csl.controller.learning.model.SuggestedLearningSection;
 import uk.gov.cabinetoffice.csl.controller.model.PagedResults;
+import uk.gov.cabinetoffice.csl.controller.model.Results;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
 import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlanCourse;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseAudienceMetadataMap;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseSearchResults;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
+import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseAggregation;
+import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseAggregationResponse;
+import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.ICourseAggregation;
 import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
+import uk.gov.cabinetoffice.csl.service.ReportService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
@@ -29,12 +32,14 @@ public class CSLCatalogueService {
     private final UserDetailsService userDetailsService;
     private final LearnerRecordService learnerRecordService;
     private final LearningPlanFactory learningPlanFactory;
+    private final ReportService reportService;
 
-    public CSLCatalogueService(LearningCatalogueService learningCatalogueService, UserDetailsService userDetailsService, LearnerRecordService learnerRecordService, LearningPlanFactory learningPlanFactory) {
+    public CSLCatalogueService(LearningCatalogueService learningCatalogueService, UserDetailsService userDetailsService, LearnerRecordService learnerRecordService, LearningPlanFactory learningPlanFactory, ReportService reportService) {
         this.learningCatalogueService = learningCatalogueService;
         this.userDetailsService = userDetailsService;
         this.learnerRecordService = learnerRecordService;
         this.learningPlanFactory = learningPlanFactory;
+        this.reportService = reportService;
     }
 
     public SuggestedLearning getSuggestedLearningForUser(String uid, GetSuggestedLearningParams params) {
@@ -75,5 +80,37 @@ public class CSLCatalogueService {
             orderedCourses.add(learningPlanFactory.getLearningPlanCourse(c, state));
         });
         return new PagedResults<>(orderedCourses, coursesForLetter.getPage(), coursesForLetter.getSize(), coursesForLetter.getTotalResults().intValue());
+    }
+
+    private Results<LearningPlanCourse> getPopularCoursesForAreaOfWork(String uid, Collection<String> departmentCodes, GetPopularCoursesParams params, Integer areaOfWorkId) {
+        List<String> requiredLearningIds = learningCatalogueService.getRequiredLearningIdsForDepartments(departmentCodes);
+        CourseAggregationResponse<CourseAggregation> courseAggregationsForAreaOfWork = reportService.getCourseAggregationsForAreaOfWork(params.getFrom(), params.getTo(), areaOfWorkId, requiredLearningIds);
+        Collection<String> courseIds = learnerRecordService.getAllCourseIds(LearnerRecordQuery.builder().learnerIds(Set.of(uid))
+                .resourceIds(courseAggregationsForAreaOfWork.getAggregations().stream().map(ICourseAggregation::getCourseId).collect(Collectors.toSet())).build());
+        Map<String, Course> courses = learningCatalogueService.getCourseIdToCourseMap(courseAggregationsForAreaOfWork.getAggregations().stream().map(ICourseAggregation::getCourseId).toList());
+        LinkedList<LearningPlanCourse> orderedResults = new LinkedList<>();
+        for (CourseAggregation aggregation : courseAggregationsForAreaOfWork.getAggregations()) {
+            Optional.ofNullable(courses.get(aggregation.getCourseId()))
+                    .ifPresent(c -> {
+                        if (c.getStatus().equals(CourseStatus.PUBLISHED) && c.getVisibility().equals(CourseVisibility.PUBLIC)) {
+                            State state = courseIds.contains(c.getId()) ? State.IN_PROGRESS : State.NULL;
+                            orderedResults.add(learningPlanFactory.getLearningPlanCourse(c, state));
+                        }
+                    });
+            if (orderedResults.size() == params.getMaxResults()) {
+                break;
+            }
+        }
+        return new Results<>(orderedResults);
+    }
+
+    public Results<LearningPlanCourse> getPopularCoursesForAreaOfWork(String uid, GetPopularCoursesParams params, Integer areaOfWorkId) {
+        User user = userDetailsService.getUserWithUid(uid);
+        return getPopularCoursesForAreaOfWork(uid, user.getDepartmentCodes(), params, areaOfWorkId);
+    }
+
+    public Results<LearningPlanCourse> getPopularCoursesForAreaOfWork(String uid, GetPopularCoursesParams params) {
+        User user = userDetailsService.getUserWithUid(uid);
+        return getPopularCoursesForAreaOfWork(uid, user.getDepartmentCodes(), params, user.getProfessionId());
     }
 }

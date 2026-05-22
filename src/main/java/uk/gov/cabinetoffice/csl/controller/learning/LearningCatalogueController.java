@@ -1,12 +1,15 @@
 package uk.gov.cabinetoffice.csl.controller.learning;
 
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.controller.learning.model.GetPopularCoursesParams;
 import uk.gov.cabinetoffice.csl.controller.learning.model.GetSuggestedLearningParams;
 import uk.gov.cabinetoffice.csl.controller.learning.model.SuggestedLearning;
 import uk.gov.cabinetoffice.csl.controller.model.PagedResults;
+import uk.gov.cabinetoffice.csl.controller.model.Results;
 import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.LearningPlanCourse;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 import uk.gov.cabinetoffice.csl.service.learning.CSLCatalogueService;
@@ -33,6 +36,18 @@ public class LearningCatalogueController {
     @GetMapping("suggestions/{uid}")
     public SuggestedLearning getSuggestedLearning(@PathVariable String uid, GetSuggestedLearningParams params) {
         return cslCatalogueService.getSuggestedLearningForUser(uid, params);
+    }
+
+    @ResponseBody
+    @GetMapping("popular/area-of-work")
+    public Results<LearningPlanCourse> getPopularLearningForAreaOfWork(@Valid GetPopularCoursesParams params) {
+        return cslCatalogueService.getPopularCoursesForAreaOfWork(userAuthService.getUsername(), params);
+    }
+
+    @ResponseBody
+    @GetMapping("popular/area-of-work/{areaOfWorkId}")
+    public Results<LearningPlanCourse> getPopularLearningForAreaOfWork(@Valid GetPopularCoursesParams params, @PathVariable Integer areaOfWorkId) {
+        return cslCatalogueService.getPopularCoursesForAreaOfWork(userAuthService.getUsername(), params, areaOfWorkId);
     }
 
     @ResponseBody

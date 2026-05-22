@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.client.reportService.IReportServiceClient;
+import uk.gov.cabinetoffice.csl.client.reportService.ReportServiceConfiguration;
 import uk.gov.cabinetoffice.csl.controller.model.CreateReportRequestWithSelectedOrganisationIdsParams;
 import uk.gov.cabinetoffice.csl.controller.model.RegisteredLearnerReportRequestParams;
 import uk.gov.cabinetoffice.csl.controller.model.SelectedOrganisationIdsCourseCompletionsParams;
@@ -19,6 +20,8 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.AddReportRequestResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.GetReportRequestsResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.RegisteredLearnerOverview;
 import uk.gov.cabinetoffice.csl.domain.reportservice.ReportType;
+import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseAggregation;
+import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.CourseAggregationResponse;
 import uk.gov.cabinetoffice.csl.domain.reportservice.aggregation.IAggregation;
 import uk.gov.cabinetoffice.csl.domain.reportservice.chart.CourseCompletionChart;
 import uk.gov.cabinetoffice.csl.domain.reportservice.reportRequest.RegisteredLearnerReportRequest;
@@ -27,7 +30,9 @@ import uk.gov.cabinetoffice.csl.service.chart.CourseCompletionChartType;
 import uk.gov.cabinetoffice.csl.service.chart.factory.CourseCompletionChartFactoryBase;
 import uk.gov.cabinetoffice.csl.service.report.params.CourseCompletionReportRequestParams;
 import uk.gov.cabinetoffice.csl.service.report.params.CreateRegisteredLearnerReportRequestParams;
+import uk.gov.cabinetoffice.csl.service.report.params.GetCourseCompletionAggregationParams;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -40,6 +45,7 @@ public class ReportService {
     private final IReportServiceClient reportServiceClient;
     private final ReportRequestParamFactory reportRequestParamFactory;
     private final ChartFactoryService chartFactoryService;
+    private final ReportServiceConfiguration config;
 
     public CourseCompletionChart getCourseCompletionsChart(SelectedOrganisationIdsCourseCompletionsParams params, IdentityDto user) {
         CourseCompletionChartType type;
@@ -86,5 +92,16 @@ public class ReportService {
     public RegisteredLearnerOverview getRegisteredLearnerOverview(IdentityDto user) {
         GetReportRequestsResponse<RegisteredLearnerReportRequest> reportExportRequest = reportServiceClient.getReportExportRequest(ReportType.REGISTERED_LEARNER, user.getUid(), List.of("REQUESTED", "PROCESSING"));
         return new RegisteredLearnerOverview(reportExportRequest.hasRequests());
+    }
+
+    public CourseAggregationResponse<CourseAggregation> getCourseAggregationsForAreaOfWork(LocalDateTime from, LocalDateTime to,
+                                                                                           Integer professionId, List<String> requiredLearningIds) {
+        GetCourseCompletionAggregationParams params = GetCourseCompletionAggregationParams.builder()
+                .from(from)
+                .to(to)
+                .professionIds(List.of(professionId))
+                .excludeIds(requiredLearningIds)
+                .size(config.getCourseCompletionsAggregationsForCourseMaxResults()).build();
+        return reportServiceClient.getCourseCompletionAggregationsForCourse(params);
     }
 }

@@ -13,9 +13,15 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PagedResults<T> {
-    protected List<T> results;
+public class PagedResults<T> extends Results<T> {
     protected Integer page;
     protected Integer size;
     protected Integer totalResults;
+
+    public PagedResults(List<T> results, Integer page, Integer size, Integer totalResults) {
+        super(results);
+        this.page = page;
+        this.size = size;
+        this.totalResults = totalResults;
+    }
 }

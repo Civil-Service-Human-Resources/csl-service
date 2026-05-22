@@ -15,6 +15,8 @@ public class ReportServiceConfiguration {
     @NotNull
     private String courseCompletionsAggregationsByOrganisationUrl;
     @NotNull
+    private String courseCompletionsAggregationsForCourseUrl;
+    @NotNull
     private String courseCompletionsAggregationsByCourseUrl;
     @NotNull
     private String courseCompletionsAggregationsUrl;
@@ -22,6 +24,8 @@ public class ReportServiceConfiguration {
     private String requestCourseCompletionReportUrl;
     @NotNull
     private String requestRegisteredLearnerReportUrl;
+    @NotNull
+    private Integer courseCompletionsAggregationsForCourseMaxResults;
 
     public String getReportRequestUrl(ReportType reportType) {
         return switch (reportType) {
@@ -29,5 +33,5 @@ public class ReportServiceConfiguration {
             case REGISTERED_LEARNER -> requestRegisteredLearnerReportUrl;
         };
     }
-    
+
 }

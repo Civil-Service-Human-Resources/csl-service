@@ -68,8 +68,13 @@ public class LearningCatalogueService {
         }
     }
 
+    public <T> Map<String, T> getCourseIdMap(Collection<String> courseIds, Function<Course, T> valueMapper) {
+        return getCourses(courseIds).stream().collect(Collectors.toMap(Course::getCacheableId, valueMapper));
+    }
+
+
     public Map<String, String> getCourseIdToTitleMap(Collection<String> courseIds) {
-        return getCourses(courseIds).stream().collect(Collectors.toMap(Course::getCacheableId, Course::getTitle));
+        return getCourseIdMap(courseIds, Course::getTitle);
     }
 
     public List<Course> getCourses(Collection<String> courseIds) {
@@ -166,5 +171,9 @@ public class LearningCatalogueService {
     public CourseSearchResults getCoursesForLetter(String startsWith, Pageable pageableParams) {
         SearchForCoursesParams p = SearchForCoursesParams.builder().titleStartsWith(startsWith).build();
         return client.searchForCourses(p, pageableParams.getPageNumber(), pageableParams.getPageSize(), "title", Sort.Direction.ASC);
+    }
+
+    public Map<String, Course> getCourseIdToCourseMap(List<String> courseIds) {
+        return getCourseIdMap(courseIds, course -> course);
     }
 }
