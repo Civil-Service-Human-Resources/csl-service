@@ -14,8 +14,10 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
-import uk.gov.cabinetoffice.csl.util.ObjectCache;
+import uk.gov.cabinetoffice.csl.util.IUtilService;
+import uk.gov.cabinetoffice.csl.util.TtlObjectCache;
 
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,7 +27,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LearningCatalogueService {
 
-    private final ObjectCache<Course> cache;
+    private final IUtilService utilService;
+    private final TtlObjectCache<Course> cache;
     private final RequiredLearningMapCache requiredLearningMapCache;
     private final CourseAudienceMetadataMapCache courseAudienceMetadataMapCache;
     private final ILearningCatalogueClient client;
@@ -84,7 +87,7 @@ public class LearningCatalogueService {
             if (!result.getCacheMisses().isEmpty()) {
                 client.getCourses(result.getCacheMisses()).forEach(course -> {
                     courses.add(course);
-                    cache.put(course);
+                    cache.put(course, utilService.getDurationUntilTomorrow(ChronoUnit.SECONDS));
                 });
             }
             return courses;
@@ -156,7 +159,7 @@ public class LearningCatalogueService {
         event.setStatus(EventStatus.CANCELLED);
         event = client.updateEvent(course.getCacheableId(), module.getId(), event);
         course.updateEvent(module.getId(), event);
-        cache.put(course);
+        cache.put(course, utilService.getDurationUntilTomorrow(ChronoUnit.SECONDS));
     }
 
     public CourseSearchResults searchWithinCourses(Collection<String> allLearningPlanCourseIds, String q, int page, int size, Sort.Direction sort) {

@@ -19,7 +19,13 @@ public class ObjectCache<T extends Cacheable> {
 
     public T get(String id) {
         log.debug("{} cache get object with ID : {}", getCacheName(), id);
-        return cache.get(id, clazz);
+        try {
+            return cache.get(id, clazz);
+        } catch (IllegalStateException e) {
+            log.warn("IllegalStateException when fetching object from cache");
+            evict(id);
+            return null;
+        }
     }
 
     public CacheGetMultipleOp<T> getMultiple(Collection<String> ids) {

@@ -2,14 +2,17 @@ package uk.gov.cabinetoffice.csl.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
+import uk.gov.cabinetoffice.csl.configuration.MockClockConfig;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
+import uk.gov.cabinetoffice.csl.service.learningCatalogue.CourseAudienceMetadataMapCache;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
+import uk.gov.cabinetoffice.csl.service.learningCatalogue.RequiredLearningMapCache;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
-import uk.gov.cabinetoffice.csl.util.ObjectCache;
+import uk.gov.cabinetoffice.csl.util.IUtilService;
+import uk.gov.cabinetoffice.csl.util.TtlObjectCache;
+import uk.gov.cabinetoffice.csl.util.UtilService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,13 +24,14 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class LearningCatalogueServiceTest {
 
-    @Mock
-    private ObjectCache<Course> cache;
-    @Mock
-    private ILearningCatalogueClient client;
+    private final TtlObjectCache<Course> cache = mock(TtlObjectCache.class);
 
-    @InjectMocks
-    private LearningCatalogueService learningCatalogueService;
+    private final IUtilService utilService = new UtilService(MockClockConfig.getClock());
+
+    private final ILearningCatalogueClient client = mock(ILearningCatalogueClient.class);
+
+    private final LearningCatalogueService learningCatalogueService = new LearningCatalogueService(utilService, cache,
+            mock(RequiredLearningMapCache.class), mock(CourseAudienceMetadataMapCache.class), client);
 
     @Test
     void getCoursesWithFullCacheHit() {
@@ -68,6 +72,6 @@ public class LearningCatalogueServiceTest {
         assertEquals("course1", result.get(0).getCacheableId());
         assertEquals("course2", result.get(1).getCacheableId());
         assertEquals("cache-miss-course3", result.get(2).getCacheableId());
-        verify(cache, atLeastOnce()).put(course3);
+        verify(cache, atLeastOnce()).put(course3, 50400L);
     }
 }
