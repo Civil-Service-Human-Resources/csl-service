@@ -18,6 +18,9 @@ class LearningCatalogueServiceTest {
     RequiredLearningMapCache requiredLearningMapCache;
 
     @Mock
+    CourseAudienceMetadataMapCache courseAudienceMetadataMapCache;
+
+    @Mock
     ObjectCache<Course> courseObjectCache;
 
     @InjectMocks
@@ -28,6 +31,7 @@ class LearningCatalogueServiceTest {
         learningCatalogueService.removeCourseFromCache("course2");
 
         verify(requiredLearningMapCache, atMostOnce()).evict();
+        verify(courseAudienceMetadataMapCache, atMostOnce()).evict();
         verify(courseObjectCache, atMostOnce()).evict("course2");
 
     }

@@ -6,8 +6,14 @@ import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
 import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
+import uk.gov.cabinetoffice.csl.util.data.ArrayJsonContentBuilder;
+import uk.gov.cabinetoffice.csl.util.data.catalogue.DateRangeJsonValues;
+import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonCourseBuilder;
+import uk.gov.cabinetoffice.csl.util.data.learnerRecord.JsonLearnerRecordBuilder;
+import uk.gov.cabinetoffice.csl.util.data.learnerRecord.JsonModuleRecordBuilder;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,361 +36,57 @@ public class LearningPlanTest extends IntegrationTestBase {
             }
             """;
 
-    String courses = """
-            [
-              {
-                "id": "course3",
-                "title": "Course 3",
-                "shortDescription": "Course 3 short description",
-                "description": "Course 3 description",
-                "modules": [
-                  {
-                    "type": "link",
-                    "url": "https://www.gov.uk/",
-                    "id": "module1",
-                    "title": "Module 1",
-                    "description": "Module 1 description",
-                    "optional": false,
-                    "moduleType": "link",
-                    "duration": 30,
-                    "cost": 0.0
-                  }
-                ],
-                "audiences": [],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-              },
-              {
-                "id": "course4",
-                "title": "Course 4",
-                "shortDescription": "Course 4 short description",
-                "description": "Course 4 description",
-                "modules": [
-                  {
-                    "type": "link",
-                    "url": "https://www.gov.uk/",
-                    "id": "module2",
-                    "title": "Module 2",
-                    "description": "Module 2 description",
-                    "optional": false,
-                    "moduleType": "link",
-                    "cost": 0.0
-                  },
-                  {
-                    "type": "file",
-                    "url": "https://www.gov.uk/",
-                    "id": "module3",
-                    "title": "Module 3",
-                    "description": "Module 3 description",
-                    "optional": false,
-                    "moduleType": "file",
-                    "cost": 0.0
-                  }
-                ],
-                "audiences": [],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-              },
-              {
-                "id": "course5",
-                "title": "Course 5",
-                "shortDescription": "Course 5 short description",
-                "description": "Course 5 description",
-                "modules": [
-                  {
-                    "type": "face-to-face",
-                    "id": "module4",
-                    "title": "Module 4",
-                    "description": "Module 4 description",
-                    "optional": false,
-                    "moduleType": "face-to-face",
-                    "cost": 0.0,
-                    "events": [
-                      {
-                        "id": "event1",
-                        "dateRanges": [
-                          {
-                            "startTime": "12:00",
-                            "endTime": "14:00",
-                            "date": "2022-01-02"
-                          },
-                          {
-                            "startTime": "09:00",
-                            "endTime": "11:00",
-                            "date": "2022-01-01"
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                "audiences": [],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-              },
-              {
-                "id": "course6",
-                "title": "Course 6",
-                "shortDescription": "Course 6 short description",
-                "description": "Course 6 description",
-                "modules": [
-                  {
-                    "type": "elearning",
-                    "url": "https://www.gov.uk/",
-                    "id": "module5",
-                    "title": "Module 5",
-                    "description": "Module 5 description",
-                    "optional": false,
-                    "moduleType": "elearning",
-                    "cost": 0.0
-                  }
-                ],
-                "audiences": [],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-              },
-              {
-                "id": "course7",
-                "title": "Course 7",
-                "shortDescription": "Course 7 short description",
-                "description": "Course 6 description",
-                "modules": [
-                  {
-                    "type": "elearning",
-                    "url": "https://www.gov.uk/",
-                    "id": "module6",
-                    "title": "Module 6",
-                    "description": "Module 6 description",
-                    "optional": false,
-                    "moduleType": "elearning",
-                    "cost": 0.0
-                  }
-                ],
-                "audiences": [],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-              },
-              {
-                "id": "course8",
-                "title": "Course 8",
-                "shortDescription": "Course 8 short description",
-                "description": "Course 8 description",
-                "modules": [
-                  {
-                    "type": "face-to-face",
-                    "id": "module7",
-                    "title": "Module 7",
-                    "description": "Module 7 description",
-                    "optional": false,
-                    "moduleType": "face-to-face",
-                    "cost": 0.0,
-                    "events": [
-                      {
-                        "id": "event2",
-                        "dateRanges": [
-                          {
-                            "startTime": "12:00",
-                            "endTime": "14:00",
-                            "date": "2022-01-02"
-                          },
-                          {
-                            "startTime": "09:00",
-                            "endTime": "11:00",
-                            "date": "2022-01-01"
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "type": "elearning",
-                    "url": "https://www.gov.uk/",
-                    "id": "module8",
-                    "title": "Module 8",
-                    "description": "Module 8 description",
-                    "optional": false,
-                    "moduleType": "elearning",
-                    "cost": 0.0
-                  }
-                ],
-                "audiences": [],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-              }
-            ]
-            """;
+    JsonCourseBuilder course3 = JsonCourseBuilder.create("course3", "Course 3")
+            .addLinkModule("module1", "Module 1", false, 30);
+
+    JsonCourseBuilder course4 = JsonCourseBuilder.create("course4", "Course 4")
+            .addLinkModule("module2", "Module 2", false, 0)
+            .addFileModule("module3", "Module 3", false, 0);
+
+    JsonCourseBuilder course5 = JsonCourseBuilder.create("course5", "Course 5")
+            .addFaceToFaceModule("module4", "Module 4", false, 0, "event1", BigDecimal.valueOf(0L),
+                    new DateRangeJsonValues("12:00", "14:00", "2022-01-02"),
+                    new DateRangeJsonValues("09:00", "11:00", "2022-01-01"));
+
+    JsonCourseBuilder course6 = JsonCourseBuilder.create("course6", "Course 6")
+            .addElearningModule("module5", "Module 5", false, 0);
+
+    JsonCourseBuilder course7 = JsonCourseBuilder.create("course7", "Course 7")
+            .addElearningModule("module6", "Module 6", false, 0);
+
+    JsonCourseBuilder course8 = JsonCourseBuilder.create("course8", "Course 8")
+            .addFaceToFaceModule("module7", "Module 7", false, 0, "event2", BigDecimal.valueOf(0L),
+                    new DateRangeJsonValues("12:00", "14:00", "2022-01-02"),
+                    new DateRangeJsonValues("09:00", "11:00", "2022-01-01"))
+            .addElearningModule("module8", "Module 8", false, 0);
+
+    String courses = ArrayJsonContentBuilder.create(course3, course4, course5, course6, course7, course8).build();
 
     @Test
     public void testGetLearningPlan() throws Exception {
 
-        String recordResponse = """
-                {
-                    "content": [
-                        {
-                            "resourceId": "course2",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": {
-                                "learnerId": "userId",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2023-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "course3",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": {
-                                "learnerId": "userId",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2023-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "course4",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": {
-                                "learnerId": "userId",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2023-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "course5",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": {
-                                "learnerId": "userId",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2023-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "course6",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": {
-                                "learnerId": "userId",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "REMOVE_FROM_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2025-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "course7",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": null
-                        }
-                        ,
-                        {
-                            "resourceId": "course8",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": null
-                        }
-                    ],
-                    "totalPages": 1
-                }
-                """;
+        String recordResponse = ArrayJsonContentBuilder.create(
+                JsonLearnerRecordBuilder.create("userId", "course2").addLatestEvent("MOVE_TO_LEARNING_PLAN", "2023-01-01T10:00:00"),
+                JsonLearnerRecordBuilder.create("userId", "course3").addLatestEvent("MOVE_TO_LEARNING_PLAN", "2023-01-01T10:00:00"),
+                JsonLearnerRecordBuilder.create("userId", "course4").addLatestEvent("MOVE_TO_LEARNING_PLAN", "2023-01-01T10:00:00"),
+                JsonLearnerRecordBuilder.create("userId", "course5").addLatestEvent("MOVE_TO_LEARNING_PLAN", "2023-01-01T10:00:00"),
+                JsonLearnerRecordBuilder.create("userId", "course6").addLatestEvent("REMOVE_FROM_LEARNING_PLAN", "2025-01-01T10:00:00"),
+                JsonLearnerRecordBuilder.create("userId", "course7"),
+                JsonLearnerRecordBuilder.create("userId", "course8")
+        ).getAsPaginated(0, 20, 1).toString();
 
-        String moduleRecordResponse = """
-                {
-                    "moduleRecords": [
-                        {
-                            "moduleId": "module2",
-                            "state": "IN_PROGRESS",
-                            "updatedAt": "2025-01-01T09:00:00",
-                            "courseId": "course4"
-                        },
-                        {
-                            "moduleId": "module4",
-                            "state": "APPROVED",
-                            "eventDate": "2022-01-02T09:00:00",
-                            "eventId": "event1",
-                            "updatedAt": "2022-01-02T09:00:00",
-                            "courseId": "course5"
-                        },
-                        {
-                            "moduleId": "module5",
-                            "state": "IN_PROGRESS",
-                            "updatedAt": "2025-01-01T09:00:00",
-                            "courseId": "course6"
-                        },
-                        {
-                            "moduleId": "module6",
-                            "state": "IN_PROGRESS",
-                            "updatedAt": "2025-01-01T09:00:00",
-                            "courseId": "course7"
-                        },
-                        {
-                            "moduleId": "module7",
-                            "state": "APPROVED",
-                            "eventDate": "2022-01-01T09:00:00",
-                            "eventId": "event2",
-                            "updatedAt": "2022-01-01T09:00:00",
-                            "courseId": "course8"
-                        }
-                    ]
-                }""";
+        String moduleRecordResponse = ArrayJsonContentBuilder.create(
+                JsonModuleRecordBuilder.create("module2", "course4", "userId", "link", "2025-01-01T09:00:00")
+                        .addUpdatedAt("2025-01-01T09:00:00").addState("IN_PROGRESS"),
+                JsonModuleRecordBuilder.create("module4", "course5", "userId", "link", "2022-01-02T09:00:00")
+                        .addUpdatedAt("2022-01-02T09:00:00").addState("APPROVED").addEvent("event1", "2022-01-02T09:00:00"),
+                JsonModuleRecordBuilder.create("module5", "course6", "userId", "link", "2025-01-01T09:00:00")
+                        .addUpdatedAt("2025-01-01T09:00:00").addState("IN_PROGRESS"),
+                JsonModuleRecordBuilder.create("module6", "course7", "userId", "link", "2025-01-01T09:00:00")
+                        .addUpdatedAt("2025-01-01T09:00:00").addState("IN_PROGRESS"),
+                JsonModuleRecordBuilder.create("module7", "course8", "userId", "link", "2022-01-01T09:00:00")
+                        .addUpdatedAt("2022-01-01T09:00:00").addState("APPROVED").addEvent("event2", "2022-01-01T09:00:00")
+        ).getAsObjectList("moduleRecords").toString();
 
         cslStubService.getLearningCatalogue().getMandatoryLearningMap(requiredLearningMap);
         cslStubService.getLearningCatalogue().getCourses(List.of("course3", "course4", "course5", "course6", "course7", "course8"), courses);
@@ -479,167 +181,28 @@ public class LearningPlanTest extends IntegrationTestBase {
     @Test
     public void testGetLearningPlanWhenHomepageCompleteLearningPlanCoursesIsTrue() throws Exception {
 
-        String recordResponse = """
-                {
-                    "content": [
-                        {
-                            "resourceId": "course2",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": {
-                                "learnerId": "userId",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2023-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "course3",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": {
-                                "learnerId": "userId",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2023-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "course4",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": {
-                                "learnerId": "userId",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2023-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "course5",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": {
-                                "learnerId": "userId",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2023-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "course6",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": {
-                                "learnerId": "userId",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "REMOVE_FROM_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2025-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "course7",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": null
-                        },
-                        {
-                            "resourceId": "course8",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": null
-                        }
-                    ],
-                    "totalPages": 1
-                }
-                """;
+        String recordResponse = ArrayJsonContentBuilder.create(
+                JsonLearnerRecordBuilder.create("userId", "course2").addLatestEvent("MOVE_TO_LEARNING_PLAN", "2023-01-01T10:00:00"),
+                JsonLearnerRecordBuilder.create("userId", "course3").addLatestEvent("MOVE_TO_LEARNING_PLAN", "2023-01-01T10:00:00"),
+                JsonLearnerRecordBuilder.create("userId", "course4").addLatestEvent("MOVE_TO_LEARNING_PLAN", "2023-01-01T10:00:00"),
+                JsonLearnerRecordBuilder.create("userId", "course5").addLatestEvent("MOVE_TO_LEARNING_PLAN", "2023-01-01T10:00:00"),
+                JsonLearnerRecordBuilder.create("userId", "course6").addLatestEvent("REMOVE_FROM_LEARNING_PLAN", "2025-01-01T10:00:00"),
+                JsonLearnerRecordBuilder.create("userId", "course7"),
+                JsonLearnerRecordBuilder.create("userId", "course8")
+        ).getAsPaginated(0, 20, 1).toString();
 
-        String moduleRecordResponse = """
-                {
-                    "moduleRecords": [
-                        {
-                            "moduleId": "module2",
-                            "state": "IN_PROGRESS",
-                            "updatedAt": "2025-01-01T09:00:00",
-                            "courseId": "course4"
-                        },
-                        {
-                            "moduleId": "module4",
-                            "state": "APPROVED",
-                            "eventDate": "2022-01-02T09:00:00",
-                            "eventId": "event1",
-                            "updatedAt": "2022-01-02T09:00:00",
-                            "courseId": "course5"
-                        },
-                        {
-                            "moduleId": "module5",
-                            "state": "IN_PROGRESS",
-                            "updatedAt": "2025-01-01T09:00:00",
-                            "courseId": "course6"
-                        },
-                        {
-                            "moduleId": "module6",
-                            "state": "IN_PROGRESS",
-                            "updatedAt": "2025-01-01T09:00:00",
-                            "courseId": "course7"
-                        },
-                        {
-                            "moduleId": "module7",
-                            "state": "APPROVED",
-                            "eventDate": "2022-01-01T09:00:00",
-                            "eventId": "event2",
-                            "updatedAt": "2022-01-01T09:00:00",
-                            "courseId": "course8"
-                        }
-                    ]
-                }""";
+        String moduleRecordResponse = ArrayJsonContentBuilder.create(
+                JsonModuleRecordBuilder.create("module2", "course4", "userId", "link", "2025-01-01T09:00:00")
+                        .addUpdatedAt("2025-01-01T09:00:00").addState("IN_PROGRESS"),
+                JsonModuleRecordBuilder.create("module4", "course5", "userId", "link", "2022-01-02T09:00:00")
+                        .addUpdatedAt("2022-01-02T09:00:00").addState("APPROVED").addEvent("event1", "2022-01-02T09:00:00"),
+                JsonModuleRecordBuilder.create("module5", "course6", "userId", "link", "2025-01-01T09:00:00")
+                        .addUpdatedAt("2025-01-01T09:00:00").addState("IN_PROGRESS"),
+                JsonModuleRecordBuilder.create("module6", "course7", "userId", "link", "2025-01-01T09:00:00")
+                        .addUpdatedAt("2025-01-01T09:00:00").addState("IN_PROGRESS"),
+                JsonModuleRecordBuilder.create("module7", "course8", "userId", "link", "2022-01-01T09:00:00")
+                        .addUpdatedAt("2022-01-01T09:00:00").addState("APPROVED").addEvent("event2", "2022-01-01T09:00:00")
+        ).getAsObjectList("moduleRecords").toString();
 
         cslStubService.getLearningCatalogue().getMandatoryLearningMap(requiredLearningMap);
         cslStubService.getLearningCatalogue().getCourses(List.of("course3", "course4", "course5", "course6", "course7", "course8"), courses);
@@ -734,123 +297,21 @@ public class LearningPlanTest extends IntegrationTestBase {
     @Test
     public void testGetLearningPlanWhenWhenAllModulesAreCompletedAndHomepageCompleteLearningPlanCoursesIsFalse() throws Exception {
 
-        String courses47 = """
-            [
-              {
-                "id": "course4",
-                "title": "Course 4",
-                "shortDescription": "Course 4 short description",
-                "description": "Course 4 description",
-                "modules": [
-                  {
-                    "type": "link",
-                    "url": "https://www.gov.uk/",
-                    "id": "module2",
-                    "title": "Module 2",
-                    "description": "Module 2 description",
-                    "optional": false,
-                    "moduleType": "link",
-                    "cost": 0.0
-                  },
-                  {
-                    "type": "file",
-                    "url": "https://www.gov.uk/",
-                    "id": "module3",
-                    "title": "Module 3",
-                    "description": "Module 3 description",
-                    "optional": false,
-                    "moduleType": "file",
-                    "cost": 0.0
-                  }
-                ],
-                "audiences": [],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-              },
-              {
-                "id": "course7",
-                "title": "Course 7",
-                "shortDescription": "Course 7 short description",
-                "description": "Course 6 description",
-                "modules": [
-                  {
-                    "type": "elearning",
-                    "url": "https://www.gov.uk/",
-                    "id": "module6",
-                    "title": "Module 6",
-                    "description": "Module 6 description",
-                    "optional": false,
-                    "moduleType": "elearning",
-                    "cost": 0.0
-                  }
-                ],
-                "audiences": [],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-              }
-            ]
-            """;
+        String courses47 = ArrayJsonContentBuilder.create(course4, course7).build();
 
-        String recordResponse = """
-                {
-                    "content": [
-                        {
-                            "resourceId": "course4",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": {
-                                "learnerId": "userId",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2023-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "course7",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": null
-                        }
-                    ],
-                    "totalPages": 1
-                }
-                """;
+        String recordResponse = ArrayJsonContentBuilder.create(
+                JsonLearnerRecordBuilder.create("userId", "course4").addLatestEvent("MOVE_TO_LEARNING_PLAN", "2023-01-01T10:00:00"),
+                JsonLearnerRecordBuilder.create("userId", "course7")
+        ).getAsPaginated(0, 20, 1).toString();
 
-        String moduleRecordResponse = """
-                {
-                    "moduleRecords": [
-                        {
-                            "moduleId": "module2",
-                            "state": "COMPLETED",
-                            "updatedAt": "2025-01-01T09:00:00",
-                            "courseId": "course4"
-                        },
-                        {
-                            "moduleId": "module3",
-                            "state": "COMPLETED",
-                            "updatedAt": "2025-01-01T10:00:00",
-                            "courseId": "course4"
-                        },
-                        {
-                            "moduleId": "module6",
-                            "state": "IN_PROGRESS",
-                            "updatedAt": "2025-01-01T09:00:00",
-                            "courseId": "course7"
-                        }
-                    ]
-                }""";
+        String moduleRecordResponse = ArrayJsonContentBuilder.create(
+                JsonModuleRecordBuilder.create("module2", "course4", "userId", "link", "2025-01-01T09:00:00")
+                        .addUpdatedAt("2025-01-01T09:00:00").addState("COMPLETED"),
+                JsonModuleRecordBuilder.create("module3", "course5", "userId", "link", "2025-01-01T10:00:00")
+                        .addUpdatedAt("2025-01-01T10:00:00").addState("COMPLETED"),
+                JsonModuleRecordBuilder.create("module6", "course7", "userId", "link", "2025-01-01T09:00:00")
+                        .addUpdatedAt("2025-01-01T09:00:00").addState("IN_PROGRESS")
+        ).getAsObjectList("moduleRecords").toString();
 
         cslStubService.getLearningCatalogue().getMandatoryLearningMap(requiredLearningMap);
         cslStubService.getLearningCatalogue().getCourses(List.of("course4", "course7"), courses47);
@@ -895,147 +356,21 @@ public class LearningPlanTest extends IntegrationTestBase {
     @Test
     public void testGetLearningPlanWhenWhenAllModulesAreCompletedAndHomepageCompleteLearningPlanCoursesIsTrue() throws Exception {
 
-        String courses47 = """
-            [
-              {
-                "id": "course4",
-                "title": "Course 4",
-                "shortDescription": "Course 4 short description",
-                "description": "Course 4 description",
-                "modules": [
-                  {
-                    "type": "link",
-                    "url": "https://www.gov.uk/",
-                    "id": "module2",
-                    "title": "Module 2",
-                    "description": "Module 2 description",
-                    "optional": false,
-                    "moduleType": "link",
-                    "cost": 0.0
-                  },
-                  {
-                    "type": "file",
-                    "url": "https://www.gov.uk/",
-                    "id": "module3",
-                    "title": "Module 3",
-                    "description": "Module 3 description",
-                    "optional": false,
-                    "moduleType": "file",
-                    "cost": 0.0
-                  }
-                ],
-                "audiences": [],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-              },
-              {
-                "id": "course7",
-                "title": "Course 7",
-                "shortDescription": "Course 7 short description",
-                "description": "Course 6 description",
-                "modules": [
-                  {
-                    "type": "elearning",
-                    "url": "https://www.gov.uk/",
-                    "id": "module6",
-                    "title": "Module 6",
-                    "description": "Module 6 description",
-                    "optional": false,
-                    "moduleType": "elearning",
-                    "cost": 0.0
-                  }
-                ],
-                "audiences": [],
-                "visibility": "PUBLIC",
-                "status": "Published",
-                "cost": 0.0
-              }
-            ]
-            """;
+        String courses47 = ArrayJsonContentBuilder.create(course4, course7).build();
 
-        String recordResponse = """
-                {
-                    "content": [
-                        {
-                            "resourceId": "course4",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": {
-                                "learnerId": "userId",
-                                "resourceId": "courseId",
-                                "eventType": {
-                                    "eventType": "MOVE_TO_LEARNING_PLAN",
-                                    "learnerRecordType": {
-                                        "type": "COURSE"
-                                    }
-                                },
-                                "eventTimestamp" : "2023-01-01T10:00:00",
-                                "eventSource": {
-                                    "source": "csl_source_id"
-                                }
-                            }
-                        },
-                        {
-                            "resourceId": "course7",
-                            "recordType": {
-                                "type": "COURSE"
-                            },
-                            "latestEvent": null
-                        }
-                    ],
-                    "totalPages": 1
-                }
-                """;
+        String recordResponse = ArrayJsonContentBuilder.create(
+                JsonLearnerRecordBuilder.create("userId", "course4").addLatestEvent("MOVE_TO_LEARNING_PLAN", "2023-01-01T10:00:00"),
+                JsonLearnerRecordBuilder.create("userId", "course7")
+        ).getAsPaginated(0, 20, 1).toString();
 
-        String moduleRecordResponse = """
-                {
-                    "moduleRecords": [
-                        {
-                            "id": 2,
-                            "uid": "module2",
-                            "userId": "userId",
-                            "courseId": "course4",
-                            "moduleId": "module2",
-                            "moduleTitle": "module2",
-                            "moduleType": "link",
-                            "duration": 3600,
-                            "state": "COMPLETED",
-                            "completionDate": "2025-01-01T10:00:00",
-                            "createdAt": "2024-01-01T10:00:00",
-                            "updatedAt": "2025-01-01T10:00:00"
-                        },
-                        {
-                            "id": 3,
-                            "uid": "module3",
-                            "userId": "userId",
-                            "courseId": "course4",
-                            "moduleId": "module3",
-                            "moduleTitle": "module3",
-                            "moduleType": "file",
-                            "duration": 3600,
-                            "state": "COMPLETED",
-                            "completionDate": "2025-01-01T10:00:00",
-                            "createdAt": "2024-01-01T10:00:00",
-                            "updatedAt": "2025-01-01T10:00:00"
-                        },
-                        {
-                            "id": 6,
-                            "uid": "module6",
-                            "userId": "userId",
-                            "courseId": "course7",
-                            "moduleId": "module6",
-                            "moduleTitle": "module6",
-                            "moduleType": "elearning",
-                            "duration": 3600,
-                            "state": "IN_PROGRESS",
-                            "createdAt": "2024-01-01T10:00:00",
-                            "updatedAt": "2025-01-01T10:00:00"
-                        }
-                    ]
-                }
-                """;
+        String moduleRecordResponse = ArrayJsonContentBuilder.create(
+                JsonModuleRecordBuilder.create("module2", "course4", "userId", "link", "2024-01-01T10:00:00")
+                        .addCompletionDate("2025-01-01T10:00:00", "2025-01-01T10:00:00").addState("COMPLETED"),
+                JsonModuleRecordBuilder.create("module3", "course4", "userId", "link", "2024-01-01T10:00:00")
+                        .addCompletionDate("2025-01-01T10:00:00", "2025-01-01T10:00:00").addState("COMPLETED"),
+                JsonModuleRecordBuilder.create("module6", "course7", "userId", "link", "2024-01-01T10:00:00")
+                        .addUpdatedAt("2025-01-01T10:00:00").addState("IN_PROGRESS")
+        ).getAsObjectList("moduleRecords").toString();
 
         String courseRecords = """
                 {

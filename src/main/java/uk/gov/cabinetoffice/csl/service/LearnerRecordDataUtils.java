@@ -7,13 +7,11 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEvent;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventQuery;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.learning.ModuleRecordCollection;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction.COMPLETE_COURSE;
@@ -62,14 +60,23 @@ public class LearnerRecordDataUtils {
         return eventMap;
     }
 
-    public Map<String, ModuleRecordCollection> getModuleRecordsForCourses(List<String> courseIds, List<ModuleRecordResourceId> moduleRecordIds) {
+    public Map<String, ModuleRecordCollection> getModuleRecordsForCourses(Collection<String> courseIds, List<ModuleRecordResourceId> moduleRecordIds) {
         Map<String, ModuleRecordCollection> map = courseIds.stream().collect(Collectors.toMap(s -> s, s -> new ModuleRecordCollection()));
         learnerRecordService.getModuleRecords(moduleRecordIds)
-                .forEach(mr -> {
-                    ModuleRecordCollection mrs = map.get(mr.getCourseId());
-                    mrs.add(mr);
-                    map.put(mr.getCourseId(), mrs);
-                });
+                .forEach(mr -> map.computeIfAbsent(mr.getCourseId(), k -> new ModuleRecordCollection()).add(mr));
+        return map;
+    }
+
+    public Map<String, ModuleRecordCollection> getModuleRecordsForCourses(String userId, Collection<Course> courses) {
+        Map<String, ModuleRecordCollection> map = new HashMap<>();
+        List<ModuleRecordResourceId> moduleRecordResourceIds = courses.stream()
+                .flatMap(course -> {
+                    map.put(course.getId(), new ModuleRecordCollection());
+                    return course.getModules().stream().map(module -> new ModuleRecordResourceId(userId, module.getId()));
+                })
+                .toList();
+        learnerRecordService.getModuleRecords(moduleRecordResourceIds)
+                .forEach(mr -> map.computeIfAbsent(mr.getCourseId(), k -> new ModuleRecordCollection()).add(mr));
         return map;
     }
 

@@ -41,7 +41,7 @@ public class HttpClient implements IHttpClient {
         String fileName = contentDisposition.get(0).replaceFirst("(?i)^.*filename=\"?([^\"]+)\"?.*$", "$1");
         return new DownloadableFile(fileName, response.getBody());
     }
-
+    
     @Override
     public <T, R extends PagedResponse<T>> List<T> getPaginatedRequest(Class<R> pagedResponseClass, UriComponentsBuilder url, Integer maxPageSize) {
         List<T> results = new ArrayList<>();

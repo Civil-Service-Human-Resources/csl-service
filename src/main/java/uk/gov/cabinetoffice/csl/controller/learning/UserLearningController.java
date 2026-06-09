@@ -1,12 +1,8 @@
 package uk.gov.cabinetoffice.csl.controller.learning;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.controller.learning.model.GetOptionalLearningRecordParams;
 import uk.gov.cabinetoffice.csl.controller.model.UserLearningResponse;
 import uk.gov.cabinetoffice.csl.domain.learning.Learning;
 import uk.gov.cabinetoffice.csl.service.learning.UserLearningService;
@@ -21,10 +17,8 @@ public class UserLearningController {
     private final UserLearningService userLearningService;
 
     @GetMapping("/{uid}")
-    public UserLearningResponse getOptionalLearningRecord(@PathVariable String uid,
-                                                          @RequestParam(defaultValue = "0") int page,
-                                                          @RequestParam(defaultValue = "20") int size) {
-        return userLearningService.getOptionalLearningRecord(uid, page, size);
+    public UserLearningResponse getOptionalLearningRecord(@PathVariable String uid, GetOptionalLearningRecordParams params) {
+        return userLearningService.getOptionalLearningRecord(uid, params);
     }
 
     @GetMapping("/detailed/{uid}")

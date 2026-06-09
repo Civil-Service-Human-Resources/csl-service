@@ -38,6 +38,17 @@ public class ReportServiceStubService {
         );
     }
 
+    public void getCourseCompletionAggregationsForCourses(String expectedInput, String response) {
+        stubFor(
+                WireMock.post(urlPathEqualTo("/report-service/course-completions/aggregations/courses"))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
     public void getCourseCompletionAggregationsByCourseAndOrganisation(String expectedInput, String response) {
         stubFor(
                 WireMock.post(urlPathEqualTo("/report-service/course-completions/aggregations/by-organisation"))
@@ -92,4 +103,5 @@ public class ReportServiceStubService {
                                 .withBody(response))
         );
     }
+
 }

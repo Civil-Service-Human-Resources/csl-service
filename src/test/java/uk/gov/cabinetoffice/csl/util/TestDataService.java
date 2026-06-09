@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -53,6 +54,13 @@ public class TestDataService {
     ));
     private final Grade grade = new Grade(1L, "SEO", "Senior Executive Officer");
     private final AreaOfWork profession = new AreaOfWork(3L, "DDaT");
+    private final Collection<AreaOfWork> otherAreasOfWork = List.of(
+            new AreaOfWork(4L, "Finance"),
+            new AreaOfWork(5L, "Analysis")
+    );
+    private final Collection<Interest> interests = List.of(
+            new Interest(1L, "EU")
+    );
 
     public ModuleRecord generateModuleRecord() {
         ModuleRecord mr = new ModuleRecord();
@@ -99,6 +107,8 @@ public class TestDataService {
                 profession.getName(),
                 grade.getId().intValue(),
                 grade.getName(),
+                otherAreasOfWork,
+                interests,
                 lineManagerName,
                 lineManagerEmail,
                 depHierarchy);
@@ -161,7 +171,7 @@ public class TestDataService {
     }
 
     public CivilServant generateCivilServant() {
-        return new CivilServant(getLearnerFirstName(), userEmail, userId, grade, organisationalUnit, profession, lineManagerEmail, lineManagerName);
+        return new CivilServant(getLearnerFirstName(), userEmail, userId, grade, organisationalUnit, profession, otherAreasOfWork, interests, lineManagerEmail, lineManagerName);
     }
 
     public OrganisationalUnitsPagedResponse generateOrganisationalUnitsPagedResponse() {

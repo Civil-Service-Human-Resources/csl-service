@@ -1,0 +1,515 @@
+package uk.gov.cabinetoffice.csl.integration.learning;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
+import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.SearchForCoursesParams;
+import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
+import uk.gov.cabinetoffice.csl.util.TestDataService;
+import uk.gov.cabinetoffice.csl.util.data.ArrayJsonContentBuilder;
+import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonCourseBuilder;
+import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
+
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+public class LearningCatalogueTest extends IntegrationTestBase {
+
+    @Autowired
+    private CSLStubService cslStubService;
+
+    @Autowired
+    private TestDataService testDataService;
+
+    String learningResourceIdsResponse = """
+            {
+                "content": [
+                    "course3",
+                    "course4",
+                    "course5"
+                ],
+                "page": 0,
+                "size": 200,
+                "totalElements": 5,
+                "totalPages": 1
+            }
+            """;
+
+    String audienceMetadataMap = """
+            {
+                "areasOfWork": {
+                    "Analysis": [
+                        "course1",
+                        "course2"
+                    ],
+                    "Project delivery": [
+                        "course1",
+                        "course2"
+                    ],
+                    "DDaT": [
+                        "course7"
+                    ]
+                },
+                "departments": {
+                    "CO": [
+                        "course1",
+                        "course5"
+                    ],
+                    "DWP": [
+                        "course8"
+                    ]
+                },
+                "interests": {
+                    "EU": [
+                        "course9",
+                        "course10"
+                    ],
+                    "Parliament": [
+                        "course5"
+                    ]
+                }
+            }
+            """;
+
+    @Test
+    public void testGetSuggestions() throws Exception {
+
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
+        cslStubService.getLearnerRecord().getLearnerRecordResourceIds(
+                LearnerRecordQuery.builder().learnerIds(java.util.Set.of("userId")).build(),
+                0,
+                200,
+                learningResourceIdsResponse);
+        cslStubService.getLearningCatalogue().getAudienceMetadataMap(audienceMetadataMap);
+
+        String courses = ArrayJsonContentBuilder.create(
+                JsonCourseBuilder.create("course1", "Course 1")
+                        .addModule("link", "module1", "module 1", false, 0)
+                        .addModule("link", "module2", "module 2", false, 0),
+                JsonCourseBuilder.create("course8", "Course 8")
+                        .addModule("link", "module3", "module 3", false, 0),
+                JsonCourseBuilder.create("course2", "Course 2")
+                        .addModule("link", "module4", "module 4", false, 0),
+                JsonCourseBuilder.create("course7", "Course 7")
+                        .addModule("link", "module5", "module 5", false, 0)
+                        .addModule("link", "module6", "module 6", false, 0)
+                        .addModule("link", "module7", "module 7", false, 0),
+                JsonCourseBuilder.create("course9", "Course 9")
+                        .addModule("link", "module8", "module 8", false, 0),
+                JsonCourseBuilder.create("course10", "Course 10")
+                        .addModule("link", "module9", "module 9", false, 0),
+                JsonCourseBuilder.create("course5", "Course 5")
+                        .addModule("link", "module10", "module 10", false, 0)
+        ).get().toString();
+
+        cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course8", "course2", "course7", "course9", "course10", "course5"), courses);
+
+        mockMvc.perform(get("/learning/catalogue/suggestions")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {
+                            "suggestions": [
+                                {
+                                    "title": "Cabinet Office",
+                                    "courses": [
+                                        {
+                                            "id": "course1",
+                                            "title": "Course 1",
+                                            "shortDescription": "Course 1 short description",
+                                            "type": "blended",
+                                            "duration": 0,
+                                            "moduleCount": 2,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        },
+                                        {
+                                            "id": "course5",
+                                            "title": "Course 5",
+                                            "shortDescription": "Course 5 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "IN_PROGRESS"
+                                        },
+                                        {
+                                            "id": "course8",
+                                            "title": "Course 8",
+                                            "shortDescription": "Course 8 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "title": "DDaT",
+                                    "courses": [
+                                        {
+                                            "id": "course7",
+                                            "title": "Course 7",
+                                            "shortDescription": "Course 7 short description",
+                                            "type": "blended",
+                                            "duration": 0,
+                                            "moduleCount": 3,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "title": "Analysis",
+                                    "courses": [
+                                        {
+                                            "id": "course2",
+                                            "title": "Course 2",
+                                            "shortDescription": "Course 2 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "title": "EU",
+                                    "courses": [
+                                        {
+                                            "id": "course10",
+                                            "title": "Course 10",
+                                            "shortDescription": "Course 10 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        },
+                                        {
+                                            "id": "course9",
+                                            "title": "Course 9",
+                                            "shortDescription": "Course 9 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                        """, true));
+    }
+
+    @Test
+    public void testGetSuggestionsFiltered() throws Exception {
+
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
+        cslStubService.getLearnerRecord().getLearnerRecordResourceIds(
+                LearnerRecordQuery.builder().learnerIds(java.util.Set.of("userId")).build(),
+                0,
+                200,
+                learningResourceIdsResponse);
+        cslStubService.getLearningCatalogue().getAudienceMetadataMap(audienceMetadataMap);
+
+        String courses = ArrayJsonContentBuilder.create(
+                JsonCourseBuilder.create("course1", "Course 1")
+                        .addModule("link", "module1", "module 1", false, 0)
+                        .addModule("link", "module2", "module 2", false, 0),
+                JsonCourseBuilder.create("course8", "Course 8")
+                        .addModule("link", "module3", "module 3", false, 0),
+                JsonCourseBuilder.create("course2", "Course 2")
+                        .addModule("link", "module4", "module 4", false, 0),
+                JsonCourseBuilder.create("course7", "Course 7")
+                        .addModule("link", "module5", "module 5", false, 0)
+                        .addModule("link", "module6", "module 6", false, 0)
+                        .addModule("link", "module7", "module 7", false, 0),
+                JsonCourseBuilder.create("course9", "Course 9")
+                        .addModule("link", "module8", "module 8", false, 0),
+                JsonCourseBuilder.create("course10", "Course 10")
+                        .addModule("link", "module9", "module 9", false, 0)
+        ).get().toString();
+
+        cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course8", "course2", "course7", "course9", "course10"), courses);
+
+        mockMvc.perform(get("/learning/catalogue/suggestions")
+                        .param("excludeLearningPlanCourses", "true")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {
+                            "suggestions": [
+                                {
+                                    "title": "Cabinet Office",
+                                    "courses": [
+                                        {
+                                            "id": "course1",
+                                            "title": "Course 1",
+                                            "shortDescription": "Course 1 short description",
+                                            "type": "blended",
+                                            "duration": 0,
+                                            "moduleCount": 2,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        },
+                                        {
+                                            "id": "course8",
+                                            "title": "Course 8",
+                                            "shortDescription": "Course 8 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "title": "DDaT",
+                                    "courses": [
+                                        {
+                                            "id": "course7",
+                                            "title": "Course 7",
+                                            "shortDescription": "Course 7 short description",
+                                            "type": "blended",
+                                            "duration": 0,
+                                            "moduleCount": 3,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "title": "Analysis",
+                                    "courses": [
+                                        {
+                                            "id": "course2",
+                                            "title": "Course 2",
+                                            "shortDescription": "Course 2 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "title": "EU",
+                                    "courses": [
+                                        {
+                                            "id": "course10",
+                                            "title": "Course 10",
+                                            "shortDescription": "Course 10 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        },
+                                        {
+                                            "id": "course9",
+                                            "title": "Course 9",
+                                            "shortDescription": "Course 9 short description",
+                                            "type": "link",
+                                            "duration": 0,
+                                            "moduleCount": 1,
+                                            "costInPounds": 0,
+                                            "status": "NULL"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                        """, true));
+    }
+
+    @Test
+    public void testGetCourseAtoZ() throws Exception {
+
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
+        cslStubService.getLearnerRecord().getLearnerRecordResourceIds(
+                LearnerRecordQuery.builder().learnerIds(java.util.Set.of("userId")).build(),
+                0,
+                200,
+                learningResourceIdsResponse);
+        cslStubService.getLearningCatalogue().getMandatoryLearningMap("""
+                {
+                    "departmentCodeMap": {
+                        "CO": ["acourse1", "acourse5"]
+                    }
+                }
+                """);
+
+        String courses = ArrayJsonContentBuilder.create(
+                JsonCourseBuilder.create("acourse1", "A Course 1")
+                        .addModule("link", "module1", "module 1", false, 0)
+                        .addModule("link", "module2", "module 2", false, 0),
+                JsonCourseBuilder.create("acourse2", "A Course 2")
+                        .addModule("link", "module4", "module 4", false, 0),
+                JsonCourseBuilder.create("acourse8", "A Course 8")
+                        .addModule("link", "module3", "module 3", false, 0)
+        ).getAsSearchResults(0, 20, 1).toString();
+
+        SearchForCoursesParams params = SearchForCoursesParams.builder()
+                .titleStartsWith("a")
+                .build();
+
+        cslStubService.getLearningCatalogue().postSearchCourses(params, courses, 0, 20, "title", "ASC");
+
+        mockMvc.perform(get("/learning/catalogue/a-z/a")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {
+                          "results": [
+                            {
+                              "id": "acourse1",
+                              "title": "A Course 1",
+                              "shortDescription": "A Course 1 short description",
+                              "type": "blended",
+                              "duration": 0,
+                              "moduleCount": 2,
+                              "costInPounds": 0,
+                              "status": "IN_PROGRESS"
+                            },
+                            {
+                              "id": "acourse2",
+                              "title": "A Course 2",
+                              "shortDescription": "A Course 2 short description",
+                              "type": "link",
+                              "duration": 0,
+                              "moduleCount": 1,
+                              "costInPounds": 0,
+                              "status": "NULL"
+                            },
+                            {
+                              "id": "acourse8",
+                              "title": "A Course 8",
+                              "shortDescription": "A Course 8 short description",
+                              "type": "link",
+                              "duration": 0,
+                              "moduleCount": 1,
+                              "costInPounds": 0,
+                              "status": "NULL"
+                            }
+                          ],
+                          "page": 0,
+                          "size": 20,
+                          "totalResults": 3
+                        }
+                        """, true));
+    }
+
+    @Test
+    public void testGetCoursePopularByAreaOfWork() throws Exception {
+
+        CivilServant civilServant = testDataService.generateCivilServant();
+        cslStubService.getCsrsStubService().getCivilServant("userId", civilServant);
+        cslStubService.getLearnerRecord().getLearnerRecordResourceIds(
+                LearnerRecordQuery.builder().learnerIds(java.util.Set.of("userId")).build(),
+                0,
+                200,
+                learningResourceIdsResponse);
+        cslStubService.getReportServiceStubService().getCourseCompletionAggregationsForCourses("""
+                        {
+                            "from": "2026-01-01T10:00:00",
+                            "to": "2026-06-01T10:00:00",
+                            "professionIds": [3],
+                            "excludeIds": ["course5", "course1"],
+                            "size": 20
+                        }
+                        """,
+                """
+                        {
+                            "aggregations": [
+                                {"courseId": "course2", "count": 10},
+                                {"courseId": "course4", "count": 7},
+                                {"courseId": "course6", "count": 4}
+                            ]
+                        }
+                        """);
+        cslStubService.getLearningCatalogue().getMandatoryLearningMap("""
+                {
+                    "departmentCodeMap": {
+                        "CO": ["course1", "course5"]
+                    }
+                }
+                """);
+
+        String courses = ArrayJsonContentBuilder.create(
+                JsonCourseBuilder.create("course2", "Course 2")
+                        .addModule("link", "module1", "module 1", false, 0)
+                        .addModule("link", "module2", "module 2", false, 0),
+                JsonCourseBuilder.create("course4", "Course 4")
+                        .addModule("link", "module4", "module 4", false, 0),
+                JsonCourseBuilder.create("course6", "Course 6")
+                        .addModule("link", "module3", "module 3", false, 0)
+        ).build();
+
+        cslStubService.getLearningCatalogue().getCourses(List.of("course2", "course4", "course6"), courses);
+
+        mockMvc.perform(get("/learning/catalogue/popular/area-of-work")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("from", "2026-01-01T10:00:00")
+                        .param("to", "2026-06-01T10:00:00"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {
+                          "results": [
+                            {
+                              "id": "course2",
+                              "title": "Course 2",
+                              "shortDescription": "Course 2 short description",
+                              "type": "blended",
+                              "duration": 0,
+                              "moduleCount": 2,
+                              "costInPounds": 0,
+                              "status": "NULL"
+                            },
+                            {
+                              "id": "course4",
+                              "title": "Course 4",
+                              "shortDescription": "Course 4 short description",
+                              "type": "link",
+                              "duration": 0,
+                              "moduleCount": 1,
+                              "costInPounds": 0,
+                              "status": "IN_PROGRESS"
+                            },
+                            {
+                              "id": "course6",
+                              "title": "Course 6",
+                              "shortDescription": "Course 6 short description",
+                              "type": "link",
+                              "duration": 0,
+                              "moduleCount": 1,
+                              "costInPounds": 0,
+                              "status": "NULL"
+                            }
+                          ]
+                        }
+                        """, true));
+    }
+
+    @Test
+    public void testGetCourseAtoZInvalid() throws Exception {
+
+        mockMvc.perform(get("/learning/catalogue/a-z/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+}

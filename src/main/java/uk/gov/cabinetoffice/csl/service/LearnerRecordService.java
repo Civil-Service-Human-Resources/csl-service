@@ -188,4 +188,8 @@ public class LearnerRecordService {
     public LearnerRecordPagedResponse getLearnerRecordPage(LearnerRecordQuery query, int page, int size) {
         return client.getLearnerRecordPage(query, page, size);
     }
+
+    public Collection<String> getAllCourseIds(LearnerRecordQuery query) {
+        return client.getLearnerRecordResourceIds(query);
+    }
 }

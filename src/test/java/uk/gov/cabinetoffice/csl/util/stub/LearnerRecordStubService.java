@@ -258,4 +258,23 @@ public class LearnerRecordStubService {
                                 .withBody(response))
         );
     }
+
+    public StubMapping getLearnerRecordResourceIds(LearnerRecordQuery query, Integer page, Integer size, String response) {
+        MappingBuilder mappingBuilder = WireMock.get(urlPathEqualTo("/learner_record_api/learner_records/resource_ids"))
+                .withQueryParam("size", equalTo(size.toString()))
+                .withQueryParam("page", equalTo(page.toString()));
+        if (query.getLearnerIds() != null && !query.getLearnerIds().isEmpty()) {
+            mappingBuilder.withQueryParam("learnerIds", including(query.getLearnerIds().toArray(String[]::new)));
+        }
+        if (query.getNotResourceIds() != null && !query.getNotResourceIds().isEmpty()) {
+            mappingBuilder.withQueryParam("notResourceIds", including(query.getNotResourceIds().toArray(String[]::new)));
+        }
+        return stubFor(
+                mappingBuilder
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
 }

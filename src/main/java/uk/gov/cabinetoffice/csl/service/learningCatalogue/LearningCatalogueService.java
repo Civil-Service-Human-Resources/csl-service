@@ -3,6 +3,8 @@ package uk.gov.cabinetoffice.csl.service.learningCatalogue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
@@ -25,6 +27,7 @@ public class LearningCatalogueService {
 
     private final ObjectCache<Course> cache;
     private final RequiredLearningMapCache requiredLearningMapCache;
+    private final CourseAudienceMetadataMapCache courseAudienceMetadataMapCache;
     private final ILearningCatalogueClient client;
 
     public CourseWithModule getCourseWithModule(String courseId, String moduleId) {
@@ -65,8 +68,13 @@ public class LearningCatalogueService {
         }
     }
 
+    public <T> Map<String, T> getCourseIdMap(Collection<String> courseIds, Function<Course, T> valueMapper) {
+        return getCourses(courseIds).stream().collect(Collectors.toMap(Course::getCacheableId, valueMapper));
+    }
+
+
     public Map<String, String> getCourseIdToTitleMap(Collection<String> courseIds) {
-        return getCourses(courseIds).stream().collect(Collectors.toMap(Course::getCacheableId, Course::getTitle));
+        return getCourseIdMap(courseIds, Course::getTitle);
     }
 
     public List<Course> getCourses(Collection<String> courseIds) {
@@ -84,6 +92,15 @@ public class LearningCatalogueService {
             log.error("Failed to retrieve courses from cache, falling back to API");
             return client.getCourses(courseIds);
         }
+    }
+
+    public CourseAudienceMetadataMap getCourseAudienceMetadataMap() {
+        CourseAudienceMetadataMap map = courseAudienceMetadataMapCache.get();
+        if (map == null) {
+            map = client.getAudienceMetadataCourseIds();
+            courseAudienceMetadataMapCache.put(map);
+        }
+        return map;
     }
 
     private RequiredLearningMap getRequiredLearningMap() {
@@ -128,6 +145,7 @@ public class LearningCatalogueService {
                 " key: {}.", courseId);
         this.cache.evict(courseId);
         requiredLearningMapCache.evict();
+        courseAudienceMetadataMapCache.evict();
     }
 
     public void cancelEvent(CourseWithModuleWithEvent data, CancelEventDto cancelEventDto) {
@@ -139,5 +157,23 @@ public class LearningCatalogueService {
         event = client.updateEvent(course.getCacheableId(), module.getId(), event);
         course.updateEvent(module.getId(), event);
         cache.put(course);
+    }
+
+    public CourseSearchResults searchWithinCourses(Collection<String> allLearningPlanCourseIds, String q, int page, int size, Sort.Direction sort) {
+        SearchForCoursesParams p = SearchForCoursesParams.builder()
+                .query(q)
+                .status(List.of(CourseStatus.PUBLISHED, CourseStatus.ARCHIVED))
+                .courseIds(allLearningPlanCourseIds)
+                .build();
+        return client.searchForCourses(p, page, size, "title", sort);
+    }
+
+    public CourseSearchResults getCoursesForLetter(String startsWith, Pageable pageableParams) {
+        SearchForCoursesParams p = SearchForCoursesParams.builder().titleStartsWith(startsWith).build();
+        return client.searchForCourses(p, pageableParams.getPageNumber(), pageableParams.getPageSize(), "title", Sort.Direction.ASC);
+    }
+
+    public Map<String, Course> getCourseIdToCourseMap(List<String> courseIds) {
+        return getCourseIdMap(courseIds, course -> course);
     }
 }
