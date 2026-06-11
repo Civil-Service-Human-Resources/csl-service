@@ -270,7 +270,7 @@ public class OrganisationTest extends IntegrationTestBase {
         cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
         String expectedFormattedOrganisations = """
                 {
-                  "organisationalUnits": [
+                  "content": [
                     {
                       "name": "OrgName1",
                       "id": 1,

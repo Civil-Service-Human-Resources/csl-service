@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.*;
+import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
@@ -153,7 +154,7 @@ public class OrganisationalUnitService {
         if (!organisationalUnit.getParentIdSafe().equals(organisationalUnitDto.getParentIdSafe())) {
             requiresRebuild = true;
             if (organisationalUnit.getParentId() != null) {
-                organisationalUnitMap.updateOrganisationalUnit(organisationalUnit.getParentId(), o -> {
+                organisationalUnitMap.update(organisationalUnit.getParentId(), o -> {
                     o.getChildIds().remove(organisationalUnitId);
                     return o;
                 });
@@ -173,8 +174,8 @@ public class OrganisationalUnitService {
 
         if (
                 !organisationalUnit.getAbbreviationSafe().equals(organisationalUnitDto.getAbbreviationSafe()) ||
-                !organisationalUnit.getName().equals(organisationalUnitDto.getName()) ||
-                !organisationalUnit.getCode().equals(organisationalUnitDto.getCode())
+                        !organisationalUnit.getName().equals(organisationalUnitDto.getName()) ||
+                        !organisationalUnit.getCode().equals(organisationalUnitDto.getCode())
         ) {
             requiresRebuild = true;
             organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
@@ -225,8 +226,8 @@ public class OrganisationalUnitService {
         return new DomainResponse(response.getDomain(), response.getUpdatedChildOrganisationIds());
     }
 
-    public OrganisationalUnitTree getOrganisationalUnitTree() {
-        return new OrganisationalUnitTree(getOrganisationalUnitMap().getOrganisationalUnitTree());
+    public BasicTaxonomyTree getOrganisationalUnitTree() {
+        return new BasicTaxonomyTree(getOrganisationalUnitMap().getTree());
     }
 
     public OrganisationalUnitOverview getOrganisationalUnitOverview(Long organisationalUnitId) {
@@ -239,7 +240,7 @@ public class OrganisationalUnitService {
         OrganisationalUnit organisationalUnit = civilServantRegistryClient.createOrganisationalUnit(organisationalUnitDto);
         OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
         organisationalUnit.setParentId(organisationalUnitDto.getParentId());
-        organisationalUnit = organisationalUnitMap.setOrganisationalUnitData(organisationalUnit);
+        organisationalUnit = organisationalUnitMap.setData(organisationalUnit);
         organisationalUnitMapCache.put(organisationalUnitMap);
         return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, false);
     }

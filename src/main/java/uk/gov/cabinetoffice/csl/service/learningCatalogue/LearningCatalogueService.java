@@ -8,6 +8,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
+import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyNode;
+import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
@@ -29,8 +31,7 @@ public class LearningCatalogueService {
 
     private final IUtilService utilService;
     private final TtlObjectCache<Course> cache;
-    private final RequiredLearningMapCache requiredLearningMapCache;
-    private final CourseAudienceMetadataMapCache courseAudienceMetadataMapCache;
+    private final LearningCatalogueCacheService learningCatalogueCacheService;
     private final ILearningCatalogueClient client;
 
     public CourseWithModule getCourseWithModule(String courseId, String moduleId) {
@@ -98,21 +99,11 @@ public class LearningCatalogueService {
     }
 
     public CourseAudienceMetadataMap getCourseAudienceMetadataMap() {
-        CourseAudienceMetadataMap map = courseAudienceMetadataMapCache.get();
-        if (map == null) {
-            map = client.getAudienceMetadataCourseIds();
-            courseAudienceMetadataMapCache.put(map);
-        }
-        return map;
+        return learningCatalogueCacheService.getCourseAudienceMetadataMapCache().get();
     }
 
     private RequiredLearningMap getRequiredLearningMap() {
-        RequiredLearningMap map = requiredLearningMapCache.get();
-        if (map == null) {
-            map = client.getRequiredLearningIdMap();
-            requiredLearningMapCache.put(map);
-        }
-        return map;
+        return learningCatalogueCacheService.getRequiredLearningMapCache().get();
     }
 
     public List<String> getRequiredLearningIdsForDepartments(Collection<String> departmentCodes) {
@@ -147,8 +138,7 @@ public class LearningCatalogueService {
         log.info("LearningCatalogueService.removeCourseFromCache: Catalogue course is removed from the cache for the" +
                 " key: {}.", courseId);
         this.cache.evict(courseId);
-        requiredLearningMapCache.evict();
-        courseAudienceMetadataMapCache.evict();
+        learningCatalogueCacheService.evict();
     }
 
     public void cancelEvent(CourseWithModuleWithEvent data, CancelEventDto cancelEventDto) {
@@ -178,5 +168,10 @@ public class LearningCatalogueService {
 
     public Map<String, Course> getCourseIdToCourseMap(List<String> courseIds) {
         return getCourseIdMap(courseIds, course -> course);
+    }
+
+    public BasicTaxonomyTree getLearningTagTree() {
+        List<BasicTaxonomyNode> taxonomyNodes = learningCatalogueCacheService.getLearningTagMapCache().get().getTree();
+        return new BasicTaxonomyTree(taxonomyNodes);
     }
 }

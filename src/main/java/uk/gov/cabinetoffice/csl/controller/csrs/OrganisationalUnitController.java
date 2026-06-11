@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.*;
+import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
-import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnitTree;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnits;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 
@@ -21,7 +21,7 @@ public class OrganisationalUnitController {
     @GetMapping(path = "/overview-tree", produces = "application/json")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public OrganisationalUnitTree getOrganisationalUnitOverviewTree() {
+    public BasicTaxonomyTree getOrganisationalUnitOverviewTree() {
         log.info("Getting all organisational units as a tree");
         return organisationalUnitService.getOrganisationalUnitTree();
 

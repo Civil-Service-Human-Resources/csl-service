@@ -8,24 +8,15 @@ import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.NullableModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitMapCache;
-import uk.gov.cabinetoffice.csl.service.learningCatalogue.CourseAudienceMetadataMapCache;
-import uk.gov.cabinetoffice.csl.service.learningCatalogue.RequiredLearningMapCache;
 import uk.gov.cabinetoffice.csl.util.ModuleRecordCache;
 import uk.gov.cabinetoffice.csl.util.ObjectCache;
 
 @Configuration
 public class RedisCaches {
 
-    @Bean
-    public RequiredLearningMapCache requiredLearningMapCache(CacheManager cacheManager) {
-        Cache cache = cacheManager.getCache("catalogue-course");
-        return new RequiredLearningMapCache(cache);
-    }
-
-    @Bean
-    public CourseAudienceMetadataMapCache courseAudienceMetadataMapCache(CacheManager cacheManager) {
-        Cache cache = cacheManager.getCache("catalogue-course");
-        return new CourseAudienceMetadataMapCache(cache);
+    @Bean(name = "learningCatalogue")
+    public Cache getLearningCatalogueCache(CacheManager cacheManager) {
+        return cacheManager.getCache("catalogue-course");
     }
 
     @Bean

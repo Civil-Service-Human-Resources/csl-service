@@ -2,7 +2,6 @@ package uk.gov.cabinetoffice.csl.client.courseCatalogue;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.RequestEntity;
@@ -11,6 +10,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagsPagedResponse;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 
 import java.util.Collection;
@@ -22,20 +23,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LearningCatalogueClient implements ILearningCatalogueClient {
 
-    @Value("${learningCatalogue.courseUrl}")
-    private String courses;
-    @Value("${learningCatalogue.courseV2Url}")
-    private String v2Courses;
-    @Value("${learningCatalogue.courseV2SearchUrl}")
-    private String v2CourseSearch;
-    @Value("${learningCatalogue.courseBatchSize}")
-    private Integer courseBatchSize;
+    private final LearningCatalogueConfiguration config;
     private final IHttpClient httpClient;
     private final CourseFactory courseFactory;
     private final IUtilService utilService;
 
-    public LearningCatalogueClient(@Qualifier("learningCatalogueHttpClient") IHttpClient httpClient,
+    public LearningCatalogueClient(LearningCatalogueConfiguration learningCatalogueConfiguration, @Qualifier("learningCatalogueHttpClient") IHttpClient httpClient,
                                    CourseFactory courseFactory, IUtilService utilService) {
+        this.config = learningCatalogueConfiguration;
         this.httpClient = httpClient;
         this.courseFactory = courseFactory;
         this.utilService = utilService;
@@ -44,9 +39,9 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     @Override
     public List<Course> getCourses(Collection<String> courseIds) {
         log.info("Getting courses with ids '{}' from learning catalogue API", courseIds);
-        return utilService.batchList(courseIds.stream().toList(), courseBatchSize)
+        return utilService.batchList(courseIds.stream().toList(), config.getCourseBatchSize())
                 .stream().flatMap(courseIdsBatch -> {
-                    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(courses);
+                    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(config.getCourseUrl());
                     uriBuilder.queryParam("courseId", courseIdsBatch);
                     RequestEntity<Void> request = RequestEntity.get(uriBuilder.build().toUriString()).build();
                     List<Course> courses = httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
@@ -57,7 +52,7 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
 
     @Override
     public CourseSearchResults searchForCourses(SearchForCoursesParams params, int page, int size, String sortBy, Sort.Direction sortDirection) {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(v2CourseSearch);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(config.getCourseV2SearchUrl());
         uriBuilder.replaceQueryParam("size", size).replaceQueryParam("page", page)
                 .replaceQueryParam("sort.field", sortBy).replaceQueryParam("sort.direction", sortDirection.name());
         RequestEntity<SearchForCoursesParams> request = RequestEntity.post(uriBuilder.toUriString()).body(params);
@@ -68,21 +63,21 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
 
     @Override
     public RequiredLearningMap getRequiredLearningIdMap() {
-        String url = String.format("%s/required-learning-map", v2Courses);
+        String url = String.format("%s/required-learning-map", config.getCourseV2Url());
         RequestEntity<Void> request = RequestEntity.get(url).build();
         return httpClient.executeRequest(request, RequiredLearningMap.class);
     }
 
     @Override
     public CourseAudienceMetadataMap getAudienceMetadataCourseIds() {
-        String url = String.format("%s/audience-attribute-map", v2Courses);
+        String url = String.format("%s/audience-attribute-map", config.getCourseV2Url());
         RequestEntity<Void> request = RequestEntity.get(url).build();
         return httpClient.executeRequest(request, CourseAudienceMetadataMap.class);
     }
 
     @Override
     public Event updateEvent(String courseId, String moduleId, Event event) {
-        String url = String.format("%s/%s/modules/%s/events/%s", courses, courseId, moduleId, event.getId());
+        String url = String.format("%s/%s/modules/%s/events/%s", config.getCourseUrl(), courseId, moduleId, event.getId());
         RequestEntity<Event> request = RequestEntity.put(url).body(event);
         return httpClient.executeRequest(request, Event.class);
     }
@@ -98,5 +93,13 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
             }
         });
         return course;
+    }
+
+    @Override
+    public List<LearningTag> getAllLearningTags() {
+        log.info("Getting all organisational units from csrs");
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(config.getLearningTagUrl());
+        return httpClient.getPaginatedRequest(LearningTagsPagedResponse.class, uriBuilder,
+                config.getLearningTagMaxPageSize()).stream().toList();
     }
 }
