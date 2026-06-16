@@ -8,6 +8,7 @@ import uk.gov.cabinetoffice.csl.configuration.MockClockConfig;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueCacheService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
+import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningTagFactory;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 import uk.gov.cabinetoffice.csl.util.TtlObjectCache;
@@ -30,7 +31,7 @@ public class LearningCatalogueServiceTest {
     private final ILearningCatalogueClient client = mock(ILearningCatalogueClient.class);
 
     private final LearningCatalogueService learningCatalogueService = new LearningCatalogueService(utilService, cache,
-            mock(LearningCatalogueCacheService.class), client);
+            mock(LearningCatalogueCacheService.class), mock(LearningTagFactory.class), client);
 
     @Test
     void getCoursesWithFullCacheHit() {

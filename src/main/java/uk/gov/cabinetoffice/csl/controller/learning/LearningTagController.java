@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.controller.learning;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
@@ -25,6 +26,13 @@ public class LearningTagController {
         log.info("Getting all organisational units as a tree");
         return learningCatalogueService.getLearningTagTree();
 
+    }
+
+    @GetMapping("/{learningTagId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public LearningTagOverview getOrganisation(@PathVariable Long learningTagId) {
+        return learningCatalogueService.getLearningTagOverview(learningTagId);
     }
 
 }

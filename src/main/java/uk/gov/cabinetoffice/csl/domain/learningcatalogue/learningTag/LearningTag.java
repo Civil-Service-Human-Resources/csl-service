@@ -37,6 +37,8 @@ public class LearningTag implements Serializable, ITaxonomyItem {
     private String formattedName;
     @JsonIgnore
     private Set<Long> childIds = new HashSet<>();
+    @JsonIgnore
+    private String fullUrl;
 
     @Override
     public void resetCustomData() {

@@ -21,6 +21,7 @@ public class LearningTagMap extends TaxonomyMap<LearningTag> {
     public LearningTag setData(LearningTag learningTag) {
         log.info("Building learning tag {}", learningTag.getId());
         StringBuilder formattedName = new StringBuilder(learningTag.getName());
+        StringBuilder fullUrl = new StringBuilder(learningTag.getUrlSlug());
         Long parentId = learningTag.getParentId();
         int parents = 0;
         while (parentId != null) {
@@ -31,9 +32,11 @@ public class LearningTagMap extends TaxonomyMap<LearningTag> {
                 parents++;
             }
             formattedName.insert(0, parentLearningTag.getName() + " | ");
+            fullUrl.insert(0, parentLearningTag.getUrlSlug() + "/");
             parentId = parentLearningTag.getParentId();
         }
         learningTag.setFormattedName(formattedName.toString());
+        learningTag.setFullUrl(fullUrl.toString());
         put(learningTag.getId(), learningTag);
         return learningTag;
     }

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
 import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyNode;
 import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
@@ -15,6 +16,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 import uk.gov.cabinetoffice.csl.util.TtlObjectCache;
@@ -32,6 +34,7 @@ public class LearningCatalogueService {
     private final IUtilService utilService;
     private final TtlObjectCache<Course> cache;
     private final LearningCatalogueCacheService learningCatalogueCacheService;
+    private final LearningTagFactory learningTagFactory;
     private final ILearningCatalogueClient client;
 
     public CourseWithModule getCourseWithModule(String courseId, String moduleId) {
@@ -173,5 +176,10 @@ public class LearningCatalogueService {
     public BasicTaxonomyTree getLearningTagTree() {
         List<BasicTaxonomyNode> taxonomyNodes = learningCatalogueCacheService.getLearningTagMapCache().get().getTree();
         return new BasicTaxonomyTree(taxonomyNodes);
+    }
+
+    public LearningTagOverview getLearningTagOverview(Long learningTagId) {
+        LearningTag learningTag = learningCatalogueCacheService.getLearningTagMapCache().get().get(learningTagId);
+        return learningTagFactory.createLearningTagOverview(learningTag);
     }
 }

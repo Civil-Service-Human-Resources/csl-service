@@ -31,11 +31,12 @@ public class LearningTagsTest extends IntegrationTestBase {
             ).getAsPaginatedAndBuild(0, 5, 1);
 
     @Test
-    public void testGetOrganisationalUnitsTree() throws Exception {
+    public void testGetLearningTagsTree() throws Exception {
         cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
 
         mockMvc.perform(get("/learning-tags/overview-tree")
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
                 .andExpect(content().json("""
                         {
                             "content": [
@@ -68,8 +69,28 @@ public class LearningTagsTest extends IntegrationTestBase {
                                 }
                             ]
                         }
-                        """, true))
-                .andExpect(status().is2xxSuccessful());
+                        """, true));
+    }
+
+    @Test
+    public void testGetLearningTagOverview() throws Exception {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+        mockMvc.perform(get("/learning-tags/2"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {
+                            "id": 2,
+                            "name": "TagName2",
+                            "description": "TagName2 description",
+                            "code": "TAGN2",
+                            "urlSlug": "TAGN2",
+                            "fullUrl": "TAGN1/TAGN2",
+                            "parentId": 1,
+                            "parentName": "TagName1",
+                            "categoryTag": false,
+                            "archived": false
+                        }
+                        """));
     }
 
 }

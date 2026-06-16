@@ -14,4 +14,5 @@ public class LearningTagMapCache extends BasicFetchedCache<LearningTagMap> {
         super(cache, "learningTagMap", LearningTagMap.class, client);
     }
 
+
 }
