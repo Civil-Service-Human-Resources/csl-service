@@ -11,8 +11,7 @@ import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueServi
 @RequestMapping("learning-tags")
 @Slf4j
 public class LearningTagController {
-
-
+    
     private final LearningCatalogueService learningCatalogueService;
 
     public LearningTagController(LearningCatalogueService learningCatalogueService) {
@@ -22,7 +21,7 @@ public class LearningTagController {
     @GetMapping(path = "/overview-tree", produces = "application/json")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public BasicTaxonomyTree getOrganisationalUnitOverviewTree() {
+    public BasicTaxonomyTree getLearningTagOverviewTree() {
         log.info("Getting all organisational units as a tree");
         return learningCatalogueService.getLearningTagTree();
 
@@ -31,7 +30,7 @@ public class LearningTagController {
     @GetMapping("/{learningTagId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LearningTagOverview getOrganisation(@PathVariable Long learningTagId) {
+    public LearningTagOverview getLearningTag(@PathVariable Long learningTagId) {
         return learningCatalogueService.getLearningTagOverview(learningTagId);
     }
 
