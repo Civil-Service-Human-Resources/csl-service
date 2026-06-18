@@ -154,7 +154,7 @@ class OrganisationalUnitServiceTest extends CsrsServiceTestBase {
         formattedOrganisationalUnitsParams.setDomain(null);
 
         Map<Long, FormattedOrganisationalUnitName> orgMap = organisationalUnitService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams)
-                .getFormattedOrganisationalUnitNames().stream().collect(Collectors.toMap(FormattedOrganisationalUnitName::getId, Function.identity()));
+                .getNames().stream().collect(Collectors.toMap(FormattedOrganisationalUnitName::getId, Function.identity()));
 
         assertEquals(6, orgMap.size());
         assertEquals("OrgName1 (OName1)", orgMap.get(1L).getName());
@@ -172,7 +172,7 @@ class OrganisationalUnitServiceTest extends CsrsServiceTestBase {
         formattedOrganisationalUnitsParams.setDomain("domain1.com");
 
         Map<Long, FormattedOrganisationalUnitName> orgMap = organisationalUnitService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams)
-                .getFormattedOrganisationalUnitNames().stream().collect(Collectors.toMap(FormattedOrganisationalUnitName::getId, Function.identity()));
+                .getNames().stream().collect(Collectors.toMap(FormattedOrganisationalUnitName::getId, Function.identity()));
 
         assertEquals(4, orgMap.size());
         assertEquals("OrgName1 (OName1)", orgMap.get(1L).getName());

@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
 @RestController
@@ -40,5 +42,12 @@ public class LearningTagController {
     @ResponseBody
     public LearningTagOverview createLearningTag(@RequestBody LearningTagDTO dto) {
         return learningCatalogueService.createLearningTag(dto);
+    }
+
+    @GetMapping(path = "/formatted_list", produces = "application/json")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public FormattedTaxonomyItems<FormattedTaxonomyItem> getFormattedOrganisationalUnitNames() {
+        return learningCatalogueService.getFormattedLearningTagNames();
     }
 }

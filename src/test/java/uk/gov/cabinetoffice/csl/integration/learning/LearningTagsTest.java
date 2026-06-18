@@ -200,4 +200,43 @@ public class LearningTagsTest extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful());
     }
 
+    @Test
+    public void testFormattedList() throws Exception {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+        mockMvc.perform(get("/learning-tags/formatted_list")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("""
+                        {
+                            "names": [
+                                {
+                                    "id": 1,
+                                    "name": "TagName1",
+                                    "code": "TAGN1"
+                                },
+                                {
+                                    "id": 2,
+                                    "name": "TagName1 | TagName2",
+                                    "code": "TAGN2"
+                                },
+                                {
+                                    "id": 3,
+                                    "name": "TagName1 | TagName2 | TagName3",
+                                    "code": "TAGN3"
+                                },
+                                {
+                                    "id": 5,
+                                    "name": "TagName1 | TagName5",
+                                    "code": "TAGN5"
+                                },
+                                {
+                                    "id": 4,
+                                    "name": "TagName4",
+                                    "code": "TAGN4"
+                                }
+                            ]
+                        }
+                        """, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
 }

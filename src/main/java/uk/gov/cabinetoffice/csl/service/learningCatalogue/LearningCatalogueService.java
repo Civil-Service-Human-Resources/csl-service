@@ -16,6 +16,8 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 import uk.gov.cabinetoffice.csl.util.TtlObjectCache;
@@ -182,5 +184,9 @@ public class LearningCatalogueService {
 
     public LearningTagOverview createLearningTag(LearningTagDTO dto) {
         return learningTagMapService.create(dto);
+    }
+
+    public FormattedTaxonomyItems<FormattedTaxonomyItem> getFormattedLearningTagNames() {
+        return learningTagMapService.getFormattedNames();
     }
 }

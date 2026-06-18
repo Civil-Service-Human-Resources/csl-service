@@ -6,8 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.*;
 import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
-import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitNames;
+import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnits;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
 
 @Slf4j
@@ -38,7 +39,7 @@ public class OrganisationalUnitController {
     @GetMapping(path = "/formatted_list", produces = "application/json")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(OrganisationalUnitsParams formattedOrganisationalUnitsParams) {
+    public FormattedTaxonomyItems<FormattedOrganisationalUnitName> getFormattedOrganisationalUnitNames(OrganisationalUnitsParams formattedOrganisationalUnitsParams) {
         log.info("Getting formatted organisational unit names");
         return organisationalUnitService.getFormattedOrganisationalUnitNames(formattedOrganisationalUnitsParams);
     }

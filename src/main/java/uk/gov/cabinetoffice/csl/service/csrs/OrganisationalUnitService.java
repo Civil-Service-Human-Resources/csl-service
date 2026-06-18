@@ -8,6 +8,7 @@ import uk.gov.cabinetoffice.csl.controller.csrs.model.*;
 import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerOrganisationDeleteMessage;
@@ -60,7 +61,7 @@ public class OrganisationalUnitService {
         return new GetOrganisationalUnits(filtered.stream().sorted(Comparator.comparing(OrganisationalUnitOverview::getName, String::compareToIgnoreCase)).toList());
     }
 
-    public FormattedOrganisationalUnitNames getFormattedOrganisationalUnitNames(OrganisationalUnitsParams params) {
+    public FormattedTaxonomyItems<FormattedOrganisationalUnitName> getFormattedOrganisationalUnitNames(OrganisationalUnitsParams params) {
         OrganisationalUnitMap allOrganisationalUnits = getOrganisationalUnitMap();
         Set<OrganisationalUnit> filtered = new HashSet<>();
         if (params.shouldGetAll()) {
@@ -86,7 +87,7 @@ public class OrganisationalUnitService {
                 }
             }
         }
-        return new FormattedOrganisationalUnitNames(filtered.stream()
+        return new FormattedTaxonomyItems<>(filtered.stream()
                 .map(o -> new FormattedOrganisationalUnitName(o.getId(), o.getFormattedName(), o.getCode(), o.getAbbreviation()))
                 .sorted(Comparator.comparing(FormattedOrganisationalUnitName::getName, String::compareToIgnoreCase))
                 .toList());
