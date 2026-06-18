@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.domain;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.ITaxonomyItem;
 
 import java.util.*;
 import java.util.function.Function;

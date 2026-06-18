@@ -4,11 +4,10 @@ import uk.gov.cabinetoffice.csl.controller.csrs.model.CreateDomainDto;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.DeleteDomainDto;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitDto;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
-import uk.gov.cabinetoffice.csl.util.IFetchClient;
 
 import java.util.List;
 
-public interface ICSRSClient extends IFetchClient<OrganisationalUnitMap> {
+public interface ICSRSClient {
 
     CivilServant getCivilServantProfileWithUid(String uid);
 
@@ -34,6 +33,7 @@ public interface ICSRSClient extends IFetchClient<OrganisationalUnitMap> {
 
     void deleteAgencyToken(Long organisationalUnitId);
 
-    OrganisationalUnit createOrganisationalUnit(OrganisationalUnitDto organisationalUnitDto);
+    OrganisationalUnit createOrganisationalUnit(OrganisationalUnitDto dto);
 
+    List<OrganisationalUnit> getAllOrganisationalUnits();
 }

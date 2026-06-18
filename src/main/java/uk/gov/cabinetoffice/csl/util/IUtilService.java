@@ -12,4 +12,6 @@ public interface IUtilService {
     Long getDurationUntilTomorrow(TemporalUnit unit);
 
     <T> List<List<T>> batchList(List<T> list, Integer batchSize);
+
+    String generateUrlSlugFromString(String string, int maxLength);
 }

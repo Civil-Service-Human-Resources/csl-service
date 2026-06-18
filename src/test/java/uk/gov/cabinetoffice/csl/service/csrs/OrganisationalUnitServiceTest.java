@@ -38,7 +38,7 @@ class OrganisationalUnitServiceTest extends CsrsServiceTestBase {
     private OrganisationalUnitFactory organisationalUnitFactory;
 
     @Mock
-    OrganisationalUnitMapCache organisationalUnitMapCache;
+    OrganisationalUnitMapService organisationalUnitMapCache;
 
     @Mock
     private IMessagingClient messagingClient;
@@ -194,7 +194,7 @@ class OrganisationalUnitServiceTest extends CsrsServiceTestBase {
         OrganisationalUnit originalParent = organisationalUnitMap.get(originalParentId);
         assertTrue(originalParent.getChildIds().contains(2L));
 
-        when(organisationalUnitFactory.createOrganisationalUnitOverview(originalOrganisationalUnit)).thenReturn(new OrganisationalUnitOverview());
+        when(organisationalUnitFactory.createOverview(originalOrganisationalUnit)).thenReturn(new OrganisationalUnitOverview());
 
         organisationalUnitService.patchOrganisationalUnit(2L, dto);
         OrganisationalUnit updatedOrganisationalUnit = organisationalUnitMap.get(2L);

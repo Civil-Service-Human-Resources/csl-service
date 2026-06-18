@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain;
+package uk.gov.cabinetoffice.csl.domain.taxonomy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -12,6 +12,8 @@ public interface ITaxonomyItem {
     Long getId();
 
     Long getParentId();
+
+    void setParentId(Long parentId);
 
     void resetCustomData();
 

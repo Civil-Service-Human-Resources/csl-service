@@ -11,6 +11,7 @@ import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagsPagedResponse;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 
@@ -101,5 +102,10 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(config.getLearningTagUrl());
         return httpClient.getPaginatedRequest(LearningTagsPagedResponse.class, uriBuilder,
                 config.getLearningTagMaxPageSize()).stream().toList();
+    }
+
+    @Override
+    public LearningTag createLearningTag(LearningTagDTO dto) {
+        return httpClient.executeRequest(RequestEntity.post(config.getLearningTagUrl()).body(dto), LearningTag.class);
     }
 }

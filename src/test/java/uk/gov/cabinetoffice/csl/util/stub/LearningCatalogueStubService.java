@@ -99,4 +99,15 @@ public class LearningCatalogueStubService {
                                 .withBody(response))
         );
     }
+
+    public StubMapping createLearningTag(String input, String response) {
+        return stubFor(
+                WireMock.post(urlPathEqualTo("/learning_catalogue/learning-tags"))
+                        .withRequestBody(equalToJson(input, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
 }

@@ -24,7 +24,7 @@ import static com.azure.core.util.CoreUtils.isNullOrEmpty;
 @RequiredArgsConstructor
 public class OrganisationalUnitService {
 
-    private final OrganisationalUnitMapCache organisationalUnitMapCache;
+    private final OrganisationalUnitMapService organisationalUnitMapCache;
     private final OrganisationalUnitFactory organisationalUnitFactory;
     private final ICSRSClient civilServantRegistryClient;
     private final MessageMetadataFactory messageMetadataFactory;
@@ -54,7 +54,7 @@ public class OrganisationalUnitService {
                             currentParentId = currentParent.getParentId();
                         }
                     }
-                    return organisationalUnits.stream().map(organisationalUnitFactory::createOrganisationalUnitOverview);
+                    return organisationalUnits.stream().map(organisationalUnitFactory::createOverview);
                 }).collect(Collectors.toSet());
 
         return new GetOrganisationalUnits(filtered.stream().sorted(Comparator.comparing(OrganisationalUnitOverview::getName, String::compareToIgnoreCase)).toList());
@@ -192,7 +192,7 @@ public class OrganisationalUnitService {
 
         organisationalUnitMapCache.put(organisationalUnitMap);
 
-        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit);
+        return organisationalUnitFactory.createOverview(organisationalUnit);
     }
 
     private void updateReportingData(List<OrganisationalUnit> multipleOrgs) {
@@ -227,22 +227,15 @@ public class OrganisationalUnitService {
     }
 
     public BasicTaxonomyTree getOrganisationalUnitTree() {
-        return new BasicTaxonomyTree(getOrganisationalUnitMap().getTree());
+        return organisationalUnitMapCache.getTree();
     }
 
     public OrganisationalUnitOverview getOrganisationalUnitOverview(Long organisationalUnitId) {
-        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
-        OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
-        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit);
+        return organisationalUnitMapCache.getOverview(organisationalUnitId);
     }
 
     public OrganisationalUnitOverview createOrganisationalUnit(OrganisationalUnitDto organisationalUnitDto) {
-        OrganisationalUnit organisationalUnit = civilServantRegistryClient.createOrganisationalUnit(organisationalUnitDto);
-        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
-        organisationalUnit.setParentId(organisationalUnitDto.getParentId());
-        organisationalUnit = organisationalUnitMap.setData(organisationalUnit);
-        organisationalUnitMapCache.put(organisationalUnitMap);
-        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, false);
+        return organisationalUnitMapCache.create(organisationalUnitDto);
     }
 
 }

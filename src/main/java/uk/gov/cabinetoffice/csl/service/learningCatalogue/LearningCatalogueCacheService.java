@@ -8,12 +8,10 @@ import org.springframework.stereotype.Service;
 public class LearningCatalogueCacheService {
 
     private final CourseAudienceMetadataMapCache courseAudienceMetadataMapCache;
-    private final LearningTagMapCache learningTagMapCache;
     private final RequiredLearningMapCache requiredLearningMapCache;
 
-    public LearningCatalogueCacheService(CourseAudienceMetadataMapCache courseAudienceMetadataMapCache, LearningTagMapCache learningTagMapCache, RequiredLearningMapCache requiredLearningMapCache) {
+    public LearningCatalogueCacheService(CourseAudienceMetadataMapCache courseAudienceMetadataMapCache, RequiredLearningMapCache requiredLearningMapCache) {
         this.courseAudienceMetadataMapCache = courseAudienceMetadataMapCache;
-        this.learningTagMapCache = learningTagMapCache;
         this.requiredLearningMapCache = requiredLearningMapCache;
     }
 

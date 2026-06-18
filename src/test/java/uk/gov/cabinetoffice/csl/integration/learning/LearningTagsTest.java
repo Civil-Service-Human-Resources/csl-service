@@ -10,6 +10,7 @@ import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonLearningTagBuilder;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -91,6 +92,98 @@ public class LearningTagsTest extends IntegrationTestBase {
                             "archived": false
                         }
                         """));
+    }
+
+    @Test
+    public void testCreate() throws Exception {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+        cslStubService.getLearningCatalogue().createLearningTag("""
+                {
+                    "name" : "New tag 01",
+                    "code" : "NEW_TAG",
+                    "description" : null,
+                    "parentId" : null,
+                    "urlSlug" : "new-tag-01",
+                    "archived" : false,
+                    "category" : false
+                }""", """
+                {
+                    "id": 1,
+                    "code": "NEW_TAG",
+                    "urlSlug": "new-tag-01",
+                    "name": "New Tag"
+                }
+                """);
+        mockMvc.perform(post("/learning-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "code": "NEW_TAG",
+                                  "name": "New tag 01",
+                                  "parentId": null
+                                }
+                                """))
+                .andExpect(content().json("""
+                        {
+                            "id": 1,
+                            "name": "New Tag",
+                            "description": null,
+                            "code": "NEW_TAG",
+                            "urlSlug": "new-tag-01",
+                            "fullUrl": "new-tag-01",
+                            "parentId": null,
+                            "parentName": null,
+                            "categoryTag": false,
+                            "archived": false
+                        }
+                        """, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void testCreateWithParent() throws Exception {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+        cslStubService.getLearningCatalogue().createLearningTag("""
+                {
+                    "name" : "New tag 01",
+                    "code" : "NEW_TAG",
+                    "description" : null,
+                    "parentId" : 1,
+                    "urlSlug" : "new-tag-01",
+                    "archived" : false,
+                    "category" : false
+                }""", """
+                {
+                    "id": 7,
+                    "code": "NEW_TAG",
+                    "urlSlug": "new-tag-01",
+                    "name": "New Tag"
+                }
+                """);
+        mockMvc.perform(post("/learning-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "code": "NEW_TAG",
+                                  "name": "New tag 01",
+                                  "parentId": 1
+                                }
+                                """))
+                .andExpect(content().json("""
+                        {
+                            "id": 7,
+                            "name": "New Tag",
+                            "description": null,
+                            "code": "NEW_TAG",
+                            "urlSlug": "new-tag-01",
+                            "fullUrl": "TAGN1/new-tag-01",
+                            "parentId": 1,
+                            "parentName": "TagName1",
+                            "categoryTag": false,
+                            "archived": false
+                        }
+                        """, true))
+                .andExpect(status().is2xxSuccessful());
     }
 
 }

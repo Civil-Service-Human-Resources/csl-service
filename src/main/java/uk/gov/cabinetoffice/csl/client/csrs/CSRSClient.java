@@ -38,16 +38,6 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public OrganisationalUnitMap fetch() {
-        log.info("Getting all organisational units from csrs");
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(csrsConfiguration.getAllOrganisationalUnits());
-        List<OrganisationalUnit> organisationalUnits = httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder,
-                        csrsConfiguration.getOrganisationalUnitMaxPageSize())
-                .stream().toList();
-        return OrganisationalUnitMap.buildFromList(organisationalUnits);
-    }
-
-    @Override
     @Cacheable("areas-of-work")
     public List<AreaOfWork> getAreasOfWork() {
         return httpClient.executeTypeReferenceRequest(
@@ -115,15 +105,6 @@ public class CSRSClient implements ICSRSClient {
     }
 
     @Override
-    public OrganisationalUnit createOrganisationalUnit(OrganisationalUnitDto organisationalUnitDto) {
-        String url = csrsConfiguration.getOrganisationalUnits();
-        if (organisationalUnitDto.getParentId() != null) {
-            organisationalUnitDto.setParent(csrsConfiguration.getOrganisationalUnitResourceUrl(organisationalUnitDto.getParentId()));
-        }
-        return httpClient.executeRequest(RequestEntity.post(url).body(organisationalUnitDto), OrganisationalUnit.class);
-    }
-
-    @Override
     public UpdateDomainResponse addDomainToOrganisation(Long organisationalUnitId, CreateDomainDto domain) {
         String url = csrsConfiguration.getDomainsUrl(organisationalUnitId);
         return httpClient.executeRequest(RequestEntity.post(url).body(domain), UpdateDomainResponse.class);
@@ -134,6 +115,24 @@ public class CSRSClient implements ICSRSClient {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(csrsConfiguration.getDomainsUrl(organisationalUnitId, domainId))
                 .queryParam("includeSubOrgs", body.isIncludeSubOrgs());
         return httpClient.executeRequest(RequestEntity.delete(uriBuilder.toUriString()).build(), UpdateDomainResponse.class);
+    }
+
+    @Override
+    public OrganisationalUnit createOrganisationalUnit(OrganisationalUnitDto dto) {
+        String url = csrsConfiguration.getOrganisationalUnits();
+        if (dto.getParentId() != null) {
+            dto.setParent(csrsConfiguration.getOrganisationalUnitResourceUrl(dto.getParentId()));
+        }
+        return httpClient.executeRequest(RequestEntity.post(url).body(dto), OrganisationalUnit.class);
+    }
+
+    @Override
+    public List<OrganisationalUnit> getAllOrganisationalUnits() {
+        log.info("Getting all organisational units from csrs");
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(csrsConfiguration.getAllOrganisationalUnits());
+        return httpClient.getPaginatedRequest(OrganisationalUnitsPagedResponse.class, uriBuilder,
+                        csrsConfiguration.getOrganisationalUnitMaxPageSize())
+                .stream().toList();
     }
 
 }

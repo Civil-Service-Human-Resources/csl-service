@@ -5,13 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 
 @RestController
 @RequestMapping("learning-tags")
 @Slf4j
 public class LearningTagController {
-    
+
     private final LearningCatalogueService learningCatalogueService;
 
     public LearningTagController(LearningCatalogueService learningCatalogueService) {
@@ -34,4 +35,10 @@ public class LearningTagController {
         return learningCatalogueService.getLearningTagOverview(learningTagId);
     }
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public LearningTagOverview createLearningTag(@RequestBody LearningTagDTO dto) {
+        return learningCatalogueService.createLearningTag(dto);
+    }
 }

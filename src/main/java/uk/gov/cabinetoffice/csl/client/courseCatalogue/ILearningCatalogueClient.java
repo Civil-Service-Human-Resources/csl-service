@@ -4,6 +4,7 @@ import org.springframework.data.domain.Sort;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,4 +22,6 @@ public interface ILearningCatalogueClient {
     Event updateEvent(String courseId, String moduleId, Event event);
 
     List<LearningTag> getAllLearningTags();
+
+    LearningTag createLearningTag(LearningTagDTO dto);
 }
