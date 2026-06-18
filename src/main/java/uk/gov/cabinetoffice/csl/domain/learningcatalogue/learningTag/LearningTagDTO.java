@@ -27,7 +27,6 @@ public class LearningTagDTO implements ITaxonomyItemDTO {
     private String urlSlug;
     @NotNull
     private boolean isCategory;
-    @NotNull
-    private boolean isArchived;
+    private boolean isArchived = false;
 
 }
