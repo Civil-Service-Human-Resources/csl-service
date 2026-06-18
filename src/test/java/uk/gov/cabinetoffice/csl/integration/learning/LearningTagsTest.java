@@ -151,7 +151,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                                 }
                                 """))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Auto-generated URL slug was greater than the max length of 50. Generated URL was andandandandandandandandandandandandandandandandand"));
+                .andExpect(jsonPath("$.detail").value("Auto-generated URL slug was greater than the max length of 50. Generated URL slug was andandandandandandandandandandandandandandandandand"));
     }
 
     @Test
