@@ -51,7 +51,7 @@ public class UtilService implements IUtilService {
                 .replaceAll("&", "and")
                 .replaceAll(" ", "-");
         if (slug.length() > maxLength) {
-            throw new ValidationException(String.format("Auto-generated URL slug was greater than the max length of %s", maxLength));
+            throw new ValidationException(String.format("Auto-generated URL slug was greater than the max length of %s. Generated URL was %s", maxLength, slug));
         }
         return slug;
     }
