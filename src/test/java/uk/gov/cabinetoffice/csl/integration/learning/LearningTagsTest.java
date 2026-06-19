@@ -104,13 +104,14 @@ public class LearningTagsTest extends IntegrationTestBase {
                     "parentId" : null,
                     "urlSlug" : "new-tag-01",
                     "archived" : false,
-                    "category" : false
+                    "categoryTag" : true
                 }""", """
                 {
                     "id": 1,
                     "code": "NEW_TAG",
                     "urlSlug": "new-tag-01",
-                    "name": "New Tag"
+                    "name": "New Tag",
+                    "categoryTag" : true
                 }
                 """);
         mockMvc.perform(post("/learning-tags")
@@ -119,7 +120,8 @@ public class LearningTagsTest extends IntegrationTestBase {
                                 {
                                   "code": "NEW_TAG",
                                   "name": "New tag 01",
-                                  "parentId": null
+                                  "parentId": null,
+                                  "categoryTag" : true
                                 }
                                 """))
                 .andExpect(content().json("""
@@ -132,7 +134,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                             "fullUrl": "new-tag-01",
                             "parentId": null,
                             "parentName": null,
-                            "categoryTag": false,
+                            "categoryTag": true,
                             "archived": false
                         }
                         """, true))

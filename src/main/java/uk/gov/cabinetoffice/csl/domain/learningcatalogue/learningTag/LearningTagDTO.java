@@ -26,7 +26,7 @@ public class LearningTagDTO implements ITaxonomyItemDTO {
     @Size(min = 1, max = 50)
     private String urlSlug;
     @NotNull
-    private boolean isCategory;
+    private boolean isCategoryTag;
     private boolean isArchived = false;
 
 }
