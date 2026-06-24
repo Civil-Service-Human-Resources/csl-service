@@ -25,7 +25,7 @@ public class LearningTag implements Serializable, ITaxonomyItem {
     private String description;
     private String code;
     private String urlSlug;
-    private boolean isCategoryTag;
+    private boolean isCategory;
     private boolean isArchived;
     private Long parentId;
     private String parentName;

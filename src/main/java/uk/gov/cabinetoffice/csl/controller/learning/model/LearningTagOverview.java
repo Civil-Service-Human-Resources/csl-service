@@ -19,7 +19,7 @@ public class LearningTagOverview {
     private String fullUrl;
     private Long parentId;
     private String parentName;
-    private boolean categoryTag;
+    private boolean category;
     private boolean archived;
 
 }

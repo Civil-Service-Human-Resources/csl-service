@@ -11,9 +11,9 @@ public class LearningTagFactory implements ITaxonomyItemFactory<LearningTag, Lea
     public LearningTagOverview createOverview(LearningTag learningTag) {
         return new LearningTagOverview(
                 learningTag.getId(), learningTag.getName(), learningTag.getDescription(), learningTag.getCode(),
-                learningTag.getUrlSlug(), learningTag.getFullUrl(), learningTag.getParentId(), learningTag.getParentName(), learningTag.isCategoryTag(),
+                learningTag.getUrlSlug(), learningTag.getFullUrl(), learningTag.getParentId(), learningTag.getParentName(), learningTag.isCategory(),
                 learningTag.isArchived()
         );
     }
-    
+
 }

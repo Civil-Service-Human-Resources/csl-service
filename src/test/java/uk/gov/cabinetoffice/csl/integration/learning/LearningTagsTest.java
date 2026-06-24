@@ -87,7 +87,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                             "fullUrl": "TAGN1/TAGN2",
                             "parentId": 1,
                             "parentName": "TagName1",
-                            "categoryTag": false,
+                            "category": false,
                             "archived": false
                         }
                         """));
@@ -104,14 +104,14 @@ public class LearningTagsTest extends IntegrationTestBase {
                     "parentId" : null,
                     "urlSlug" : "new-tag-01",
                     "archived" : false,
-                    "categoryTag" : true
+                    "category" : true
                 }""", """
                 {
                     "id": 1,
                     "code": "NEW_TAG",
                     "urlSlug": "new-tag-01",
                     "name": "New Tag",
-                    "categoryTag" : true
+                    "category" : true
                 }
                 """);
         mockMvc.perform(post("/learning-tags")
@@ -121,7 +121,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                                   "code": "NEW_TAG",
                                   "name": "New tag 01",
                                   "parentId": null,
-                                  "categoryTag" : true
+                                  "category" : true
                                 }
                                 """))
                 .andExpect(content().json("""
@@ -134,7 +134,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                             "fullUrl": "new-tag-01",
                             "parentId": null,
                             "parentName": null,
-                            "categoryTag": true,
+                            "category": true,
                             "archived": false
                         }
                         """, true))
@@ -195,7 +195,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                             "fullUrl": "TAGN1/new-tag-01",
                             "parentId": 1,
                             "parentName": "TagName1",
-                            "categoryTag": false,
+                            "category": false,
                             "archived": false
                         }
                         """, true))

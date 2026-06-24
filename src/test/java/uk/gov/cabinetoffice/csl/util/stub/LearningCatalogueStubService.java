@@ -103,7 +103,7 @@ public class LearningCatalogueStubService {
     public StubMapping createLearningTag(String input, String response) {
         return stubFor(
                 WireMock.post(urlPathEqualTo("/learning_catalogue/learning-tags"))
-                        .withRequestBody(equalToJson(input, true, true))
+                        .withRequestBody(equalToJson(input, true, false))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")

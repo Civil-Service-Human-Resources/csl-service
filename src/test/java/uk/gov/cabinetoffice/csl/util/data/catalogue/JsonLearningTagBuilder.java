@@ -13,7 +13,7 @@ public class JsonLearningTagBuilder extends BaseJsonBuilder {
         builder.root.put("description", String.format("%s description", name));
         builder.root.put("code", code);
         builder.root.put("urlSlug", code);
-        builder.root.put("isCategoryTag", false);
+        builder.root.put("isCategory", false);
         builder.root.put("isArchived", false);
         builder.root.put("parentId", parentId);
         builder.root.put("parentName", parentName);
@@ -30,7 +30,7 @@ public class JsonLearningTagBuilder extends BaseJsonBuilder {
         builder.root.put("description", String.format("%s description", name));
         builder.root.put("code", code);
         builder.root.put("urlSlug", code);
-        builder.root.put("isCategoryTag", false);
+        builder.root.put("isCategory", false);
         builder.root.put("isArchived", false);
         builder.root.put("parentId", parentId);
         builder.root.put("parentName", parentName);
