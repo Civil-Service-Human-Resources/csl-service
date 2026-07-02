@@ -209,12 +209,14 @@ public class LearningTagsTest extends IntegrationTestBase {
                   "code": "TAGN2",
                   "name": "TagName2 edit",
                   "description": "TAGN2 new description",
-                  "parentId": 5
+                  "parentId": 5,
+                  "category": true
                 }""", """
                 {
                   "code": "TAGN2",
                   "name": "TagName2 edit",
-                  "description": "TAGN2 new description"
+                  "description": "TAGN2 new description",
+                  "category": true
                 }
                 """);
         mockMvc.perform(put("/learning-tags/2")
@@ -224,7 +226,8 @@ public class LearningTagsTest extends IntegrationTestBase {
                                   "code": "TAGN2",
                                   "name": "TagName2 edit",
                                   "description": "TAGN2 new description",
-                                  "parentId": 5
+                                  "parentId": 5,
+                                  "category": true
                                 }
                                 """))
                 .andExpect(content().json("""
@@ -237,7 +240,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                           "fullUrl": "TAGN1/TAGN5/tagname2-edit",
                           "parentId": 5,
                           "parentName": "TagName5",
-                          "category": false,
+                          "category": true,
                           "archived": false
                         }
                         """, true))
