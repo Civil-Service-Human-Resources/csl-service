@@ -49,12 +49,18 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
     }
 
     @Override
-    protected void updateObjectWithDto(LearningTag object, LearningTagDTO dto) {
-        super.updateObjectWithDto(object, dto);
+    public LearningTagOverview update(Long id, LearningTagDTO dto) {
         if (dto.getUrlSlug() == null) {
             String slug = utilService.generateUrlSlugFromString(dto.getName(), maxUrlSlugSize);
-            object.setUrlSlug(slug);
+            dto.setUrlSlug(slug);
         }
+        return super.update(id, dto);
+    }
+
+    @Override
+    protected void updateObjectWithDto(LearningTag object, LearningTagDTO dto) {
+        super.updateObjectWithDto(object, dto);
+        object.setUrlSlug(dto.getUrlSlug());
         object.setCategory(dto.isCategory());
         object.setDescription(dto.getDescription());
     }

@@ -248,6 +248,54 @@ public class LearningTagsTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testUpdateLearningTagNullSlug() throws Exception {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+        cslStubService.getLearningCatalogue().updateLearningTag(2, """
+                {
+                  "code": "TAGN2",
+                  "name": "TagName2 edit",
+                  "description": "TAGN2 new description",
+                  "category": true,
+                  "urlSlug": "tagname2-edit"
+                }""", """
+                {
+                  "code": "TAGN2",
+                  "name": "TagName2 edit",
+                  "description": "TAGN2 new description",
+                  "category": true,
+                  "urlSlug": "tagname2-edit"
+                }
+                """);
+        mockMvc.perform(put("/learning-tags/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "code": "TAGN2",
+                                  "name": "TagName2 edit",
+                                  "description": "TAGN2 new description",
+                                  "parentId": 1,
+                                  "category": true,
+                                  "urlSlug": null
+                                }
+                                """))
+                .andExpect(content().json("""
+                        {
+                          "id": 2,
+                          "name": "TagName2 edit",
+                          "description": "TAGN2 new description",
+                          "code": "TAGN2",
+                          "urlSlug": "tagname2-edit",
+                          "fullUrl": "TAGN1/tagname2-edit",
+                          "parentId": 1,
+                          "parentName": "TagName1",
+                          "category": true,
+                          "archived": false
+                        }
+                        """, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
     public void testFormattedList() throws Exception {
         cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         mockMvc.perform(get("/learning-tags/formatted_list")
