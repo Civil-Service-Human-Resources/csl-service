@@ -53,10 +53,9 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         super.updateObjectWithDto(object, dto);
         if (dto.getUrlSlug() == null) {
             String slug = utilService.generateUrlSlugFromString(dto.getName(), maxUrlSlugSize);
-            dto.setUrlSlug(slug);
+            object.setUrlSlug(slug);
         }
         object.setCategory(dto.isCategory());
-        object.setUrlSlug(dto.getUrlSlug());
         object.setDescription(dto.getDescription());
     }
 }
