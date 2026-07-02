@@ -28,4 +28,7 @@ public class LearningCatalogueConfiguration {
     @NotNull
     private final String courseV2SearchUrl;
 
+    public String getLearningTagUrl(Long id) {
+        return learningTagUrl + "/" + id;
+    }
 }

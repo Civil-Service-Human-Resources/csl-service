@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.domain;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.ITaxonomyItem;
 
 import java.util.*;
@@ -102,5 +103,33 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem> extends HashMap<Long,
     }
 
     public abstract T setData(T object);
+
+    public void validateUpdate(Long id, Long parentId) {
+        Optional.ofNullable(parentId)
+                .ifPresent(pId -> {
+                    if (id.equals(pId)) throw new ValidationException("Can't set parent ID to self");
+                    if (getMultipleAsIds(List.of(id), true).contains(pId))
+                        throw new ValidationException("Can't set a parent to a child in the same hierarchy");
+                });
+    }
+
+    public T updateParent(T object, Long parentId) {
+        if (object.getParentId() != null) {
+            update(object.getParentId(), o -> {
+                o.getChildIds().remove(object.getId());
+                return o;
+            });
+        }
+        Optional.ofNullable(parentId)
+                .map(newParentIdStr -> get(parentId))
+                .ifPresentOrElse(newParent -> {
+                    object.setParentId(newParent.getId());
+                    object.setParentName(newParent.getName());
+                }, () -> {
+                    object.setParentId(null);
+                    object.setParentName(null);
+                });
+        return object;
+    }
 
 }

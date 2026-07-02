@@ -47,4 +47,15 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
                 .sorted(Comparator.comparing(FormattedTaxonomyItem::getName, String::compareToIgnoreCase))
                 .toList());
     }
+
+    @Override
+    protected void updateObjectWithDto(LearningTag object, LearningTagDTO dto) {
+        super.updateObjectWithDto(object, dto);
+        if (dto.getUrlSlug() == null) {
+            String slug = utilService.generateUrlSlugFromString(dto.getName(), maxUrlSlugSize);
+            dto.setUrlSlug(slug);
+        }
+        object.setUrlSlug(dto.getUrlSlug());
+        object.setDescription(dto.getDescription());
+    }
 }

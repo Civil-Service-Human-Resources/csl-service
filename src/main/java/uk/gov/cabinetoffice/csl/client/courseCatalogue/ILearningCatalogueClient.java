@@ -24,4 +24,6 @@ public interface ILearningCatalogueClient {
     List<LearningTag> getAllLearningTags();
 
     LearningTag createLearningTag(LearningTagDTO dto);
+
+    LearningTag updateLearningTag(Long id, LearningTagDTO dto);
 }

@@ -9,8 +9,7 @@ import uk.gov.cabinetoffice.csl.util.data.ArrayJsonContentBuilder;
 import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonLearningTagBuilder;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class LearningTagsTest extends IntegrationTestBase {
@@ -197,6 +196,49 @@ public class LearningTagsTest extends IntegrationTestBase {
                             "parentName": "TagName1",
                             "category": false,
                             "archived": false
+                        }
+                        """, true))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void testUpdateLearningTag() throws Exception {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+        cslStubService.getLearningCatalogue().updateLearningTag(2, """
+                {
+                  "code": "TAGN2",
+                  "name": "TagName2 edit",
+                  "description": "TAGN2 new description",
+                  "parentId": 5
+                }""", """
+                {
+                  "code": "TAGN2",
+                  "name": "TagName2 edit",
+                  "description": "TAGN2 new description"
+                }
+                """);
+        mockMvc.perform(put("/learning-tags/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "code": "TAGN2",
+                                  "name": "TagName2 edit",
+                                  "description": "TAGN2 new description",
+                                  "parentId": 5
+                                }
+                                """))
+                .andExpect(content().json("""
+                        {
+                          "id": 2,
+                          "name": "TagName2 edit",
+                          "description": "TAGN2 new description",
+                          "code": "TAGN2",
+                          "urlSlug": "tagname2-edit",
+                          "fullUrl": "TAGN1/TAGN5/tagname2-edit",
+                          "parentId": 5,
+                          "parentName": "TagName5",
+                          "category": false,
+                          "archived": false
                         }
                         """, true))
                 .andExpect(status().is2xxSuccessful());

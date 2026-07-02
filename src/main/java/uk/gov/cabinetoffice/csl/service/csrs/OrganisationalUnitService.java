@@ -7,12 +7,10 @@ import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.*;
 import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
-import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerOrganisationDeleteMessage;
-import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerOrganisationUpdateMessage;
 
 import java.util.*;
 import java.util.function.Function;
@@ -139,67 +137,7 @@ public class OrganisationalUnitService {
 
     public OrganisationalUnitOverview patchOrganisationalUnit(Long organisationalUnitId, OrganisationalUnitDto organisationalUnitDto) {
         log.info("Updating organisational unit data: {} for organisationalUnitId: {}", organisationalUnitDto, organisationalUnitId);
-        if (organisationalUnitId.equals(organisationalUnitDto.getParentIdSafe())) {
-            throw new ValidationException("Can't set parent ID to self");
-        }
-        OrganisationalUnitMap organisationalUnitMap = getOrganisationalUnitMap();
-        if (organisationalUnitDto.getParentId() != null) {
-            if (organisationalUnitMap.getMultipleAsIds(List.of(organisationalUnitId), true)
-                    .contains(organisationalUnitDto.getParentId())) {
-                throw new ValidationException("Can't set a parent organisation to a child in the same hierarchy");
-            }
-        }
-        civilServantRegistryClient.patchOrganisationalUnit(organisationalUnitId, organisationalUnitDto);
-        OrganisationalUnit organisationalUnit = organisationalUnitMap.get(organisationalUnitId);
-        boolean requiresRebuild = false;
-        if (!organisationalUnit.getParentIdSafe().equals(organisationalUnitDto.getParentIdSafe())) {
-            requiresRebuild = true;
-            if (organisationalUnit.getParentId() != null) {
-                organisationalUnitMap.update(organisationalUnit.getParentId(), o -> {
-                    o.getChildIds().remove(organisationalUnitId);
-                    return o;
-                });
-            }
-            Optional.ofNullable(organisationalUnitDto.getParentId())
-                    .map(newParentIdStr -> organisationalUnitMap.get(organisationalUnitDto.getParentId()))
-                    .ifPresentOrElse(newParent -> {
-                        organisationalUnit.setParentId(newParent.getId());
-                        organisationalUnit.setParentName(newParent.getName());
-                    }, () -> {
-                        organisationalUnit.setParentId(null);
-                        organisationalUnit.setParentName(null);
-                    });
-        }
-
-        boolean requiresUpdateRegisteredLearnerReportData = !organisationalUnit.getName().equals(organisationalUnitDto.getName());
-
-        if (
-                !organisationalUnit.getAbbreviationSafe().equals(organisationalUnitDto.getAbbreviationSafe()) ||
-                        !organisationalUnit.getName().equals(organisationalUnitDto.getName()) ||
-                        !organisationalUnit.getCode().equals(organisationalUnitDto.getCode())
-        ) {
-            requiresRebuild = true;
-            organisationalUnit.setAbbreviation(organisationalUnitDto.getAbbreviation());
-            organisationalUnit.setName(organisationalUnitDto.getName());
-            organisationalUnit.setCode(organisationalUnitDto.getCode());
-        }
-
-        if (requiresRebuild) {
-            List<OrganisationalUnit> updatedOrganisationalUnits = organisationalUnitMap.rebuildHierarchy(organisationalUnit);
-            if (requiresUpdateRegisteredLearnerReportData) {
-                updateReportingData(updatedOrganisationalUnits);
-            }
-        }
-
-        organisationalUnitMapCache.put(organisationalUnitMap);
-
-        return organisationalUnitFactory.createOverview(organisationalUnit);
-    }
-
-    private void updateReportingData(List<OrganisationalUnit> multipleOrgs) {
-        RegisteredLearnerOrganisationUpdateMessage message = messageMetadataFactory.generateRegisteredLearnersOrganisationUpdateMessage(multipleOrgs);
-        log.info("Sending organisational unit message to update reporting data: {}", message);
-        messagingClient.sendMessages(List.of(message));
+        return organisationalUnitMapCache.update(organisationalUnitId, organisationalUnitDto);
     }
 
     public List<OrganisationalUnit> updateOrganisationalUnit(Collection<Long> ids, Function<OrganisationalUnit, OrganisationalUnit> update) {

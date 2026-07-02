@@ -46,4 +46,5 @@ public class LearningTag implements Serializable, ITaxonomyItem {
         parentName = null;
         childIds = new HashSet<>();
     }
+    
 }

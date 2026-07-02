@@ -21,4 +21,10 @@ public interface ITaxonomyItem {
     default void addChildId(Long childId) {
         getChildIds().add(childId);
     }
+
+    void setParentName(String name);
+
+    void setName(String name);
+
+    void setCode(String code);
 }

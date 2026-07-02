@@ -189,4 +189,8 @@ public class LearningCatalogueService {
     public FormattedTaxonomyItems<FormattedTaxonomyItem> getFormattedLearningTagNames() {
         return learningTagMapService.getFormattedNames();
     }
+
+    public LearningTagOverview patchLearningTag(Long learningTagId, LearningTagDTO dto) {
+        return learningTagMapService.update(learningTagId, dto);
+    }
 }

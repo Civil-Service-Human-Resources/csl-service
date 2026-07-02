@@ -20,6 +20,11 @@ public class LearningTagMapClient implements ILearningTagMapClient {
     }
 
     @Override
+    public LearningTag patch(Long id, LearningTagDTO dto) {
+        return learningCatalogueClient.updateLearningTag(id, dto);
+    }
+
+    @Override
     public LearningTagMap fetch() {
         return LearningTagMap.buildFromList(learningCatalogueClient.getAllLearningTags());
     }

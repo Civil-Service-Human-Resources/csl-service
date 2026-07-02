@@ -44,6 +44,15 @@ public class LearningTagController {
         return learningCatalogueService.createLearningTag(dto);
     }
 
+    @PutMapping("/{learningTagId}")
+    @ResponseStatus(HttpStatus.OK)
+    public LearningTagOverview updateOrganisationalUnit(@PathVariable Long learningTagId,
+                                                        @RequestBody LearningTagDTO request
+    ) {
+        log.info("Update learning tag for id: {} and request: {}", learningTagId, request.toString());
+        return learningCatalogueService.patchLearningTag(learningTagId, request);
+    }
+
     @GetMapping(path = "/formatted_list", produces = "application/json")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)

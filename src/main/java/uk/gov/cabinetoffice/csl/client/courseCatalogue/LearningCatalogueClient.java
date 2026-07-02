@@ -108,4 +108,10 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     public LearningTag createLearningTag(LearningTagDTO dto) {
         return httpClient.executeRequest(RequestEntity.post(config.getLearningTagUrl()).body(dto), LearningTag.class);
     }
+
+    @Override
+    public LearningTag updateLearningTag(Long id, LearningTagDTO dto) {
+        String url = config.getLearningTagUrl(id);
+        return httpClient.executeRequest(RequestEntity.put(url).body(dto), LearningTag.class);
+    }
 }

@@ -110,4 +110,15 @@ public class LearningCatalogueStubService {
                                 .withBody(response))
         );
     }
+
+    public StubMapping updateLearningTag(int learningTagId, String expectedInput, String response) {
+        return stubFor(
+                WireMock.put(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s", learningTagId)))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
 }

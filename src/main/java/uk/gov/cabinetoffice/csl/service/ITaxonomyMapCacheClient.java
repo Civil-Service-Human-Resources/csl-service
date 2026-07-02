@@ -7,4 +7,6 @@ import uk.gov.cabinetoffice.csl.util.IFetchClient;
 
 public interface ITaxonomyMapCacheClient<T extends ITaxonomyItem, M extends TaxonomyMap<T>, DTO extends ITaxonomyItemDTO> extends IFetchClient<M> {
     T create(DTO dto);
+
+    T patch(Long id, DTO dto);
 }

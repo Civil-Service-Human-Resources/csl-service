@@ -7,11 +7,13 @@ import uk.gov.cabinetoffice.csl.domain.taxonomy.ITaxonomyItem;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.ITaxonomyItemDTO;
 import uk.gov.cabinetoffice.csl.util.BasicFetchedCache;
 
+import java.util.Objects;
+
 public class CachedTaxonomyMapService<Item extends ITaxonomyItem, Map extends TaxonomyMap<Item>,
         DTO extends ITaxonomyItemDTO, Overview> extends BasicFetchedCache<Map> {
 
-    private final ITaxonomyItemFactory<Item, Overview> taxonomyItemFactory;
-    private final ITaxonomyMapCacheClient<Item, Map, DTO> client;
+    protected final ITaxonomyItemFactory<Item, Overview> taxonomyItemFactory;
+    protected final ITaxonomyMapCacheClient<Item, Map, DTO> client;
 
     public CachedTaxonomyMapService(Cache cache, String singleId, Class<Map> clazz, ITaxonomyItemFactory<Item, Overview> taxonomyItemFactory, ITaxonomyMapCacheClient<Item, Map, DTO> client) {
         super(cache, singleId, clazz, client);
@@ -35,5 +37,24 @@ public class CachedTaxonomyMapService<Item extends ITaxonomyItem, Map extends Ta
         object = map.setData(object);
         put(map);
         return taxonomyItemFactory.createOverview(object);
+    }
+
+    public Overview update(Long id, DTO dto) {
+        Map map = get();
+        Item object = map.get(id);
+        map.validateUpdate(id, dto.getParentId());
+        client.patch(id, dto);
+        if (!Objects.equals(object.getParentId(), dto.getParentId())) {
+            object = map.updateParent(object, dto.getParentId());
+        }
+        updateObjectWithDto(object, dto);
+        map.rebuildHierarchy(object);
+        put(map);
+        return taxonomyItemFactory.createOverview(object);
+    }
+    
+    protected void updateObjectWithDto(Item object, DTO dto) {
+        object.setName(dto.getName());
+        object.setCode(dto.getCode());
     }
 }

@@ -22,6 +22,11 @@ public class OrganisationalUnitClient implements IOrganisationalUnitClient {
     }
 
     @Override
+    public OrganisationalUnit patch(Long id, OrganisationalUnitDto dto) {
+        return client.patchOrganisationalUnit(id, dto);
+    }
+
+    @Override
     public OrganisationalUnitMap fetch() {
         return OrganisationalUnitMap.buildFromList(client.getAllOrganisationalUnits());
     }
