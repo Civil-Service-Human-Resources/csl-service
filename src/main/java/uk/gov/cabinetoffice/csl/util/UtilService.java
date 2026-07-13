@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -42,4 +43,16 @@ public class UtilService implements IUtilService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public String generateUrlSlugFromString(String string, int maxLength) {
+        String slug = string
+                .toLowerCase()
+                .replaceAll("'", "")
+                .replaceAll("&", "and")
+                .replaceAll(" ", "-");
+        if (slug.length() > maxLength) {
+            throw new ValidationException(String.format("Auto-generated URL slug was greater than the max length of %s. Generated URL slug was %s", maxLength, slug));
+        }
+        return slug;
+    }
 }

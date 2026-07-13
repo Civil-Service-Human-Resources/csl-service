@@ -15,10 +15,7 @@ import static org.mockito.Mockito.verify;
 class LearningCatalogueServiceTest {
 
     @Mock
-    RequiredLearningMapCache requiredLearningMapCache;
-
-    @Mock
-    CourseAudienceMetadataMapCache courseAudienceMetadataMapCache;
+    LearningCatalogueCacheService learningCatalogueCacheService;
 
     @Mock
     TtlObjectCache<Course> courseObjectCache;
@@ -30,8 +27,7 @@ class LearningCatalogueServiceTest {
     void removeCourseFromCache() {
         learningCatalogueService.removeCourseFromCache("course2");
 
-        verify(requiredLearningMapCache, atMostOnce()).evict();
-        verify(courseAudienceMetadataMapCache, atMostOnce()).evict();
+        verify(learningCatalogueCacheService, atMostOnce()).evict();
         verify(courseObjectCache, atMostOnce()).evict("course2");
 
     }

@@ -7,12 +7,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
+import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 import uk.gov.cabinetoffice.csl.util.TtlObjectCache;
@@ -29,8 +34,8 @@ public class LearningCatalogueService {
 
     private final IUtilService utilService;
     private final TtlObjectCache<Course> cache;
-    private final RequiredLearningMapCache requiredLearningMapCache;
-    private final CourseAudienceMetadataMapCache courseAudienceMetadataMapCache;
+    private final LearningCatalogueCacheService learningCatalogueCacheService;
+    private final LearningTagMapService learningTagMapService;
     private final ILearningCatalogueClient client;
 
     public CourseWithModule getCourseWithModule(String courseId, String moduleId) {
@@ -98,21 +103,11 @@ public class LearningCatalogueService {
     }
 
     public CourseAudienceMetadataMap getCourseAudienceMetadataMap() {
-        CourseAudienceMetadataMap map = courseAudienceMetadataMapCache.get();
-        if (map == null) {
-            map = client.getAudienceMetadataCourseIds();
-            courseAudienceMetadataMapCache.put(map);
-        }
-        return map;
+        return learningCatalogueCacheService.getCourseAudienceMetadataMapCache().get();
     }
 
     private RequiredLearningMap getRequiredLearningMap() {
-        RequiredLearningMap map = requiredLearningMapCache.get();
-        if (map == null) {
-            map = client.getRequiredLearningIdMap();
-            requiredLearningMapCache.put(map);
-        }
-        return map;
+        return learningCatalogueCacheService.getRequiredLearningMapCache().get();
     }
 
     public List<String> getRequiredLearningIdsForDepartments(Collection<String> departmentCodes) {
@@ -147,8 +142,7 @@ public class LearningCatalogueService {
         log.info("LearningCatalogueService.removeCourseFromCache: Catalogue course is removed from the cache for the" +
                 " key: {}.", courseId);
         this.cache.evict(courseId);
-        requiredLearningMapCache.evict();
-        courseAudienceMetadataMapCache.evict();
+        learningCatalogueCacheService.evict();
     }
 
     public void cancelEvent(CourseWithModuleWithEvent data, CancelEventDto cancelEventDto) {
@@ -178,5 +172,25 @@ public class LearningCatalogueService {
 
     public Map<String, Course> getCourseIdToCourseMap(List<String> courseIds) {
         return getCourseIdMap(courseIds, course -> course);
+    }
+
+    public BasicTaxonomyTree getLearningTagTree() {
+        return learningTagMapService.getTree();
+    }
+
+    public LearningTagOverview getLearningTagOverview(Long learningTagId) {
+        return learningTagMapService.getOverview(learningTagId);
+    }
+
+    public LearningTagOverview createLearningTag(LearningTagDTO dto) {
+        return learningTagMapService.create(dto);
+    }
+
+    public FormattedTaxonomyItems<FormattedTaxonomyItem> getFormattedLearningTagNames() {
+        return learningTagMapService.getFormattedNames();
+    }
+
+    public LearningTagOverview patchLearningTag(Long learningTagId, LearningTagDTO dto) {
+        return learningTagMapService.update(learningTagId, dto);
     }
 }

@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.ITaxonomyItem;
 
 import java.io.Serializable;
 import java.util.*;
@@ -20,7 +21,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OrganisationalUnit implements Serializable {
+public class OrganisationalUnit implements Serializable, ITaxonomyItem {
     private Long id;
     private String name;
     private String code;
@@ -77,11 +78,6 @@ public class OrganisationalUnit implements Serializable {
             return name + " (" + abbreviation + ")";
         }
         return name;
-    }
-
-    @JsonIgnore
-    public void addChildId(Long childId) {
-        childIds.add(childId);
     }
 
     public boolean domainExists(String domain) {

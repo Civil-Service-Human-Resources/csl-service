@@ -14,7 +14,7 @@ public class AgencyTokenService {
 
     private final AgencyTokenFactory agencyTokenFactory;
 
-    private final OrganisationalUnitMapCache organisationalUnitMapCache;
+    private final OrganisationalUnitMapService organisationalUnitMapCache;
     private final OrganisationalUnitFactory organisationalUnitFactory;
     private final ICSRSClient civilServantRegistryClient;
 
@@ -29,7 +29,7 @@ public class AgencyTokenService {
         AgencyToken agencyToken = agencyTokenFactory.createAgencyToken(agencyTokenDto);
         agencyToken = civilServantRegistryClient.createAgencyToken(organisationalUnitId, agencyToken);
         OrganisationalUnit organisationalUnit = updateAgencyTokenForOrganisation(organisationalUnitId, agencyToken);
-        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, false);
+        return organisationalUnitFactory.createOverview(organisationalUnit, false);
     }
 
     public OrganisationalUnitOverview updateAgencyToken(Long organisationalUnitId, AgencyTokenDTO agencyTokenDto) {
@@ -42,7 +42,7 @@ public class AgencyTokenService {
         agencyToken = civilServantRegistryClient.updateAgencyToken(organisationalUnitId, agencyToken);
         organisationalUnit = organisationalUnitMap.updateAgencyToken(organisationalUnitId, agencyToken);
         organisationalUnitMapCache.put(organisationalUnitMap);
-        return organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnit, true);
+        return organisationalUnitFactory.createOverview(organisationalUnit, true);
     }
 
     public void deleteAgencyToken(Long organisationalUnitId) {

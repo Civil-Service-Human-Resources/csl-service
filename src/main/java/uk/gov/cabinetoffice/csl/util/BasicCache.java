@@ -1,9 +1,12 @@
 package uk.gov.cabinetoffice.csl.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
+import org.springframework.data.redis.serializer.SerializationException;
 
 import java.io.Serializable;
 
+@Slf4j
 public class BasicCache<T extends Serializable> {
 
     private final Cache cache;
@@ -17,7 +20,17 @@ public class BasicCache<T extends Serializable> {
     }
 
     public T get() {
-        return cache.get(singleId, clazz);
+        try {
+            return cache.get(singleId, clazz);
+        } catch (IllegalStateException e) {
+            log.warn("IllegalStateException when fetching object from cache");
+            evict();
+            return null;
+        } catch (SerializationException e) {
+            log.warn("SerializationException when fetching object from cache");
+            evict();
+            return null;
+        }
     }
 
     public void put(T object) {

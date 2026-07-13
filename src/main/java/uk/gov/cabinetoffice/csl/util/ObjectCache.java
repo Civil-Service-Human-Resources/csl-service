@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
+import org.springframework.data.redis.serializer.SerializationException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +24,10 @@ public class ObjectCache<T extends Cacheable> {
             return cache.get(id, clazz);
         } catch (IllegalStateException e) {
             log.warn("IllegalStateException when fetching object from cache");
+            evict(id);
+            return null;
+        } catch (SerializationException e) {
+            log.warn("SerializationException when fetching object from cache");
             evict(id);
             return null;
         }
