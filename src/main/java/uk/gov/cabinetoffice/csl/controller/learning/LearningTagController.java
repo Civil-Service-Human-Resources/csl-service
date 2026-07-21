@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateDTO;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
@@ -46,11 +47,20 @@ public class LearningTagController {
 
     @PutMapping("/{learningTagId}")
     @ResponseStatus(HttpStatus.OK)
-    public LearningTagOverview updateOrganisationalUnit(@PathVariable Long learningTagId,
-                                                        @RequestBody LearningTagDTO request
+    public LearningTagOverview updateLearningTag(@PathVariable Long learningTagId,
+                                                 @RequestBody LearningTagDTO request
     ) {
         log.info("Update learning tag for id: {} and request: {}", learningTagId, request.toString());
         return learningCatalogueService.patchLearningTag(learningTagId, request);
+    }
+
+    @PutMapping("/{learningTagId}/state")
+    @ResponseStatus(HttpStatus.OK)
+    public LearningTagOverview updateState(@PathVariable Long learningTagId,
+                                           @RequestBody LearningTagStateDTO request
+    ) {
+        log.info("Update learning tag for id: {} and request: {}", learningTagId, request.toString());
+        return learningCatalogueService.updateState(learningTagId, request);
     }
 
     @GetMapping(path = "/formatted_list", produces = "application/json")

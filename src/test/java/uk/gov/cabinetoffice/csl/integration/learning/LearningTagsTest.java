@@ -334,4 +334,44 @@ public class LearningTagsTest extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful());
     }
 
+    @Test
+    public void testArchive() throws Exception {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+        String expectedStateUpdate = """
+                {
+                    "state": "ARCHIVE",
+                    "ids": [1, 2, 3, 5]
+                }
+                """;
+        String response = """
+                {
+                    "successfulUpdates": [1,2,3],
+                    "failedUpdates": []
+                }
+                """;
+        cslStubService.getLearningCatalogue().updateLearningTagState(expectedStateUpdate, response);
+        mockMvc.perform(put("/learning-tags/1/state")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "state": "ARCHIVE"
+                                }
+                                """))
+                .andExpect(content().json("""
+                          {
+                            "id":1,
+                            "name":"TagName1",
+                            "description":"TagName1 description",
+                            "code":"TAGN1",
+                            "urlSlug":"TAGN1",
+                            "fullUrl":"TAGN1",
+                            "parentId":null,
+                            "parentName":null,
+                            "category":false,
+                            "archived":true
+                          }
+                        """))
+                .andExpect(status().is2xxSuccessful());
+    }
+
 }

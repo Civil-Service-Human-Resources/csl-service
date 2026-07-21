@@ -18,6 +18,8 @@ public class LearningCatalogueConfiguration {
     @NotNull
     private final String learningTagUrl;
     @NotNull
+    private final String learningTagStateUrl;
+    @NotNull
     private final Integer learningTagMaxPageSize;
     @NotNull
     private final String courseUrl;
