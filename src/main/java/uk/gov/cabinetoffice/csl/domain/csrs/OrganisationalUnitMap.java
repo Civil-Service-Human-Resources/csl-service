@@ -2,12 +2,13 @@ package uk.gov.cabinetoffice.csl.domain.csrs;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
-import uk.gov.cabinetoffice.csl.domain.TaxonomyMap;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyNode;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.TaxonomyMap;
 
 import java.util.List;
 
 @Slf4j
-public class OrganisationalUnitMap extends TaxonomyMap<OrganisationalUnit> {
+public class OrganisationalUnitMap extends TaxonomyMap<OrganisationalUnit, BasicTaxonomyNode> {
 
     public static OrganisationalUnitMap buildFromList(List<OrganisationalUnit> organisationalUnits) {
         OrganisationalUnitMap map = new OrganisationalUnitMap();
@@ -16,6 +17,11 @@ public class OrganisationalUnitMap extends TaxonomyMap<OrganisationalUnit> {
         }
         organisationalUnits.forEach(map::setData);
         return map;
+    }
+
+    @Override
+    protected BasicTaxonomyNode buildNode(OrganisationalUnit object) {
+        return new BasicTaxonomyNode(object.getName(), object.getId());
     }
 
     public OrganisationalUnit setData(OrganisationalUnit organisationalUnit) {

@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.LearningTagMapClient;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagMap;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateUpdate;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.service.CachedTaxonomyMapService;
@@ -22,7 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag, LearningTagMap, LearningTagDTO, LearningTagOverview> {
+public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag, LearningTagTreeNode, LearningTagMap, LearningTagDTO, LearningTagOverview> {
 
     private final Integer maxUrlSlugSize;
     private final IUtilService utilService;

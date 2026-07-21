@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain;
+package uk.gov.cabinetoffice.csl.domain.taxonomy;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 public class BasicTaxonomyTree {
 
-    private List<BasicTaxonomyNode> content;
+    private List<? extends BasicTaxonomyNode> content;
 
 }

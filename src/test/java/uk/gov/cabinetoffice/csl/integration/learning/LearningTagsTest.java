@@ -50,21 +50,26 @@ public class LearningTagsTest extends IntegrationTestBase {
                                                 {
                                                     "name": "TagName3",
                                                     "id": 3,
-                                                    "children": []
+                                                    "children": [],
+                                                    "archived": false
                                                 }
-                                            ]
+                                            ],
+                                            "archived": false
                                         },
                                         {
                                             "name": "TagName5",
                                             "id": 5,
-                                            "children": []
+                                            "children": [],
+                                            "archived": false
                                         }
-                                    ]
+                                    ],
+                                    "archived": false
                                 },
                                 {
                                     "name": "TagName4",
                                     "id": 4,
-                                    "children": []
+                                    "children": [],
+                                    "archived": false
                                 }
                             ]
                         }
