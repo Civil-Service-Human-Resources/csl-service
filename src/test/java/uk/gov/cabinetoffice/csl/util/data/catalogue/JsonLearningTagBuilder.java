@@ -13,8 +13,8 @@ public class JsonLearningTagBuilder extends BaseJsonBuilder {
         builder.root.put("description", String.format("%s description", name));
         builder.root.put("code", code);
         builder.root.put("urlSlug", code);
-        builder.root.put("isCategory", false);
-        builder.root.put("isArchived", false);
+        builder.root.put("category", false);
+        builder.root.put("archived", false);
         builder.root.put("parentId", parentId);
         builder.root.put("parentName", parentName);
         builder.root.put("createdTimestamp", createdTimestamp);
@@ -30,13 +30,18 @@ public class JsonLearningTagBuilder extends BaseJsonBuilder {
         builder.root.put("description", String.format("%s description", name));
         builder.root.put("code", code);
         builder.root.put("urlSlug", code);
-        builder.root.put("isCategory", false);
-        builder.root.put("isArchived", false);
+        builder.root.put("category", false);
+        builder.root.put("archived", false);
         builder.root.put("parentId", parentId);
         builder.root.put("parentName", parentName);
         builder.root.put("createdTimestamp", createdTimestamp);
         builder.root.put("updatedTimestamp", createdTimestamp);
         return builder;
+    }
+
+    public JsonLearningTagBuilder isArchived() {
+        root.put("archived", true);
+        return this;
     }
 
 }

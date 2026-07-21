@@ -76,6 +76,7 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
             learningTag.setArchived(update.equals(LearningTagStateUpdate.ARCHIVE));
             return learningTag;
         }));
+        put(learningTagMap);
         return taxonomyItemFactory.createOverview(learningTagMap.get(learningTagId));
     }
 }

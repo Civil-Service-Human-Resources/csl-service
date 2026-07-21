@@ -26,7 +26,8 @@ public class LearningTagsTest extends IntegrationTestBase {
                     JsonLearningTagBuilder.create(2L, 1L, "TagName1", "2025-01-01T10:00:00"),
                     JsonLearningTagBuilder.create(3L, 2L, "TagName2", "2025-01-01T10:00:00"),
                     JsonLearningTagBuilder.create(4L, null, null, "2025-01-01T10:00:00"),
-                    JsonLearningTagBuilder.create(5L, 1L, "TagName1", "2025-01-01T10:00:00")
+                    JsonLearningTagBuilder.create(5L, 1L, "TagName1", "2025-01-01T10:00:00"),
+                    JsonLearningTagBuilder.create(6L, null, null, "2025-01-01T10:00:00").isArchived()
             ).getAsPaginatedAndBuild(0, 5, 1);
 
     @Test
@@ -70,6 +71,12 @@ public class LearningTagsTest extends IntegrationTestBase {
                                     "id": 4,
                                     "children": [],
                                     "archived": false
+                                },
+                                {
+                                    "name": "TagName6",
+                                    "id": 6,
+                                    "children": [],
+                                    "archived": true
                                 }
                             ]
                         }
@@ -332,6 +339,11 @@ public class LearningTagsTest extends IntegrationTestBase {
                                     "id": 4,
                                     "name": "TagName4",
                                     "code": "TAGN4"
+                                },
+                                {
+                                    "id": 6,
+                                    "name": "TagName6",
+                                    "code": "TAGN6"
                                 }
                             ]
                         }
