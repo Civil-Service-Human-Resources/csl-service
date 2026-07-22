@@ -4,32 +4,35 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.client.courseCatalogue.LearningTagMapClient;
+import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagMap;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.service.CachedTaxonomyMapService;
 import uk.gov.cabinetoffice.csl.service.ITaxonomyItemFactory;
-import uk.gov.cabinetoffice.csl.service.ITaxonomyMapCacheClient;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 
 @Service
-public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag, LearningTagMap, LearningTagDTO, LearningTagOverview> {
+public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag, LearningTagTreeNode, LearningTagMap, LearningTagDTO, LearningTagOverview> {
 
     private final Integer maxUrlSlugSize;
     private final IUtilService utilService;
+    private final LearningTagMapClient client;
 
     public LearningTagMapService(@Qualifier("learningCatalogue") Cache cache,
                                  ITaxonomyItemFactory<LearningTag, LearningTagOverview> taxonomyItemFactory,
-                                 ITaxonomyMapCacheClient<LearningTag, LearningTagMap, LearningTagDTO> client,
+                                 LearningTagMapClient client,
                                  @Value("${learningCatalogue.validation.learningTag.maxUrlSize}") Integer maxUrlSlugSize, IUtilService utilService) {
         super(cache, "learningTagMap", LearningTagMap.class, taxonomyItemFactory, client);
         this.maxUrlSlugSize = maxUrlSlugSize;
         this.utilService = utilService;
+        this.client = client;
     }
 
     @Override
@@ -63,5 +66,17 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         object.setUrlSlug(dto.getUrlSlug());
         object.setCategory(dto.isCategory());
         object.setDescription(dto.getDescription());
+    }
+
+    public LearningTagOverview updateState(Long learningTagId, LearningTagStateUpdate update) {
+        LearningTagMap learningTagMap = get();
+        Collection<Long> ids = learningTagMap.getMultipleAsIds(List.of(learningTagId), true);
+        BulkUpdateResponse result = client.updateState(ids, update);
+        result.getSuccessfulUpdates().forEach(id -> learningTagMap.update(id, learningTag -> {
+            learningTag.setArchived(update.equals(LearningTagStateUpdate.ARCHIVE));
+            return learningTag;
+        }));
+        put(learningTagMap);
+        return taxonomyItemFactory.createOverview(learningTagMap.get(learningTagId));
     }
 }

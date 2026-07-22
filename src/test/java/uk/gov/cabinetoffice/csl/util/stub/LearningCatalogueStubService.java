@@ -122,6 +122,15 @@ public class LearningCatalogueStubService {
         );
     }
 
+    public StubMapping updateLearningTagState(String expectedInput, String response) {
+        return stubFor(WireMock.put(urlPathEqualTo("/learning_catalogue/learning-tags/state"))
+                .withRequestBody(equalToJson(expectedInput, true, false))
+                .withHeader("Authorization", equalTo("Bearer token"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(response)));
+    }
+
     public StubMapping addLearningTagToCourse(String courseUid, String input, String response) {
         return stubFor(
                 WireMock.post(urlPathEqualTo(String.format("/learning_catalogue/courses/%s/learning-tags", courseUid)))

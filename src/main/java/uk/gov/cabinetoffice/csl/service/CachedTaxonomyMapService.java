@@ -1,21 +1,18 @@
 package uk.gov.cabinetoffice.csl.service;
 
 import org.springframework.cache.Cache;
-import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
-import uk.gov.cabinetoffice.csl.domain.TaxonomyMap;
-import uk.gov.cabinetoffice.csl.domain.taxonomy.ITaxonomyItem;
-import uk.gov.cabinetoffice.csl.domain.taxonomy.ITaxonomyItemDTO;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.*;
 import uk.gov.cabinetoffice.csl.util.BasicFetchedCache;
 
 import java.util.Objects;
 
-public class CachedTaxonomyMapService<Item extends ITaxonomyItem, Map extends TaxonomyMap<Item>,
+public class CachedTaxonomyMapService<Item extends ITaxonomyItem, Node extends BasicTaxonomyNode, Map extends TaxonomyMap<Item, Node>,
         DTO extends ITaxonomyItemDTO, Overview> extends BasicFetchedCache<Map> {
 
     protected final ITaxonomyItemFactory<Item, Overview> taxonomyItemFactory;
-    protected final ITaxonomyMapCacheClient<Item, Map, DTO> client;
+    protected final ITaxonomyMapCacheClient<Item, Node, Map, DTO> client;
 
-    public CachedTaxonomyMapService(Cache cache, String singleId, Class<Map> clazz, ITaxonomyItemFactory<Item, Overview> taxonomyItemFactory, ITaxonomyMapCacheClient<Item, Map, DTO> client) {
+    public CachedTaxonomyMapService(Cache cache, String singleId, Class<Map> clazz, ITaxonomyItemFactory<Item, Overview> taxonomyItemFactory, ITaxonomyMapCacheClient<Item, Node, Map, DTO> client) {
         super(cache, singleId, clazz, client);
         this.taxonomyItemFactory = taxonomyItemFactory;
         this.client = client;
@@ -52,7 +49,7 @@ public class CachedTaxonomyMapService<Item extends ITaxonomyItem, Map extends Ta
         put(map);
         return taxonomyItemFactory.createOverview(object);
     }
-    
+
     protected void updateObjectWithDto(Item object, DTO dto) {
         object.setName(dto.getName());
         object.setCode(dto.getCode());
