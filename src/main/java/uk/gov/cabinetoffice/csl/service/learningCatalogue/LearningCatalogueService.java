@@ -196,8 +196,10 @@ public class LearningCatalogueService {
     }
 
     public CourseLearningTagDto addLearningTagToCourse(String courseId, LearningTagDTO learningTagDTO) {
+        log.info("Adding learning tag {} to course {}", learningTagDTO.getCode(), courseId);
         CourseLearningTagDto courseLearningTagDto = client.addLearningTagToCourse(courseId, learningTagDTO);
-//        cache.put(course, utilService.getDurationUntilTomorrow(ChronoUnit.SECONDS));
+//      cache.put(course, utilService.getDurationUntilTomorrow(ChronoUnit.SECONDS));
+        log.info("Added learning tag {} to course {}", learningTagDTO.getCode(), courseId);
         return courseLearningTagDto;
     }
 }

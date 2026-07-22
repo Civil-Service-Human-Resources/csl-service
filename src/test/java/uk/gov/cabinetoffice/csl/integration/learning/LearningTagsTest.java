@@ -334,4 +334,46 @@ public class LearningTagsTest extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful());
     }
 
+    @Test
+    public void testAddLearningTagToCourse() throws Exception {
+        String courseId = "course-id";
+        cslStubService.getLearningCatalogue().addLearningTagToCourse(courseId, """
+                {
+                  "name": "Tag Name",
+                  "code": "TAG_CODE",
+                  "description" : null,
+                  "parentId" : null,
+                  "urlSlug" : null,
+                  "category" : false,
+                  "archived" : false
+                }""", """
+                {
+                  "uid": "course-id",
+                  "title": "Course Title",
+                  "learningTag": {
+                    "name": "Tag Name",
+                    "code": "TAG_CODE",
+                    "description" : null,
+                    "parentId" : null,
+                    "urlSlug" : null,
+                    "category" : false,
+                    "archived" : false
+                  }
+                }
+                """);
+
+        mockMvc.perform(post("/courses/{courseId}/learning-tags", courseId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Tag Name",
+                                  "code": "TAG_CODE"
+                                }
+                                """))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.uid").value(courseId))
+                .andExpect(jsonPath("$.title").value("Course Title"))
+                .andExpect(jsonPath("$.learningTag.name").value("Tag Name"))
+                .andExpect(jsonPath("$.learningTag.code").value("TAG_CODE"));
+    }
 }
