@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.client.courseCatalogue;
 import org.springframework.data.domain.Sort;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.CourseLearningTagDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 
@@ -26,4 +27,6 @@ public interface ILearningCatalogueClient {
     LearningTag createLearningTag(LearningTagDTO dto);
 
     LearningTag updateLearningTag(Long id, LearningTagDTO dto);
+
+    CourseLearningTagDto addLearningTagToCourse(String courseId, LearningTagDTO learningTagDTO);
 }

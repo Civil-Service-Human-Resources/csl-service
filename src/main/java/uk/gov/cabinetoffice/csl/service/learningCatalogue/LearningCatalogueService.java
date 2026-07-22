@@ -15,6 +15,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.CourseLearningTagDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
@@ -192,5 +193,11 @@ public class LearningCatalogueService {
 
     public LearningTagOverview patchLearningTag(Long learningTagId, LearningTagDTO dto) {
         return learningTagMapService.update(learningTagId, dto);
+    }
+
+    public CourseLearningTagDto addLearningTagToCourse(String courseId, LearningTagDTO learningTagDTO) {
+        CourseLearningTagDto courseLearningTagDto = client.addLearningTagToCourse(courseId, learningTagDTO);
+//        cache.put(course, utilService.getDurationUntilTomorrow(ChronoUnit.SECONDS));
+        return courseLearningTagDto;
     }
 }

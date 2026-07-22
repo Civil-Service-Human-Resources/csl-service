@@ -10,6 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.CourseLearningTagDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagsPagedResponse;
@@ -113,5 +114,12 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     public LearningTag updateLearningTag(Long id, LearningTagDTO dto) {
         String url = config.getLearningTagUrl(id);
         return httpClient.executeRequest(RequestEntity.put(url).body(dto), LearningTag.class);
+    }
+
+    @Override
+    public CourseLearningTagDto addLearningTagToCourse(String courseId, LearningTagDTO learningTagDTO) {
+        String url = String.format("%s/%s/learning-tags", config.getCourseUrl(), courseId);
+        RequestEntity<LearningTagDTO> request = RequestEntity.post(url).body(learningTagDTO);
+        return httpClient.executeRequest(request, CourseLearningTagDto.class);
     }
 }
