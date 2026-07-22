@@ -202,9 +202,9 @@ public class LearningCatalogueService {
         return courseLearningTagDto;
     }
 
-    public void removeLearningTagFromCourse(String courseUid, Long learningTagId) {
-        log.info("Removing learning tag {} from course {}", learningTagId, courseUid);
-        client.removeLearningTagFromCourse(courseUid, learningTagId);
-        log.info("Removed learning tag {} from course {}", learningTagId, courseUid);
+    public void removeLearningTagFromCourse(String courseUid, String learningTagCode) {
+        log.info("Removing learning tag {} from course {}", learningTagCode, courseUid);
+        client.removeLearningTagFromCourse(courseUid, learningTagCode);
+        log.info("Removed learning tag {} from course {}", learningTagCode, courseUid);
     }
 }

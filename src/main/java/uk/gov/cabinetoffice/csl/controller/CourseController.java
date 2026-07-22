@@ -46,9 +46,9 @@ public class CourseController {
         return learningCatalogueService.addLearningTagToCourse(courseUid, learningTagDTO);
     }
 
-    @DeleteMapping("/{courseUid}/learning-tags/{learningTagId}")
+    @DeleteMapping("/{courseUid}/learning-tags/{learningTagCode}")
     @ResponseBody
-    public void removeLearningTagFromCourse(@PathVariable("courseUid") String courseUid, @PathVariable("learningTagId") Long learningTagId) {
-        learningCatalogueService.removeLearningTagFromCourse(courseUid, learningTagId);
+    public void removeLearningTagFromCourse(@PathVariable("courseUid") String courseUid, @PathVariable("learningTagCode") String learningTagCode) {
+        learningCatalogueService.removeLearningTagFromCourse(courseUid, learningTagCode);
     }
 }

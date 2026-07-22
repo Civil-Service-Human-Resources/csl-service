@@ -133,9 +133,9 @@ public class LearningCatalogueStubService {
         );
     }
 
-    public StubMapping removeLearningTagFromCourse(String courseUid, Long learningTagId) {
+    public StubMapping removeLearningTagFromCourse(String courseUid, String learningTagCode) {
         return stubFor(
-                WireMock.delete(urlPathEqualTo(String.format("/learning_catalogue/courses/%s/learning-tags/%s", courseUid, learningTagId)))
+                WireMock.delete(urlPathEqualTo(String.format("/learning_catalogue/courses/%s/learning-tags/%s", courseUid, learningTagCode)))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withStatus(204))
