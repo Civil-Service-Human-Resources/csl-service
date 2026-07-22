@@ -1,12 +1,13 @@
 package uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag;
 
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.cabinetoffice.csl.domain.TaxonomyMap;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.TaxonomyMap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class LearningTagMap extends TaxonomyMap<LearningTag> {
+public class LearningTagMap extends TaxonomyMap<LearningTag, LearningTagTreeNode> {
 
     public static LearningTagMap buildFromList(List<LearningTag> learningTags) {
         LearningTagMap map = new LearningTagMap();
@@ -15,6 +16,11 @@ public class LearningTagMap extends TaxonomyMap<LearningTag> {
         }
         learningTags.forEach(map::setData);
         return map;
+    }
+
+    @Override
+    protected LearningTagTreeNode buildNode(LearningTag object) {
+        return new LearningTagTreeNode(object.getName(), object.getId(), new ArrayList<>(), object.isArchived());
     }
 
     @Override

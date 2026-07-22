@@ -12,6 +12,7 @@ import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitOverview
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnitFactory;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnitMap;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyNode;
 import uk.gov.cabinetoffice.csl.service.ITaxonomyMapCacheClient;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 
@@ -35,7 +36,7 @@ class OrganisationalUnitMapServiceTest extends CsrsServiceTestBase {
     private IMessagingClient messagingClient;
 
     @Mock
-    private ITaxonomyMapCacheClient<OrganisationalUnit,
+    private ITaxonomyMapCacheClient<OrganisationalUnit, BasicTaxonomyNode,
             OrganisationalUnitMap, OrganisationalUnitDto> client;
 
     @InjectMocks

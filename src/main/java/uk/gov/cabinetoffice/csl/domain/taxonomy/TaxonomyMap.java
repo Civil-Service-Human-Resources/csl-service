@@ -1,20 +1,23 @@
-package uk.gov.cabinetoffice.csl.domain;
+package uk.gov.cabinetoffice.csl.domain.taxonomy;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
-import uk.gov.cabinetoffice.csl.domain.taxonomy.ITaxonomyItem;
 
 import java.util.*;
 import java.util.function.Function;
 
 @Slf4j
-public abstract class TaxonomyMap<T extends ITaxonomyItem> extends HashMap<Long, T> {
+public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTaxonomyNode> extends HashMap<Long, T> {
 
-    protected BasicTaxonomyNode buildNode(T object) {
-        List<BasicTaxonomyNode> childNodes = object.getChildIds().stream().map(id -> buildNode(get(id)))
+    protected Node buildNodeWithChildren(T object) {
+        Node node = buildNode(object);
+        List<Node> childNodes = object.getChildIds().stream().map(id -> buildNodeWithChildren(get(id)))
                 .sorted(Comparator.comparing(BasicTaxonomyNode::getName, String::compareToIgnoreCase)).toList();
-        return new BasicTaxonomyNode(object.getName(), object.getId(), childNodes);
+        node.setChildren(childNodes);
+        return node;
     }
+
+    protected abstract Node buildNode(T object);
 
     public T get(Long id) {
         return Optional.ofNullable(super.get(id)).orElseThrow(() -> new IllegalArgumentException("object not found for id: " + id));
@@ -39,10 +42,10 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem> extends HashMap<Long,
         return getMultiple(ids, includeChildren).stream().map(T::getId).toList();
     }
 
-    public List<BasicTaxonomyNode> getTree() {
+    public List<Node> getTree() {
         return values()
                 .stream().filter(o -> o.getParentId() == null)
-                .map(this::buildNode)
+                .map(this::buildNodeWithChildren)
                 .sorted(Comparator.comparing(BasicTaxonomyNode::getName, String::compareToIgnoreCase))
                 .toList();
     }

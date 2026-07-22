@@ -8,11 +8,10 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
+import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagsPagedResponse;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 
 import java.util.Collection;
@@ -113,5 +112,11 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     public LearningTag updateLearningTag(Long id, LearningTagDTO dto) {
         String url = config.getLearningTagUrl(id);
         return httpClient.executeRequest(RequestEntity.put(url).body(dto), LearningTag.class);
+    }
+
+    @Override
+    public BulkUpdateResponse updateLearningTagState(Collection<Long> ids, LearningTagStateUpdate stateUpdate) {
+        BulkLearningTagStateDto dto = new BulkLearningTagStateDto(ids, stateUpdate.getName());
+        return httpClient.executeRequest(RequestEntity.put(config.getLearningTagStateUrl()).body(dto), BulkUpdateResponse.class);
     }
 }

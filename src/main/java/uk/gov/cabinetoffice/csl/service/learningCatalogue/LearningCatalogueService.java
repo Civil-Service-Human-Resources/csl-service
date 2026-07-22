@@ -9,13 +9,14 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
-import uk.gov.cabinetoffice.csl.domain.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateDTO;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
@@ -192,5 +193,9 @@ public class LearningCatalogueService {
 
     public LearningTagOverview patchLearningTag(Long learningTagId, LearningTagDTO dto) {
         return learningTagMapService.update(learningTagId, dto);
+    }
+
+    public LearningTagOverview updateState(Long learningTagId, LearningTagStateDTO request) {
+        return learningTagMapService.updateState(learningTagId, request.getState());
     }
 }
