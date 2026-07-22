@@ -132,4 +132,13 @@ public class LearningCatalogueStubService {
                                 .withBody(response))
         );
     }
+
+    public StubMapping removeLearningTagFromCourse(String courseId, Long learningTagId) {
+        return stubFor(
+                WireMock.delete(urlPathEqualTo(String.format("/learning_catalogue/courses/%s/learning-tags/%s", courseId, learningTagId)))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withStatus(204))
+        );
+    }
 }

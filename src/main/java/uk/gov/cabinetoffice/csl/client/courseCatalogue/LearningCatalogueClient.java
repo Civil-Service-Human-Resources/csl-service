@@ -122,4 +122,11 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         RequestEntity<LearningTagDTO> request = RequestEntity.post(url).body(learningTagDTO);
         return httpClient.executeRequest(request, CourseLearningTagDto.class);
     }
+
+    @Override
+    public void removeLearningTagFromCourse(String courseId, Long learningTagId) {
+        String url = String.format("%s/%s/learning-tags/%s", config.getCourseUrl(), courseId, learningTagId);
+        RequestEntity<Void> request = RequestEntity.delete(url).build();
+        httpClient.executeRequest(request, Void.class);
+    }
 }

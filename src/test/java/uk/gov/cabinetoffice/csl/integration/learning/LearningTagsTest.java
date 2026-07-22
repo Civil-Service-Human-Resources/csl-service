@@ -376,4 +376,15 @@ public class LearningTagsTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.learningTag.name").value("Tag Name"))
                 .andExpect(jsonPath("$.learningTag.code").value("TAG_CODE"));
     }
+
+    @Test
+    public void testRemoveLearningTagFromCourse() throws Exception {
+        String courseId = "course-id";
+        Long learningTagId = 1L;
+        cslStubService.getLearningCatalogue().removeLearningTagFromCourse(courseId, learningTagId);
+
+        mockMvc.perform(delete("/courses/{courseId}/learning-tags/{learningTagId}", courseId, learningTagId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful());
+    }
 }
