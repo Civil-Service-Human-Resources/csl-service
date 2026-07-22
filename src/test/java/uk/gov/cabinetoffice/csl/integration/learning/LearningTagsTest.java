@@ -336,8 +336,8 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testAddLearningTagToCourse() throws Exception {
-        String courseId = "course-id";
-        cslStubService.getLearningCatalogue().addLearningTagToCourse(courseId, """
+        String courseUid = "course-uid";
+        cslStubService.getLearningCatalogue().addLearningTagToCourse(courseUid, """
                 {
                   "name": "Tag Name",
                   "code": "TAG_CODE",
@@ -348,7 +348,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                   "archived" : false
                 }""", """
                 {
-                  "uid": "course-id",
+                  "uid": "course-uid",
                   "title": "Course Title",
                   "learningTag": {
                     "name": "Tag Name",
@@ -362,7 +362,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                 }
                 """);
 
-        mockMvc.perform(post("/courses/{courseId}/learning-tags", courseId)
+        mockMvc.perform(post("/courses/{courseUid}/learning-tags", courseUid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -371,7 +371,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                                 }
                                 """))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.uid").value(courseId))
+                .andExpect(jsonPath("$.uid").value(courseUid))
                 .andExpect(jsonPath("$.title").value("Course Title"))
                 .andExpect(jsonPath("$.learningTag.name").value("Tag Name"))
                 .andExpect(jsonPath("$.learningTag.code").value("TAG_CODE"));
@@ -379,11 +379,11 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testRemoveLearningTagFromCourse() throws Exception {
-        String courseId = "course-id";
+        String courseUid = "course-uid";
         Long learningTagId = 1L;
-        cslStubService.getLearningCatalogue().removeLearningTagFromCourse(courseId, learningTagId);
+        cslStubService.getLearningCatalogue().removeLearningTagFromCourse(courseUid, learningTagId);
 
-        mockMvc.perform(delete("/courses/{courseId}/learning-tags/{learningTagId}", courseId, learningTagId)
+        mockMvc.perform(delete("/courses/{courseUid}/learning-tags/{learningTagId}", courseUid, learningTagId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
     }

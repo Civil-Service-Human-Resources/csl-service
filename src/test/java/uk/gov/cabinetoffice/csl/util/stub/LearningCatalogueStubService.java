@@ -122,9 +122,9 @@ public class LearningCatalogueStubService {
         );
     }
 
-    public StubMapping addLearningTagToCourse(String courseId, String input, String response) {
+    public StubMapping addLearningTagToCourse(String courseUid, String input, String response) {
         return stubFor(
-                WireMock.post(urlPathEqualTo(String.format("/learning_catalogue/courses/%s/learning-tags", courseId)))
+                WireMock.post(urlPathEqualTo(String.format("/learning_catalogue/courses/%s/learning-tags", courseUid)))
                         .withRequestBody(equalToJson(input, true, false))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
@@ -133,9 +133,9 @@ public class LearningCatalogueStubService {
         );
     }
 
-    public StubMapping removeLearningTagFromCourse(String courseId, Long learningTagId) {
+    public StubMapping removeLearningTagFromCourse(String courseUid, Long learningTagId) {
         return stubFor(
-                WireMock.delete(urlPathEqualTo(String.format("/learning_catalogue/courses/%s/learning-tags/%s", courseId, learningTagId)))
+                WireMock.delete(urlPathEqualTo(String.format("/learning_catalogue/courses/%s/learning-tags/%s", courseUid, learningTagId)))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withStatus(204))

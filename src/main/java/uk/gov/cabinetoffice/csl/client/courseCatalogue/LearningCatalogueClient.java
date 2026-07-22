@@ -117,15 +117,15 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
-    public CourseLearningTagDto addLearningTagToCourse(String courseId, LearningTagDTO learningTagDTO) {
-        String url = String.format("%s/%s/learning-tags", config.getCourseUrl(), courseId);
+    public CourseLearningTagDto addLearningTagToCourse(String courseUid, LearningTagDTO learningTagDTO) {
+        String url = String.format("%s/%s/learning-tags", config.getCourseUrl(), courseUid);
         RequestEntity<LearningTagDTO> request = RequestEntity.post(url).body(learningTagDTO);
         return httpClient.executeRequest(request, CourseLearningTagDto.class);
     }
 
     @Override
-    public void removeLearningTagFromCourse(String courseId, Long learningTagId) {
-        String url = String.format("%s/%s/learning-tags/%s", config.getCourseUrl(), courseId, learningTagId);
+    public void removeLearningTagFromCourse(String courseUid, Long learningTagId) {
+        String url = String.format("%s/%s/learning-tags/%s", config.getCourseUrl(), courseUid, learningTagId);
         RequestEntity<Void> request = RequestEntity.delete(url).build();
         httpClient.executeRequest(request, Void.class);
     }

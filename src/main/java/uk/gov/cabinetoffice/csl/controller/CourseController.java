@@ -40,15 +40,15 @@ public class CourseController {
         return courseActionService.performCourseAction(action);
     }
 
-    @PostMapping("/{courseId}/learning-tags")
+    @PostMapping("/{courseUid}/learning-tags")
     @ResponseBody
-    public CourseLearningTagDto addLearningTagToCourse(@PathVariable("courseId") String courseId, @RequestBody LearningTagDTO learningTagDTO) {
-        return learningCatalogueService.addLearningTagToCourse(courseId, learningTagDTO);
+    public CourseLearningTagDto addLearningTagToCourse(@PathVariable("courseUid") String courseUid, @RequestBody LearningTagDTO learningTagDTO) {
+        return learningCatalogueService.addLearningTagToCourse(courseUid, learningTagDTO);
     }
 
-    @DeleteMapping("/{courseId}/learning-tags/{learningTagId}")
+    @DeleteMapping("/{courseUid}/learning-tags/{learningTagId}")
     @ResponseBody
-    public void removeLearningTagFromCourse(@PathVariable("courseId") String courseId, @PathVariable("learningTagId") Long learningTagId) {
-        learningCatalogueService.removeLearningTagFromCourse(courseId, learningTagId);
+    public void removeLearningTagFromCourse(@PathVariable("courseUid") String courseUid, @PathVariable("learningTagId") Long learningTagId) {
+        learningCatalogueService.removeLearningTagFromCourse(courseUid, learningTagId);
     }
 }

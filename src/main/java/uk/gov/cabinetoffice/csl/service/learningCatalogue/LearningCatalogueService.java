@@ -195,16 +195,16 @@ public class LearningCatalogueService {
         return learningTagMapService.update(learningTagId, dto);
     }
 
-    public CourseLearningTagDto addLearningTagToCourse(String courseId, LearningTagDTO learningTagDTO) {
-        log.info("Adding learning tag {} to course {}", learningTagDTO.getCode(), courseId);
-        CourseLearningTagDto courseLearningTagDto = client.addLearningTagToCourse(courseId, learningTagDTO);
-        log.info("Added learning tag {} to course {}", learningTagDTO.getCode(), courseId);
+    public CourseLearningTagDto addLearningTagToCourse(String courseUid, LearningTagDTO learningTagDTO) {
+        log.info("Adding learning tag {} to course {}", learningTagDTO.getCode(), courseUid);
+        CourseLearningTagDto courseLearningTagDto = client.addLearningTagToCourse(courseUid, learningTagDTO);
+        log.info("Added learning tag {} to course {}", learningTagDTO.getCode(), courseUid);
         return courseLearningTagDto;
     }
 
-    public void removeLearningTagFromCourse(String courseId, Long learningTagId) {
-        log.info("Removing learning tag {} from course {}", learningTagId, courseId);
-        client.removeLearningTagFromCourse(courseId, learningTagId);
-        log.info("Removed learning tag {} from course {}", learningTagId, courseId);
+    public void removeLearningTagFromCourse(String courseUid, Long learningTagId) {
+        log.info("Removing learning tag {} from course {}", learningTagId, courseUid);
+        client.removeLearningTagFromCourse(courseUid, learningTagId);
+        log.info("Removed learning tag {} from course {}", learningTagId, courseUid);
     }
 }
