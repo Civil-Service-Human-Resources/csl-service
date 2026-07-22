@@ -44,4 +44,9 @@ public class JsonLearningTagBuilder extends BaseJsonBuilder {
         return this;
     }
 
+    public JsonLearningTagBuilder isCategory() {
+        root.put("category", true);
+        return this;
+    }
+
 }
