@@ -4,8 +4,6 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.CourseResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.ActionWithId;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.CourseLearningTagDto;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.service.CourseActionService;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
@@ -38,12 +36,6 @@ public class CourseController {
     public CourseResponse addCourseToLearningPlan(@PathVariable("courseId") String courseId) {
         ActionWithId action = actionWithIdFactory.create(courseId, userAuthService.getUsername(), CourseRecordAction.MOVE_TO_LEARNING_PLAN);
         return courseActionService.performCourseAction(action);
-    }
-
-    @PostMapping("/{courseUid}/learning-tags")
-    @ResponseBody
-    public CourseLearningTagDto addLearningTagToCourse(@PathVariable("courseUid") String courseUid, @RequestBody LearningTagDTO learningTagDTO) {
-        return learningCatalogueService.addLearningTagToCourse(courseUid, learningTagDTO);
     }
 
     @DeleteMapping("/{courseUid}/learning-tags/{learningTagCode}")

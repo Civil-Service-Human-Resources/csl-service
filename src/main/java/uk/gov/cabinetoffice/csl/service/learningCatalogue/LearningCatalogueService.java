@@ -14,7 +14,6 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.CourseLearningTagDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateDTO;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyTree;
@@ -64,7 +63,6 @@ public class LearningCatalogueService {
         }
     }
 
-
     public Course getCourse(String courseId) {
         try {
             Course course = getCourses(List.of(courseId)).stream().findFirst().orElse(null);
@@ -81,7 +79,6 @@ public class LearningCatalogueService {
     public <T> Map<String, T> getCourseIdMap(Collection<String> courseIds, Function<Course, T> valueMapper) {
         return getCourses(courseIds).stream().collect(Collectors.toMap(Course::getCacheableId, valueMapper));
     }
-
 
     public Map<String, String> getCourseIdToTitleMap(Collection<String> courseIds) {
         return getCourseIdMap(courseIds, Course::getTitle);
@@ -198,13 +195,6 @@ public class LearningCatalogueService {
 
     public LearningTagOverview updateState(Long learningTagId, LearningTagStateDTO request) {
         return learningTagMapService.updateState(learningTagId, request.getState());
-    }
-
-    public CourseLearningTagDto addLearningTagToCourse(String courseUid, LearningTagDTO learningTagDTO) {
-        log.info("Adding learning tag {} to course {}", learningTagDTO.getCode(), courseUid);
-        CourseLearningTagDto courseLearningTagDto = client.addLearningTagToCourse(courseUid, learningTagDTO);
-        log.info("Added learning tag {} to course {}", learningTagDTO.getCode(), courseUid);
-        return courseLearningTagDto;
     }
 
     public void removeLearningTagFromCourse(String courseUid, String learningTagCode) {

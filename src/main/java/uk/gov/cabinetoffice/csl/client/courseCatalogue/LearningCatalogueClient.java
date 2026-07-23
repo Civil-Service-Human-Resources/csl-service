@@ -12,7 +12,6 @@ import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.CourseLearningTagDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagsPagedResponse;
@@ -122,13 +121,6 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     public BulkUpdateResponse updateLearningTagState(Collection<Long> ids, LearningTagStateUpdate stateUpdate) {
         BulkLearningTagStateDto dto = new BulkLearningTagStateDto(ids, stateUpdate.getName());
         return httpClient.executeRequest(RequestEntity.put(config.getLearningTagStateUrl()).body(dto), BulkUpdateResponse.class);
-    }
-
-    @Override
-    public CourseLearningTagDto addLearningTagToCourse(String courseUid, LearningTagDTO learningTagDTO) {
-        String url = String.format("%s/%s/learning-tags", config.getCourseUrl(), courseUid);
-        RequestEntity<LearningTagDTO> request = RequestEntity.post(url).body(learningTagDTO);
-        return httpClient.executeRequest(request, CourseLearningTagDto.class);
     }
 
     @Override

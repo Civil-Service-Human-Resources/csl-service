@@ -131,17 +131,6 @@ public class LearningCatalogueStubService {
                         .withBody(response)));
     }
 
-    public StubMapping addLearningTagToCourse(String courseUid, String input, String response) {
-        return stubFor(
-                WireMock.post(urlPathEqualTo(String.format("/learning_catalogue/courses/%s/learning-tags", courseUid)))
-                        .withRequestBody(equalToJson(input, true, false))
-                        .withHeader("Authorization", equalTo("Bearer token"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withBody(response))
-        );
-    }
-
     public StubMapping removeLearningTagFromCourse(String courseUid, String learningTagCode) {
         return stubFor(
                 WireMock.delete(urlPathEqualTo(String.format("/learning_catalogue/courses/%s/learning-tags/%s", courseUid, learningTagCode)))

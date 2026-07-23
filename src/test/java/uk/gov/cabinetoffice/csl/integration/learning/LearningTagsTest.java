@@ -392,49 +392,6 @@ public class LearningTagsTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testAddLearningTagToCourse() throws Exception {
-        String courseUid = "course-uid";
-        cslStubService.getLearningCatalogue().addLearningTagToCourse(courseUid, """
-                {
-                  "name": "Tag Name",
-                  "code": "TAG_CODE",
-                  "description" : null,
-                  "parentId" : null,
-                  "urlSlug" : null,
-                  "category" : false,
-                  "archived" : false
-                }""", """
-                {
-                  "uid": "course-uid",
-                  "title": "Course Title",
-                  "learningTag": {
-                    "name": "Tag Name",
-                    "code": "TAG_CODE",
-                    "description" : null,
-                    "parentId" : null,
-                    "urlSlug" : null,
-                    "category" : false,
-                    "archived" : false
-                  }
-                }
-                """);
-
-        mockMvc.perform(post("/courses/{courseUid}/learning-tags", courseUid)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "name": "Tag Name",
-                                  "code": "TAG_CODE"
-                                }
-                                """))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.uid").value(courseUid))
-                .andExpect(jsonPath("$.title").value("Course Title"))
-                .andExpect(jsonPath("$.learningTag.name").value("Tag Name"))
-                .andExpect(jsonPath("$.learningTag.code").value("TAG_CODE"));
-    }
-
-    @Test
     public void testRemoveLearningTagFromCourse() throws Exception {
         String courseUid = "course-uid";
         String learningTagCode = "TAG_CODE";

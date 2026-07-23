@@ -4,7 +4,6 @@ import org.springframework.data.domain.Sort;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.CourseLearningTagDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateUpdate;
@@ -31,8 +30,6 @@ public interface ILearningCatalogueClient {
     LearningTag updateLearningTag(Long id, LearningTagDTO dto);
 
     BulkUpdateResponse updateLearningTagState(Collection<Long> ids, LearningTagStateUpdate stateUpdate);
-
-    CourseLearningTagDto addLearningTagToCourse(String courseUid, LearningTagDTO learningTagDTO);
 
     void removeLearningTagFromCourse(String courseUid, String learningTagCode);
 
