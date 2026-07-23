@@ -197,12 +197,6 @@ public class LearningCatalogueService {
         return learningTagMapService.updateState(learningTagId, request.getState());
     }
 
-    public void removeLearningTagFromCourse(String courseUid, String learningTagCode) {
-        log.info("Removing learning tag {} from course {}", learningTagCode, courseUid);
-        client.removeLearningTagFromCourse(courseUid, learningTagCode);
-        log.info("Removed learning tag {} from course {}", learningTagCode, courseUid);
-    }
-
     public CourseSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
         return client.getCoursesForLearningTag(tagId, page, size);
     }

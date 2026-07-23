@@ -124,13 +124,6 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
-    public void removeLearningTagFromCourse(String courseUid, String learningTagCode) {
-        String url = String.format("%s/%s/learning-tags/%s", config.getCourseUrl(), courseUid, learningTagCode);
-        RequestEntity<Void> request = RequestEntity.delete(url).build();
-        httpClient.executeRequest(request, Void.class);
-    }
-
-    @Override
     public CourseSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(config.getLearningTagUrl(tagId) + "/courses");
         uriBuilder.queryParam("page", page);

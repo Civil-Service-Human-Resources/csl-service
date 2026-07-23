@@ -37,10 +37,4 @@ public class CourseController {
         ActionWithId action = actionWithIdFactory.create(courseId, userAuthService.getUsername(), CourseRecordAction.MOVE_TO_LEARNING_PLAN);
         return courseActionService.performCourseAction(action);
     }
-
-    @DeleteMapping("/{courseUid}/learning-tags/{learningTagCode}")
-    @ResponseBody
-    public void removeLearningTagFromCourse(@PathVariable("courseUid") String courseUid, @PathVariable("learningTagCode") String learningTagCode) {
-        learningCatalogueService.removeLearningTagFromCourse(courseUid, learningTagCode);
-    }
 }

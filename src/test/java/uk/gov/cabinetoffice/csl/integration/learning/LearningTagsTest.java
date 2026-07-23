@@ -392,17 +392,6 @@ public class LearningTagsTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testRemoveLearningTagFromCourse() throws Exception {
-        String courseUid = "course-uid";
-        String learningTagCode = "TAG_CODE";
-        cslStubService.getLearningCatalogue().removeLearningTagFromCourse(courseUid, learningTagCode);
-
-        mockMvc.perform(delete("/courses/{courseUid}/learning-tags/{learningTagCode}", courseUid, learningTagCode)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is2xxSuccessful());
-    }
-
-    @Test
     public void testGetCoursesForLearningTag() throws Exception {
         Long tagId = 1L;
         int page = 0;

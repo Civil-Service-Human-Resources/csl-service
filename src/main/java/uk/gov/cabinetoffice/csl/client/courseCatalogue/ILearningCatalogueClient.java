@@ -31,7 +31,5 @@ public interface ILearningCatalogueClient {
 
     BulkUpdateResponse updateLearningTagState(Collection<Long> ids, LearningTagStateUpdate stateUpdate);
 
-    void removeLearningTagFromCourse(String courseUid, String learningTagCode);
-
     CourseSearchResults getCoursesForLearningTag(Long tagId, int page, int size);
 }
