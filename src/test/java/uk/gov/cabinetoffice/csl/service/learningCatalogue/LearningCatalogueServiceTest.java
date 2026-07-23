@@ -5,11 +5,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.util.TtlObjectCache;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class LearningCatalogueServiceTest {
@@ -20,9 +20,6 @@ class LearningCatalogueServiceTest {
     @Mock
     TtlObjectCache<Course> courseObjectCache;
 
-    @Mock
-    ILearningCatalogueClient learningCatalogueClient;
-
     @InjectMocks
     LearningCatalogueService learningCatalogueService;
 
@@ -32,5 +29,6 @@ class LearningCatalogueServiceTest {
 
         verify(learningCatalogueCacheService, atMostOnce()).evict();
         verify(courseObjectCache, atMostOnce()).evict("course2");
+
     }
 }

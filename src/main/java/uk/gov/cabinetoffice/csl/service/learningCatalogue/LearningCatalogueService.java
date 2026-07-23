@@ -63,6 +63,7 @@ public class LearningCatalogueService {
         }
     }
 
+
     public Course getCourse(String courseId) {
         try {
             Course course = getCourses(List.of(courseId)).stream().findFirst().orElse(null);
@@ -79,6 +80,7 @@ public class LearningCatalogueService {
     public <T> Map<String, T> getCourseIdMap(Collection<String> courseIds, Function<Course, T> valueMapper) {
         return getCourses(courseIds).stream().collect(Collectors.toMap(Course::getCacheableId, valueMapper));
     }
+
 
     public Map<String, String> getCourseIdToTitleMap(Collection<String> courseIds) {
         return getCourseIdMap(courseIds, Course::getTitle);
