@@ -36,5 +36,5 @@ public class CourseController {
         ActionWithId action = actionWithIdFactory.create(courseId, userAuthService.getUsername(), CourseRecordAction.MOVE_TO_LEARNING_PLAN);
         return courseActionService.performCourseAction(action);
     }
-
+    
 }

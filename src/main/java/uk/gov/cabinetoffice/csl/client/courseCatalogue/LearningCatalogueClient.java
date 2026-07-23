@@ -12,9 +12,6 @@ import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagsPagedResponse;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 
 import java.util.Collection;
