@@ -35,4 +35,6 @@ public interface ILearningCatalogueClient {
     CourseLearningTagDto addLearningTagToCourse(String courseUid, LearningTagDTO learningTagDTO);
 
     void removeLearningTagFromCourse(String courseUid, String learningTagCode);
+
+    CourseSearchResults getCoursesForLearningTag(Long tagId, int page, int size);
 }

@@ -212,4 +212,8 @@ public class LearningCatalogueService {
         client.removeLearningTagFromCourse(courseUid, learningTagCode);
         log.info("Removed learning tag {} from course {}", learningTagCode, courseUid);
     }
+
+    public CourseSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
+        return client.getCoursesForLearningTag(tagId, page, size);
+    }
 }
