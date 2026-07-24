@@ -121,15 +121,11 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
-    public CourseSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
+    public CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(config.getLearningTagUrl(tagId) + "/courses");
         uriBuilder.queryParam("page", page);
         uriBuilder.queryParam("size", size);
         RequestEntity<Void> request = RequestEntity.get(uriBuilder.toUriString()).build();
-        CourseSearchResults resp = httpClient.executeRequest(request, CourseSearchResults.class);
-        if (resp != null && resp.getResults() != null) {
-            resp.getResults().forEach(this::buildCourseData);
-        }
-        return resp;
+        return httpClient.executeRequest(request, CourseLearningTagSearchResults.class);
     }
 }

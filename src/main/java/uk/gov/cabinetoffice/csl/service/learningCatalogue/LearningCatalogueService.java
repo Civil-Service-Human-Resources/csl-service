@@ -199,7 +199,7 @@ public class LearningCatalogueService {
         return learningTagMapService.updateState(learningTagId, request.getState());
     }
 
-    public CourseSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
+    public CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
         return client.getCoursesForLearningTag(tagId, page, size);
     }
 }
