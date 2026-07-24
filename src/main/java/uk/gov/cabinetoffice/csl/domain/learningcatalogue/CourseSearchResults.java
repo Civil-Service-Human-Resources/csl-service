@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.domain.learningcatalogue;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +16,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CourseSearchResults {
 
+    @JsonAlias("content")
     private List<Course> results;
     private Integer page;
     private Long totalResults;
