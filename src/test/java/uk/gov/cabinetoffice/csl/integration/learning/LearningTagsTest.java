@@ -398,7 +398,7 @@ public class LearningTagsTest extends IntegrationTestBase {
         int size = 20;
         String response = """
                 {
-                  "results": [
+                  "content": [
                     {
                       "id": "course-id-1",
                       "title": "Course Title 1"
@@ -410,7 +410,10 @@ public class LearningTagsTest extends IntegrationTestBase {
                   ],
                   "page": 0,
                   "size": 20,
-                  "totalResults": 2
+                  "totalResults": 2,
+                  "totalElements": 2,
+                  "totalPages": 1,
+                  "sort": []
                 }
                 """;
         cslStubService.getLearningCatalogue().getCoursesForLearningTag(tagId, page, size, response);
