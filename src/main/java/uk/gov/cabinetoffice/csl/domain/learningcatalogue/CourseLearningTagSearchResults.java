@@ -19,10 +19,10 @@ public class CourseLearningTagSearchResults {
     @JsonAlias("content")
     private List<CourseLearningTagResponse> results;
     private Integer page;
-    private Long totalResults;
     private Integer size;
-    private Integer totalElements;
+    private Long totalResults;
     private Integer totalPages;
+    private Integer totalElements;
     private Integer numberOfElements;
     private boolean last;
     private boolean first;
