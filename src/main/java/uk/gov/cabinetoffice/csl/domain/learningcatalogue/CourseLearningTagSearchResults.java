@@ -20,7 +20,7 @@ public class CourseLearningTagSearchResults {
     private List<CourseLearningTagResponse> results;
     private Integer page;
     private Integer size;
-    private Long totalResults;
+    private Integer totalResults;
     private Integer totalPages;
     private Integer totalElements;
     private Integer numberOfElements;
