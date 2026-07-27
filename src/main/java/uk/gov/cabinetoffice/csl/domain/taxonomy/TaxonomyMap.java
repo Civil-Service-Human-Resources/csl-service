@@ -40,7 +40,9 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTax
 
     public List<T> getDescendants(Long parentId) {
         List<T> parentWithDescendants = getMultiple(List.of(parentId), true);
-        parentWithDescendants.remove(0);
+        if (!parentWithDescendants.isEmpty()) {
+            parentWithDescendants.remove(0);
+        }
         return parentWithDescendants;
     }
 
@@ -97,7 +99,9 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTax
 
     public List<T> getParents(Long id) {
         List<T> hierarchy = getHierarchy(id);
-        hierarchy.remove(0);
+        if (!hierarchy.isEmpty()) {
+            hierarchy.remove(0);
+        }
         return hierarchy;
     }
 
