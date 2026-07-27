@@ -2,6 +2,8 @@ package uk.gov.cabinetoffice.csl.service.learning;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCategories;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagSubCategories;
+import uk.gov.cabinetoffice.csl.domain.learning.LearningTagTaxonomy;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningTagMapService;
 
@@ -21,5 +23,10 @@ public class LearningCategoryService {
     public LearningTagCategories getCategories() {
         Collection<LearningTag> tags = learningTagMapService.getTierOneUnarchivedHomepageTags();
         return learningCategoryFactory.buildCategories(tags);
+    }
+
+    public LearningTagSubCategories getCategories(String urlSlug) {
+        LearningTagTaxonomy taxonomy = learningTagMapService.getTierOneUnarchivedHomepageTagsWithUrl(urlSlug);
+        return learningCategoryFactory.buildSubCategories(taxonomy);
     }
 }

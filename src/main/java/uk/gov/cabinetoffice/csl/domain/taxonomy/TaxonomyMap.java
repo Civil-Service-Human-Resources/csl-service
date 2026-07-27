@@ -38,6 +38,12 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTax
         return objects;
     }
 
+    public List<T> getDescendants(Long parentId) {
+        List<T> parentWithDescendants = getMultiple(List.of(parentId), true);
+        parentWithDescendants.remove(0);
+        return parentWithDescendants;
+    }
+
     public List<Long> getMultipleAsIds(Collection<Long> ids, boolean includeChildren) {
         return getMultiple(ids, includeChildren).stream().map(T::getId).toList();
     }
@@ -86,6 +92,12 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTax
             hierarchy.add(parent);
             parentId = parent.getParentId();
         }
+        return hierarchy;
+    }
+
+    public List<T> getParents(Long id) {
+        List<T> hierarchy = getHierarchy(id);
+        hierarchy.remove(0);
         return hierarchy;
     }
 

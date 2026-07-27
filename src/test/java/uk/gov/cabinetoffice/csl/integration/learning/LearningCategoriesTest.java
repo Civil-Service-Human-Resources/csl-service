@@ -54,5 +54,31 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                         """));
     }
 
+    @Test
+    public void testGetSubCategories() throws Exception {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+        mockMvc.perform(get("/learning/categories/TAGN2"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {
+                            "categories": [
+                                {
+                                    "title": "TagName3",
+                                    "description": "TagName3 description",
+                                    "url": "TAGN3"
+                                }
+                            ],
+                            "title": "TagName2",
+                            "description": "TagName2 description",
+                            "parents": [
+                                {
+                                    "link": "TagName1",
+                                    "text": "TAGN1"
+                                }
+                            ]
+                        }
+                        """));
+    }
+
 
 }
