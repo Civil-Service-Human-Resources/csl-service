@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CourseLearningTagSearchResults {
 
-    @JsonProperty("content")
+    @JsonProperty("results")
     @JsonAlias("content")
     private List<CourseLearningTagResponse> results;
     private Integer page;
@@ -23,5 +23,7 @@ public class CourseLearningTagSearchResults {
     private Integer size;
     private Integer totalElements;
     private Integer totalPages;
-    private List<Object> sort;
+    private Integer numberOfElements;
+    private boolean last;
+    private boolean first;
 }
