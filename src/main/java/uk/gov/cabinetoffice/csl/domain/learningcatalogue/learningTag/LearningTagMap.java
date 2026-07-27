@@ -34,7 +34,8 @@ public class LearningTagMap extends TaxonomyMap<LearningTag, LearningTagTreeNode
     public LearningTagTaxonomy getFullTaxonomyFromUrl(String urlSlug) {
         LearningTag learningTag = getWithUrl(urlSlug);
         Long learningTagId = learningTag.getId();
-        return new LearningTagTaxonomy(learningTag, getParents(learningTagId), getDescendants(learningTagId));
+        return new LearningTagTaxonomy(learningTag, getParents(learningTagId), learningTag.getChildIds()
+                .stream().map(this::get).toList());
 
     }
 

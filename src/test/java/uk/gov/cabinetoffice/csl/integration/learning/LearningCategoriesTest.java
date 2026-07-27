@@ -80,5 +80,54 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                         """));
     }
 
+    @Test
+    public void testGetSubCategoriesDescendant() throws Exception {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+        mockMvc.perform(get("/learning/categories/TAGN3"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {
+                            "categories": [],
+                            "title": "TagName3",
+                            "description": "TagName3 description",
+                            "parents": [
+                                {
+                                    "link": "TagName1",
+                                    "text": "TAGN1"
+                                },
+                                {
+                                    "link": "TagName2",
+                                    "text": "TAGN2"
+                                }
+                            ]
+                        }
+                        """));
+    }
+
+    @Test
+    public void testGetSubCategoriesParent() throws Exception {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+        mockMvc.perform(get("/learning/categories/TAGN1"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {
+                            "categories": [
+                                {
+                                    "title": "TagName2",
+                                    "description": "TagName2 description",
+                                    "url": "TAGN2"
+                                },
+                                {
+                                    "title": "TagName5",
+                                    "description": "TagName5 description",
+                                    "url": "TAGN5"
+                                }
+                            ],
+                            "title": "TagName1",
+                            "description": "TagName1 description",
+                            "parents": []
+                        }
+                        """));
+    }
 
 }

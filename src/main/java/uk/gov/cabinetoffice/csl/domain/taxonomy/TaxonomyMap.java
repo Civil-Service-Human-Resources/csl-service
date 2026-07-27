@@ -38,14 +38,6 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTax
         return objects;
     }
 
-    public List<T> getDescendants(Long parentId) {
-        List<T> parentWithDescendants = getMultiple(List.of(parentId), true);
-        if (!parentWithDescendants.isEmpty()) {
-            parentWithDescendants.remove(0);
-        }
-        return parentWithDescendants;
-    }
-
     public List<Long> getMultipleAsIds(Collection<Long> ids, boolean includeChildren) {
         return getMultiple(ids, includeChildren).stream().map(T::getId).toList();
     }
