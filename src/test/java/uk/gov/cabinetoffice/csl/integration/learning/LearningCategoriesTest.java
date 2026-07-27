@@ -72,8 +72,8 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                             "description": "TagName2 description",
                             "parents": [
                                 {
-                                    "link": "TagName1",
-                                    "text": "TAGN1"
+                                    "text": "TagName1",
+                                    "link": "TAGN1"
                                 }
                             ]
                         }
@@ -92,12 +92,12 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                             "description": "TagName3 description",
                             "parents": [
                                 {
-                                    "link": "TagName1",
-                                    "text": "TAGN1"
+                                    "text": "TagName1",
+                                    "link": "TAGN1"
                                 },
                                 {
-                                    "link": "TagName2",
-                                    "text": "TAGN2"
+                                    "text": "TagName2",
+                                    "link": "TAGN2"
                                 }
                             ]
                         }

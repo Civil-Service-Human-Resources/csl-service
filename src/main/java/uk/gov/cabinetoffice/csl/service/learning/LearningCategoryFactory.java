@@ -24,7 +24,7 @@ public class LearningCategoryFactory {
 
     public LearningTagSubCategories buildSubCategories(LearningTagTaxonomy taxonomy) {
         Collection<Link> parentLinks = taxonomy.parents().stream()
-                .map(lt -> new Link(lt.getName(), lt.getUrlSlug())).toList();
+                .map(lt -> new Link(lt.getUrlSlug(), lt.getName())).toList();
         Collection<LearningTagCategory> categories = taxonomy.children()
                 .stream().map(lt -> new LearningTagCategory(lt.getName(), lt.getDescription(), lt.getUrlSlug()))
                 .sorted(Comparator.comparing(LearningTagCategory::getTitle))
