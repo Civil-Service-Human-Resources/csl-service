@@ -68,7 +68,7 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         object.setDescription(dto.getDescription());
     }
 
-    public LearningTagOverview updateState(Long learningTagId, LearningTagStateUpdate update) {
+    public BulkUpdateResponse updateState(Long learningTagId, LearningTagStateUpdate update) {
         LearningTagMap learningTagMap = get();
         Collection<Long> ids = learningTagMap.getMultipleAsIds(List.of(learningTagId), true);
         BulkUpdateResponse result = client.updateState(ids, update);
@@ -77,6 +77,6 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
             return learningTag;
         }));
         put(learningTagMap);
-        return taxonomyItemFactory.createOverview(learningTagMap.get(learningTagId));
+        return result;
     }
 }

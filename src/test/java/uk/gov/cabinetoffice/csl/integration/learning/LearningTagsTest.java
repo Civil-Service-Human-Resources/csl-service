@@ -375,18 +375,10 @@ public class LearningTagsTest extends IntegrationTestBase {
                                 }
                                 """))
                 .andExpect(content().json("""
-                          {
-                            "id":1,
-                            "name":"TagName1",
-                            "description":"TagName1 description",
-                            "code":"TAGN1",
-                            "urlSlug":"TAGN1",
-                            "fullUrl":"TAGN1",
-                            "parentId":null,
-                            "parentName":null,
-                            "category":false,
-                            "archived":true
-                          }
+                        {
+                            "state": "ARCHIVE",
+                            "updatedIds": [1, 2, 3]
+                        }
                         """))
                 .andExpect(status().is2xxSuccessful());
     }

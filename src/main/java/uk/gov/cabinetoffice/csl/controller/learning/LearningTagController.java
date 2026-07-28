@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagStateResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateDTO;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyTree;
@@ -56,8 +57,8 @@ public class LearningTagController {
 
     @PutMapping("/{learningTagId}/state")
     @ResponseStatus(HttpStatus.OK)
-    public LearningTagOverview updateState(@PathVariable Long learningTagId,
-                                           @RequestBody LearningTagStateDTO request
+    public LearningTagStateResponse updateState(@PathVariable Long learningTagId,
+                                                @RequestBody LearningTagStateDTO request
     ) {
         log.info("Update learning tag for id: {} and request: {}", learningTagId, request.toString());
         return learningCatalogueService.updateState(learningTagId, request);
