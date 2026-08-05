@@ -79,4 +79,10 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         put(learningTagMap);
         return taxonomyItemFactory.createOverview(learningTagMap.get(learningTagId));
     }
+
+    public Collection<LearningTag> getTierOneUnarchivedHomepageTags() {
+        return get().values()
+                .stream().filter(lt -> !lt.isArchived() && lt.getParentId() == null && lt.isCategory())
+                .toList();
+    }
 }
