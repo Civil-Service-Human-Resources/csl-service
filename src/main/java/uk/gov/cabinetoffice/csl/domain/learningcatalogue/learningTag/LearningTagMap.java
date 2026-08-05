@@ -34,6 +34,9 @@ public class LearningTagMap extends TaxonomyMap<LearningTag, LearningTagTreeNode
 
     public LearningTagTaxonomy getFullTaxonomyFromUrl(String urlSlug) {
         LearningTag learningTag = getWithUrl(urlSlug);
+        if (!learningTag.showOnHomepage()) {
+            throw new NotFoundException("Learning tag cannot be shown on the homepage for url: " + urlSlug);
+        }
         Long learningTagId = learningTag.getId();
         return new LearningTagTaxonomy(learningTag, getParents(learningTagId), learningTag.getChildIds()
                 .stream().map(this::get)

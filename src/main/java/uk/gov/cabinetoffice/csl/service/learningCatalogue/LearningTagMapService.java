@@ -104,4 +104,5 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
     public LearningTagTaxonomy getUnarchivedHomepageTagsWithUrl(String urlSlug) {
         return get().getFullTaxonomyFromUrl(urlSlug);
     }
+
 }
