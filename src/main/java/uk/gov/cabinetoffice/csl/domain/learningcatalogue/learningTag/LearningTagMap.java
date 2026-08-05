@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learning.LearningTagTaxonomy;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.TaxonomyMap;
 
@@ -28,7 +29,7 @@ public class LearningTagMap extends TaxonomyMap<LearningTag, LearningTagTreeNode
     public LearningTag getWithUrl(String urlSlug) {
         return Optional.ofNullable(urlSlugMap.get(urlSlug))
                 .map(this::get)
-                .orElseThrow(() -> new IllegalArgumentException("Learning tag with not found for url: " + urlSlug));
+                .orElseThrow(() -> new NotFoundException("Learning tag with not found for url: " + urlSlug));
     }
 
     public LearningTagTaxonomy getFullTaxonomyFromUrl(String urlSlug) {
@@ -37,6 +38,11 @@ public class LearningTagMap extends TaxonomyMap<LearningTag, LearningTagTreeNode
         return new LearningTagTaxonomy(learningTag, getParents(learningTagId), learningTag.getChildIds()
                 .stream().map(this::get).toList());
 
+    }
+
+    public void updateUrl(String existingUrl, String newUrl) {
+        Long id = urlSlugMap.remove(existingUrl);
+        urlSlugMap.put(newUrl, id);
     }
 
     @Override

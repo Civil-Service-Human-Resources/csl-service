@@ -18,6 +18,7 @@ import uk.gov.cabinetoffice.csl.util.IUtilService;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag, LearningTagTreeNode, LearningTagMap, LearningTagDTO, LearningTagOverview> {
@@ -58,7 +59,20 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
             String slug = utilService.generateUrlSlugFromString(dto.getName(), maxUrlSlugSize);
             dto.setUrlSlug(slug);
         }
-        return super.update(id, dto);
+        LearningTagMap map = get();
+        LearningTag object = map.get(id);
+        map.validateUpdate(id, dto.getParentId());
+        client.patch(id, dto);
+        if (!Objects.equals(object.getParentId(), dto.getParentId())) {
+            object = map.updateParent(object, dto.getParentId());
+        }
+        if (!Objects.equals(object.getUrlSlug(), dto.getUrlSlug())) {
+            map.updateUrl(object.getUrlSlug(), dto.getUrlSlug());
+        }
+        updateObjectWithDto(object, dto);
+        map.rebuildHierarchy(object);
+        put(map);
+        return taxonomyItemFactory.createOverview(object);
     }
 
     @Override
