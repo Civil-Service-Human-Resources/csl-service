@@ -26,7 +26,7 @@ public class LearningCategoryService {
     }
 
     public LearningTagSubCategories getCategories(String urlSlug) {
-        LearningTagTaxonomy taxonomy = learningTagMapService.getTierOneUnarchivedHomepageTagsWithUrl(urlSlug);
+        LearningTagTaxonomy taxonomy = learningTagMapService.getUnarchivedHomepageTagsWithUrl(urlSlug);
         return learningCategoryFactory.buildSubCategories(taxonomy);
     }
 }

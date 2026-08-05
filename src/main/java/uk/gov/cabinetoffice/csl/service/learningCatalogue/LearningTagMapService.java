@@ -97,11 +97,11 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
 
     public Collection<LearningTag> getTierOneUnarchivedHomepageTags() {
         return get().values()
-                .stream().filter(LearningTag::showOnHomepage)
+                .stream().filter(lt -> lt.showOnHomepage() && lt.getParentId() == null)
                 .toList();
     }
 
-    public LearningTagTaxonomy getTierOneUnarchivedHomepageTagsWithUrl(String urlSlug) {
+    public LearningTagTaxonomy getUnarchivedHomepageTagsWithUrl(String urlSlug) {
         return get().getFullTaxonomyFromUrl(urlSlug);
     }
 }
