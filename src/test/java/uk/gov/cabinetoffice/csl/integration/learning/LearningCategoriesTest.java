@@ -23,10 +23,10 @@ public class LearningCategoriesTest extends IntegrationTestBase {
     private final String learningTagsPagedResponse = new ArrayJsonContentBuilder<JsonLearningTagBuilder>()
             .addElements(
                     JsonLearningTagBuilder.create(1L, null, null, "2025-01-01T10:00:00").isCategory(),
-                    JsonLearningTagBuilder.create(2L, 1L, "TagName1", "2025-01-01T10:00:00"),
-                    JsonLearningTagBuilder.create(3L, 2L, "TagName2", "2025-01-01T10:00:00"),
+                    JsonLearningTagBuilder.create(2L, 1L, "TagName1", "2025-01-01T10:00:00").isCategory(),
+                    JsonLearningTagBuilder.create(3L, 2L, "TagName2", "2025-01-01T10:00:00").isCategory(),
                     JsonLearningTagBuilder.create(4L, null, null, "2025-01-01T10:00:00").isCategory(),
-                    JsonLearningTagBuilder.create(5L, 1L, "TagName1", "2025-01-01T10:00:00"),
+                    JsonLearningTagBuilder.create(5L, 1L, "TagName1", "2025-01-01T10:00:00").isCategory(),
                     JsonLearningTagBuilder.create(6L, null, null, "2025-01-01T10:00:00").isArchived()
             ).getAsPaginatedAndBuild(0, 5, 1);
 

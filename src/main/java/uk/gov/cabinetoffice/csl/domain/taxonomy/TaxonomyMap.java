@@ -77,9 +77,9 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTax
         return object;
     }
 
-    public List<T> getHierarchy(Long id) {
+    public LinkedList<T> getHierarchy(Long id) {
         T object = get(id);
-        List<T> hierarchy = new ArrayList<>(List.of(object));
+        LinkedList<T> hierarchy = new LinkedList<>(List.of(object));
         Long parentId = object.getParentId();
         while (parentId != null) {
             T parent = get(parentId);
@@ -89,8 +89,8 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTax
         return hierarchy;
     }
 
-    public List<T> getParents(Long id) {
-        List<T> hierarchy = getHierarchy(id);
+    public LinkedList<T> getParents(Long id) {
+        LinkedList<T> hierarchy = getHierarchy(id);
         if (!hierarchy.isEmpty()) {
             hierarchy.remove(0);
         }

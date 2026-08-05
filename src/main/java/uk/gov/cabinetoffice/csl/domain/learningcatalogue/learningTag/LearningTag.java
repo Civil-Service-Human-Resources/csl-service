@@ -45,4 +45,9 @@ public class LearningTag implements Serializable, ITaxonomyItem {
         childIds = new HashSet<>();
     }
 
+    @JsonIgnore
+    public boolean showOnHomepage() {
+        return isCategory && !isArchived;
+    }
+
 }

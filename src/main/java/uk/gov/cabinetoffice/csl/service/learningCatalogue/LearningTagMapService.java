@@ -97,7 +97,7 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
 
     public Collection<LearningTag> getTierOneUnarchivedHomepageTags() {
         return get().values()
-                .stream().filter(lt -> !lt.isArchived() && lt.getParentId() == null && lt.isCategory())
+                .stream().filter(LearningTag::showOnHomepage)
                 .toList();
     }
 
