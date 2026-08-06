@@ -1,21 +1,53 @@
 package uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
+import uk.gov.cabinetoffice.csl.domain.learning.LearningTagTaxonomy;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.TaxonomyMap;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 public class LearningTagMap extends TaxonomyMap<LearningTag, LearningTagTreeNode> {
 
+    private final Map<String, Long> urlSlugMap;
+
+    public LearningTagMap(Map<String, Long> urlSlugMap) {
+        this.urlSlugMap = urlSlugMap;
+    }
+
     public static LearningTagMap buildFromList(List<LearningTag> learningTags) {
-        LearningTagMap map = new LearningTagMap();
+        LearningTagMap map = new LearningTagMap(new HashMap<>());
         for (LearningTag learningTag : learningTags) {
             map.put(learningTag.getId(), learningTag);
+            map.urlSlugMap.put(learningTag.getUrlSlug(), learningTag.getId());
         }
         learningTags.forEach(map::setData);
         return map;
+    }
+
+    public LearningTag getWithUrl(String urlSlug) {
+        return Optional.ofNullable(urlSlugMap.get(urlSlug))
+                .map(this::get)
+                .orElseThrow(() -> new NotFoundException("Learning tag with not found for url: " + urlSlug));
+    }
+
+    public LearningTagTaxonomy getFullTaxonomyFromUrl(String urlSlug) {
+        LearningTag learningTag = getWithUrl(urlSlug);
+        if (!learningTag.showOnHomepage()) {
+            throw new NotFoundException("Learning tag cannot be shown on the homepage for url: " + urlSlug);
+        }
+        Long learningTagId = learningTag.getId();
+        return new LearningTagTaxonomy(learningTag, getParents(learningTagId), learningTag.getChildIds()
+                .stream().map(this::get)
+                .filter(LearningTag::showOnHomepage)
+                .toList());
+
+    }
+
+    public void updateUrl(String existingUrl, String newUrl) {
+        Long id = urlSlugMap.remove(existingUrl);
+        urlSlugMap.put(newUrl, id);
     }
 
     @Override
@@ -27,7 +59,6 @@ public class LearningTagMap extends TaxonomyMap<LearningTag, LearningTagTreeNode
     public LearningTag setData(LearningTag learningTag) {
         log.info("Building learning tag {}", learningTag.getId());
         StringBuilder formattedName = new StringBuilder(learningTag.getName());
-        StringBuilder fullUrl = new StringBuilder(learningTag.getUrlSlug());
         Long parentId = learningTag.getParentId();
         int parents = 0;
         while (parentId != null) {
@@ -38,11 +69,9 @@ public class LearningTagMap extends TaxonomyMap<LearningTag, LearningTagTreeNode
                 parents++;
             }
             formattedName.insert(0, parentLearningTag.getName() + " | ");
-            fullUrl.insert(0, parentLearningTag.getUrlSlug() + "/");
             parentId = parentLearningTag.getParentId();
         }
         learningTag.setFormattedName(formattedName.toString());
-        learningTag.setFullUrl(fullUrl.toString());
         put(learningTag.getId(), learningTag);
         return learningTag;
     }

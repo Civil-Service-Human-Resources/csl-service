@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.LearningTagMapClient;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
+import uk.gov.cabinetoffice.csl.domain.learning.LearningTagTaxonomy;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
@@ -17,6 +18,7 @@ import uk.gov.cabinetoffice.csl.util.IUtilService;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag, LearningTagTreeNode, LearningTagMap, LearningTagDTO, LearningTagOverview> {
@@ -57,7 +59,20 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
             String slug = utilService.generateUrlSlugFromString(dto.getName(), maxUrlSlugSize);
             dto.setUrlSlug(slug);
         }
-        return super.update(id, dto);
+        LearningTagMap map = get();
+        LearningTag object = map.get(id);
+        map.validateUpdate(id, dto.getParentId());
+        client.patch(id, dto);
+        if (!Objects.equals(object.getParentId(), dto.getParentId())) {
+            object = map.updateParent(object, dto.getParentId());
+        }
+        if (!Objects.equals(object.getUrlSlug(), dto.getUrlSlug())) {
+            map.updateUrl(object.getUrlSlug(), dto.getUrlSlug());
+        }
+        updateObjectWithDto(object, dto);
+        map.rebuildHierarchy(object);
+        put(map);
+        return taxonomyItemFactory.createOverview(object);
     }
 
     @Override
@@ -82,7 +97,12 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
 
     public Collection<LearningTag> getTierOneUnarchivedHomepageTags() {
         return get().values()
-                .stream().filter(lt -> !lt.isArchived() && lt.getParentId() == null && lt.isCategory())
+                .stream().filter(lt -> lt.showOnHomepage() && lt.getParentId() == null)
                 .toList();
     }
+
+    public LearningTagTaxonomy getUnarchivedHomepageTagsWithUrl(String urlSlug) {
+        return get().getFullTaxonomyFromUrl(urlSlug);
+    }
+
 }
