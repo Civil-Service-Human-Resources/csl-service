@@ -128,4 +128,12 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         RequestEntity<Void> request = RequestEntity.get(uriBuilder.toUriString()).build();
         return httpClient.executeRequest(request, CourseLearningTagSearchResults.class);
     }
+
+    @Override
+    public List<CourseDto> assignCoursesToLearningTag(Long tagId, Collection<CourseDto> courses) {
+        String url = config.getLearningTagUrl(tagId) + "/courses";
+        RequestEntity<Collection<CourseDto>> request = RequestEntity.post(url).body(courses);
+        return httpClient.executeTypeReferenceRequest(request, new ParameterizedTypeReference<>() {
+        });
+    }
 }

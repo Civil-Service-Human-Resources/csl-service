@@ -202,4 +202,8 @@ public class LearningCatalogueService {
     public CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
         return client.getCoursesForLearningTag(tagId, page, size);
     }
+
+    public List<CourseDto> assignCoursesToLearningTag(Long tagId, Collection<CourseDto> courses) {
+        return client.assignCoursesToLearningTag(tagId, courses);
+    }
 }

@@ -32,4 +32,6 @@ public interface ILearningCatalogueClient {
     BulkUpdateResponse updateLearningTagState(Collection<Long> ids, LearningTagStateUpdate stateUpdate);
 
     CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size);
+
+    List<CourseDto> assignCoursesToLearningTag(Long tagId, Collection<CourseDto> courses);
 }

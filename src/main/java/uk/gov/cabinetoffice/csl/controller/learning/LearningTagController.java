@@ -6,11 +6,14 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateDTO;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("learning-tags")
@@ -78,5 +81,13 @@ public class LearningTagController {
                                                                    @RequestParam(defaultValue = "0") int page,
                                                                    @RequestParam(defaultValue = "20") int size) {
         return learningCatalogueService.getCoursesForLearningTag(learningTagId, page, size);
+    }
+
+    @PostMapping("/{learningTagId}/courses")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public List<CourseDto> assignCoursesToLearningTag(@PathVariable Long learningTagId,
+                                                      @RequestBody List<CourseDto> courses) {
+        return learningCatalogueService.assignCoursesToLearningTag(learningTagId, courses);
     }
 }

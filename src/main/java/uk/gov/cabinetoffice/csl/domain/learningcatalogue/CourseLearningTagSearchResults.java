@@ -17,7 +17,7 @@ public class CourseLearningTagSearchResults {
 
     @JsonProperty("results")
     @JsonAlias("content")
-    private List<CourseLearningTagResponse> results;
+    private List<CourseDto> results;
     private Integer page;
     private Integer size;
     private Integer totalResults;
