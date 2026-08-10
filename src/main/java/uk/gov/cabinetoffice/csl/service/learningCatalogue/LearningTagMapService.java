@@ -66,9 +66,6 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         if (!Objects.equals(object.getParentId(), dto.getParentId())) {
             object = map.updateParent(object, dto.getParentId());
         }
-        if (!Objects.equals(object.getUrlSlug(), dto.getUrlSlug())) {
-            map.updateUrl(object.getUrlSlug(), dto.getUrlSlug());
-        }
         updateObjectWithDto(object, dto);
         map.rebuildHierarchy(object);
         put(map);
