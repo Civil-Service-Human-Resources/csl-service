@@ -130,4 +130,16 @@ public class LearningCatalogueStubService {
                         .withHeader("Content-Type", "application/json")
                         .withBody(response)));
     }
+
+    public StubMapping getCoursesForLearningTag(Long tagId, int page, int size, String response) {
+        return stubFor(
+                WireMock.get(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s/courses", tagId)))
+                        .withQueryParam("page", equalTo(String.valueOf(page)))
+                        .withQueryParam("size", equalTo(String.valueOf(size)))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
 }

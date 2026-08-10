@@ -198,4 +198,8 @@ public class LearningCatalogueService {
     public LearningTagOverview updateState(Long learningTagId, LearningTagStateDTO request) {
         return learningTagMapService.updateState(learningTagId, request.getState());
     }
+
+    public CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
+        return client.getCoursesForLearningTag(tagId, page, size);
+    }
 }

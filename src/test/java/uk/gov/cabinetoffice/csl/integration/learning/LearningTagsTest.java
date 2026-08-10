@@ -385,4 +385,42 @@ public class LearningTagsTest extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful());
     }
 
+    @Test
+    public void testGetCoursesForLearningTag() throws Exception {
+        Long tagId = 1L;
+        int page = 0;
+        int size = 20;
+        String response = """
+                {
+                  "results": [
+                    {
+                      "id": "course-id-1",
+                      "title": "Course Title 1",
+                      "status": "Published"
+                    },
+                    {
+                      "id": "course-id-2",
+                      "title": "Course Title 2",
+                      "status": "Published"
+                    }
+                  ],
+                  "page": 0,
+                  "size": 20,
+                  "totalResults": 2,
+                  "totalElements": 2,
+                  "totalPages": 1,
+                  "numberOfElements": 2,
+                  "last": true,
+                  "first": true
+                }
+                """;
+        cslStubService.getLearningCatalogue().getCoursesForLearningTag(tagId, page, size, response);
+
+        mockMvc.perform(get("/learning-tags/{tagId}/courses", tagId)
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
 }

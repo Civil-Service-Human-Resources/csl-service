@@ -119,4 +119,13 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         BulkLearningTagStateDto dto = new BulkLearningTagStateDto(ids, stateUpdate.getName());
         return httpClient.executeRequest(RequestEntity.put(config.getLearningTagStateUrl()).body(dto), BulkUpdateResponse.class);
     }
+
+    @Override
+    public CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(config.getLearningTagUrl(tagId) + "/courses");
+        uriBuilder.queryParam("page", page);
+        uriBuilder.queryParam("size", size);
+        RequestEntity<Void> request = RequestEntity.get(uriBuilder.toUriString()).build();
+        return httpClient.executeRequest(request, CourseLearningTagSearchResults.class);
+    }
 }
