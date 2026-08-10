@@ -29,6 +29,7 @@ public class LearningCategoryFactory {
         Collection<LearningTagCategory> categories = taxonomy.children()
                 .stream().map(lt -> new LearningTagCategory(lt.category().getName(), lt.category().getDescription(), lt.category().getUrlSlug(),
                         lt.children().stream().map(descLt -> new Link(descLt.category().getUrlSlug(), descLt.category().getName()))
+                                .sorted(Comparator.comparing(Link::getText))
                                 .toList()))
                 .sorted(Comparator.comparing(LearningTagCategory::getTitle))
                 .toList();
