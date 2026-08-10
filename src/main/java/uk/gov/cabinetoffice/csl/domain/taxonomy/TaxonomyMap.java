@@ -19,8 +19,12 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTax
 
     protected abstract Node buildNode(T object);
 
+    public Optional<T> getNullable(Long id) {
+        return Optional.ofNullable(super.get(id));
+    }
+
     public T get(Long id) {
-        return Optional.ofNullable(super.get(id)).orElseThrow(() -> new IllegalArgumentException("object not found for id: " + id));
+        return getNullable(id).orElseThrow(() -> new IllegalArgumentException("object not found for id: " + id));
     }
 
     public List<T> getMultiple(Collection<Long> ids, boolean includeChildren) {

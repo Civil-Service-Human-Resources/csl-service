@@ -52,10 +52,7 @@ public class LearningTagMap extends TaxonomyMap<LearningTag, LearningTagTreeNode
 
     @Override
     public LearningTag put(Long key, LearningTag value) {
-        LearningTag learningTag = get(key);
-        if (learningTag != null) {
-            urlSlugMap.remove(learningTag.getUrlSlug());
-        }
+        getNullable(key).ifPresent(learningTag -> urlSlugMap.remove(learningTag.getUrlSlug()));
         urlSlugMap.put(value.getUrlSlug(), key);
         return super.put(key, value);
     }
