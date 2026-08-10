@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Collection;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -14,5 +16,6 @@ public class LearningTagCategory {
     private String title;
     private String description;
     private String url;
+    private Collection<Link> categories;
 
 }
