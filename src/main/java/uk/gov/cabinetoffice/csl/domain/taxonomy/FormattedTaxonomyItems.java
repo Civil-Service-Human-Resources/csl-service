@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain.csrs;
+package uk.gov.cabinetoffice.csl.domain.taxonomy;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,10 +11,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BasicOrganisationalUnitNode {
+public class FormattedTaxonomyItems<T extends IFormattedTaxonomyItem> implements IFormattedTaxonomyItems<T> {
 
-    private String name;
-    private Long id;
-    private List<BasicOrganisationalUnitNode> children;
+    private List<T> names;
 
 }

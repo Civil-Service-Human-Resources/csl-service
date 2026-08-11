@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.domain.csrs;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyNode;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 
 import java.util.List;
@@ -23,7 +24,7 @@ class OrganisationalUnitMapTest {
 
     @Test
     void testGetOrganisationalUnitTree() {
-        List<BasicOrganisationalUnitNode> tree = organisationalUnitMap.getOrganisationalUnitTree();
+        List<BasicTaxonomyNode> tree = organisationalUnitMap.getTree();
         assertEquals("OrgName1", tree.get(0).getName());
         assertEquals("OrgName2", tree.get(0).getChildren().get(0).getName());
         assertEquals("OrgName3", tree.get(0).getChildren().get(0).getChildren().get(0).getName());

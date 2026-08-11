@@ -270,7 +270,7 @@ public class OrganisationTest extends IntegrationTestBase {
         cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
         String expectedFormattedOrganisations = """
                 {
-                  "organisationalUnits": [
+                  "content": [
                     {
                       "name": "OrgName1",
                       "id": 1,
@@ -395,7 +395,7 @@ public class OrganisationTest extends IntegrationTestBase {
         cslStubService.stubGetOrganisations(organisationalUnitsPagedResponse);
         String expectedFormattedOrganisations = """
                 {
-                    "formattedOrganisationalUnitNames": [
+                    "names": [
                          {
                              "id": 1,
                              "name": "OrgName1 (OName1)",
@@ -466,7 +466,7 @@ public class OrganisationTest extends IntegrationTestBase {
         cslStubService.stubGetOrganisations(organisationalUnits);
         String expectedFormattedOrganisations = """
                 {
-                    "formattedOrganisationalUnitNames": [
+                    "names": [
                         {
                           "id": 7,
                           "name": "OrgName7 (OName7)",
@@ -497,7 +497,7 @@ public class OrganisationTest extends IntegrationTestBase {
         cslStubService.stubGetOrganisations(organisationalUnits);
         String expectedFormattedOrganisations = """
                 {
-                    "formattedOrganisationalUnitNames": [
+                    "names": [
                         {
                           "id": 1,
                           "name": "OrgName1 (OName1)",

@@ -38,6 +38,10 @@ public class ArrayJsonContentBuilder<T extends BaseJsonBuilder> {
         return root.toString();
     }
 
+    public String getAsPaginatedAndBuild(int page, int size, int totalPages) {
+        return this.getAsPaginated(page, size, totalPages).toString();
+    }
+
     public ObjectNode getAsPaginated(int page, int size, int totalPages) {
         ObjectNode pagedRoot = mapper.createObjectNode();
         pagedRoot.putArray("content").addAll(this.get());

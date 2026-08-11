@@ -32,7 +32,7 @@ class AgencyTokenServiceTest extends CsrsServiceTestBase {
     private OrganisationalUnitFactory organisationalUnitFactory;
 
     @Mock
-    OrganisationalUnitMapCache organisationalUnitMapCache;
+    OrganisationalUnitMapService organisationalUnitMapCache;
 
     @Mock
     private ICSRSClient csrs;
@@ -54,7 +54,7 @@ class AgencyTokenServiceTest extends CsrsServiceTestBase {
         response.setUid("UID");
         when(agencyTokenFactory.createAgencyToken(agencyToken)).thenReturn(response);
         when(csrs.createAgencyToken(1L, response)).thenReturn(response);
-        when(organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnitMap.get(1L), false)).thenReturn(new OrganisationalUnitOverview());
+        when(organisationalUnitFactory.createOverview(organisationalUnitMap.get(1L), false)).thenReturn(new OrganisationalUnitOverview());
         agencyTokenService.createAgencyToken(1L, agencyToken);
         assertEquals("UID", organisationalUnitMap.get(1L).getAgencyToken().getUid());
         assertEquals("UID", organisationalUnitMap.get(2L).getInheritedAgencyToken().getUid());
@@ -72,7 +72,7 @@ class AgencyTokenServiceTest extends CsrsServiceTestBase {
         when(agencyTokenFactory.createAgencyToken(agencyToken)).thenReturn(response);
         when(agencyTokenFactory.isCapacityValidForToken(existingToken, agencyToken)).thenReturn(true);
         when(csrs.updateAgencyToken(1L, response)).thenReturn(response);
-        when(organisationalUnitFactory.createOrganisationalUnitOverview(organisationalUnitMap.get(1L), true)).thenReturn(new OrganisationalUnitOverview());
+        when(organisationalUnitFactory.createOverview(organisationalUnitMap.get(1L), true)).thenReturn(new OrganisationalUnitOverview());
         agencyTokenService.updateAgencyToken(1L, agencyToken);
         assertEquals("UID2", organisationalUnitMap.get(1L).getAgencyToken().getUid());
         assertEquals("UID2", organisationalUnitMap.get(2L).getInheritedAgencyToken().getUid());

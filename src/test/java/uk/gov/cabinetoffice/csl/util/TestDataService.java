@@ -12,6 +12,8 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagsPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
 import uk.gov.cabinetoffice.csl.domain.rustici.Learner;
@@ -261,5 +263,57 @@ public class TestDataService {
         organisationalUnits.add(organisationalUnits9);
 
         return organisationalUnits;
+    }
+
+    public LearningTagsPagedResponse generateLearningTagsPagedResponse() {
+        LearningTagsPagedResponse learningTagsPagedResponse = new LearningTagsPagedResponse();
+        learningTagsPagedResponse.setContent(createLearningTagList());
+        learningTagsPagedResponse.setLast(true);
+        learningTagsPagedResponse.setNumber(0);
+        learningTagsPagedResponse.setTotalPages(1);
+        learningTagsPagedResponse.setTotalElements(5);
+        learningTagsPagedResponse.setSize(10);
+        return learningTagsPagedResponse;
+    }
+
+    private List<LearningTag> createLearningTagList() {
+        List<LearningTag> learningTags = new ArrayList<>();
+
+        LearningTag learningTags1 = new LearningTag();
+        learningTags1.setId(1L);
+        learningTags1.setName("TagName1");
+        learningTags1.setParentId(null);
+        learningTags1.setCode("TAGN1");
+        learningTags.add(learningTags1);
+
+        LearningTag learningTags2 = new LearningTag();
+        learningTags2.setId(2L);
+        learningTags2.setName("TagName2");
+        learningTags2.setParentId(1L);
+        learningTags2.setCode("TAGN2");
+        learningTags.add(learningTags2);
+
+        LearningTag learningTags3 = new LearningTag();
+        learningTags3.setId(3L);
+        learningTags3.setName("TagName3");
+        learningTags3.setParentId(2L);
+        learningTags3.setCode("TAGN3");
+        learningTags.add(learningTags3);
+
+        LearningTag learningTags4 = new LearningTag();
+        learningTags4.setId(4L);
+        learningTags4.setName("TagName4");
+        learningTags4.setParentId(3L);
+        learningTags4.setCode("TAGN4");
+        learningTags.add(learningTags4);
+
+        LearningTag learningTags5 = new LearningTag();
+        learningTags5.setId(5L);
+        learningTags5.setName("TagName5");
+        learningTags5.setParentId(1L);
+        learningTags5.setCode("TAGN5");
+        learningTags.add(learningTags5);
+
+        return learningTags;
     }
 }

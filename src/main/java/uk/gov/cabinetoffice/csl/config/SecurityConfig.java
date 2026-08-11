@@ -67,6 +67,7 @@ public class SecurityConfig {
                         "/areas-of-work/**",
                         "/grades/**",
                         "/learning/**",
+                        "/learning-tags/**",
                         "/courses/**",
                         "/course_records/**",
                         "/admin/**",

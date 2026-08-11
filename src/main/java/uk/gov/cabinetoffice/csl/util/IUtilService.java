@@ -1,6 +1,7 @@
 package uk.gov.cabinetoffice.csl.util;
 
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 
 public interface IUtilService {
@@ -8,5 +9,9 @@ public interface IUtilService {
 
     LocalDateTime getNowDateTime();
 
+    Long getDurationUntilTomorrow(TemporalUnit unit);
+
     <T> List<List<T>> batchList(List<T> list, Integer batchSize);
+
+    String generateUrlSlugFromString(String string, int maxLength);
 }

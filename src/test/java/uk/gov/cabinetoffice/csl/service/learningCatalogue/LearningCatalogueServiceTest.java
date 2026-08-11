@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
-import uk.gov.cabinetoffice.csl.util.ObjectCache;
+import uk.gov.cabinetoffice.csl.util.TtlObjectCache;
 
 import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.verify;
@@ -15,13 +15,10 @@ import static org.mockito.Mockito.verify;
 class LearningCatalogueServiceTest {
 
     @Mock
-    RequiredLearningMapCache requiredLearningMapCache;
+    LearningCatalogueCacheService learningCatalogueCacheService;
 
     @Mock
-    CourseAudienceMetadataMapCache courseAudienceMetadataMapCache;
-
-    @Mock
-    ObjectCache<Course> courseObjectCache;
+    TtlObjectCache<Course> courseObjectCache;
 
     @InjectMocks
     LearningCatalogueService learningCatalogueService;
@@ -30,8 +27,7 @@ class LearningCatalogueServiceTest {
     void removeCourseFromCache() {
         learningCatalogueService.removeCourseFromCache("course2");
 
-        verify(requiredLearningMapCache, atMostOnce()).evict();
-        verify(courseAudienceMetadataMapCache, atMostOnce()).evict();
+        verify(learningCatalogueCacheService, atMostOnce()).evict();
         verify(courseObjectCache, atMostOnce()).evict("course2");
 
     }

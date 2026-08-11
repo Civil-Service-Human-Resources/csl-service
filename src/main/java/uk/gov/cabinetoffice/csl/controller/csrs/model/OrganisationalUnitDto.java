@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.ITaxonomyItemDTO;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrganisationalUnitDto {
+public class OrganisationalUnitDto implements ITaxonomyItemDTO {
     private String code;
     private String name;
     private String abbreviation;

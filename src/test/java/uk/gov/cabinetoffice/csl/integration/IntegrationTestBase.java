@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.cabinetoffice.csl.configuration.MockCacheConfig;
 import uk.gov.cabinetoffice.csl.configuration.TestConfig;
 import uk.gov.cabinetoffice.csl.util.CSLServiceWireMockServer;
 import uk.gov.cabinetoffice.csl.util.CslTestUtil;
@@ -27,7 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"wiremock", "no-redis"})
-@Import(TestConfig.class)
+@Import({TestConfig.class, MockCacheConfig.class})
 public class IntegrationTestBase extends CSLServiceWireMockServer {
 
     protected MockMvc mockMvc;

@@ -63,7 +63,7 @@ public class LearningPlanService {
                     if (courseToBeDisplayed != null) {
                         LearnerRecordEvent latestEvent = latestEventForCourseMap.get(courseId);
                         if (!(latestEvent != null && latestEvent.getActionType().equals(REMOVE_FROM_LEARNING_PLAN)
-                                && latestEvent.getEventTimestamp().isAfter(requiredModuleRecords.getLatestUpdatedDate()))) {
+                                && !latestEvent.getEventTimestamp().isBefore(requiredModuleRecords.getLatestUpdatedDate()))) {
                             coursesToBeDisplayed(homepageCompleteLearningPlanCourses, requiredModuleRecords, courseToBeDisplayed,
                                     bookedLearningPlanCourses, user, learningPlanCourses);
                         }

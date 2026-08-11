@@ -2,9 +2,12 @@ package uk.gov.cabinetoffice.csl.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,6 +29,13 @@ public class UtilService implements IUtilService {
     }
 
     @Override
+    public Long getDurationUntilTomorrow(TemporalUnit unit) {
+        LocalDateTime now = getNowDateTime();
+        LocalDateTime tomorrowStart = now.toLocalDate().plusDays(1).atStartOfDay();
+        return Duration.between(now, tomorrowStart).get(unit);
+    }
+
+    @Override
     public <T> List<List<T>> batchList(List<T> list, Integer batchSize) {
         return IntStream.iterate(0, i -> i + batchSize)
                 .limit((int) Math.ceil((double) list.size() / batchSize))
@@ -33,4 +43,16 @@ public class UtilService implements IUtilService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public String generateUrlSlugFromString(String string, int maxLength) {
+        String slug = string
+                .toLowerCase()
+                .replaceAll("'", "")
+                .replaceAll("&", "and")
+                .replaceAll(" ", "-");
+        if (slug.length() > maxLength) {
+            throw new ValidationException(String.format("Auto-generated URL slug was greater than the max length of %s. Generated URL slug was %s", maxLength, slug));
+        }
+        return slug;
+    }
 }

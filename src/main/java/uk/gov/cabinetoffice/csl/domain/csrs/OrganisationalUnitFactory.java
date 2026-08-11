@@ -2,9 +2,10 @@ package uk.gov.cabinetoffice.csl.domain.csrs;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.OrganisationalUnitOverview;
+import uk.gov.cabinetoffice.csl.service.ITaxonomyItemFactory;
 
 @Service
-public class OrganisationalUnitFactory {
+public class OrganisationalUnitFactory implements ITaxonomyItemFactory<OrganisationalUnit, OrganisationalUnitOverview> {
 
     private final AgencyTokenFactory agencyTokenFactory;
 
@@ -12,11 +13,11 @@ public class OrganisationalUnitFactory {
         this.agencyTokenFactory = agencyTokenFactory;
     }
 
-    public OrganisationalUnitOverview createOrganisationalUnitOverview(OrganisationalUnit organisationalUnit) {
-        return createOrganisationalUnitOverview(organisationalUnit, true);
+    public OrganisationalUnitOverview createOverview(OrganisationalUnit organisationalUnit) {
+        return createOverview(organisationalUnit, true);
     }
 
-    public OrganisationalUnitOverview createOrganisationalUnitOverview(OrganisationalUnit organisationalUnit, boolean includeAgencyCapacityUsed) {
+    public OrganisationalUnitOverview createOverview(OrganisationalUnit organisationalUnit, boolean includeAgencyCapacityUsed) {
 
         AgencyToken agencyToken = organisationalUnit.getAgencyToken();
         if (agencyToken != null && includeAgencyCapacityUsed) {

@@ -1,17 +1,19 @@
 package uk.gov.cabinetoffice.csl.domain.csrs;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
 
-import java.io.Serializable;
-
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-public class FormattedOrganisationalUnitName implements Serializable {
-    private Long id;
-    private String name;
-    private String code;
+public class FormattedOrganisationalUnitName extends FormattedTaxonomyItem {
     private String abbreviation;
+
+    public FormattedOrganisationalUnitName(Long id, String name, String code, String abbreviation) {
+        super(id, name, code);
+        this.abbreviation = abbreviation;
+    }
+
 }
