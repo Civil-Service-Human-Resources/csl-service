@@ -42,16 +42,18 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                             {
                               "title": "TagName1",
                               "description": "TagName1 description",
-                              "url": "TAGN1"
+                              "url": "TAGN1",
+                              "categories": []
                             },
                             {
                               "title": "TagName4",
                               "description": "TagName4 description",
-                              "url": "TAGN4"
+                              "url": "TAGN4",
+                              "categories": []
                             }
                           ]
                         }
-                        """));
+                        """, true));
     }
 
     @Test
@@ -65,7 +67,8 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                                 {
                                     "title": "TagName3",
                                     "description": "TagName3 description",
-                                    "url": "TAGN3"
+                                    "url": "TAGN3",
+                                    "categories": []
                                 }
                             ],
                             "title": "TagName2",
@@ -77,7 +80,7 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                                 }
                             ]
                         }
-                        """));
+                        """, true));
     }
 
     @Test
@@ -115,19 +118,26 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                                 {
                                     "title": "TagName2",
                                     "description": "TagName2 description",
-                                    "url": "TAGN2"
+                                    "url": "TAGN2",
+                                      "categories": [
+                                          {
+                                              "link": "TAGN3",
+                                              "text": "TagName3"
+                                          }
+                                      ]
                                 },
                                 {
                                     "title": "TagName5",
                                     "description": "TagName5 description",
-                                    "url": "TAGN5"
+                                    "url": "TAGN5",
+                                    "categories": []
                                 }
                             ],
                             "title": "TagName1",
                             "description": "TagName1 description",
                             "parents": []
                         }
-                        """));
+                        """, true));
     }
 
 }
