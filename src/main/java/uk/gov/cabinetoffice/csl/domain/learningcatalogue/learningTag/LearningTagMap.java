@@ -32,22 +32,29 @@ public class LearningTagMap extends TaxonomyMap<LearningTag, LearningTagTreeNode
                 .orElseThrow(() -> new NotFoundException("Learning tag with not found for url: " + urlSlug));
     }
 
+    public LearningTagTaxonomy getFullTaxonomy(LearningTag learningTag) {
+        Long learningTagId = learningTag.getId();
+        Collection<LearningTagTaxonomy> childTaxonomies = learningTag.getChildIds()
+                .stream().map(this::get)
+                .filter(LearningTag::showOnHomepage)
+                .map(this::getFullTaxonomy)
+                .toList();
+        return new LearningTagTaxonomy(learningTag, getParents(learningTagId), childTaxonomies);
+    }
+
     public LearningTagTaxonomy getFullTaxonomyFromUrl(String urlSlug) {
         LearningTag learningTag = getWithUrl(urlSlug);
         if (!learningTag.showOnHomepage()) {
             throw new NotFoundException("Learning tag cannot be shown on the homepage for url: " + urlSlug);
         }
-        Long learningTagId = learningTag.getId();
-        return new LearningTagTaxonomy(learningTag, getParents(learningTagId), learningTag.getChildIds()
-                .stream().map(this::get)
-                .filter(LearningTag::showOnHomepage)
-                .toList());
-
+        return getFullTaxonomy(learningTag);
     }
 
-    public void updateUrl(String existingUrl, String newUrl) {
-        Long id = urlSlugMap.remove(existingUrl);
-        urlSlugMap.put(newUrl, id);
+    @Override
+    public LearningTag put(Long key, LearningTag value) {
+        getNullable(key).ifPresent(learningTag -> urlSlugMap.remove(learningTag.getUrlSlug()));
+        urlSlugMap.put(value.getUrlSlug(), key);
+        return super.put(key, value);
     }
 
     @Override
