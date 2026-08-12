@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
@@ -201,5 +203,9 @@ public class LearningCatalogueService {
 
     public CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
         return client.getCoursesForLearningTag(tagId, page, size);
+    }
+
+    public LearningTagCourseUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagCourseUpdateRequest request) {
+        return client.deleteCoursesFromLearningTag(tagId, request);
     }
 }

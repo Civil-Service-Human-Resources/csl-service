@@ -4,11 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
@@ -127,5 +130,12 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         uriBuilder.queryParam("size", size);
         RequestEntity<Void> request = RequestEntity.get(uriBuilder.toUriString()).build();
         return httpClient.executeRequest(request, CourseLearningTagSearchResults.class);
+    }
+
+    @Override
+    public LearningTagCourseUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagCourseUpdateRequest request) {
+        String url = config.getLearningTagUrl(tagId) + "/courses";
+        RequestEntity<LearningTagCourseUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
+        return httpClient.executeRequest(requestEntity, LearningTagCourseUpdateResponse.class);
     }
 }
