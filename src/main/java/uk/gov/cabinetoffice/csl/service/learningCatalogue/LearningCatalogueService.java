@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateRequest;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
@@ -209,7 +210,7 @@ public class LearningCatalogueService {
         return client.deleteCoursesFromLearningTag(tagId, request);
     }
 
-    public List<CourseDto> assignCoursesToLearningTag(Long tagId, Collection<CourseDto> courses) {
-        return client.assignCoursesToLearningTag(tagId, courses);
+    public LearningTagCourseUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
+        return client.assignCoursesToLearningTags(request);
     }
 }

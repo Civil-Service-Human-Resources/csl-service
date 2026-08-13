@@ -154,9 +154,9 @@ public class LearningCatalogueStubService {
         );
     }
 
-    public StubMapping assignCoursesToLearningTag(Long tagId, String expectedInput, String response) {
+    public StubMapping assignCoursesToLearningTags(String expectedInput, String response) {
         return stubFor(
-                WireMock.post(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s/courses", tagId)))
+                WireMock.post(urlPathEqualTo("/learning_catalogue/learning-tags/courses"))
                         .withRequestBody(equalToJson(expectedInput, true, true))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()

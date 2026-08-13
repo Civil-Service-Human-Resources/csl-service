@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.controller.learning;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateRequest;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
@@ -93,11 +94,10 @@ public class LearningTagController {
         return learningCatalogueService.deleteCoursesFromLearningTag(learningTagId, request);
     }
 
-    @PostMapping("/{learningTagId}/courses")
+    @PostMapping("/courses")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public List<CourseDto> assignCoursesToLearningTag(@PathVariable Long learningTagId,
-                                                      @RequestBody List<CourseDto> courses) {
-        return learningCatalogueService.assignCoursesToLearningTag(learningTagId, courses);
+    public LearningTagCourseUpdateResponse assignCoursesToLearningTags(@RequestBody LearningTagCourseAssignmentRequest request) {
+        return learningCatalogueService.assignCoursesToLearningTags(request);
     }
 }

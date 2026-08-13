@@ -448,28 +448,25 @@ public class LearningTagsTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testAssignCoursesToLearningTag() throws Exception {
-        Long tagId = 1L;
-        String coursesRequest = """
-                [
-                  {
-                    "id": "course-id-1",
-                    "title": "Course Title 1",
-                    "status": "Published"
-                  },
-                  {
-                    "id": "course-id-2",
-                    "title": "Course Title 2",
-                    "status": "Published"
-                  }
-                ]
+    public void testAssignCoursesToLearningTags() throws Exception {
+        String request = """
+                {
+                    "learningTagIds": [1, 2],
+                    "courseIds": ["course-id-1", "course-id-2"]
+                }
                 """;
-        cslStubService.getLearningCatalogue().assignCoursesToLearningTag(tagId, coursesRequest, coursesRequest);
+        String response = """
+                {
+                    "successfulIds": ["course-id-1", "course-id-2"],
+                    "failedIds": []
+                }
+                """;
+        cslStubService.getLearningCatalogue().assignCoursesToLearningTags(request, response);
 
-        mockMvc.perform(post("/learning-tags/{tagId}/courses", tagId)
+        mockMvc.perform(post("/learning-tags/courses")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(coursesRequest))
+                        .content(request))
                 .andExpect(status().isCreated())
-                .andExpect(content().json(coursesRequest));
+                .andExpect(content().json(response));
     }
 }
