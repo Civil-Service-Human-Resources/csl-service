@@ -434,8 +434,8 @@ public class LearningTagsTest extends IntegrationTestBase {
                 """;
         String response = """
                 {
-                  "successful_ids": ["course-id-1"],
-                  "failed_ids": ["course-id-2"]
+                  "successfulIds": ["course-id-1"],
+                  "failedIds": ["course-id-2"]
                 }
                 """;
         cslStubService.getLearningCatalogue().deleteCoursesFromLearningTag(tagId, request, response);
