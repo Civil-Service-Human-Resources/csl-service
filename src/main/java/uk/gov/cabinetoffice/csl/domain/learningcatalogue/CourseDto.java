@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CourseLearningTagResponse {
+public class CourseDto {
     private String id;
     private String title;
     private String status;

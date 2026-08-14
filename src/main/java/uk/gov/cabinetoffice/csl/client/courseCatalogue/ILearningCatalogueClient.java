@@ -2,6 +2,9 @@ package uk.gov.cabinetoffice.csl.client.courseCatalogue;
 
 import org.springframework.data.domain.Sort;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
@@ -32,4 +35,8 @@ public interface ILearningCatalogueClient {
     BulkUpdateResponse updateLearningTagState(Collection<Long> ids, LearningTagStateUpdate stateUpdate);
 
     CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size);
+
+    LearningTagCourseUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagCourseUpdateRequest request);
+
+    LearningTagCourseUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request);
 }

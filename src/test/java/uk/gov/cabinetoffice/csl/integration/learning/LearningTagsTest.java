@@ -423,4 +423,50 @@ public class LearningTagsTest extends IntegrationTestBase {
                 .andExpect(status().isOk())
                 .andExpect(content().json(response));
     }
+
+    @Test
+    public void testDeleteCoursesFromLearningTag() throws Exception {
+        Long tagId = 1L;
+        String request = """
+                {
+                  "ids": ["course-id-1", "course-id-2"]
+                }
+                """;
+        String response = """
+                {
+                  "successfulIds": ["course-id-1"],
+                  "failedIds": ["course-id-2"]
+                }
+                """;
+        cslStubService.getLearningCatalogue().deleteCoursesFromLearningTag(tagId, request, response);
+
+        mockMvc.perform(delete("/learning-tags/{tagId}/courses", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testAssignCoursesToLearningTags() throws Exception {
+        String request = """
+                {
+                    "learningTagIds": [1, 2],
+                    "courseIds": ["course-id-1", "course-id-2"]
+                }
+                """;
+        String response = """
+                {
+                    "successfulIds": ["course-id-1", "course-id-2"],
+                    "failedIds": []
+                }
+                """;
+        cslStubService.getLearningCatalogue().assignCoursesToLearningTags(request, response);
+
+        mockMvc.perform(post("/learning-tags/courses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(response));
+    }
 }

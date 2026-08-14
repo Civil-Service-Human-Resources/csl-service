@@ -3,6 +3,9 @@ package uk.gov.cabinetoffice.csl.controller.learning;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateDTO;
@@ -11,6 +14,8 @@ import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("learning-tags")
@@ -78,5 +83,20 @@ public class LearningTagController {
                                                                    @RequestParam(defaultValue = "0") int page,
                                                                    @RequestParam(defaultValue = "20") int size) {
         return learningCatalogueService.getCoursesForLearningTag(learningTagId, page, size);
+    }
+
+    @DeleteMapping("/{learningTagId}/courses")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public LearningTagCourseUpdateResponse deleteCoursesFromLearningTag(@PathVariable Long learningTagId,
+                                                                        @RequestBody LearningTagCourseUpdateRequest request) {
+        return learningCatalogueService.deleteCoursesFromLearningTag(learningTagId, request);
+    }
+
+    @PostMapping("/courses")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public LearningTagCourseUpdateResponse assignCoursesToLearningTags(@RequestBody LearningTagCourseAssignmentRequest request) {
+        return learningCatalogueService.assignCoursesToLearningTags(request);
     }
 }
