@@ -425,6 +425,74 @@ public class LearningTagsTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testGetHyperlinksForLearningTag() throws Exception {
+        Long tagId = 1L;
+        int page = 0;
+        int size = 20;
+        String response = """
+                {
+                  "results": [
+                    {
+                      "id": 1,
+                      "title": "BBC",
+                      "description": "The BBC is a news website",
+                      "href": "https://bbc.co.uk"
+                    }
+                  ],
+                  "page": 0,
+                  "size": 20,
+                  "totalResults": 7,
+                  "totalPages": 1,
+                  "totalElements": 7,
+                  "numberOfElements": 7,
+                  "last": true,
+                  "first": true
+                }
+                """;
+        cslStubService.getLearningCatalogue().getHyperlinksForLearningTag(tagId, page, size, response);
+
+        mockMvc.perform(get("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testGetHyperlinksForLearningTagDefaultPagination() throws Exception {
+        Long tagId = 1L;
+        int page = 0;
+        int size = 20;
+        String response = """
+                {
+                  "results": [
+                    {
+                      "id": 1,
+                      "title": "BBC",
+                      "description": "The BBC is a news website",
+                      "href": "https://bbc.co.uk"
+                    }
+                  ],
+                  "page": 0,
+                  "size": 20,
+                  "totalResults": 7,
+                  "totalPages": 1,
+                  "totalElements": 7,
+                  "numberOfElements": 7,
+                  "last": true,
+                  "first": true
+                }
+                """;
+        cslStubService.getLearningCatalogue().getHyperlinksForLearningTag(tagId, page, size, response);
+
+        mockMvc.perform(get("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
+
+    @Test
     public void testDeleteCoursesFromLearningTag() throws Exception {
         Long tagId = 1L;
         String request = """

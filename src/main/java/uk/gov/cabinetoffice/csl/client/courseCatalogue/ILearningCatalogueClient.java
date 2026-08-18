@@ -36,6 +36,8 @@ public interface ILearningCatalogueClient {
 
     CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size);
 
+    HyperlinkSearchResults getHyperlinksForLearningTag(Long tagId, int page, int size);
+
     LearningTagCourseUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagCourseUpdateRequest request);
 
     LearningTagCourseUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request);
