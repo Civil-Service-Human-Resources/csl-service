@@ -396,12 +396,14 @@ public class LearningTagsTest extends IntegrationTestBase {
                     {
                       "id": "course-id-1",
                       "title": "Course Title 1",
-                      "status": "Published"
+                      "status": "Published",
+                      "shortDescription": "Short description for Course Title 1"
                     },
                     {
                       "id": "course-id-2",
                       "title": "Course Title 2",
-                      "status": "Published"
+                      "status": "Published",
+                      "shortDescription": "Short description for Course Title 2"
                     }
                   ],
                   "page": 0,
