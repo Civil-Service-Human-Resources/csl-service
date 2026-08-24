@@ -44,7 +44,8 @@ public class CourseStatusService {
             Map<String, ModuleRecordCollection> moduleRecordsForCourses = learnerRecordDataUtils.getModuleRecordsForCourses(userId, nonCompletedCourses);
             nonCompletedCourses.forEach(course -> Optional.ofNullable(moduleRecordsForCourses.get(course.getId()))
                     .ifPresent(modules -> {
-                        if (course.isDateAfterLearningPeriod(user, modules.getLatestUpdatedDate())) {
+                        if (modules.getLatestUpdatedDate().isAfter(LocalDateTime.MIN) &&
+                                course.isDateAfterLearningPeriod(user, modules.getLatestUpdatedDate())) {
                             results.put(course.getId(), State.IN_PROGRESS);
                         }
                     }));
