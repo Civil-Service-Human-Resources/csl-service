@@ -211,7 +211,6 @@ public class LearnerRecordStubService {
         }
         if (query.getResourceIds() != null) {
             query.getResourceIds().forEach(resourceId -> mappingBuilder.withQueryParam("resourceIds", equalTo(resourceId)));
-//            mappingBuilder.withQueryParam("resourceIds", equalTo(String.join(",", query.getResourceIds())));
         }
         return stubFor(
                 mappingBuilder
