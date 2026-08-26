@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.controller.learning.model.CategoryContent;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCategories;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagSubCategories;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
@@ -34,8 +35,13 @@ public class LearningCategoriesController {
     @GetMapping("/{url}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public LearningTagSubCategories getSubCategories(@PathVariable String url, @PageableDefault(size = 20, direction = Sort.Direction.ASC) Pageable pageableParams) {
-        return learningCategoryService.getCategories(iUserAuthService.getUsername(), url, pageableParams);
+    public LearningTagSubCategories getSubCategories(@PathVariable String url, @PageableDefault(size = 20, direction = Sort.Direction.ASC) Pageable pageableParams,
+                                                     @RequestParam(required = false) CategoryContent content) {
+        if (content == null || content == CategoryContent.COURSE) {
+            return learningCategoryService.getCategoriesCourses(iUserAuthService.getUsername(), url, pageableParams);
+        } else {
+            return learningCategoryService.getCategoriesHyperlinks(url, pageableParams);
+        }
     }
 
 }

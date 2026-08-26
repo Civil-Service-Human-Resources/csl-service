@@ -10,6 +10,8 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learning.LearningTagTaxonomy;
 import uk.gov.cabinetoffice.csl.domain.learning.learningPlan.BasicCourse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkDto;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkSearchResults;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
 
 import java.util.Collection;
@@ -39,14 +41,22 @@ public class LearningCategoryFactory {
                 .sorted(Comparator.comparing(LearningTagCategory::getTitle))
                 .toList();
         return new LearningTagSubCategories(categories, taxonomy.category().getName(),
-                taxonomy.category().getDescription(), parentLinks, PagedResults.emptyResults());
+                taxonomy.category().getDescription(), parentLinks, taxonomy.category().getCourseCount(), PagedResults.emptyResults(),
+                taxonomy.category().getLinkCount(), PagedResults.emptyResults());
     }
 
-    public LearningTagSubCategories buildSubCategories(LearningTagTaxonomy taxonomy, CourseLearningTagSearchResults courses, Map<String, State> states) {
+    public LearningTagSubCategories buildSubCategories(LearningTagTaxonomy taxonomy, CourseLearningTagSearchResults courses, Map<String, State> courseStates) {
         LearningTagSubCategories learningTagSubCategories = buildSubCategories(taxonomy);
-        List<BasicCourse> formattedCourses = courses.getResults().stream().map(c -> new BasicCourse(c.getId(), c.getTitle(), c.getShortDescription(), states.get(c.getId()))).toList();
+        List<BasicCourse> formattedCourses = courses.getResults().stream().map(c -> new BasicCourse(c.getId(), c.getTitle(), c.getShortDescription(), courseStates.get(c.getId()))).toList();
         PagedResults<BasicCourse> results = new PagedResults<>(formattedCourses, courses.getPage(), courses.getSize(), courses.getTotalResults());
         learningTagSubCategories.setCourses(results);
+        return learningTagSubCategories;
+    }
+
+    public LearningTagSubCategories buildSubCategories(LearningTagTaxonomy taxonomy, HyperlinkSearchResults hyperlinkSearchResults) {
+        LearningTagSubCategories learningTagSubCategories = buildSubCategories(taxonomy);
+        PagedResults<HyperlinkDto> links = PagedResults.fromSearchResults(hyperlinkSearchResults);
+        learningTagSubCategories.setLinks(links);
         return learningTagSubCategories;
     }
 }
