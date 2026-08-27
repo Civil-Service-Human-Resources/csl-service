@@ -10,9 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateRequest;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateResponse;
+import uk.gov.cabinetoffice.csl.controller.learning.model.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
@@ -140,6 +138,13 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         uriBuilder.queryParam("size", size);
         RequestEntity<Void> request = RequestEntity.get(uriBuilder.toUriString()).build();
         return httpClient.executeRequest(request, HyperlinkSearchResults.class);
+    }
+
+    @Override
+    public LearningTagHyperlinkUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagHyperlinkUpdateRequest request) {
+        String url = config.getLearningTagUrl(tagId) + "/hyperlinks";
+        RequestEntity<LearningTagHyperlinkUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
+        return httpClient.executeRequest(requestEntity, LearningTagHyperlinkUpdateResponse.class);
     }
 
     @Override

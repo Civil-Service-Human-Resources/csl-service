@@ -3,10 +3,7 @@ package uk.gov.cabinetoffice.csl.controller.learning;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateRequest;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateResponse;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
+import uk.gov.cabinetoffice.csl.controller.learning.model.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
@@ -93,6 +90,14 @@ public class LearningTagController {
                                                               @RequestParam(defaultValue = "0") int page,
                                                               @RequestParam(defaultValue = "20") int size) {
         return learningCatalogueService.getHyperlinksForLearningTag(learningTagId, page, size);
+    }
+
+    @DeleteMapping("/{learningTagId}/hyperlinks")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public LearningTagHyperlinkUpdateResponse deleteHyperlinksFromLearningTag(@PathVariable Long learningTagId,
+                                                                              @RequestBody LearningTagHyperlinkUpdateRequest request) {
+        return learningCatalogueService.deleteHyperlinksFromLearningTag(learningTagId, request);
     }
 
     @DeleteMapping("/{learningTagId}/courses")
