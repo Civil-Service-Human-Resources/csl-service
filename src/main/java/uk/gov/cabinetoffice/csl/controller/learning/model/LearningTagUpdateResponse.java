@@ -11,7 +11,7 @@ import java.util.Collection;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LearningTagHyperlinkUpdateResponse {
+public class LearningTagUpdateResponse {
     private Collection<String> successfulIds;
     private Collection<String> failedIds;
 }

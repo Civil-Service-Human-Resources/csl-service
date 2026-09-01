@@ -1,18 +1,16 @@
 package uk.gov.cabinetoffice.csl.controller.learning.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LearningTagCourseUpdateResponse {
-    private Collection<String> successfulIds;
-    private Collection<String> failedIds;
+public class LearningTagUpdateRequest {
+    private List<String> ids;
 }

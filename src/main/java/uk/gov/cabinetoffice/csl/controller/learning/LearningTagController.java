@@ -95,23 +95,23 @@ public class LearningTagController {
     @DeleteMapping("/{learningTagId}/hyperlinks")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LearningTagHyperlinkUpdateResponse deleteHyperlinksFromLearningTag(@PathVariable Long learningTagId,
-                                                                              @RequestBody LearningTagHyperlinkUpdateRequest request) {
+    public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(@PathVariable Long learningTagId,
+                                                                      @RequestBody LearningTagUpdateRequest request) {
         return learningCatalogueService.deleteHyperlinksFromLearningTag(learningTagId, request);
     }
 
     @DeleteMapping("/{learningTagId}/courses")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LearningTagCourseUpdateResponse deleteCoursesFromLearningTag(@PathVariable Long learningTagId,
-                                                                        @RequestBody LearningTagCourseUpdateRequest request) {
+    public LearningTagUpdateResponse deleteCoursesFromLearningTag(@PathVariable Long learningTagId,
+                                                                @RequestBody LearningTagUpdateRequest request) {
         return learningCatalogueService.deleteCoursesFromLearningTag(learningTagId, request);
     }
 
     @PostMapping("/courses")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public LearningTagCourseUpdateResponse assignCoursesToLearningTags(@RequestBody LearningTagCourseAssignmentRequest request) {
+    public LearningTagUpdateResponse assignCoursesToLearningTags(@RequestBody LearningTagCourseAssignmentRequest request) {
         return learningCatalogueService.assignCoursesToLearningTags(request);
     }
 }

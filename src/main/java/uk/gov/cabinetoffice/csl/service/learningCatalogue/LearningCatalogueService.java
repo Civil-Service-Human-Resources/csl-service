@@ -207,15 +207,15 @@ public class LearningCatalogueService {
         return client.getHyperlinksForLearningTag(tagId, page, size);
     }
 
-    public LearningTagHyperlinkUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagHyperlinkUpdateRequest request) {
+    public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
         return client.deleteHyperlinksFromLearningTag(tagId, request);
     }
 
-    public LearningTagCourseUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagCourseUpdateRequest request) {
+    public LearningTagUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
         return client.deleteCoursesFromLearningTag(tagId, request);
     }
 
-    public LearningTagCourseUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
+    public LearningTagUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
         return client.assignCoursesToLearningTags(request);
     }
 }

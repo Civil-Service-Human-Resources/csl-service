@@ -141,23 +141,23 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
-    public LearningTagHyperlinkUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagHyperlinkUpdateRequest request) {
+    public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
         String url = config.getLearningTagUrl(tagId) + "/hyperlinks";
-        RequestEntity<LearningTagHyperlinkUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
-        return httpClient.executeRequest(requestEntity, LearningTagHyperlinkUpdateResponse.class);
+        RequestEntity<LearningTagUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
+        return httpClient.executeRequest(requestEntity, LearningTagUpdateResponse.class);
     }
 
     @Override
-    public LearningTagCourseUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagCourseUpdateRequest request) {
+    public LearningTagUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
         String url = config.getLearningTagUrl(tagId) + "/courses";
-        RequestEntity<LearningTagCourseUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
-        return httpClient.executeRequest(requestEntity, LearningTagCourseUpdateResponse.class);
+        RequestEntity<LearningTagUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
+        return httpClient.executeRequest(requestEntity, LearningTagUpdateResponse.class);
     }
 
     @Override
-    public LearningTagCourseUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
+    public LearningTagUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
         String url = config.getLearningTagUrl() + "/courses";
         RequestEntity<LearningTagCourseAssignmentRequest> requestEntity = RequestEntity.post(url).body(request);
-        return httpClient.executeRequest(requestEntity, LearningTagCourseUpdateResponse.class);
+        return httpClient.executeRequest(requestEntity, LearningTagUpdateResponse.class);
     }
 }
