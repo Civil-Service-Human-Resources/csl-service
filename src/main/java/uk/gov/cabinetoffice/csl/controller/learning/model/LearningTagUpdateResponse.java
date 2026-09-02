@@ -1,6 +1,5 @@
 package uk.gov.cabinetoffice.csl.controller.learning.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,7 @@ import java.util.Collection;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LearningTagCourseUpdateResponse {
+public class LearningTagUpdateResponse {
     private Collection<String> successfulIds;
     private Collection<String> failedIds;
 }

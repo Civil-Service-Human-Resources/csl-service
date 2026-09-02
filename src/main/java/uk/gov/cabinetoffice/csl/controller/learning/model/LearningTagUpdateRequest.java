@@ -11,6 +11,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LearningTagCourseUpdateRequest {
+public class LearningTagUpdateRequest {
     private List<String> ids;
 }

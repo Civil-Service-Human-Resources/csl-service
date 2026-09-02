@@ -10,9 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateRequest;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateResponse;
+import uk.gov.cabinetoffice.csl.controller.learning.model.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
@@ -143,16 +141,23 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
-    public LearningTagCourseUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagCourseUpdateRequest request) {
-        String url = config.getLearningTagUrl(tagId) + "/courses";
-        RequestEntity<LearningTagCourseUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
-        return httpClient.executeRequest(requestEntity, LearningTagCourseUpdateResponse.class);
+    public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
+        String url = config.getLearningTagUrl(tagId) + "/hyperlinks";
+        RequestEntity<LearningTagUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
+        return httpClient.executeRequest(requestEntity, LearningTagUpdateResponse.class);
     }
 
     @Override
-    public LearningTagCourseUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
+    public LearningTagUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
+        String url = config.getLearningTagUrl(tagId) + "/courses";
+        RequestEntity<LearningTagUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
+        return httpClient.executeRequest(requestEntity, LearningTagUpdateResponse.class);
+    }
+
+    @Override
+    public LearningTagUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
         String url = config.getLearningTagUrl() + "/courses";
         RequestEntity<LearningTagCourseAssignmentRequest> requestEntity = RequestEntity.post(url).body(request);
-        return httpClient.executeRequest(requestEntity, LearningTagCourseUpdateResponse.class);
+        return httpClient.executeRequest(requestEntity, LearningTagUpdateResponse.class);
     }
 }

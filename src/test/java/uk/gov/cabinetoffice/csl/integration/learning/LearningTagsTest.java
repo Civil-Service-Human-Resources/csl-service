@@ -495,6 +495,29 @@ public class LearningTagsTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testDeleteHyperlinksFromLearningTag() throws Exception {
+        Long tagId = 1L;
+        String request = """
+                {
+                  "ids": ["1", "2"]
+                }
+                """;
+        String response = """
+                {
+                  "successfulIds": ["1"],
+                  "failedIds": ["2"]
+                }
+                """;
+        cslStubService.getLearningCatalogue().deleteHyperlinksFromLearningTag(tagId, request, response);
+
+        mockMvc.perform(delete("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
+
+    @Test
     public void testDeleteCoursesFromLearningTag() throws Exception {
         Long tagId = 1L;
         String request = """
