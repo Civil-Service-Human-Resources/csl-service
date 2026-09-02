@@ -3,8 +3,8 @@ package uk.gov.cabinetoffice.csl.client.courseCatalogue;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateRequest;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateResponse;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkSearchResults;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
@@ -42,16 +42,20 @@ public class LearningTagMapClient implements ILearningTagMapClient {
         return learningCatalogueClient.updateLearningTagState(ids, stateUpdate);
     }
 
-    public LearningTagCourseUpdateResponse removeCourses(Long tagId, LearningTagCourseUpdateRequest request) {
+    public LearningTagUpdateResponse removeCourses(Long tagId, LearningTagUpdateRequest request) {
         return learningCatalogueClient.deleteCoursesFromLearningTag(tagId, request);
     }
 
-    public LearningTagCourseUpdateResponse addCourses(LearningTagCourseAssignmentRequest request) {
+    public LearningTagUpdateResponse addCourses(LearningTagCourseAssignmentRequest request) {
         return learningCatalogueClient.assignCoursesToLearningTags(request);
     }
 
     public CourseLearningTagSearchResults getCourses(Long tagId, int page, int size) {
         return learningCatalogueClient.getCoursesForLearningTag(tagId, page, size);
+    }
+
+    public LearningTagUpdateResponse removeHyperlinks(Long tagId, LearningTagUpdateRequest request) {
+        return learningCatalogueClient.deleteHyperlinksFromLearningTag(tagId, request);
     }
 
     public HyperlinkSearchResults getHyperlinks(Long tagId, int page, int size) {

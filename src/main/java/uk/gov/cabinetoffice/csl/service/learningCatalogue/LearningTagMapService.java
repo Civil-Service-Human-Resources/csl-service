@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.LearningTagMapClient;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateRequest;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseUpdateResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateResponse;
 import uk.gov.cabinetoffice.csl.domain.learning.LearningTagTaxonomy;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkSearchResults;
@@ -85,8 +85,8 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         object.setDescription(dto.getDescription());
     }
 
-    public LearningTagCourseUpdateResponse addCourses(LearningTagCourseAssignmentRequest request) {
-        LearningTagCourseUpdateResponse response = client.addCourses(request);
+    public LearningTagUpdateResponse addCourses(LearningTagCourseAssignmentRequest request) {
+        LearningTagUpdateResponse response = client.addCourses(request);
         LearningTagMap map = get();
         request.getLearningTagIds().forEach(tagId -> map.update(tagId, learningTag -> {
             learningTag.setCourseCount(learningTag.getCourseCount() + response.getSuccessfulIds().size());
@@ -95,10 +95,19 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         return response;
     }
 
-    public LearningTagCourseUpdateResponse removeCourses(Long tagId, LearningTagCourseUpdateRequest request) {
-        LearningTagCourseUpdateResponse response = client.removeCourses(tagId, request);
+    public LearningTagUpdateResponse removeCourses(Long tagId, LearningTagUpdateRequest request) {
+        LearningTagUpdateResponse response = client.removeCourses(tagId, request);
         get().update(tagId, learningTag -> {
             learningTag.setCourseCount(learningTag.getCourseCount() - response.getSuccessfulIds().size());
+            return learningTag;
+        });
+        return response;
+    }
+
+    public LearningTagUpdateResponse removeHyperlinks(Long tagId, LearningTagUpdateRequest request) {
+        LearningTagUpdateResponse response = client.removeHyperlinks(tagId, request);
+        get().update(tagId, learningTag -> {
+            learningTag.setLinkCount(learningTag.getLinkCount() - response.getSuccessfulIds().size());
             return learningTag;
         });
         return response;
