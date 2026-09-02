@@ -34,19 +34,42 @@ public class LearningCategoryService {
         return learningCategoryFactory.buildCategories(tags);
     }
 
-    public LearningTagSubCategories getCategoriesCourses(String uid, String urlSlug, Pageable pageableParams) {
+    public LearningTagSubCategories getCategories(String uid, String urlSlug, Pageable pageableParams) {
         LearningTagTaxonomy taxonomy = learningTagMapService.getUnarchivedHomepageTagsWithUrl(urlSlug);
         if (taxonomy.category().getCourseCount() > 0) {
-            CourseLearningTagSearchResults courses = learningTagMapService.getCourses(taxonomy.category().getId(), pageableParams.getPageNumber(), pageableParams.getPageSize());
-            Map<String, State> courseStates = courseStatusService.getStateForCourses(uid, courses.getResults().stream().map(CourseDto::getId).toList());
-            return learningCategoryFactory.buildSubCategories(taxonomy, courses, courseStates);
+            return getCategoriesCourses(uid, taxonomy, pageableParams);
+        } else if (taxonomy.category().getLinkCount() > 0) {
+            return getCategoriesHyperlinks(taxonomy, pageableParams);
         } else {
             return learningCategoryFactory.buildSubCategories(taxonomy);
         }
     }
 
+    public LearningTagSubCategories getCategoriesCourses(String uid, String urlSlug, Pageable pageableParams) {
+        LearningTagTaxonomy taxonomy = learningTagMapService.getUnarchivedHomepageTagsWithUrl(urlSlug);
+        if (taxonomy.category().getCourseCount() > 0) {
+            return getCategoriesCourses(uid, taxonomy, pageableParams);
+        } else {
+            return learningCategoryFactory.buildSubCategories(taxonomy);
+        }
+    }
+
+    LearningTagSubCategories getCategoriesCourses(String uid, LearningTagTaxonomy taxonomy, Pageable pageableParams) {
+        CourseLearningTagSearchResults courses = learningTagMapService.getCourses(taxonomy.category().getId(), pageableParams.getPageNumber(), pageableParams.getPageSize());
+        Map<String, State> courseStates = courseStatusService.getStateForCourses(uid, courses.getResults().stream().map(CourseDto::getId).toList());
+        return learningCategoryFactory.buildSubCategories(taxonomy, courses, courseStates);
+    }
+
     public LearningTagSubCategories getCategoriesHyperlinks(String urlSlug, Pageable pageableParams) {
         LearningTagTaxonomy taxonomy = learningTagMapService.getUnarchivedHomepageTagsWithUrl(urlSlug);
+        if (taxonomy.category().getLinkCount() > 0) {
+            return getCategoriesHyperlinks(taxonomy, pageableParams);
+        } else {
+            return learningCategoryFactory.buildSubCategories(taxonomy);
+        }
+    }
+
+    LearningTagSubCategories getCategoriesHyperlinks(LearningTagTaxonomy taxonomy, Pageable pageableParams) {
         HyperlinkSearchResults links = learningTagMapService.getHyperlinks(taxonomy.category().getId(), pageableParams.getPageNumber(), pageableParams.getPageSize());
         return learningCategoryFactory.buildSubCategories(taxonomy, links);
     }
