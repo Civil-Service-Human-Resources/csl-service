@@ -1,9 +1,11 @@
 package uk.gov.cabinetoffice.csl.controller.learning;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.learning.model.*;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
@@ -90,6 +92,14 @@ public class LearningTagController {
                                                               @RequestParam(defaultValue = "0") int page,
                                                               @RequestParam(defaultValue = "20") int size) {
         return learningCatalogueService.getHyperlinksForLearningTag(learningTagId, page, size);
+    }
+
+    @PostMapping("/{learningTagId}/hyperlink")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public HyperlinkDto createHyperlink(@PathVariable Long learningTagId,
+                                        @Valid @RequestBody HyperlinkDto request) {
+        return learningCatalogueService.createHyperlink(learningTagId, request);
     }
 
     @DeleteMapping("/{learningTagId}/hyperlinks")

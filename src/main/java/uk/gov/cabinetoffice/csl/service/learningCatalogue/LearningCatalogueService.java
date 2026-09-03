@@ -207,6 +207,10 @@ public class LearningCatalogueService {
         return client.getHyperlinksForLearningTag(tagId, page, size);
     }
 
+    public HyperlinkDto createHyperlink(Long tagId, HyperlinkDto hyperlinkDto) {
+        return client.createHyperlink(tagId, hyperlinkDto);
+    }
+
     public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
         return client.deleteHyperlinksFromLearningTag(tagId, request);
     }
