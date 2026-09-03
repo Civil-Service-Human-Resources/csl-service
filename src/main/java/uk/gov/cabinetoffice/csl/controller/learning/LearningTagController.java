@@ -4,16 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.learning.model.*;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkSearchResults;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateDTO;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("learning-tags")
@@ -96,7 +94,7 @@ public class LearningTagController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(@PathVariable Long learningTagId,
-                                                                      @RequestBody LearningTagUpdateRequest request) {
+                                                                     @RequestBody LearningTagUpdateRequest request) {
         return learningCatalogueService.deleteHyperlinksFromLearningTag(learningTagId, request);
     }
 
@@ -104,14 +102,14 @@ public class LearningTagController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public LearningTagUpdateResponse deleteCoursesFromLearningTag(@PathVariable Long learningTagId,
-                                                                @RequestBody LearningTagUpdateRequest request) {
+                                                                  @RequestBody LearningTagUpdateRequest request) {
         return learningCatalogueService.deleteCoursesFromLearningTag(learningTagId, request);
     }
 
     @PostMapping("/courses")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public LearningTagUpdateResponse assignCoursesToLearningTags(@RequestBody LearningTagCourseAssignmentRequest request) {
+    public BulkLearningTagUpdateResponse assignCoursesToLearningTags(@RequestBody LearningTagCourseAssignmentRequest request) {
         return learningCatalogueService.assignCoursesToLearningTags(request);
     }
 }

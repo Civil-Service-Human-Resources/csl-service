@@ -549,7 +549,10 @@ public class LearningTagsTest extends IntegrationTestBase {
                 """;
         String response = """
                 {
-                    "successfulIds": ["course-id-1", "course-id-2"],
+                    "successfulIds": [
+                      {"learningTagId": 1, "successfulIds":  ["course-id-1", "course-id-2"]},
+                      {"learningTagId": 2, "successfulIds":  ["course-id-1"]}
+                    ],
                     "failedIds": []
                 }
                 """;

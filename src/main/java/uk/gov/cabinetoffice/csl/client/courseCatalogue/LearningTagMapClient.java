@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.client.courseCatalogue;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
+import uk.gov.cabinetoffice.csl.controller.learning.model.BulkLearningTagUpdateResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateRequest;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateResponse;
@@ -46,7 +47,7 @@ public class LearningTagMapClient implements ILearningTagMapClient {
         return learningCatalogueClient.deleteCoursesFromLearningTag(tagId, request);
     }
 
-    public LearningTagUpdateResponse addCourses(LearningTagCourseAssignmentRequest request) {
+    public BulkLearningTagUpdateResponse addCourses(LearningTagCourseAssignmentRequest request) {
         return learningCatalogueClient.assignCoursesToLearningTags(request);
     }
 

@@ -6,10 +6,7 @@ import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.LearningTagMapClient;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateRequest;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateResponse;
+import uk.gov.cabinetoffice.csl.controller.learning.model.*;
 import uk.gov.cabinetoffice.csl.domain.learning.LearningTagTaxonomy;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkSearchResults;
@@ -85,10 +82,10 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         object.setDescription(dto.getDescription());
     }
 
-    public LearningTagUpdateResponse addCourses(LearningTagCourseAssignmentRequest request) {
-        LearningTagUpdateResponse response = client.addCourses(request);
-        updateMap(learningTagMap -> request.getLearningTagIds().forEach(tagId -> learningTagMap.update(tagId, learningTag -> {
-            learningTag.setCourseCount(learningTag.getCourseCount() + response.getSuccessfulIds().size());
+    public BulkLearningTagUpdateResponse addCourses(LearningTagCourseAssignmentRequest request) {
+        BulkLearningTagUpdateResponse response = client.addCourses(request);
+        updateMap(learningTagMap -> response.getSuccessfulIds().forEach(id -> learningTagMap.update(id.getLearningTagId(), learningTag -> {
+            learningTag.setCourseCount(learningTag.getCourseCount() + id.getSuccessfulIds().size());
             return learningTag;
         })));
         return response;
