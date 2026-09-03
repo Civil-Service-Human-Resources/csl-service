@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.integration.learning;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -22,7 +23,8 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     private final String learningTagsPagedResponse = new ArrayJsonContentBuilder<JsonLearningTagBuilder>()
             .addElements(
-                    JsonLearningTagBuilder.create(1L, null, null, "2025-01-01T10:00:00"),
+                    JsonLearningTagBuilder.create(1L, null, null, "2025-01-01T10:00:00")
+                            .courseCount(2).linkCount(1),
                     JsonLearningTagBuilder.create(2L, 1L, "TagName1", "2025-01-01T10:00:00"),
                     JsonLearningTagBuilder.create(3L, 2L, "TagName2", "2025-01-01T10:00:00"),
                     JsonLearningTagBuilder.create(4L, null, null, "2025-01-01T10:00:00"),
@@ -30,9 +32,13 @@ public class LearningTagsTest extends IntegrationTestBase {
                     JsonLearningTagBuilder.create(6L, null, null, "2025-01-01T10:00:00").isArchived()
             ).getAsPaginatedAndBuild(0, 5, 1);
 
+    @BeforeEach
+    void before() {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+    }
+
     @Test
     public void testGetLearningTagsTree() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
 
         mockMvc.perform(get("/learning-tags/overview-tree")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -85,7 +91,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testGetLearningTagOverview() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         mockMvc.perform(get("/learning-tags/2"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().json("""
@@ -105,7 +110,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testCreate() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         cslStubService.getLearningCatalogue().createLearningTag("""
                 {
                     "name" : "New tag 01",
@@ -167,7 +171,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testCreateWithParent() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         cslStubService.getLearningCatalogue().createLearningTag("""
                 {
                     "name" : "New tag 01",
@@ -212,7 +215,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testUpdateLearningTag() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         cslStubService.getLearningCatalogue().updateLearningTag(2, """
                 {
                   "code": "TAGN2",
@@ -257,7 +259,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testUpdateLearningTagNullSlug() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         cslStubService.getLearningCatalogue().updateLearningTag(2, """
                 {
                   "code": "TAGN2",
@@ -304,7 +305,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testFormattedList() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         mockMvc.perform(get("/learning-tags/formatted_list")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
@@ -348,7 +348,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testArchive() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         String expectedStateUpdate = """
                 {
                     "state": "ARCHIVE",
@@ -550,7 +549,10 @@ public class LearningTagsTest extends IntegrationTestBase {
                 """;
         String response = """
                 {
-                    "successfulIds": ["course-id-1", "course-id-2"],
+                    "successfulIds": [
+                      {"learningTagId": 1, "successfulIds":  ["course-id-1", "course-id-2"]},
+                      {"learningTagId": 2, "successfulIds":  ["course-id-1"]}
+                    ],
                     "failedIds": []
                 }
                 """;

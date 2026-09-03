@@ -29,6 +29,8 @@ public class LearningTag implements Serializable, ITaxonomyItem {
     private boolean isArchived;
     private Long parentId;
     private String parentName;
+    private Integer courseCount = 0;
+    private Integer linkCount = 0;
     private LocalDateTime createdTimestamp;
     private LocalDateTime updatedTimestamp;
     private LocalDateTime archivedTimestamp;
