@@ -6,9 +6,10 @@ import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.LearningTagMapClient;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
+import uk.gov.cabinetoffice.csl.controller.learning.model.*;
 import uk.gov.cabinetoffice.csl.domain.learning.LearningTagTaxonomy;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkSearchResults;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
@@ -81,6 +82,33 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         object.setDescription(dto.getDescription());
     }
 
+    public BulkLearningTagUpdateResponse addCourses(LearningTagCourseAssignmentRequest request) {
+        BulkLearningTagUpdateResponse response = client.addCourses(request);
+        updateMap(learningTagMap -> response.getSuccessfulIds().forEach(id -> learningTagMap.update(id.getLearningTagId(), learningTag -> {
+            learningTag.setCourseCount(learningTag.getCourseCount() + id.getSuccessfulIds().size());
+            return learningTag;
+        })));
+        return response;
+    }
+
+    public LearningTagUpdateResponse removeCourses(Long tagId, LearningTagUpdateRequest request) {
+        LearningTagUpdateResponse response = client.removeCourses(tagId, request);
+        updateMap(learningTagMap -> learningTagMap.update(tagId, learningTag -> {
+            learningTag.setCourseCount(learningTag.getCourseCount() - response.getSuccessfulIds().size());
+            return learningTag;
+        }));
+        return response;
+    }
+
+    public LearningTagUpdateResponse removeHyperlinks(Long tagId, LearningTagUpdateRequest request) {
+        LearningTagUpdateResponse response = client.removeHyperlinks(tagId, request);
+        updateMap(learningTagMap -> learningTagMap.update(tagId, learningTag -> {
+            learningTag.setLinkCount(learningTag.getLinkCount() - response.getSuccessfulIds().size());
+            return learningTag;
+        }));
+        return response;
+    }
+
     public LearningTagOverview updateState(Long learningTagId, LearningTagStateUpdate update) {
         LearningTagMap learningTagMap = get();
         Collection<Long> ids = learningTagMap.getMultipleAsIds(List.of(learningTagId), true);
@@ -103,8 +131,19 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         return get().getFullTaxonomyFromUrl(urlSlug);
     }
 
-    public CourseLearningTagSearchResults getCourses(Long learningTagId, Integer page, Integer size) {
-        return this.client.getCoursesForTag(learningTagId, page, size);
+    public CourseLearningTagSearchResults getCourses(Long tagId, int page, int size) {
+        if (get().get(tagId).getCourseCount() > 0) {
+            return client.getCourses(tagId, page, size);
+        } else {
+            return new CourseLearningTagSearchResults();
+        }
     }
 
+    public HyperlinkSearchResults getHyperlinks(Long tagId, int page, int size) {
+        if (get().get(tagId).getLinkCount() > 0) {
+            return client.getHyperlinks(tagId, page, size);
+        } else {
+            return new HyperlinkSearchResults();
+        }
+    }
 }

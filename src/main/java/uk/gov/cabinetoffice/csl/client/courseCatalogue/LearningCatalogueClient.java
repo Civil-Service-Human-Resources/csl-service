@@ -10,7 +10,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
-import uk.gov.cabinetoffice.csl.controller.learning.model.*;
+import uk.gov.cabinetoffice.csl.controller.learning.model.BulkLearningTagUpdateResponse;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
@@ -162,9 +165,9 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
-    public LearningTagUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
+    public BulkLearningTagUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
         String url = config.getLearningTagUrl() + "/courses";
         RequestEntity<LearningTagCourseAssignmentRequest> requestEntity = RequestEntity.post(url).body(request);
-        return httpClient.executeRequest(requestEntity, LearningTagUpdateResponse.class);
+        return httpClient.executeRequest(requestEntity, BulkLearningTagUpdateResponse.class);
     }
 }

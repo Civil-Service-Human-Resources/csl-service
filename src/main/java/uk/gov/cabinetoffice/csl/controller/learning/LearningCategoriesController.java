@@ -38,4 +38,19 @@ public class LearningCategoriesController {
         return learningCategoryService.getCategories(iUserAuthService.getUsername(), url, pageableParams);
     }
 
+    @GetMapping("/{url}/courses")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public LearningTagSubCategories getSubCategoriesCourses(@PathVariable String url, @PageableDefault(size = 20, direction = Sort.Direction.ASC) Pageable pageableParams) {
+        return learningCategoryService.getCategoriesCourses(iUserAuthService.getUsername(), url, pageableParams);
+    }
+
+    @GetMapping("/{url}/links")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public LearningTagSubCategories getSubCategoriesLinks(@PathVariable String url, @PageableDefault(size = 20, direction = Sort.Direction.ASC) Pageable pageableParams) {
+        return learningCategoryService.getCategoriesHyperlinks(url, pageableParams);
+    }
+
+
 }

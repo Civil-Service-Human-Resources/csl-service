@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.integration.learning;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventQuery;
@@ -28,7 +29,8 @@ public class LearningCategoriesTest extends IntegrationTestBase {
 
     private final String learningTagsPagedResponse = new ArrayJsonContentBuilder<JsonLearningTagBuilder>()
             .addElements(
-                    JsonLearningTagBuilder.create(1L, null, null, "2025-01-01T10:00:00").isCategory(),
+                    JsonLearningTagBuilder.create(1L, null, null, "2025-01-01T10:00:00").isCategory()
+                            .courseCount(3),
                     JsonLearningTagBuilder.create(2L, 1L, "TagName1", "2025-01-01T10:00:00").isCategory(),
                     JsonLearningTagBuilder.create(3L, 2L, "TagName2", "2025-01-01T10:00:00").isCategory(),
                     JsonLearningTagBuilder.create(4L, null, null, "2025-01-01T10:00:00").isCategory(),
@@ -36,10 +38,30 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                     JsonLearningTagBuilder.create(6L, null, null, "2025-01-01T10:00:00").isArchived()
             ).getAsPaginatedAndBuild(0, 5, 1);
 
+    private final String learningTagCoursesResponse = ArrayJsonContentBuilder.create(
+            JsonCourseDtoBuilder.create("course1", "Course 1"),
+            JsonCourseDtoBuilder.create("course2", "Course 2"),
+            JsonCourseDtoBuilder.create("course3", "Course 3")
+    ).getAsPaginatedAndBuild(0, 20, 1);
+
+    private final String learningCatalogueCoursesResponse = ArrayJsonContentBuilder.create(
+            JsonCourseBuilder.create("course1", "Course 1")
+                    .addLinkModule("module1", "module1", false, 30)
+                    .addDepartmentRequiredLearning("DWP", "2024-01-01T00:00:00Z", "P1Y")
+                    .addDepartmentRequiredLearning("HMRC", "2023-01-01T00:00:00Z", "P1Y"),
+            JsonCourseBuilder.create("course2", "Course 2")
+                    .addLinkModule("module3", "module3", false, 0),
+            JsonCourseBuilder.create("course3", "Course 3")
+                    .addLinkModule("module5", "module5", false, 0)
+                    .addFileModule("module6", "module6", false, 0)).build();
+
+    @BeforeEach
+    void before() {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+    }
 
     @Test
     public void testGetCategories() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         mockMvc.perform(get("/learning/categories"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().json("""
@@ -67,7 +89,6 @@ public class LearningCategoriesTest extends IntegrationTestBase {
         cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         String response = ArrayJsonContentBuilder.create().getAsPaginatedAndBuild(0, 20, 1);
         cslStubService.getLearningCatalogue().getCoursesForLearningTag(2L, 0, 20, response);
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         mockMvc.perform(get("/learning/categories/TAGN2"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().json("""
@@ -88,19 +109,26 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                                     "text": "TagName1"
                                 }
                             ],
-                            "courses": {
-                                "results": [],
-                                "page": 0,
-                                "size": 0,
-                                "totalResults": 0
-                            }
+                             "courseCount": 0,
+                             "courses": {
+                                 "results": [],
+                                 "page": 0,
+                                 "size": 0,
+                                 "totalResults": 0
+                             },
+                             "linkCount": 0,
+                             "links": {
+                                 "results": [],
+                                 "page": 0,
+                                 "size": 0,
+                                 "totalResults": 0
+                             }
                         }
                         """, true));
     }
 
     @Test
     public void testGetSubCategoriesDescendant() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         String response = ArrayJsonContentBuilder.create().getAsPaginatedAndBuild(0, 20, 1);
         cslStubService.getLearningCatalogue().getCoursesForLearningTag(3L, 0, 20, response);
@@ -134,9 +162,13 @@ public class LearningCategoriesTest extends IntegrationTestBase {
     @Test
     public void testGetSubCategoriesParent() throws Exception {
         cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
-        String response = ArrayJsonContentBuilder.create().getAsPaginatedAndBuild(0, 20, 1);
-        cslStubService.getLearningCatalogue().getCoursesForLearningTag(1L, 0, 20, response);
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+        cslStubService.getLearningCatalogue().getCoursesForLearningTag(1L, 0, 20, learningTagCoursesResponse);
+        cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course2", "course3"), learningCatalogueCoursesResponse);
+        cslStubService.getLearnerRecord().getLearnerRecordEvents(0, LearnerRecordEventQuery.builder().userId("userId").resourceIds(List.of("course1", "course2", "course3"))
+                .eventTypes(List.of("COMPLETE_COURSE")).build(), ArrayJsonContentBuilder.create().getAsPaginatedAndBuild(0, 20, 1));
+        cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module5"), """
+                {"moduleRecords": []}
+                """);
         mockMvc.perform(get("/learning/categories/TAGN1"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().json("""
@@ -146,12 +178,12 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                                     "title": "TagName2",
                                     "description": "TagName2 description",
                                     "url": "TAGN2",
-                                      "categories": [
-                                          {
-                                              "link": "TAGN3",
-                                              "text": "TagName3"
-                                          }
-                                      ]
+                                    "categories": [
+                                        {
+                                            "link": "TAGN3",
+                                            "text": "TagName3"
+                                        }
+                                    ]
                                 },
                                 {
                                     "title": "TagName5",
@@ -163,12 +195,39 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                             "title": "TagName1",
                             "description": "TagName1 description",
                             "parents": [],
+                            "courseCount": 3,
                             "courses": {
-                              "results":[],
-                              "page":0,
-                              "size":0,
-                              "totalResults":0
-                          }
+                                "results": [
+                                    {
+                                        "id": "course1",
+                                        "title": "Course 1",
+                                        "shortDescription": "Course 1 short description",
+                                        "status": "NULL"
+                                    },
+                                    {
+                                        "id": "course2",
+                                        "title": "Course 2",
+                                        "shortDescription": "Course 2 short description",
+                                        "status": "NULL"
+                                    },
+                                    {
+                                        "id": "course3",
+                                        "title": "Course 3",
+                                        "shortDescription": "Course 3 short description",
+                                        "status": "NULL"
+                                    }
+                                ],
+                                "page": 0,
+                                "size": 20,
+                                "totalResults": 0
+                            },
+                            "linkCount": 0,
+                            "links": {
+                                "results": [],
+                                "page": 0,
+                                "size": 0,
+                                "totalResults": 0
+                            }
                         }
                         """, true));
     }
@@ -176,25 +235,8 @@ public class LearningCategoriesTest extends IntegrationTestBase {
     @Test
     public void testGetSubCategoriesParentWithCourses() throws Exception {
         cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
-        String response = ArrayJsonContentBuilder.create(
-                JsonCourseDtoBuilder.create("course1", "Course 1"),
-                JsonCourseDtoBuilder.create("course2", "Course 2"),
-                JsonCourseDtoBuilder.create("course3", "Course 3")
-        ).getAsPaginatedAndBuild(0, 20, 1);
-        cslStubService.getLearningCatalogue().getCoursesForLearningTag(1L, 0, 20, response);
-
-        String courses = ArrayJsonContentBuilder.create(
-                JsonCourseBuilder.create("course1", "Course 1")
-                        .addLinkModule("module1", "module1", false, 30)
-                        .addDepartmentRequiredLearning("DWP", "2024-01-01T00:00:00Z", "P1Y")
-                        .addDepartmentRequiredLearning("HMRC", "2023-01-01T00:00:00Z", "P1Y"),
-                JsonCourseBuilder.create("course2", "Course 2")
-                        .addLinkModule("module3", "module3", false, 0),
-                JsonCourseBuilder.create("course3", "Course 3")
-                        .addLinkModule("module5", "module5", false, 0)
-                        .addFileModule("module6", "module6", false, 0)).build();
-        cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course2", "course3"), courses);
+        cslStubService.getLearningCatalogue().getCoursesForLearningTag(1L, 0, 20, learningTagCoursesResponse);
+        cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course2", "course3"), learningCatalogueCoursesResponse);
         String eventsResponse = """
                 {
                     "content": [
@@ -245,6 +287,7 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                             "title": "TagName1",
                             "description": "TagName1 description",
                             "parents": [],
+                            "courseCount": 3,
                             "courses": {
                                 "results": [
                                     {
@@ -268,8 +311,15 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                                 ],
                                 "page": 0,
                                 "size": 20,
-                                "totalResults": null
-                            }
+                                "totalResults": 0
+                            },
+                             "linkCount": 0,
+                             "links": {
+                                 "results": [],
+                                 "page": 0,
+                                 "size": 0,
+                                 "totalResults": 0
+                             }
                         }
                         """, true));
     }

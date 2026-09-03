@@ -200,11 +200,11 @@ public class LearningCatalogueService {
     }
 
     public CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
-        return client.getCoursesForLearningTag(tagId, page, size);
+        return learningTagMapService.getCourses(tagId, page, size);
     }
 
     public HyperlinkSearchResults getHyperlinksForLearningTag(Long tagId, int page, int size) {
-        return client.getHyperlinksForLearningTag(tagId, page, size);
+        return learningTagMapService.getHyperlinks(tagId, page, size);
     }
 
     public HyperlinkDto createHyperlink(Long tagId, HyperlinkDto hyperlinkDto) {
@@ -212,14 +212,14 @@ public class LearningCatalogueService {
     }
 
     public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
-        return client.deleteHyperlinksFromLearningTag(tagId, request);
+        return learningTagMapService.removeHyperlinks(tagId, request);
     }
 
     public LearningTagUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
-        return client.deleteCoursesFromLearningTag(tagId, request);
+        return learningTagMapService.removeCourses(tagId, request);
     }
 
-    public LearningTagUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
-        return client.assignCoursesToLearningTags(request);
+    public BulkLearningTagUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
+        return learningTagMapService.addCourses(request);
     }
 }
