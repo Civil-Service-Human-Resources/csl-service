@@ -87,29 +87,28 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
 
     public LearningTagUpdateResponse addCourses(LearningTagCourseAssignmentRequest request) {
         LearningTagUpdateResponse response = client.addCourses(request);
-        LearningTagMap map = get();
-        request.getLearningTagIds().forEach(tagId -> map.update(tagId, learningTag -> {
+        updateMap(learningTagMap -> request.getLearningTagIds().forEach(tagId -> learningTagMap.update(tagId, learningTag -> {
             learningTag.setCourseCount(learningTag.getCourseCount() + response.getSuccessfulIds().size());
             return learningTag;
-        }));
+        })));
         return response;
     }
 
     public LearningTagUpdateResponse removeCourses(Long tagId, LearningTagUpdateRequest request) {
         LearningTagUpdateResponse response = client.removeCourses(tagId, request);
-        get().update(tagId, learningTag -> {
+        updateMap(learningTagMap -> learningTagMap.update(tagId, learningTag -> {
             learningTag.setCourseCount(learningTag.getCourseCount() - response.getSuccessfulIds().size());
             return learningTag;
-        });
+        }));
         return response;
     }
 
     public LearningTagUpdateResponse removeHyperlinks(Long tagId, LearningTagUpdateRequest request) {
         LearningTagUpdateResponse response = client.removeHyperlinks(tagId, request);
-        get().update(tagId, learningTag -> {
+        updateMap(learningTagMap -> learningTagMap.update(tagId, learningTag -> {
             learningTag.setLinkCount(learningTag.getLinkCount() - response.getSuccessfulIds().size());
             return learningTag;
-        });
+        }));
         return response;
     }
 
