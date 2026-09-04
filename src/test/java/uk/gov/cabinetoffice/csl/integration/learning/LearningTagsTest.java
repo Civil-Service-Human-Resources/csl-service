@@ -437,7 +437,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                       "id": 1,
                       "title": "BBC",
                       "description": "The BBC is a news website",
-                      "href": "https://bbc.co.uk"
+                      "url": "https://bbc.co.uk"
                     }
                   ],
                   "page": 0,
@@ -472,7 +472,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                       "id": 1,
                       "title": "BBC",
                       "description": "The BBC is a news website",
-                      "href": "https://bbc.co.uk"
+                      "url": "https://bbc.co.uk"
                     }
                   ],
                   "page": 0,
@@ -571,7 +571,7 @@ public class LearningTagsTest extends IntegrationTestBase {
         String request = """
                 {
                   "title": "Link title",
-                  "href": "https://bbc.co.uk",
+                  "url": "https://bbc.co.uk",
                   "description": "Lorem ipsum..."
                 }
                 """;
@@ -579,7 +579,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                 {
                   "id": 10,
                   "title": "Link title",
-                  "href": "https://bbc.co.uk",
+                  "url": "https://bbc.co.uk",
                   "description": "Lorem ipsum..."
                 }
                 """;
@@ -593,12 +593,12 @@ public class LearningTagsTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testCreateHyperlinkForLearningTagInvalidHrefNotHttps() throws Exception {
+    public void testCreateHyperlinkForLearningTagInvalidUrlNotHttps() throws Exception {
         Long tagId = 1L;
         String request = """
                 {
                   "title": "Link title",
-                  "href": "http://bbc.co.uk",
+                  "url": "http://bbc.co.uk",
                   "description": "Lorem ipsum..."
                 }
                 """;
@@ -615,7 +615,7 @@ public class LearningTagsTest extends IntegrationTestBase {
         String request = """
                 {
                   "title": "",
-                  "href": "https://bbc.co.uk",
+                  "url": "https://bbc.co.uk",
                   "description": "Lorem ipsum..."
                 }
                 """;
