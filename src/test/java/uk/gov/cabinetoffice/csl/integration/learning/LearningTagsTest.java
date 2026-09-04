@@ -437,7 +437,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                       "id": 1,
                       "title": "BBC",
                       "description": "The BBC is a news website",
-                      "href": "https://bbc.co.uk"
+                      "url": "https://bbc.co.uk"
                     }
                   ],
                   "page": 0,
@@ -472,7 +472,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                       "id": 1,
                       "title": "BBC",
                       "description": "The BBC is a news website",
-                      "href": "https://bbc.co.uk"
+                      "url": "https://bbc.co.uk"
                     }
                   ],
                   "page": 0,
@@ -563,5 +563,66 @@ public class LearningTagsTest extends IntegrationTestBase {
                         .content(request))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testCreateHyperlinkForLearningTag() throws Exception {
+        Long tagId = 1L;
+        String request = """
+                {
+                  "title": "Link title",
+                  "url": "https://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        String response = """
+                {
+                  "id": 10,
+                  "title": "Link title",
+                  "url": "https://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        cslStubService.getLearningCatalogue().createHyperlink(tagId, request, response);
+
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlink", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testCreateHyperlinkForLearningTagInvalidUrlNotHttps() throws Exception {
+        Long tagId = 1L;
+        String request = """
+                {
+                  "title": "Link title",
+                  "url": "http://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlink", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testCreateHyperlinkForLearningTagBlankTitle() throws Exception {
+        Long tagId = 1L;
+        String request = """
+                {
+                  "title": "",
+                  "url": "https://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlink", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest());
     }
 }

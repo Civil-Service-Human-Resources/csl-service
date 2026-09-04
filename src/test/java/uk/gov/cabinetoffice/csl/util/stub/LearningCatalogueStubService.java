@@ -155,6 +155,18 @@ public class LearningCatalogueStubService {
         );
     }
 
+    public StubMapping createHyperlink(Long tagId, String expectedInput, String response) {
+        return stubFor(
+                WireMock.post(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s/hyperlink", tagId)))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withStatus(201)
+                                .withBody(response))
+        );
+    }
+
     public StubMapping deleteHyperlinksFromLearningTag(Long tagId, String expectedInput, String response) {
         return stubFor(
                 WireMock.delete(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s/hyperlinks", tagId)))

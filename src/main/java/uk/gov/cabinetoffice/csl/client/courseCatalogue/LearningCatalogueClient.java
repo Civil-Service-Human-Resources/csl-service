@@ -144,6 +144,13 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     }
 
     @Override
+    public HyperlinkDto createHyperlink(Long tagId, HyperlinkDto dto) {
+        String url = config.getLearningTagUrl(tagId) + "/hyperlink";
+        RequestEntity<HyperlinkDto> requestEntity = RequestEntity.post(url).body(dto);
+        return httpClient.executeRequest(requestEntity, HyperlinkDto.class);
+    }
+
+    @Override
     public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
         String url = config.getLearningTagUrl(tagId) + "/hyperlinks";
         RequestEntity<LearningTagUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
