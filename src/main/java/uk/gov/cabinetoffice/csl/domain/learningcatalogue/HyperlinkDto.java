@@ -1,11 +1,11 @@
 package uk.gov.cabinetoffice.csl.domain.learningcatalogue;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 
 @Data
 @AllArgsConstructor
@@ -22,6 +22,6 @@ public class HyperlinkDto {
 
     @NotBlank
     @Size(max = 255)
-    @Pattern(regexp = "^https://.*", message = "url must be an HTTPS URL")
+    @URL(protocol = "https", message = "url must be an HTTPS URL")
     private String url;
 }

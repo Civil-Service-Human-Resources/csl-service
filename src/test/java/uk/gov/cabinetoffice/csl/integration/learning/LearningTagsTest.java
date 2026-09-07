@@ -610,6 +610,23 @@ public class LearningTagsTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testCreateHyperlinkForLearningTagInvalidUrlFormat() throws Exception {
+        Long tagId = 1L;
+        String request = """
+                {
+                  "title": "Link title",
+                  "url": "https://example.com:abc",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlink", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void testCreateHyperlinkForLearningTagBlankTitle() throws Exception {
         Long tagId = 1L;
         String request = """
