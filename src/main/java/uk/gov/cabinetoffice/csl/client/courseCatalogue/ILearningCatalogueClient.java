@@ -41,6 +41,10 @@ public interface ILearningCatalogueClient {
 
     HyperlinkDto createHyperlink(Long tagId, HyperlinkDto dto);
 
+    HyperlinkDto updateHyperlink(Long learningTagId, Long hyperlinkId, HyperlinkDto hyperlinkDto);
+
+    HyperlinkDto getHyperlink(Long learningTagId, Long hyperlinkId);
+
     LearningTagUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagUpdateRequest request);
 
     LearningTagUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagUpdateRequest request);

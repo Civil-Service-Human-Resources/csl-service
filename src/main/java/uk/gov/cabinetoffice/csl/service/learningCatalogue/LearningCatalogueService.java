@@ -211,6 +211,14 @@ public class LearningCatalogueService {
         return client.createHyperlink(tagId, hyperlinkDto);
     }
 
+    public HyperlinkDto updateHyperlink(Long learningTagId, Long hyperlinkId, HyperlinkDto hyperlinkDto) {
+        return client.updateHyperlink(learningTagId, hyperlinkId, hyperlinkDto);
+    }
+
+    public HyperlinkDto getHyperlink(Long learningTagId, Long hyperlinkId) {
+        return client.getHyperlink(learningTagId, hyperlinkId);
+    }
+
     public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
         return learningTagMapService.removeHyperlinks(tagId, request);
     }
