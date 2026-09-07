@@ -153,7 +153,7 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
     @Override
     public HyperlinkDto updateHyperlink(Long learningTagId, Long hyperlinkId, HyperlinkDto hyperlinkDto) {
         String url = config.getLearningTagHyperlinkUrl(learningTagId, hyperlinkId);
-        RequestEntity<HyperlinkDto> requestEntity = RequestEntity.post(url).body(hyperlinkDto);
+        RequestEntity<HyperlinkDto> requestEntity = RequestEntity.put(url).body(hyperlinkDto);
         return httpClient.executeRequest(requestEntity, HyperlinkDto.class);
     }
 

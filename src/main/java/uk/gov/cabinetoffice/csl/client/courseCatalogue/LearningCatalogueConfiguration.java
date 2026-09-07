@@ -39,6 +39,6 @@ public class LearningCatalogueConfiguration {
     }
 
     public String getLearningTagHyperlinkUrl(Long id, Long hyperlinkId) {
-        return this.getLearningTagUrl(id) + "/hyperlinks/" + hyperlinkId;
+        return this.getLearningTagHyperlinkUrl(id) + "/" + hyperlinkId;
     }
 }
