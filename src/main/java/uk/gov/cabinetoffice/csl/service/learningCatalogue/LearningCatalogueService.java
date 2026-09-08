@@ -207,8 +207,8 @@ public class LearningCatalogueService {
         return learningTagMapService.getHyperlinks(tagId, page, size);
     }
 
-    public HyperlinkDto createHyperlink(Long tagId, HyperlinkDto hyperlinkDto) {
-        return client.createHyperlink(tagId, hyperlinkDto);
+    public HyperlinkDto assignHyperlinkToLearningTag(Long tagId, HyperlinkDto hyperlinkDto) {
+        return learningTagMapService.addHyperlink(tagId, hyperlinkDto);
     }
 
     public HyperlinkDto updateHyperlink(Long learningTagId, Long hyperlinkId, HyperlinkDto hyperlinkDto) {

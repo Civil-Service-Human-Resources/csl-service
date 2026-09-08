@@ -39,7 +39,7 @@ public interface ILearningCatalogueClient {
 
     HyperlinkSearchResults getHyperlinksForLearningTag(Long tagId, int page, int size);
 
-    HyperlinkDto createHyperlink(Long tagId, HyperlinkDto dto);
+    HyperlinkDto assignHyperlinkToLearningTag(Long tagId, HyperlinkDto dto);
 
     HyperlinkDto updateHyperlink(Long learningTagId, Long hyperlinkId, HyperlinkDto hyperlinkDto);
 
