@@ -334,11 +334,6 @@ public class LearningTagsTest extends IntegrationTestBase {
                                     "id": 4,
                                     "name": "TagName4",
                                     "code": "TAGN4"
-                                },
-                                {
-                                    "id": 6,
-                                    "name": "TagName6",
-                                    "code": "TAGN6"
                                 }
                             ]
                         }
