@@ -585,10 +585,58 @@ public class LearningTagsTest extends IntegrationTestBase {
                 """;
         cslStubService.getLearningCatalogue().createHyperlink(tagId, request, response);
 
-        mockMvc.perform(post("/learning-tags/{tagId}/hyperlink", tagId)
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlinks", tagId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isCreated())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testEditHyperlinkForLearningTag() throws Exception {
+        Long hyperlinkId = 1L;
+        Long tagId = 1L;
+        String request = """
+                {
+                  "title": "Link title",
+                  "url": "https://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        String response = """
+                {
+                  "id": 1,
+                  "title": "Link title",
+                  "url": "https://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        cslStubService.getLearningCatalogue().editHyperlink(tagId, hyperlinkId, request, response);
+
+        mockMvc.perform(put("/learning-tags/{tagId}/hyperlinks/{hyperlinkId}", tagId, hyperlinkId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testGetHyperlinkForLearningTag() throws Exception {
+        Long hyperlinkId = 1L;
+        Long tagId = 1L;
+        String response = """
+                {
+                  "id": 1,
+                  "title": "Link title",
+                  "url": "https://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        cslStubService.getLearningCatalogue().getHyperlink(tagId, hyperlinkId, response);
+
+        mockMvc.perform(get("/learning-tags/{tagId}/hyperlinks/{hyperlinkId}", tagId, hyperlinkId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andExpect(content().json(response));
     }
 
@@ -603,7 +651,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                 }
                 """;
 
-        mockMvc.perform(post("/learning-tags/{tagId}/hyperlink", tagId)
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlinks", tagId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isBadRequest());
@@ -620,7 +668,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                 }
                 """;
 
-        mockMvc.perform(post("/learning-tags/{tagId}/hyperlink", tagId)
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlinks", tagId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isBadRequest());
@@ -637,7 +685,7 @@ public class LearningTagsTest extends IntegrationTestBase {
                 }
                 """;
 
-        mockMvc.perform(post("/learning-tags/{tagId}/hyperlink", tagId)
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlinks", tagId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isBadRequest());

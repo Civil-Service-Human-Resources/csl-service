@@ -1,15 +1,12 @@
 package uk.gov.cabinetoffice.csl.controller.learning;
 
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.learning.model.*;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkDto;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagStateDTO;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkSearchResults;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
@@ -81,31 +78,6 @@ public class LearningTagController {
                                                                    @RequestParam(defaultValue = "0") int page,
                                                                    @RequestParam(defaultValue = "20") int size) {
         return learningCatalogueService.getCoursesForLearningTag(learningTagId, page, size);
-    }
-
-    @GetMapping("/{learningTagId}/hyperlinks")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public HyperlinkSearchResults getHyperlinksForLearningTag(@PathVariable Long learningTagId,
-                                                              @RequestParam(defaultValue = "0") int page,
-                                                              @RequestParam(defaultValue = "20") int size) {
-        return learningCatalogueService.getHyperlinksForLearningTag(learningTagId, page, size);
-    }
-
-    @PostMapping("/{learningTagId}/hyperlink")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
-    public HyperlinkDto createHyperlink(@PathVariable Long learningTagId,
-                                        @Valid @RequestBody HyperlinkDto request) {
-        return learningCatalogueService.createHyperlink(learningTagId, request);
-    }
-
-    @DeleteMapping("/{learningTagId}/hyperlinks")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(@PathVariable Long learningTagId,
-                                                                     @RequestBody LearningTagUpdateRequest request) {
-        return learningCatalogueService.deleteHyperlinksFromLearningTag(learningTagId, request);
     }
 
     @DeleteMapping("/{learningTagId}/courses")

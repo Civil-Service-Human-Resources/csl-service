@@ -136,7 +136,7 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
 
     @Override
     public HyperlinkSearchResults getHyperlinksForLearningTag(Long tagId, int page, int size) {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(config.getLearningTagUrl(tagId) + "/hyperlinks");
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(config.getLearningTagHyperlinkUrl(tagId));
         uriBuilder.queryParam("page", page);
         uriBuilder.queryParam("size", size);
         RequestEntity<Void> request = RequestEntity.get(uriBuilder.toUriString()).build();
@@ -145,14 +145,28 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
 
     @Override
     public HyperlinkDto createHyperlink(Long tagId, HyperlinkDto dto) {
-        String url = config.getLearningTagUrl(tagId) + "/hyperlink";
+        String url = config.getLearningTagHyperlinkUrl(tagId);
         RequestEntity<HyperlinkDto> requestEntity = RequestEntity.post(url).body(dto);
         return httpClient.executeRequest(requestEntity, HyperlinkDto.class);
     }
 
     @Override
+    public HyperlinkDto updateHyperlink(Long learningTagId, Long hyperlinkId, HyperlinkDto hyperlinkDto) {
+        String url = config.getLearningTagHyperlinkUrl(learningTagId, hyperlinkId);
+        RequestEntity<HyperlinkDto> requestEntity = RequestEntity.put(url).body(hyperlinkDto);
+        return httpClient.executeRequest(requestEntity, HyperlinkDto.class);
+    }
+
+    @Override
+    public HyperlinkDto getHyperlink(Long learningTagId, Long hyperlinkId) {
+        String url = config.getLearningTagHyperlinkUrl(learningTagId, hyperlinkId);
+        RequestEntity<Void> requestEntity = RequestEntity.get(url).build();
+        return httpClient.executeRequest(requestEntity, HyperlinkDto.class);
+    }
+
+    @Override
     public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
-        String url = config.getLearningTagUrl(tagId) + "/hyperlinks";
+        String url = config.getLearningTagHyperlinkUrl(tagId);
         RequestEntity<LearningTagUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
         return httpClient.executeRequest(requestEntity, LearningTagUpdateResponse.class);
     }
@@ -170,4 +184,5 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         RequestEntity<LearningTagCourseAssignmentRequest> requestEntity = RequestEntity.post(url).body(request);
         return httpClient.executeRequest(requestEntity, BulkLearningTagUpdateResponse.class);
     }
+
 }
