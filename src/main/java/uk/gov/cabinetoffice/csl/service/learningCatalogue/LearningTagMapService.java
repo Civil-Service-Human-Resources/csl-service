@@ -50,6 +50,7 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
 
     public FormattedTaxonomyItems<FormattedTaxonomyItem> getFormattedNames() {
         return new FormattedTaxonomyItems<>(get().values().stream()
+                .filter(lt -> !lt.isArchived())
                 .map(o -> new FormattedTaxonomyItem(o.getId(), o.getFormattedName(), o.getCode()))
                 .sorted(Comparator.comparing(FormattedTaxonomyItem::getName, String::compareToIgnoreCase))
                 .toList());
