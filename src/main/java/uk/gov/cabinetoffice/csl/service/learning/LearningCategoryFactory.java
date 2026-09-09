@@ -24,7 +24,7 @@ public class LearningCategoryFactory {
 
     public LearningTagCategories buildCategories(Collection<LearningTag> tierOneTags) {
         Collection<LearningTagCategory> categories = tierOneTags
-                .stream().map(lt -> new LearningTagCategory(lt.getName(), lt.getDescription(), lt.getUrlSlug(), List.of()))
+                .stream().map(lt -> new LearningTagCategory(lt.getName(), lt.getDescription(), lt.getUrlSlug(), List.of(), lt.getCourseCount(), lt.getLinkCount()))
                 .sorted(Comparator.comparing(LearningTagCategory::getTitle))
                 .toList();
         return new LearningTagCategories(categories);
@@ -37,7 +37,7 @@ public class LearningCategoryFactory {
                 .stream().map(lt -> new LearningTagCategory(lt.category().getName(), lt.category().getDescription(), lt.category().getUrlSlug(),
                         lt.children().stream().map(descLt -> new Link(descLt.category().getUrlSlug(), descLt.category().getName()))
                                 .sorted(Comparator.comparing(Link::getText))
-                                .toList()))
+                                .toList(), lt.category().getCourseCount(), lt.category().getLinkCount()))
                 .sorted(Comparator.comparing(LearningTagCategory::getTitle))
                 .toList();
         return new LearningTagSubCategories(categories, taxonomy.category().getName(),

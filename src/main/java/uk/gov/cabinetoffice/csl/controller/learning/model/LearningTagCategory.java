@@ -17,5 +17,7 @@ public class LearningTagCategory {
     private String description;
     private String url;
     private Collection<Link> categories;
+    private Integer courseCount;
+    private Integer linkCount;
 
 }
