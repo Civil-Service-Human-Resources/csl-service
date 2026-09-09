@@ -71,13 +71,17 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                               "title": "TagName1",
                               "description": "TagName1 description",
                               "url": "TAGN1",
-                              "categories": []
+                              "categories": [],
+                              "courseCount": 3,
+                              "linkCount": 0
                             },
                             {
                               "title": "TagName4",
                               "description": "TagName4 description",
                               "url": "TAGN4",
-                              "categories": []
+                              "categories": [],
+                              "courseCount": 0,
+                              "linkCount": 0
                             }
                           ]
                         }
@@ -98,7 +102,9 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                                     "title": "TagName3",
                                     "description": "TagName3 description",
                                     "url": "TAGN3",
-                                    "categories": []
+                                    "categories": [],
+                                    "courseCount": 0,
+                                    "linkCount": 0
                                 }
                             ],
                             "title": "TagName2",
@@ -183,13 +189,17 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                                             "link": "TAGN3",
                                             "text": "TagName3"
                                         }
-                                    ]
+                                    ],
+                                    "courseCount": 0,
+                                    "linkCount": 0
                                 },
                                 {
                                     "title": "TagName5",
                                     "description": "TagName5 description",
                                     "url": "TAGN5",
-                                    "categories": []
+                                    "categories": [],
+                                    "courseCount": 0,
+                                    "linkCount": 0
                                 }
                             ],
                             "title": "TagName1",
@@ -275,13 +285,17 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                                             "link": "TAGN3",
                                             "text": "TagName3"
                                         }
-                                    ]
+                                    ],
+                                    "courseCount": 0,
+                                    "linkCount": 0
                                 },
                                 {
                                     "title": "TagName5",
                                     "description": "TagName5 description",
                                     "url": "TAGN5",
-                                    "categories": []
+                                    "categories": [],
+                                    "courseCount": 0,
+                                    "linkCount": 0
                                 }
                             ],
                             "title": "TagName1",
