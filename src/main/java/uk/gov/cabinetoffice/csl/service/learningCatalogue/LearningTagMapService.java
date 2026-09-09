@@ -9,6 +9,7 @@ import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
 import uk.gov.cabinetoffice.csl.controller.learning.model.*;
 import uk.gov.cabinetoffice.csl.domain.learning.LearningTagTaxonomy;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkSearchResults;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItem;
@@ -146,5 +147,14 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         } else {
             return new HyperlinkSearchResults();
         }
+    }
+
+    public HyperlinkDto addHyperlink(Long tagId, HyperlinkDto hyperlinkDto) {
+        HyperlinkDto response = client.addHyperlink(tagId, hyperlinkDto);
+        updateMap(learningTagMap -> learningTagMap.update(tagId, learningTag -> {
+            learningTag.setLinkCount(learningTag.getLinkCount() + 1);
+            return learningTag;
+        }));
+        return response;
     }
 }
