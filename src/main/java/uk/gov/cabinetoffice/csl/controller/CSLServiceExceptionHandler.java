@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import uk.gov.cabinetoffice.csl.controller.model.ErrorDto;
 import uk.gov.cabinetoffice.csl.controller.model.ErrorDtoFactory;
 import uk.gov.cabinetoffice.csl.domain.error.*;
 
@@ -20,12 +21,16 @@ public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final ErrorDtoFactory errorDtoFactory;
 
-    private ProblemDetail createProblemDetail(int statusCode, Exception e, String title) {
+    private ProblemDetail createProblemDetail(int statusCode, String detail, String title) {
         ProblemDetail body = ProblemDetail
-                .forStatusAndDetail(HttpStatusCode.valueOf(statusCode), e.getMessage());
+                .forStatusAndDetail(HttpStatusCode.valueOf(statusCode), detail);
         body.setTitle(title);
         body.setProperty("timestamp", Instant.now());
         return body;
+    }
+
+    private ProblemDetail createProblemDetail(int statusCode, Exception e, String title) {
+        return createProblemDetail(statusCode, e.getMessage(), title);
     }
 
     @ExceptionHandler(IncorrectStateException.class)
@@ -55,6 +60,13 @@ public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ProblemDetail handleValidationException(ValidationException ex) {
+        ErrorDto errorDto = ex.getErrorDto();
+        if (errorDto != null && errorDto.getMessage() != null && !errorDto.getMessage().isBlank()
+                && errorDto.getErrors() != null && !errorDto.getErrors().isEmpty()
+                && errorDto.getStatus() != 0) {
+            String detail = String.join(". ", errorDto.getErrors()) + ".";
+            return createProblemDetail(errorDto.getStatus(), detail, errorDto.getMessage());
+        }
         return createProblemDetail(400, ex, "Validation exception");
     }
 

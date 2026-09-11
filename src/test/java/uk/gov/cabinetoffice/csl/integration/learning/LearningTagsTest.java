@@ -690,4 +690,69 @@ public class LearningTagsTest extends IntegrationTestBase {
                         .content(request))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void testCreateHyperlinkBackendValidationErrorResponse() throws Exception {
+        Long tagId = 10L;
+        String request = """
+                {
+                  "title": "Sky news 42",
+                  "url": "https://news.sky.com/uk/42",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        String backendErrorResponse = """
+                {
+                    "timestamp": "2026-09-11T15:11:03.503Z",
+                    "errors": [
+                        "Hyperlink with title 'Sky news 42' and URL 'https://news.sky.com/uk/42' already exists for Learning tag with name Tag-NJ-2-Name",
+                        "Second error message"
+                    ],
+                    "status": 400,
+                    "message": "Validation error"
+                }
+                """;
+        cslStubService.getLearningCatalogue().createHyperlink(tagId, request, backendErrorResponse, 400);
+
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.title").value("Validation error"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.detail").value("Hyperlink with title 'Sky news 42' and URL 'https://news.sky.com/uk/42' already exists for Learning tag with name Tag-NJ-2-Name. Second error message."))
+                .andExpect(jsonPath("$.instance").value("/learning-tags/10/hyperlinks"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+    }
+
+    @Test
+    public void testCreateHyperlinkBackendNonMatchingErrorResponse() throws Exception {
+        Long tagId = 10L;
+        String request = """
+                {
+                  "title": "Sky news 42",
+                  "url": "https://news.sky.com/uk/42",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        String backendErrorResponse = """
+                {
+                    "timestamp": "2026-09-11T15:11:03.503Z",
+                    "status": 400,
+                    "error": "Bad Request"
+                }
+                """;
+        cslStubService.getLearningCatalogue().createHyperlink(tagId, request, backendErrorResponse, 400);
+
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.title").value("Validation exception"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.instance").value("/learning-tags/10/hyperlinks"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+    }
 }
