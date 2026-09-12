@@ -22,6 +22,6 @@ public class HyperlinkDto {
 
     @NotBlank
     @Size(max = 255)
-    @URL(protocol = "https", message = "url must be an HTTPS URL")
+    @URL(protocol = "https", message = "URL must be an HTTPS URL")
     private String url;
 }

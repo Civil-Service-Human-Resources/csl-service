@@ -10,16 +10,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.cabinetoffice.csl.controller.model.ErrorDto;
-import uk.gov.cabinetoffice.csl.controller.model.ErrorDtoFactory;
 import uk.gov.cabinetoffice.csl.domain.error.*;
 
 import java.time.Instant;
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ControllerAdvice
 @RequiredArgsConstructor
 public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
-
-    private final ErrorDtoFactory errorDtoFactory;
 
     private ProblemDetail createProblemDetail(int statusCode, String detail, String title) {
         ProblemDetail body = ProblemDetail
@@ -83,7 +83,11 @@ public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         BindingResult result = ex.getBindingResult();
-        return errorDtoFactory.createWithErrorFields(HttpStatus.BAD_REQUEST, result.getFieldErrors()).getAsResponseEntity();
+        List<String> errors = result.getFieldErrors().stream()
+                .map(ef -> String.format("Field %s is invalid: %s", ef.getField(), ef.getDefaultMessage()))
+                .toList();
+        String detail = String.join(". ", errors) + ".";
+        return new ResponseEntity<>(createProblemDetail(BAD_REQUEST.value(), detail, "Validation error"), BAD_REQUEST);
     }
 
 }
