@@ -25,8 +25,8 @@ public class ErrorDtoFactory {
         return errorDto;
     }
 
-    public ErrorDto createWithErrorFields(HttpStatus httpStatus, List<FieldError> errors) {
+    public ErrorDto createWithErrorFields(HttpStatus httpStatus, List<FieldError> errors, String message) {
         List<String> errorList = errors.stream().map(ef -> String.format("Field %s is invalid: %s", ef.getField(), ef.getDefaultMessage())).toList();
-        return create(httpStatus, errorList);
+        return create(httpStatus, errorList, message);
     }
 }

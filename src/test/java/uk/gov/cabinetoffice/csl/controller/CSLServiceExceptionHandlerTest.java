@@ -13,13 +13,12 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.WebRequest;
 import uk.gov.cabinetoffice.csl.controller.model.ErrorDto;
+import uk.gov.cabinetoffice.csl.controller.model.ErrorDtoFactory;
 import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 public class CSLServiceExceptionHandlerTest {
@@ -28,7 +27,8 @@ public class CSLServiceExceptionHandlerTest {
 
     @BeforeEach
     public void setUp() {
-        exceptionHandler = new CSLServiceExceptionHandler();
+        ErrorDtoFactory errorDtoFactory = new ErrorDtoFactory();
+        exceptionHandler = new CSLServiceExceptionHandler(errorDtoFactory);
     }
 
     @Test
@@ -43,20 +43,20 @@ public class CSLServiceExceptionHandlerTest {
 
         ValidationException ex = new ValidationException("Error sending request. Status code: 400", errorDto);
 
-        ProblemDetail problemDetail = exceptionHandler.handleValidationException(ex);
-
-        assertEquals(400, problemDetail.getStatus());
-        assertEquals("Validation error", problemDetail.getTitle());
-        assertEquals("Hyperlink with title 'Sky news 42' and URL 'https://news.sky.com/uk/42' already exists for Learning tag with name Tag-NJ-2-Name. Second error message.", problemDetail.getDetail());
-        assertNotNull(problemDetail.getProperties().get("timestamp"));
+        Object object = exceptionHandler.handleValidationException(ex);
+        assertInstanceOf(ResponseEntity.class, object);
+        ResponseEntity<?> responseEntity = (ResponseEntity<?>) object;
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(errorDto, responseEntity.getBody());
     }
 
     @Test
     public void testHandleValidationExceptionWithoutErrorDto() {
         ValidationException ex = new ValidationException("Error sending request. Status code: 400 BAD_REQUEST");
 
-        ProblemDetail problemDetail = exceptionHandler.handleValidationException(ex);
-
+        Object object = exceptionHandler.handleValidationException(ex);
+        assertInstanceOf(ProblemDetail.class, object);
+        ProblemDetail problemDetail = (ProblemDetail) object;
         assertEquals(400, problemDetail.getStatus());
         assertEquals("Validation exception", problemDetail.getTitle());
         assertEquals("Error sending request. Status code: 400 BAD_REQUEST", problemDetail.getDetail());
@@ -67,13 +67,15 @@ public class CSLServiceExceptionHandlerTest {
     public void testHandleValidationExceptionWithIncompleteErrorDto() {
         ErrorDto errorDto = new ErrorDto();
         errorDto.setStatus(400);
-        errorDto.setMessage("Validation error");
+        errorDto.setMessage("Other error");
         errorDto.setErrors(List.of()); // empty errors
 
         ValidationException ex = new ValidationException("Fallback message", errorDto);
 
-        ProblemDetail problemDetail = exceptionHandler.handleValidationException(ex);
+        Object object = exceptionHandler.handleValidationException(ex);
+        assertInstanceOf(ProblemDetail.class, object);
 
+        ProblemDetail problemDetail = (ProblemDetail) object;
         assertEquals(400, problemDetail.getStatus());
         assertEquals("Validation exception", problemDetail.getTitle());
         assertEquals("Fallback message", problemDetail.getDetail());
@@ -95,11 +97,12 @@ public class CSLServiceExceptionHandlerTest {
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertTrue(responseEntity.getBody() instanceof ProblemDetail);
-        ProblemDetail problemDetail = (ProblemDetail) responseEntity.getBody();
-        assertEquals(400, problemDetail.getStatus());
-        assertEquals("Validation error", problemDetail.getTitle());
-        assertEquals("Field field1 is invalid: defaultMessage1. Field field2 is invalid: defaultMessage2.", problemDetail.getDetail());
-        assertNotNull(problemDetail.getProperties().get("timestamp"));
+        assertInstanceOf(ErrorDto.class, responseEntity.getBody());
+        ErrorDto errorDto = (ErrorDto) responseEntity.getBody();
+        assertEquals(400, errorDto.getStatus());
+        assertEquals("Validation error", errorDto.getMessage());
+        assertEquals("Field field1 is invalid: defaultMessage1", errorDto.getErrors().get(0));
+        assertEquals("Field field2 is invalid: defaultMessage2", errorDto.getErrors().get(1));
+        assertNotNull(errorDto.getTimestamp());
     }
 }

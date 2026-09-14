@@ -703,10 +703,10 @@ public class LearningTagsTest extends IntegrationTestBase {
                 """;
         String backendErrorResponse = """
                 {
-                    "timestamp": "2026-09-11T15:11:03.503Z",
+                    "timestamp": "2026-09-14T12:57:09.605Z",
                     "errors": [
-                        "Hyperlink with title 'Sky news 42' and URL 'https://news.sky.com/uk/42' already exists for Learning tag with name Tag-NJ-2-Name",
-                        "Second error message"
+                        "Field title is invalid: A link with this title already exists for the tag",
+                        "Field url is invalid: A link with this URL already exists for the tag"
                     ],
                     "status": 400,
                     "message": "Validation error"
@@ -718,12 +718,11 @@ public class LearningTagsTest extends IntegrationTestBase {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.type").value("about:blank"))
-                .andExpect(jsonPath("$.title").value("Validation error"))
+                .andExpect(jsonPath("$.timestamp").value("2026-09-14T12:57:09.605Z"))
                 .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.detail").value("Hyperlink with title 'Sky news 42' and URL 'https://news.sky.com/uk/42' already exists for Learning tag with name Tag-NJ-2-Name. Second error message."))
-                .andExpect(jsonPath("$.instance").value("/learning-tags/10/hyperlinks"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+                .andExpect(jsonPath("$.message").value("Validation error"))
+                .andExpect(jsonPath("$.errors[0]").value("Field title is invalid: A link with this title already exists for the tag"))
+                .andExpect(jsonPath("$.errors[1]").value("Field url is invalid: A link with this URL already exists for the tag"));
     }
 
     @Test
