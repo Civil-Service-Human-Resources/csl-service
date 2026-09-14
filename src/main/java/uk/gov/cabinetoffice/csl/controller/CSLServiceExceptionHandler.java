@@ -21,16 +21,16 @@ public class CSLServiceExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final ErrorDtoFactory errorDtoFactory;
 
+    private ProblemDetail createProblemDetail(int statusCode, Exception e, String title) {
+        return createProblemDetail(statusCode, e.getMessage(), title);
+    }
+
     private ProblemDetail createProblemDetail(int statusCode, String detail, String title) {
         ProblemDetail body = ProblemDetail
                 .forStatusAndDetail(HttpStatusCode.valueOf(statusCode), detail);
         body.setTitle(title);
         body.setProperty("timestamp", Instant.now());
         return body;
-    }
-
-    private ProblemDetail createProblemDetail(int statusCode, Exception e, String title) {
-        return createProblemDetail(statusCode, e.getMessage(), title);
     }
 
     @ExceptionHandler(IncorrectStateException.class)
