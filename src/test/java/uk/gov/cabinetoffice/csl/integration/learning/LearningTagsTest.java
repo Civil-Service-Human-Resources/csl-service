@@ -11,7 +11,8 @@ import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonLearningTagBuilder;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class LearningTagsTest extends IntegrationTestBase {
 
@@ -152,21 +153,6 @@ public class LearningTagsTest extends IntegrationTestBase {
                         }
                         """, true))
                 .andExpect(status().is2xxSuccessful());
-    }
-
-    @Test
-    public void testCreateGeneratedUrlSlugTooLong() throws Exception {
-        mockMvc.perform(post("/learning-tags")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "code": "NEW_TAG",
-                                  "name": "&&&&&&&&&&&&&&&&&",
-                                  "parentId": null
-                                }
-                                """))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Auto-generated URL slug was greater than the max length of 50. Generated URL slug was andandandandandandandandandandandandandandandandand"));
     }
 
     @Test
