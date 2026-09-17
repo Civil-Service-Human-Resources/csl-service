@@ -12,17 +12,21 @@ import static java.util.Collections.sort;
 @Component
 public class ErrorDtoFactory {
     public ErrorDto create(HttpStatus httpStatus, List<String> errors) {
+        return create(httpStatus, errors, httpStatus.getReasonPhrase());
+    }
+
+    public ErrorDto create(HttpStatus httpStatus, List<String> errors, String message) {
         errors = new ArrayList<>(errors);
         sort(errors);
         ErrorDto errorDto = new ErrorDto();
         errorDto.setStatus(httpStatus.value());
-        errorDto.setMessage(httpStatus.getReasonPhrase());
+        errorDto.setMessage(message);
         errorDto.setErrors(new ArrayList<>(errors));
         return errorDto;
     }
 
-    public ErrorDto createWithErrorFields(HttpStatus httpStatus, List<FieldError> errors) {
+    public ErrorDto createWithErrorFields(HttpStatus httpStatus, List<FieldError> errors, String message) {
         List<String> errorList = errors.stream().map(ef -> String.format("Field %s is invalid: %s", ef.getField(), ef.getDefaultMessage())).toList();
-        return create(httpStatus, errorList);
+        return create(httpStatus, errorList, message);
     }
 }
