@@ -140,24 +140,33 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                             "categories": [],
                             "title": "TagName3",
                             "description": "TagName3 description",
+                            "url": "TAGN3",
                             "parents": [
-                                {
-                                    "link": "TAGN2",
-                                    "text": "TagName2"
-                                },
                                 {
                                     "link": "TAGN1",
                                     "text": "TagName1"
+                                },
+                                {
+                                    "link": "TAGN2",
+                                    "text": "TagName2"
                                 }
                             ],
+                            "courseCount": 0,
                             "courses": {
                                 "results": [],
                                 "page": 0,
                                 "size": 0,
                                 "totalResults": 0
-                            }
+                            },
+                             "linkCount": 0,
+                             "links": {
+                                 "results": [],
+                                 "page": 0,
+                                 "size": 0,
+                                 "totalResults": 0
+                             }
                         }
-                        """));
+                        """, true));
     }
 
     @Test
