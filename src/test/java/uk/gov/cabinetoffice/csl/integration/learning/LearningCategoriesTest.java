@@ -103,6 +103,7 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                             ],
                             "title": "TagName2",
                             "description": "TagName2 description",
+                            "url": "TAGN2",
                             "parents": [
                                 {
                                     "link": "TAGN1",
@@ -194,6 +195,7 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                             ],
                             "title": "TagName1",
                             "description": "TagName1 description",
+                            "url": "TAGN1",
                             "parents": [],
                             "courseCount": 3,
                             "courses": {
@@ -286,6 +288,7 @@ public class LearningCategoriesTest extends IntegrationTestBase {
                             ],
                             "title": "TagName1",
                             "description": "TagName1 description",
+                            "url": "TAGN1",
                             "parents": [],
                             "courseCount": 3,
                             "courses": {

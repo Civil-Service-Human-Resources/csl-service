@@ -41,7 +41,7 @@ public class LearningCategoryFactory {
                 .sorted(Comparator.comparing(LearningTagCategory::getTitle))
                 .toList();
         return new LearningTagSubCategories(categories, taxonomy.category().getName(),
-                taxonomy.category().getDescription(), parentLinks, taxonomy.category().getCourseCount(), PagedResults.emptyResults(),
+                taxonomy.category().getDescription(), taxonomy.category().getUrlSlug(), parentLinks, taxonomy.category().getCourseCount(), PagedResults.emptyResults(),
                 taxonomy.category().getLinkCount(), PagedResults.emptyResults());
     }
 
