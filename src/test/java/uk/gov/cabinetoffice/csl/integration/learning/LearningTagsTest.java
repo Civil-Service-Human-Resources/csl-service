@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.integration.learning;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -10,7 +11,8 @@ import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonLearningTagBuilder;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class LearningTagsTest extends IntegrationTestBase {
 
@@ -22,7 +24,8 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     private final String learningTagsPagedResponse = new ArrayJsonContentBuilder<JsonLearningTagBuilder>()
             .addElements(
-                    JsonLearningTagBuilder.create(1L, null, null, "2025-01-01T10:00:00"),
+                    JsonLearningTagBuilder.create(1L, null, null, "2025-01-01T10:00:00")
+                            .courseCount(2).linkCount(1),
                     JsonLearningTagBuilder.create(2L, 1L, "TagName1", "2025-01-01T10:00:00"),
                     JsonLearningTagBuilder.create(3L, 2L, "TagName2", "2025-01-01T10:00:00"),
                     JsonLearningTagBuilder.create(4L, null, null, "2025-01-01T10:00:00"),
@@ -30,9 +33,13 @@ public class LearningTagsTest extends IntegrationTestBase {
                     JsonLearningTagBuilder.create(6L, null, null, "2025-01-01T10:00:00").isArchived()
             ).getAsPaginatedAndBuild(0, 5, 1);
 
+    @BeforeEach
+    void before() {
+        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
+    }
+
     @Test
     public void testGetLearningTagsTree() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
 
         mockMvc.perform(get("/learning-tags/overview-tree")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -85,7 +92,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testGetLearningTagOverview() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         mockMvc.perform(get("/learning-tags/2"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().json("""
@@ -95,7 +101,6 @@ public class LearningTagsTest extends IntegrationTestBase {
                             "description": "TagName2 description",
                             "code": "TAGN2",
                             "urlSlug": "TAGN2",
-                            "fullUrl": "TAGN1/TAGN2",
                             "parentId": 1,
                             "parentName": "TagName1",
                             "category": false,
@@ -106,7 +111,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testCreate() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         cslStubService.getLearningCatalogue().createLearningTag("""
                 {
                     "name" : "New tag 01",
@@ -142,7 +146,6 @@ public class LearningTagsTest extends IntegrationTestBase {
                             "description": null,
                             "code": "NEW_TAG",
                             "urlSlug": "new-tag-01",
-                            "fullUrl": "new-tag-01",
                             "parentId": null,
                             "parentName": null,
                             "category": true,
@@ -153,23 +156,7 @@ public class LearningTagsTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testCreateGeneratedUrlSlugTooLong() throws Exception {
-        mockMvc.perform(post("/learning-tags")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "code": "NEW_TAG",
-                                  "name": "&&&&&&&&&&&&&&&&&",
-                                  "parentId": null
-                                }
-                                """))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Auto-generated URL slug was greater than the max length of 50. Generated URL slug was andandandandandandandandandandandandandandandandand"));
-    }
-
-    @Test
     public void testCreateWithParent() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         cslStubService.getLearningCatalogue().createLearningTag("""
                 {
                     "name" : "New tag 01",
@@ -203,7 +190,6 @@ public class LearningTagsTest extends IntegrationTestBase {
                             "description": null,
                             "code": "NEW_TAG",
                             "urlSlug": "new-tag-01",
-                            "fullUrl": "TAGN1/new-tag-01",
                             "parentId": 1,
                             "parentName": "TagName1",
                             "category": false,
@@ -215,7 +201,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testUpdateLearningTag() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         cslStubService.getLearningCatalogue().updateLearningTag(2, """
                 {
                   "code": "TAGN2",
@@ -249,7 +234,6 @@ public class LearningTagsTest extends IntegrationTestBase {
                           "description": "TAGN2 new description",
                           "code": "TAGN2",
                           "urlSlug": "tagname2-edit",
-                          "fullUrl": "TAGN1/TAGN5/tagname2-edit",
                           "parentId": 5,
                           "parentName": "TagName5",
                           "category": true,
@@ -261,7 +245,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testUpdateLearningTagNullSlug() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         cslStubService.getLearningCatalogue().updateLearningTag(2, """
                 {
                   "code": "TAGN2",
@@ -297,7 +280,6 @@ public class LearningTagsTest extends IntegrationTestBase {
                           "description": "TAGN2 new description",
                           "code": "TAGN2",
                           "urlSlug": "tagname2-edit",
-                          "fullUrl": "TAGN1/tagname2-edit",
                           "parentId": 1,
                           "parentName": "TagName1",
                           "category": true,
@@ -309,7 +291,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testFormattedList() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         mockMvc.perform(get("/learning-tags/formatted_list")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""
@@ -339,11 +320,6 @@ public class LearningTagsTest extends IntegrationTestBase {
                                     "id": 4,
                                     "name": "TagName4",
                                     "code": "TAGN4"
-                                },
-                                {
-                                    "id": 6,
-                                    "name": "TagName6",
-                                    "code": "TAGN6"
                                 }
                             ]
                         }
@@ -353,7 +329,6 @@ public class LearningTagsTest extends IntegrationTestBase {
 
     @Test
     public void testArchive() throws Exception {
-        cslStubService.getLearningCatalogue().getLearningTags(learningTagsPagedResponse);
         String expectedStateUpdate = """
                 {
                     "state": "ARCHIVE",
@@ -381,7 +356,6 @@ public class LearningTagsTest extends IntegrationTestBase {
                             "description":"TagName1 description",
                             "code":"TAGN1",
                             "urlSlug":"TAGN1",
-                            "fullUrl":"TAGN1",
                             "parentId":null,
                             "parentName":null,
                             "category":false,
@@ -391,4 +365,310 @@ public class LearningTagsTest extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful());
     }
 
+    @Test
+    public void testGetCoursesForLearningTag() throws Exception {
+        Long tagId = 1L;
+        int page = 0;
+        int size = 20;
+        String response = """
+                {
+                  "results": [
+                    {
+                      "id": "course-id-1",
+                      "title": "Course Title 1",
+                      "status": "Published",
+                      "shortDescription": "Short description for Course Title 1"
+                    },
+                    {
+                      "id": "course-id-2",
+                      "title": "Course Title 2",
+                      "status": "Published",
+                      "shortDescription": "Short description for Course Title 2"
+                    }
+                  ],
+                  "page": 0,
+                  "size": 20,
+                  "totalResults": 2,
+                  "totalElements": 2,
+                  "totalPages": 1,
+                  "numberOfElements": 2,
+                  "last": true,
+                  "first": true
+                }
+                """;
+        cslStubService.getLearningCatalogue().getCoursesForLearningTag(tagId, page, size, response);
+
+        mockMvc.perform(get("/learning-tags/{tagId}/courses", tagId)
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testGetHyperlinksForLearningTag() throws Exception {
+        Long tagId = 1L;
+        int page = 0;
+        int size = 20;
+        String response = """
+                {
+                  "results": [
+                    {
+                      "id": 1,
+                      "title": "BBC",
+                      "description": "The BBC is a news website",
+                      "url": "https://bbc.co.uk"
+                    }
+                  ],
+                  "page": 0,
+                  "size": 20,
+                  "totalResults": 7,
+                  "totalPages": 1,
+                  "totalElements": 7,
+                  "numberOfElements": 7,
+                  "last": true,
+                  "first": true
+                }
+                """;
+        cslStubService.getLearningCatalogue().getHyperlinksForLearningTag(tagId, page, size, response);
+
+        mockMvc.perform(get("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testGetHyperlinksForLearningTagDefaultPagination() throws Exception {
+        Long tagId = 1L;
+        int page = 0;
+        int size = 20;
+        String response = """
+                {
+                  "results": [
+                    {
+                      "id": 1,
+                      "title": "BBC",
+                      "description": "The BBC is a news website",
+                      "url": "https://bbc.co.uk"
+                    }
+                  ],
+                  "page": 0,
+                  "size": 20,
+                  "totalResults": 7,
+                  "totalPages": 1,
+                  "totalElements": 7,
+                  "numberOfElements": 7,
+                  "last": true,
+                  "first": true
+                }
+                """;
+        cslStubService.getLearningCatalogue().getHyperlinksForLearningTag(tagId, page, size, response);
+
+        mockMvc.perform(get("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testDeleteHyperlinksFromLearningTag() throws Exception {
+        Long tagId = 1L;
+        String request = """
+                {
+                  "ids": ["1", "2"]
+                }
+                """;
+        String response = """
+                {
+                  "successfulIds": ["1"],
+                  "failedIds": ["2"]
+                }
+                """;
+        cslStubService.getLearningCatalogue().deleteHyperlinksFromLearningTag(tagId, request, response);
+
+        mockMvc.perform(delete("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testDeleteCoursesFromLearningTag() throws Exception {
+        Long tagId = 1L;
+        String request = """
+                {
+                  "ids": ["course-id-1", "course-id-2"]
+                }
+                """;
+        String response = """
+                {
+                  "successfulIds": ["course-id-1"],
+                  "failedIds": ["course-id-2"]
+                }
+                """;
+        cslStubService.getLearningCatalogue().deleteCoursesFromLearningTag(tagId, request, response);
+
+        mockMvc.perform(delete("/learning-tags/{tagId}/courses", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testAssignCoursesToLearningTags() throws Exception {
+        String request = """
+                {
+                    "learningTagIds": [1, 2],
+                    "courseIds": ["course-id-1", "course-id-2"]
+                }
+                """;
+        String response = """
+                {
+                    "successfulIds": [
+                      {"learningTagId": 1, "successfulIds":  ["course-id-1", "course-id-2"]},
+                      {"learningTagId": 2, "successfulIds":  ["course-id-1"]}
+                    ],
+                    "failedIds": []
+                }
+                """;
+        cslStubService.getLearningCatalogue().assignCoursesToLearningTags(request, response);
+
+        mockMvc.perform(post("/learning-tags/courses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testCreateHyperlinkForLearningTag() throws Exception {
+        Long tagId = 1L;
+        String request = """
+                {
+                  "title": "Link title",
+                  "url": "https://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        String response = """
+                {
+                  "id": 10,
+                  "title": "Link title",
+                  "url": "https://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        cslStubService.getLearningCatalogue().createHyperlink(tagId, request, response);
+
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testEditHyperlinkForLearningTag() throws Exception {
+        Long hyperlinkId = 1L;
+        Long tagId = 1L;
+        String request = """
+                {
+                  "title": "Link title",
+                  "url": "https://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        String response = """
+                {
+                  "id": 1,
+                  "title": "Link title",
+                  "url": "https://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        cslStubService.getLearningCatalogue().editHyperlink(tagId, hyperlinkId, request, response);
+
+        mockMvc.perform(put("/learning-tags/{tagId}/hyperlinks/{hyperlinkId}", tagId, hyperlinkId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testGetHyperlinkForLearningTag() throws Exception {
+        Long hyperlinkId = 1L;
+        Long tagId = 1L;
+        String response = """
+                {
+                  "id": 1,
+                  "title": "Link title",
+                  "url": "https://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        cslStubService.getLearningCatalogue().getHyperlink(tagId, hyperlinkId, response);
+
+        mockMvc.perform(get("/learning-tags/{tagId}/hyperlinks/{hyperlinkId}", tagId, hyperlinkId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(response));
+    }
+
+    @Test
+    public void testCreateHyperlinkForLearningTagInvalidUrlNotHttps() throws Exception {
+        Long tagId = 1L;
+        String request = """
+                {
+                  "title": "Link title",
+                  "url": "http://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testCreateHyperlinkForLearningTagInvalidUrlFormat() throws Exception {
+        Long tagId = 1L;
+        String request = """
+                {
+                  "title": "Link title",
+                  "url": "https://example.com:abc",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testCreateHyperlinkForLearningTagBlankTitle() throws Exception {
+        Long tagId = 1L;
+        String request = """
+                {
+                  "title": "",
+                  "url": "https://bbc.co.uk",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest());
+    }
 }

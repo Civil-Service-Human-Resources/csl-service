@@ -29,6 +29,8 @@ public class LearningTag implements Serializable, ITaxonomyItem {
     private boolean isArchived;
     private Long parentId;
     private String parentName;
+    private Integer courseCount = 0;
+    private Integer linkCount = 0;
     private LocalDateTime createdTimestamp;
     private LocalDateTime updatedTimestamp;
     private LocalDateTime archivedTimestamp;
@@ -37,8 +39,6 @@ public class LearningTag implements Serializable, ITaxonomyItem {
     private String formattedName;
     @JsonIgnore
     private Set<Long> childIds = new HashSet<>();
-    @JsonIgnore
-    private String fullUrl;
 
     @Override
     public void resetCustomData() {
@@ -46,5 +46,10 @@ public class LearningTag implements Serializable, ITaxonomyItem {
         parentName = null;
         childIds = new HashSet<>();
     }
-    
+
+    @JsonIgnore
+    public boolean showOnHomepage() {
+        return isCategory && !isArchived;
+    }
+
 }

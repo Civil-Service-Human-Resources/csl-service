@@ -16,7 +16,6 @@ public class LearningTagOverview {
     private String description;
     private String code;
     private String urlSlug;
-    private String fullUrl;
     private Long parentId;
     private String parentName;
     private boolean category;

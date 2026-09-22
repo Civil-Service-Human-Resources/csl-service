@@ -5,6 +5,7 @@ import uk.gov.cabinetoffice.csl.domain.taxonomy.*;
 import uk.gov.cabinetoffice.csl.util.BasicFetchedCache;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class CachedTaxonomyMapService<Item extends ITaxonomyItem, Node extends BasicTaxonomyNode, Map extends TaxonomyMap<Item, Node>,
         DTO extends ITaxonomyItemDTO, Overview> extends BasicFetchedCache<Map> {
@@ -25,6 +26,12 @@ public class CachedTaxonomyMapService<Item extends ITaxonomyItem, Node extends B
     public Overview getOverview(Long id) {
         Item object = get().get(id);
         return taxonomyItemFactory.createOverview(object);
+    }
+
+    protected void updateMap(Consumer<Map> updateFn) {
+        Map map = get();
+        updateFn.accept(map);
+        put(map);
     }
 
     public Overview create(DTO dto) {

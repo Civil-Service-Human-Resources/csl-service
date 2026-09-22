@@ -44,4 +44,19 @@ public class JsonLearningTagBuilder extends BaseJsonBuilder {
         return this;
     }
 
+    public JsonLearningTagBuilder isCategory() {
+        root.put("category", true);
+        return this;
+    }
+
+    public JsonLearningTagBuilder courseCount(Integer count) {
+        root.put("courseCount", count);
+        return this;
+    }
+
+    public JsonLearningTagBuilder linkCount(Integer count) {
+        root.put("linkCount", count);
+        return this;
+    }
+
 }

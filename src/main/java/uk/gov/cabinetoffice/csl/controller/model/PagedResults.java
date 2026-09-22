@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.SearchResults;
 
 import java.util.List;
 
@@ -23,5 +24,14 @@ public class PagedResults<T> extends Results<T> {
         this.page = page;
         this.size = size;
         this.totalResults = totalResults;
+    }
+
+    public static <R> PagedResults<R> emptyResults() {
+        return new PagedResults<>(List.of(), 0, 0, 0);
+    }
+
+    public static <T> PagedResults<T> fromSearchResults(SearchResults<T> searchResults) {
+        return new PagedResults<>(searchResults.getResults(), searchResults.getPage(), searchResults.getSize(),
+                searchResults.getTotalResults());
     }
 }

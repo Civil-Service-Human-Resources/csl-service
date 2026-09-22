@@ -130,4 +130,97 @@ public class LearningCatalogueStubService {
                         .withHeader("Content-Type", "application/json")
                         .withBody(response)));
     }
+
+    public StubMapping getCoursesForLearningTag(Long tagId, int page, int size, String response) {
+        return stubFor(
+                WireMock.get(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s/courses", tagId)))
+                        .withQueryParam("page", equalTo(String.valueOf(page)))
+                        .withQueryParam("size", equalTo(String.valueOf(size)))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
+    public StubMapping getHyperlinksForLearningTag(Long tagId, int page, int size, String response) {
+        return stubFor(
+                WireMock.get(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s/hyperlinks", tagId)))
+                        .withQueryParam("page", equalTo(String.valueOf(page)))
+                        .withQueryParam("size", equalTo(String.valueOf(size)))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
+    public StubMapping createHyperlink(Long tagId, String expectedInput, String response) {
+        return stubFor(
+                WireMock.post(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s/hyperlinks", tagId)))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withStatus(201)
+                                .withBody(response))
+        );
+    }
+
+    public StubMapping editHyperlink(Long tagId, Long hyperlinkId, String expectedInput, String response) {
+        return stubFor(
+                WireMock.put(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s/hyperlinks/%s", tagId, hyperlinkId)))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withStatus(201)
+                                .withBody(response))
+        );
+    }
+
+    public StubMapping getHyperlink(Long tagId, Long hyperlinkId, String response) {
+        return stubFor(
+                WireMock.get(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s/hyperlinks/%s", tagId, hyperlinkId)))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withStatus(201)
+                                .withBody(response))
+        );
+    }
+
+    public StubMapping deleteHyperlinksFromLearningTag(Long tagId, String expectedInput, String response) {
+        return stubFor(
+                WireMock.delete(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s/hyperlinks", tagId)))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
+    public StubMapping deleteCoursesFromLearningTag(Long tagId, String expectedInput, String response) {
+        return stubFor(
+                WireMock.delete(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s/courses", tagId)))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
+    public StubMapping assignCoursesToLearningTags(String expectedInput, String response) {
+        return stubFor(
+                WireMock.post(urlPathEqualTo("/learning_catalogue/learning-tags/courses"))
+                        .withRequestBody(equalToJson(expectedInput, true, true))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(response))
+        );
+    }
+
 }

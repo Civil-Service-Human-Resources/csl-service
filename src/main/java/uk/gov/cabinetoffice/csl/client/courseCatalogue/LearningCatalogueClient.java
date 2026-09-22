@@ -4,11 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
+import uk.gov.cabinetoffice.csl.controller.learning.model.BulkLearningTagUpdateResponse;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.*;
@@ -119,4 +124,65 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         BulkLearningTagStateDto dto = new BulkLearningTagStateDto(ids, stateUpdate.getName());
         return httpClient.executeRequest(RequestEntity.put(config.getLearningTagStateUrl()).body(dto), BulkUpdateResponse.class);
     }
+
+    @Override
+    public CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(config.getLearningTagUrl(tagId) + "/courses");
+        uriBuilder.queryParam("page", page);
+        uriBuilder.queryParam("size", size);
+        RequestEntity<Void> request = RequestEntity.get(uriBuilder.toUriString()).build();
+        return httpClient.executeRequest(request, CourseLearningTagSearchResults.class);
+    }
+
+    @Override
+    public HyperlinkSearchResults getHyperlinksForLearningTag(Long tagId, int page, int size) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(config.getLearningTagHyperlinkUrl(tagId));
+        uriBuilder.queryParam("page", page);
+        uriBuilder.queryParam("size", size);
+        RequestEntity<Void> request = RequestEntity.get(uriBuilder.toUriString()).build();
+        return httpClient.executeRequest(request, HyperlinkSearchResults.class);
+    }
+
+    @Override
+    public HyperlinkDto assignHyperlinkToLearningTag(Long tagId, HyperlinkDto dto) {
+        String url = config.getLearningTagHyperlinkUrl(tagId);
+        RequestEntity<HyperlinkDto> requestEntity = RequestEntity.post(url).body(dto);
+        return httpClient.executeRequest(requestEntity, HyperlinkDto.class);
+    }
+
+    @Override
+    public HyperlinkDto updateHyperlink(Long learningTagId, Long hyperlinkId, HyperlinkDto hyperlinkDto) {
+        String url = config.getLearningTagHyperlinkUrl(learningTagId, hyperlinkId);
+        RequestEntity<HyperlinkDto> requestEntity = RequestEntity.put(url).body(hyperlinkDto);
+        return httpClient.executeRequest(requestEntity, HyperlinkDto.class);
+    }
+
+    @Override
+    public HyperlinkDto getHyperlink(Long learningTagId, Long hyperlinkId) {
+        String url = config.getLearningTagHyperlinkUrl(learningTagId, hyperlinkId);
+        RequestEntity<Void> requestEntity = RequestEntity.get(url).build();
+        return httpClient.executeRequest(requestEntity, HyperlinkDto.class);
+    }
+
+    @Override
+    public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
+        String url = config.getLearningTagHyperlinkUrl(tagId);
+        RequestEntity<LearningTagUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
+        return httpClient.executeRequest(requestEntity, LearningTagUpdateResponse.class);
+    }
+
+    @Override
+    public LearningTagUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
+        String url = config.getLearningTagUrl(tagId) + "/courses";
+        RequestEntity<LearningTagUpdateRequest> requestEntity = RequestEntity.method(HttpMethod.DELETE, url).body(request);
+        return httpClient.executeRequest(requestEntity, LearningTagUpdateResponse.class);
+    }
+
+    @Override
+    public BulkLearningTagUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
+        String url = config.getLearningTagUrl() + "/courses";
+        RequestEntity<LearningTagCourseAssignmentRequest> requestEntity = RequestEntity.post(url).body(request);
+        return httpClient.executeRequest(requestEntity, BulkLearningTagUpdateResponse.class);
+    }
+
 }

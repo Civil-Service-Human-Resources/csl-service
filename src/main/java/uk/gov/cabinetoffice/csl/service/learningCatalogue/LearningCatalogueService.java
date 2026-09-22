@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
-import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagOverview;
+import uk.gov.cabinetoffice.csl.controller.learning.model.*;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
@@ -197,5 +197,37 @@ public class LearningCatalogueService {
 
     public LearningTagOverview updateState(Long learningTagId, LearningTagStateDTO request) {
         return learningTagMapService.updateState(learningTagId, request.getState());
+    }
+
+    public CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
+        return learningTagMapService.getCourses(tagId, page, size);
+    }
+
+    public HyperlinkSearchResults getHyperlinksForLearningTag(Long tagId, int page, int size) {
+        return learningTagMapService.getHyperlinks(tagId, page, size);
+    }
+
+    public HyperlinkDto assignHyperlinkToLearningTag(Long tagId, HyperlinkDto hyperlinkDto) {
+        return learningTagMapService.addHyperlink(tagId, hyperlinkDto);
+    }
+
+    public HyperlinkDto updateHyperlink(Long learningTagId, Long hyperlinkId, HyperlinkDto hyperlinkDto) {
+        return client.updateHyperlink(learningTagId, hyperlinkId, hyperlinkDto);
+    }
+
+    public HyperlinkDto getHyperlink(Long learningTagId, Long hyperlinkId) {
+        return client.getHyperlink(learningTagId, hyperlinkId);
+    }
+
+    public LearningTagUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
+        return learningTagMapService.removeHyperlinks(tagId, request);
+    }
+
+    public LearningTagUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
+        return learningTagMapService.removeCourses(tagId, request);
+    }
+
+    public BulkLearningTagUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
+        return learningTagMapService.addCourses(request);
     }
 }

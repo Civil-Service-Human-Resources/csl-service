@@ -2,6 +2,10 @@ package uk.gov.cabinetoffice.csl.client.courseCatalogue;
 
 import org.springframework.data.domain.Sort;
 import uk.gov.cabinetoffice.csl.client.model.BulkUpdateResponse;
+import uk.gov.cabinetoffice.csl.controller.learning.model.BulkLearningTagUpdateResponse;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssignmentRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateRequest;
+import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
@@ -30,4 +34,20 @@ public interface ILearningCatalogueClient {
     LearningTag updateLearningTag(Long id, LearningTagDTO dto);
 
     BulkUpdateResponse updateLearningTagState(Collection<Long> ids, LearningTagStateUpdate stateUpdate);
+
+    CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size);
+
+    HyperlinkSearchResults getHyperlinksForLearningTag(Long tagId, int page, int size);
+
+    HyperlinkDto assignHyperlinkToLearningTag(Long tagId, HyperlinkDto dto);
+
+    HyperlinkDto updateHyperlink(Long learningTagId, Long hyperlinkId, HyperlinkDto hyperlinkDto);
+
+    HyperlinkDto getHyperlink(Long learningTagId, Long hyperlinkId);
+
+    LearningTagUpdateResponse deleteHyperlinksFromLearningTag(Long tagId, LearningTagUpdateRequest request);
+
+    LearningTagUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagUpdateRequest request);
+
+    BulkLearningTagUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request);
 }
