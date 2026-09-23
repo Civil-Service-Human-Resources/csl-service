@@ -167,7 +167,7 @@ public class LearningCatalogueService {
     }
 
     public CourseSearchResults getCoursesForLetter(String startsWith, Pageable pageableParams) {
-        SearchForCoursesParams p = SearchForCoursesParams.builder().titleStartsWith(startsWith).build();
+        SearchForCoursesParams p = SearchForCoursesParams.builder().titleStartsWith(startsWith).status(List.of(CourseStatus.PUBLISHED)).visibility("PUBLIC").build();
         return client.searchForCourses(p, pageableParams.getPageNumber(), pageableParams.getPageSize(), "title", Sort.Direction.ASC);
     }
 

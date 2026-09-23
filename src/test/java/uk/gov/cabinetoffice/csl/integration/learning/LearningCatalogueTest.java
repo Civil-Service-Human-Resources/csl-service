@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordQuery;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.SearchForCoursesParams;
 import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
@@ -365,6 +366,8 @@ public class LearningCatalogueTest extends IntegrationTestBase {
 
         SearchForCoursesParams params = SearchForCoursesParams.builder()
                 .titleStartsWith("a")
+                .status(List.of(CourseStatus.PUBLISHED))
+                .visibility("PUBLIC")
                 .build();
 
         cslStubService.getLearningCatalogue().postSearchCourses(params, courses, 0, 20, "title", "ASC");
