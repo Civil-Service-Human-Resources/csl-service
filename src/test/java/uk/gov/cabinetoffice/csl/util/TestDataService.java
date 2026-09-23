@@ -276,11 +276,12 @@ public class TestDataService {
         return learningTagsPagedResponse;
     }
 
-    private List<LearningTag> createLearningTagList() {
+    public List<LearningTag> createLearningTagList() {
         List<LearningTag> learningTags = new ArrayList<>();
 
         LearningTag learningTags1 = new LearningTag();
         learningTags1.setId(1L);
+        learningTags1.setUrlSlug("TagName1");
         learningTags1.setName("TagName1");
         learningTags1.setParentId(null);
         learningTags1.setCode("TAGN1");
@@ -288,6 +289,7 @@ public class TestDataService {
 
         LearningTag learningTags2 = new LearningTag();
         learningTags2.setId(2L);
+        learningTags2.setUrlSlug("TagName2");
         learningTags2.setName("TagName2");
         learningTags2.setParentId(1L);
         learningTags2.setCode("TAGN2");
@@ -295,6 +297,7 @@ public class TestDataService {
 
         LearningTag learningTags3 = new LearningTag();
         learningTags3.setId(3L);
+        learningTags3.setUrlSlug("TagName3");
         learningTags3.setName("TagName3");
         learningTags3.setParentId(2L);
         learningTags3.setCode("TAGN3");
@@ -302,6 +305,7 @@ public class TestDataService {
 
         LearningTag learningTags4 = new LearningTag();
         learningTags4.setId(4L);
+        learningTags4.setUrlSlug("TagName4");
         learningTags4.setName("TagName4");
         learningTags4.setParentId(3L);
         learningTags4.setCode("TAGN4");
@@ -309,6 +313,7 @@ public class TestDataService {
 
         LearningTag learningTags5 = new LearningTag();
         learningTags5.setId(5L);
+        learningTags5.setUrlSlug("TagName5");
         learningTags5.setName("TagName5");
         learningTags5.setParentId(1L);
         learningTags5.setCode("TAGN5");

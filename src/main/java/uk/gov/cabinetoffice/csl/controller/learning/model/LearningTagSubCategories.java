@@ -16,17 +16,19 @@ public class LearningTagSubCategories extends LearningTagCategories {
 
     private String title;
     private String description;
+    private String url;
     private Collection<Link> parents;
     private Integer courseCount;
     private PagedResults<BasicCourse> courses;
     private Integer linkCount;
     private PagedResults<HyperlinkDto> links;
 
-    public LearningTagSubCategories(Collection<LearningTagCategory> categories, String title, String description, Collection<Link> parents,
+    public LearningTagSubCategories(Collection<LearningTagCategory> categories, String title, String description, String url, Collection<Link> parents,
                                     Integer courseCount, PagedResults<BasicCourse> courses, Integer linkCount, PagedResults<HyperlinkDto> links) {
         super(categories);
         this.title = title;
         this.description = description;
+        this.url = url;
         this.parents = parents;
         this.courseCount = courseCount;
         this.courses = courses;
