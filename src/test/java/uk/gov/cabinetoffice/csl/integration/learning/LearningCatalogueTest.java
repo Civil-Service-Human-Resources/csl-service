@@ -367,7 +367,7 @@ public class LearningCatalogueTest extends IntegrationTestBase {
         SearchForCoursesParams params = SearchForCoursesParams.builder()
                 .titleStartsWith("a")
                 .status(List.of(CourseStatus.PUBLISHED))
-                .visibility("PUBLIC")
+                .visibility(List.of("PUBLIC"))
                 .build();
 
         cslStubService.getLearningCatalogue().postSearchCourses(params, courses, 0, 20, "title", "ASC");
