@@ -35,7 +35,7 @@ public class LearningTagHyperlinkController {
     @ResponseBody
     public HyperlinkDto createHyperlink(@PathVariable Long learningTagId,
                                         @Valid @RequestBody HyperlinkDto request) {
-        return learningCatalogueService.createHyperlink(learningTagId, request);
+        return learningCatalogueService.assignHyperlinkToLearningTag(learningTagId, request);
     }
 
     @GetMapping("/{hyperlinkId}")

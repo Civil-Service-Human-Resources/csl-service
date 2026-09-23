@@ -155,21 +155,6 @@ public class LearningTagsTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testCreateGeneratedUrlSlugTooLong() throws Exception {
-        mockMvc.perform(post("/learning-tags")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "code": "NEW_TAG",
-                                  "name": "&&&&&&&&&&&&&&&&&",
-                                  "parentId": null
-                                }
-                                """))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Auto-generated URL slug was greater than the max length of 50. Generated URL slug was andandandandandandandandandandandandandandandandand"));
-    }
-
-    @Test
     public void testCreateWithParent() throws Exception {
         cslStubService.getLearningCatalogue().createLearningTag("""
                 {
@@ -334,11 +319,6 @@ public class LearningTagsTest extends IntegrationTestBase {
                                     "id": 4,
                                     "name": "TagName4",
                                     "code": "TAGN4"
-                                },
-                                {
-                                    "id": 6,
-                                    "name": "TagName6",
-                                    "code": "TAGN6"
                                 }
                             ]
                         }

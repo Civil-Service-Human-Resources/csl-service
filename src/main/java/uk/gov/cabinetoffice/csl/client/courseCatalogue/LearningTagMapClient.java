@@ -7,6 +7,7 @@ import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagCourseAssig
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateRequest;
 import uk.gov.cabinetoffice.csl.controller.learning.model.LearningTagUpdateResponse;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseLearningTagSearchResults;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkSearchResults;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagDTO;
@@ -61,5 +62,9 @@ public class LearningTagMapClient implements ILearningTagMapClient {
 
     public HyperlinkSearchResults getHyperlinks(Long tagId, int page, int size) {
         return learningCatalogueClient.getHyperlinksForLearningTag(tagId, page, size);
+    }
+
+    public HyperlinkDto addHyperlink(Long tagId, HyperlinkDto hyperlinkDto) {
+        return learningCatalogueClient.assignHyperlinkToLearningTag(tagId, hyperlinkDto);
     }
 }
