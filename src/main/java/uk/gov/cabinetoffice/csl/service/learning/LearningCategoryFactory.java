@@ -19,9 +19,20 @@ import java.util.*;
 @Service
 public class LearningCategoryFactory {
 
-    public LearningTagCategories buildCategories(Collection<LearningTag> tierOneTags) {
-        Collection<LearningTagCategory> categories = tierOneTags
-                .stream().map(lt -> new LearningTagCategory(lt.getName(), lt.getDescription(), lt.getUrlSlug(), List.of(), lt.getCourseCount(), lt.getLinkCount()))
+    public LearningTagCategories buildCategories(Collection<LearningTagTaxonomy> tierOneTaxonomies) {
+        Collection<LearningTagCategory> categories = tierOneTaxonomies
+                .stream().map(tax -> new LearningTagCategory(
+                        tax.category().getName(),
+                        tax.category().getDescription(),
+                        tax.category().getUrlSlug(),
+                        tax.children().stream()
+                                .filter(childTax -> childTax.category().showOnHomepage())
+                                .map(childTax -> new Link(childTax.category().getUrlSlug(), childTax.category().getName()))
+                                .sorted(Comparator.comparing(Link::getText))
+                                .toList(),
+                        tax.category().getCourseCount(),
+                        tax.category().getLinkCount()
+                ))
                 .sorted(Comparator.comparing(LearningTagCategory::getTitle))
                 .toList();
         return new LearningTagCategories(categories);
@@ -34,7 +45,9 @@ public class LearningCategoryFactory {
         Collections.reverse(parentLinks);
         Collection<LearningTagCategory> categories = taxonomy.children()
                 .stream().map(lt -> new LearningTagCategory(lt.category().getName(), lt.category().getDescription(), lt.category().getUrlSlug(),
-                        lt.children().stream().map(descLt -> new Link(descLt.category().getUrlSlug(), descLt.category().getName()))
+                        lt.children().stream()
+                                .filter(descLt -> descLt.category().showOnHomepage())
+                                .map(descLt -> new Link(descLt.category().getUrlSlug(), descLt.category().getName()))
                                 .sorted(Comparator.comparing(Link::getText))
                                 .toList(), lt.category().getCourseCount(), lt.category().getLinkCount()))
                 .sorted(Comparator.comparing(LearningTagCategory::getTitle))

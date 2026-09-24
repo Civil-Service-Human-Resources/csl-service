@@ -129,6 +129,10 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
                 .toList();
     }
 
+    public Collection<LearningTagTaxonomy> getTierOneUnarchivedHomepageTaxonomies() {
+        return get().getTierOneTaxonomies();
+    }
+
     public LearningTagTaxonomy getUnarchivedHomepageTagsWithUrl(String urlSlug) {
         return get().getFullTaxonomyFromUrl(urlSlug);
     }

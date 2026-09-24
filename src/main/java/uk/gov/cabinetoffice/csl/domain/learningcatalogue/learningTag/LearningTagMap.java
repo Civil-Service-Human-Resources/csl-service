@@ -50,6 +50,13 @@ public class LearningTagMap extends TaxonomyMap<LearningTag, LearningTagTreeNode
         return getFullTaxonomy(learningTag);
     }
 
+    public Collection<LearningTagTaxonomy> getTierOneTaxonomies() {
+        return values().stream()
+                .filter(lt -> lt.showOnHomepage() && lt.getParentId() == null)
+                .map(this::getFullTaxonomy)
+                .toList();
+    }
+
     @Override
     public LearningTag put(Long key, LearningTag value) {
         urlSlugMap.entrySet().removeIf(entry -> Objects.equals(entry.getValue(), key));

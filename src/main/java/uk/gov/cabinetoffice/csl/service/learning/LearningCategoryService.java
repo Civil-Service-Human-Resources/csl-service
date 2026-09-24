@@ -30,8 +30,8 @@ public class LearningCategoryService {
     }
 
     public LearningTagCategories getCategories() {
-        Collection<LearningTag> tags = learningTagMapService.getTierOneUnarchivedHomepageTags();
-        return learningCategoryFactory.buildCategories(tags);
+        Collection<LearningTagTaxonomy> taxonomies = learningTagMapService.getTierOneUnarchivedHomepageTaxonomies();
+        return learningCategoryFactory.buildCategories(taxonomies);
     }
 
     public LearningTagSubCategories getCategories(String uid, String urlSlug, Pageable pageableParams) {
