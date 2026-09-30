@@ -31,6 +31,7 @@ public class Module implements IChildLearningResource, IParentLearningResource<E
     private BigDecimal cost;
     private Collection<Event> events = Collections.emptyList();
     private boolean optional;
+    private boolean associatedLearning;
     private String url;
 
     private boolean requiredForCompletion;

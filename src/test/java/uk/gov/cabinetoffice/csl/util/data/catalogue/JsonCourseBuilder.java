@@ -42,8 +42,28 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
         return this;
     }
 
+    public JsonCourseBuilder addGradesAudience(String... grades) {
+        ArrayNode aud = getOrCreateArray("audiences");
+        ObjectNode item = aud.addObject();
+        item.put("type", "OPEN");
+        ArrayNode gradesArray = item.putArray("grades");
+        for (String grade : grades) {
+            gradesArray.add(grade);
+        }
+        return this;
+    }
+
     public JsonCourseBuilder addDepartmentRequiredLearning(String departmentCode, String requiredBy) {
         createRequiredAudience(departmentCode, requiredBy);
+        return this;
+    }
+
+    public JsonCourseBuilder addLearningTag(Long tagId, String tagName, String tagUrl) {
+        ArrayNode aud = getOrCreateArray("tags");
+        ObjectNode item = aud.addObject();
+        item.put("id", tagId)
+                .put("name", tagName)
+                .put("urlSlug", tagUrl);
         return this;
     }
 

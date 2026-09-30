@@ -47,6 +47,12 @@ public class ModuleRecordCollection extends ArrayList<ModuleRecord> {
     }
 
     @Override
+    public boolean addAll(Collection<? extends ModuleRecord> c) {
+        c.forEach(this::addModule);
+        return super.addAll(c);
+    }
+
+    @Override
     public boolean add(ModuleRecord moduleRecord) {
         this.addModule(moduleRecord);
         return super.add(moduleRecord);
