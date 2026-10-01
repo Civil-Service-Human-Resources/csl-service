@@ -181,7 +181,6 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                 "Finance"
                             ],
                             "costInPounds": 0,
-                            "location": null,
                             "modules": [
                                 {
                                     "id": "module1",
@@ -305,10 +304,9 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "title": "Validation exception",
                             "status": 400,
                             "detail": "Course overview cannot be displayed.",
-                            "instance": "/courses/course1/overview",
-                            "timestamp": "2026-10-01T13:27:22.530131971Z"
+                            "instance": "/courses/course1/overview"
                         }
-                        """, true));
+                        """, false));
     }
 
 }

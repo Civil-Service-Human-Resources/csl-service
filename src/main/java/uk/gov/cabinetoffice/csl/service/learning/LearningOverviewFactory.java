@@ -52,7 +52,7 @@ public class LearningOverviewFactory {
         ModuleOverviewCollection collection = new ModuleOverviewCollection();
         modules.forEach(module -> {
             State state = State.NULL;
-            ModuleRecord moduleRecord = moduleRecordMap.get(module.getUrl());
+            ModuleRecord moduleRecord = moduleRecordMap.get(module.getId());
             if (moduleRecord != null) {
                 state = optLp.map(moduleRecord::getStateForLearningPeriod).orElse(moduleRecord.getState());
             }

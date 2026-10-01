@@ -192,11 +192,23 @@ public class LearningCatalogueService {
     }
 
     public LearningTagOverview patchLearningTag(Long learningTagId, LearningTagDTO dto) {
-        return learningTagMapService.update(learningTagId, dto);
+        LearningTagPatchResult result = learningTagMapService.updateTag(learningTagId, dto);
+        return processUpdateResult(result);
     }
 
     public LearningTagOverview updateState(Long learningTagId, LearningTagStateDTO request) {
-        return learningTagMapService.updateState(learningTagId, request.getState());
+        LearningTagPatchResult result = learningTagMapService.updateState(learningTagId, request.getState());
+        return processUpdateResult(result);
+    }
+
+    private LearningTagOverview processUpdateResult(LearningTagPatchResult result) {
+        LearningTagOverview overview = result.getLearningTagOverview();
+        if (result.getCourseCount() > 0) {
+            log.info("{} Courses found for tag {}. Removing cache entries", overview.getId(), result.getCourseCount());
+            learningTagMapService.getCourses(overview.getId(), 0, result.getCourseCount())
+                    .getResults().forEach(course -> cache.evict(course.getId()));
+        }
+        return overview;
     }
 
     public CourseLearningTagSearchResults getCoursesForLearningTag(Long tagId, int page, int size) {
@@ -224,10 +236,14 @@ public class LearningCatalogueService {
     }
 
     public LearningTagUpdateResponse deleteCoursesFromLearningTag(Long tagId, LearningTagUpdateRequest request) {
-        return learningTagMapService.removeCourses(tagId, request);
+        LearningTagUpdateResponse learningTagUpdateResponse = learningTagMapService.removeCourses(tagId, request);
+        request.getIds().forEach(cache::evict);
+        return learningTagUpdateResponse;
     }
 
     public BulkLearningTagUpdateResponse assignCoursesToLearningTags(LearningTagCourseAssignmentRequest request) {
-        return learningTagMapService.addCourses(request);
+        BulkLearningTagUpdateResponse bulkLearningTagUpdateResponse = learningTagMapService.addCourses(request);
+        request.getCourseIds().forEach(cache::evict);
+        return bulkLearningTagUpdateResponse;
     }
 }

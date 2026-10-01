@@ -58,8 +58,7 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
                 .toList());
     }
 
-    @Override
-    public LearningTagOverview update(Long id, LearningTagDTO dto) {
+    public LearningTagPatchResult updateTag(Long id, LearningTagDTO dto) {
         if (dto.getUrlSlug() == null) {
             String slug = utilService.generateUrlSlugFromString(dto.getName(), maxUrlSlugSize);
             dto.setUrlSlug(slug);
@@ -74,7 +73,8 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         updateObjectWithDto(object, dto);
         map.rebuildHierarchy(object);
         put(map);
-        return taxonomyItemFactory.createOverview(object);
+        LearningTagOverview overview = taxonomyItemFactory.createOverview(object);
+        return new LearningTagPatchResult(overview, object.getCourseCount());
     }
 
     @Override
@@ -112,7 +112,7 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
         return response;
     }
 
-    public LearningTagOverview updateState(Long learningTagId, LearningTagStateUpdate update) {
+    public LearningTagPatchResult updateState(Long learningTagId, LearningTagStateUpdate update) {
         LearningTagMap learningTagMap = get();
         Collection<Long> ids = learningTagMap.getMultipleAsIds(List.of(learningTagId), true);
         BulkUpdateResponse result = client.updateState(ids, update);
@@ -121,7 +121,9 @@ public class LearningTagMapService extends CachedTaxonomyMapService<LearningTag,
             return learningTag;
         }));
         put(learningTagMap);
-        return taxonomyItemFactory.createOverview(learningTagMap.get(learningTagId));
+        LearningTag tag = learningTagMap.get(learningTagId);
+        LearningTagOverview overview = taxonomyItemFactory.createOverview(tag);
+        return new LearningTagPatchResult(overview, tag.getCourseCount());
     }
 
     public Collection<LearningTag> getTierOneUnarchivedHomepageTags() {
