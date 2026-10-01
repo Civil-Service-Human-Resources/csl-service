@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.CourseResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.ActionWithId;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseOverview;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.overview.CourseOverview;
 import uk.gov.cabinetoffice.csl.service.CourseActionService;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 import uk.gov.cabinetoffice.csl.service.learning.LearningOverviewService;

@@ -1,4 +1,4 @@
-package uk.gov.cabinetoffice.csl.domain.learningcatalogue;
+package uk.gov.cabinetoffice.csl.domain.learningcatalogue.overview;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagOverview;
 
 import java.util.Collection;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,11 +16,13 @@ public class CourseOverview {
     private String title;
     private String description;
     private String learningOutcomes;
+    private LearningPlan isInLearningPlan;
     private String type;
     private Integer duration;
     private Collection<LearningTagOverview> tags;
-    private Collection<String> grades;
+    private Set<String> grades;
+    private Set<String> areasOfWork;
     private Integer costInPounds;
-    private Collection<ModuleOverview> modules;
+    private Collection<? extends ModuleOverview> modules;
 
 }

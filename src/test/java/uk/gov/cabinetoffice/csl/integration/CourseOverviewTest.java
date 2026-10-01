@@ -9,6 +9,7 @@ import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.data.ArrayJsonContentBuilder;
 import uk.gov.cabinetoffice.csl.util.data.catalogue.DateRangeJsonValues;
 import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonCourseBuilder;
+import uk.gov.cabinetoffice.csl.util.data.learnerRecord.JsonLearnerRecordBuilder;
 import uk.gov.cabinetoffice.csl.util.data.learnerRecord.JsonModuleRecordBuilder;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
@@ -35,9 +36,9 @@ public class CourseOverviewTest extends IntegrationTestBase {
         jsonCourse = JsonCourseBuilder.create("course1", "A Course 1")
                 .addModule("link", "module1", "module 1", false, 0)
                 .addModule("elearning", "module2", "module 2", true, 100)
-                .addModule("file", "module3", "module 3", false, 200)
+                .addFileModule("module3", "module 3", false, 200)
                 .addLearningTag(1L, "Project Management", "project-management")
-                .addGradesAudience("AA", "AO", "G7");
+                .addAudience(new String[]{"AA", "AO", "G7"}, new String[]{"Commercial", "Finance"});
     }
 
     @Test
@@ -49,9 +50,12 @@ public class CourseOverviewTest extends IntegrationTestBase {
                 JsonModuleRecordBuilder.create("module2", "course1", "userId", "link", "2022-01-02T09:00:00")
                         .addUpdatedAt("2022-01-02T09:00:00").addState("COMPLETED")
         ).getAsObjectList("moduleRecords").toString();
+        String learnerRecordResponse = ArrayJsonContentBuilder.create(JsonLearnerRecordBuilder.create("userId", "course1")
+                .addLatestEvent("MOVE_TO_LEARNING_PLAN", "2022-01-02T09:00:00")).getAsPaginatedAndBuild(0, 1, 1);
         cslStubService.getLearningCatalogue().getCourses(List.of("course1"), course);
         cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1", "module2", "module3"), moduleRecordResponse);
+        cslStubService.getLearnerRecord().getLearnerRecords("userId", "course1", 0, learnerRecordResponse);
 
         mockMvc.perform(get("/courses/course1/overview")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -62,6 +66,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "title": "A Course 1",
                             "description": "A Course 1",
                             "learningOutcomes": null,
+                            "isInLearningPlan": "IS_IN_LEARNING_PLAN",
                             "type": "blended",
                             "duration": 300,
                             "tags": [
@@ -76,6 +81,10 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                 "G7",
                                 "AO"
                             ],
+                            "areasOfWork": [
+                                "Commercial",
+                                "Finance"
+                            ],
                             "costInPounds": 0,
                             "modules": [
                                 {
@@ -87,7 +96,8 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                     "type": "link",
                                     "duration": 0,
                                     "costInPounds": 0,
-                                    "state": "IN_PROGRESS"
+                                    "state": "IN_PROGRESS",
+                                    "mustConfirmBooking": false
                                 },
                                 {
                                     "id": "module2",
@@ -98,7 +108,8 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                     "type": "elearning",
                                     "duration": 100,
                                     "costInPounds": 0,
-                                    "state": "COMPLETED"
+                                    "state": "COMPLETED",
+                                    "mustConfirmBooking": false
                                 },
                                 {
                                     "id": "module3",
@@ -109,7 +120,11 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                     "type": "file",
                                     "duration": 200,
                                     "costInPounds": 0,
-                                    "state": "NULL"
+                                    "state": "NULL",
+                                    "mustConfirmBooking": false,
+                                    "filename": "file",
+                                    "extension": "txt",
+                                    "sizeInKb": 1000
                                 }
                             ]
                         }
@@ -146,6 +161,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "title": "A Course 1",
                             "description": "A Course 1",
                             "learningOutcomes": null,
+                            "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "blended",
                             "duration": 300,
                             "tags": [
@@ -160,7 +176,12 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                 "G7",
                                 "AO"
                             ],
+                            "areasOfWork": [
+                                "Commercial",
+                                "Finance"
+                            ],
                             "costInPounds": 0,
+                            "location": null,
                             "modules": [
                                 {
                                     "id": "module1",
@@ -171,7 +192,8 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                     "type": "link",
                                     "duration": 0,
                                     "costInPounds": 0,
-                                    "state": "IN_PROGRESS"
+                                    "state": "IN_PROGRESS",
+                                    "mustConfirmBooking": false
                                 },
                                 {
                                     "id": "module2",
@@ -182,7 +204,8 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                     "type": "elearning",
                                     "duration": 100,
                                     "costInPounds": 0,
-                                    "state": "NULL"
+                                    "state": "NULL",
+                                    "mustConfirmBooking": false
                                 },
                                 {
                                     "id": "module3",
@@ -193,7 +216,11 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                     "type": "file",
                                     "duration": 200,
                                     "costInPounds": 0,
-                                    "state": "NULL"
+                                    "state": "NULL",
+                                    "mustConfirmBooking": false,
+                                    "filename": "file",
+                                    "extension": "txt",
+                                    "sizeInKb": 1000
                                 }
                             ]
                         }
@@ -207,14 +234,17 @@ public class CourseOverviewTest extends IntegrationTestBase {
                         new DateRangeJsonValues("12:00", "14:00", "2022-01-02"),
                         new DateRangeJsonValues("09:00", "11:00", "2022-01-01"))
                 .addLearningTag(1L, "Project Management", "project-management")
-                .addGradesAudience("AA", "AO", "G7")).get().toString();
+                .addAudience(new String[]{"AA", "AO", "G7"}, new String[]{})).get().toString();
         String moduleRecordResponse = ArrayJsonContentBuilder.create(
                 JsonModuleRecordBuilder.create("module1", "course1", "userId", "face-to-face", "2022-01-02T09:00:00")
                         .addUpdatedAt("2022-01-02T09:00:00").addState("APPROVED").addEvent("event1", "2022-01-02T09:00:00")
         ).getAsObjectList("moduleRecords").toString();
+        String learnerRecordResponse = ArrayJsonContentBuilder.create(JsonLearnerRecordBuilder.create("userId", "course1")
+                .addLatestEvent("MOVE_TO_LEARNING_PLAN", "2022-01-02T09:00:00")).getAsPaginatedAndBuild(0, 1, 1);
         cslStubService.getLearningCatalogue().getCourses(List.of("course1"), course);
         cslStubService.getCsrsStubService().getCivilServant("userId", testDataService.generateCivilServant());
         cslStubService.getLearnerRecord().getModuleRecords(List.of("userId"), List.of("module1"), moduleRecordResponse);
+        cslStubService.getLearnerRecord().getLearnerRecords("userId", "course1", 0, learnerRecordResponse);
         mockMvc.perform(get("/courses/course1/overview")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
@@ -224,6 +254,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "title": "A Course 1",
                             "description": "A Course 1",
                             "learningOutcomes": null,
+                            "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "face-to-face",
                             "duration": 14400,
                             "tags": [
@@ -238,6 +269,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                 "G7",
                                 "AO"
                             ],
+                            "areasOfWork": [],
                             "costInPounds": 100,
                             "modules": [
                                 {
@@ -249,9 +281,32 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                     "type": "face-to-face",
                                     "duration": 14400,
                                     "costInPounds": 100,
-                                    "state": "APPROVED"
+                                    "state": "APPROVED",
+                                    "mustConfirmBooking": false,
+                                    "eventId": "event1",
+                                    "canBeBooked": false,
+                                    "canBeCancelled": true
                                 }
                             ]
+                        }
+                        """, true));
+    }
+
+    @Test
+    public void testCourseOverviewForArchivedCourse() throws Exception {
+        String course = ArrayJsonContentBuilder.create(jsonCourse.status("ARCHIVED")).build();
+        cslStubService.getLearningCatalogue().getCourses(List.of("course1"), course);
+        mockMvc.perform(get("/courses/course1/overview")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andExpect(content().json("""
+                        {
+                            "type": "about:blank",
+                            "title": "Validation exception",
+                            "status": 400,
+                            "detail": "Course overview cannot be displayed.",
+                            "instance": "/courses/course1/overview",
+                            "timestamp": "2026-10-01T13:27:22.530131971Z"
                         }
                         """, true));
     }

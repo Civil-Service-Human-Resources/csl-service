@@ -9,9 +9,11 @@ import uk.gov.cabinetoffice.csl.domain.IChildLearningResource;
 import uk.gov.cabinetoffice.csl.domain.IParentLearningResource;
 import uk.gov.cabinetoffice.csl.domain.LearningResourceType;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 import uk.gov.cabinetoffice.csl.util.Cacheable;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +35,7 @@ public class Module implements IChildLearningResource, IParentLearningResource<E
     private boolean optional;
     private boolean associatedLearning;
     private String url;
+    private Integer fileSize;
 
     private boolean requiredForCompletion;
 
@@ -72,6 +75,19 @@ public class Module implements IChildLearningResource, IParentLearningResource<E
     @JsonIgnore
     public boolean isType(ModuleType type) {
         return this.getModuleType().equals(type);
+    }
+
+    @JsonIgnore
+    public boolean canBeBooked(LocalDateTime now) {
+        return !getBookableEvents(now).isEmpty();
+    }
+
+    @JsonIgnore
+    public Collection<Event> getBookableEvents(LocalDateTime now) {
+        var ev = this.events.stream()
+                .filter(e -> now.isBefore(e.getStartDateTime()) && e.getStatus().equals(EventStatus.ACTIVE))
+                .toList();
+        return ev;
     }
 
     @Override

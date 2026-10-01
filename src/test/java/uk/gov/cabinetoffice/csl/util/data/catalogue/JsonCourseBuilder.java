@@ -42,7 +42,7 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
         return this;
     }
 
-    public JsonCourseBuilder addGradesAudience(String... grades) {
+    public JsonCourseBuilder addAudience(String[] grades, String[] areasOfWork) {
         ArrayNode aud = getOrCreateArray("audiences");
         ObjectNode item = aud.addObject();
         item.put("type", "OPEN");
@@ -50,11 +50,20 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
         for (String grade : grades) {
             gradesArray.add(grade);
         }
+        ArrayNode areasOfWorkArray = item.putArray("areasOfWork");
+        for (String aow : areasOfWork) {
+            areasOfWorkArray.add(aow);
+        }
         return this;
     }
 
     public JsonCourseBuilder addDepartmentRequiredLearning(String departmentCode, String requiredBy) {
         createRequiredAudience(departmentCode, requiredBy);
+        return this;
+    }
+
+    public JsonCourseBuilder status(String status) {
+        root.put("status", status);
         return this;
     }
 
@@ -90,7 +99,9 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
     }
 
     public JsonCourseBuilder addFileModule(String id, String title, boolean optional, int duration) {
-        return this.addModule("file", id, title, optional, duration);
+        getOrCreateArray("modules").add(JsonModuleBuilder.create("file", id, courseId, title, optional, duration)
+                .addUrlAndSize("location/file.txt", 1000).get());
+        return this;
     }
 
     public JsonCourseBuilder addElearningModule(String id, String title, boolean optional, int duration) {

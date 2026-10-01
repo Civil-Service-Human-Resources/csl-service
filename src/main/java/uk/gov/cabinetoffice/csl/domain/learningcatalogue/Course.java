@@ -194,4 +194,9 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     public Set<String> getGrades() {
         return audiences.stream().flatMap(a -> a.getGrades().stream()).collect(Collectors.toSet());
     }
+
+    @JsonIgnore
+    public Set<String> getAreasOfWork() {
+        return audiences.stream().flatMap(a -> a.getAreasOfWork().stream()).collect(Collectors.toSet());
+    }
 }
