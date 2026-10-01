@@ -19,7 +19,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LearningOverviewFactoryTest extends TestDataService {
@@ -35,7 +34,7 @@ class LearningOverviewFactoryTest extends TestDataService {
 
     @BeforeEach
     void setUp() {
-        when(utilService.getNowDateTime()).thenReturn(LocalDateTime.of(2022, 10, 1, 12, 0));
+        lenient().when(utilService.getNowDateTime()).thenReturn(LocalDateTime.of(2022, 10, 1, 12, 0));
         module = generateModule();
         event = generateEvent();
         module.setEvents(List.of(event));
@@ -93,5 +92,5 @@ class LearningOverviewFactoryTest extends TestDataService {
         assertEquals("eventId", overview.getEventId());
         assertFalse(overview.isCanBeCancelled());
     }
-    
+
 }
