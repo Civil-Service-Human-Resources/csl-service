@@ -68,6 +68,7 @@ public class LearningOverviewFactory {
                                 module.getDurationInSeconds(), module.getCost().intValue(), state, module.isAssociatedLearning());
             };
             collection.add(o);
+            if (!module.isOptional()) collection.setMandatoryCount(collection.getMandatoryCount() + 1);
         });
         collection.setAssociatedLearning();
         return collection;

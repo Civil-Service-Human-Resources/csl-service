@@ -66,6 +66,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "title": "A Course 1",
                             "description": "A Course 1",
                             "learningOutcomes": null,
+                            "status": "PUBLISHED",
                             "isInLearningPlan": "IS_IN_LEARNING_PLAN",
                             "type": "blended",
                             "duration": 300,
@@ -126,7 +127,8 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                     "extension": "txt",
                                     "sizeInKb": 1000
                                 }
-                            ]
+                            ],
+                            "mandatoryModuleCount": 2
                         }
                         """, true));
     }
@@ -161,6 +163,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "title": "A Course 1",
                             "description": "A Course 1",
                             "learningOutcomes": null,
+                            "status": "PUBLISHED",
                             "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "blended",
                             "duration": 300,
@@ -221,7 +224,8 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                     "extension": "txt",
                                     "sizeInKb": 1000
                                 }
-                            ]
+                            ],
+                            "mandatoryModuleCount": 2
                         }
                         """, true));
     }
@@ -253,6 +257,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "title": "A Course 1",
                             "description": "A Course 1",
                             "learningOutcomes": null,
+                            "status": "PUBLISHED",
                             "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "face-to-face",
                             "duration": 14400,
@@ -286,7 +291,8 @@ public class CourseOverviewTest extends IntegrationTestBase {
                                     "canBeBooked": false,
                                     "canBeCancelled": true
                                 }
-                            ]
+                            ],
+                            "mandatoryModuleCount": 1
                         }
                         """, true));
     }
@@ -300,11 +306,33 @@ public class CourseOverviewTest extends IntegrationTestBase {
                 .andExpect(status().is4xxClientError())
                 .andExpect(content().json("""
                         {
-                            "type": "about:blank",
-                            "title": "Validation exception",
-                            "status": 400,
-                            "detail": "Course overview cannot be displayed.",
-                            "instance": "/courses/course1/overview"
+                            "id": "course1",
+                            "title": "A Course 1",
+                            "description": "A Course 1",
+                            "learningOutcomes": null,
+                            "status": "ARCHIVED",
+                            "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
+                            "type": "blended",
+                            "duration": 300,
+                            "learningTags": [
+                                {
+                                    "id": 1,
+                                    "urlSlug": "project-management",
+                                    "name": "Project Management"
+                                }
+                            ],
+                            "grades": [
+                                "AA",
+                                "G7",
+                                "AO"
+                            ],
+                            "areasOfWork": [
+                                "Commercial",
+                                "Finance"
+                            ],
+                            "costInPounds": 0,
+                            "modules": [],
+                            "mandatoryModuleCount": 0
                         }
                         """, false));
     }

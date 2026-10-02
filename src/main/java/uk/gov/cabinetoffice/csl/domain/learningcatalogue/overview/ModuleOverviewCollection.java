@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class ModuleOverviewCollection extends ArrayList<ModuleOverview> {
 
     private boolean hasFaceToFace;
+    private Integer mandatoryCount = 0;
 
     public void setAssociatedLearning() {
         if (isHasFaceToFace()) {

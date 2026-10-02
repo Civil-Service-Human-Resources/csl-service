@@ -2,7 +2,6 @@ package uk.gov.cabinetoffice.csl.service.learning;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
-import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.CourseRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ModuleRecordResourceId;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction.COMPLETE_COURSE;
 import static uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction.REMOVE_FROM_LEARNING_PLAN;
-import static uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus.PUBLISHED;
+import static uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus.ARCHIVED;
 
 @Service
 public class LearningOverviewService {
@@ -42,20 +41,20 @@ public class LearningOverviewService {
     public CourseOverview getCourseOverview(String courseId, String uid) {
         Course course = learningCatalogueService.getCourse(courseId);
         LearningPlan learningPlan = LearningPlan.CANNOT_BE_ADDED_TO_LEARNING_PLAN;
-        if (Objects.equals(PUBLISHED, course.getStatus())) {
+        ModuleOverviewCollection collection = new ModuleOverviewCollection();
+        if (!Objects.equals(ARCHIVED, course.getStatus())) {
             User user = userDetailsService.getUserWithUid(uid);
             Optional<LearningPeriod> optLp = course.getLearningPeriodForUser(user);
             Map<String, ModuleRecord> moduleRecordsMap = learnerRecordService.getModuleRecords(course.getModules().stream().map(module -> new ModuleRecordResourceId(uid, module.getId())).toList())
                     .stream().collect(Collectors.toMap(ModuleRecord::getModuleId, mr -> mr));
-            ModuleOverviewCollection collection = learningOverviewFactory.getModuleOverviews(course.getModules(), moduleRecordsMap, optLp);
+            collection = learningOverviewFactory.getModuleOverviews(course.getModules(), moduleRecordsMap, optLp);
             if (optLp.isEmpty() && !collection.isEmpty()) {
                 learningPlan = getIsInLearningPlan(uid, courseId, collection.isHasFaceToFace());
             }
-            return new CourseOverview(course.getId(), course.getTitle(), course.getDescription(), course.getLearningOutcomes(), learningPlan,
-                    course.getCourseType(), course.getDurationInSeconds(), course.getLearningTags(), course.getGrades(), course.getAreasOfWork(), course.getCost(), collection);
-        } else {
-            throw new ValidationException("Course overview cannot be displayed.");
         }
+        return new CourseOverview(course.getId(), course.getTitle(), course.getDescription(), course.getLearningOutcomes(), course.getStatus(), learningPlan,
+                course.getCourseType(), course.getDurationInSeconds(), course.getLearningTags(), course.getGrades(), course.getAreasOfWork(), course.getCost(), collection,
+                collection.getMandatoryCount());
     }
 
     private LearningPlan getIsInLearningPlan(String uid, String courseId, boolean hasFaceToFaceModule) {
