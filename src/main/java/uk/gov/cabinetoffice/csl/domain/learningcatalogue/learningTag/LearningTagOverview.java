@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class LearningTagOverview {
+public class LearningTagOverview implements Serializable {
 
     private Long id;
     private String urlSlug;
