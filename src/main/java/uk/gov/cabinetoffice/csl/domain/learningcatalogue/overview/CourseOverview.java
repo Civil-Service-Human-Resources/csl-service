@@ -19,7 +19,7 @@ public class CourseOverview {
     private LearningPlan isInLearningPlan;
     private String type;
     private Integer duration;
-    private Collection<LearningTagOverview> tags;
+    private Collection<LearningTagOverview> learningTags;
     private Set<String> grades;
     private Set<String> areasOfWork;
     private Integer costInPounds;

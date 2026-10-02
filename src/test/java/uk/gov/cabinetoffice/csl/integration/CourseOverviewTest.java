@@ -69,7 +69,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "isInLearningPlan": "IS_IN_LEARNING_PLAN",
                             "type": "blended",
                             "duration": 300,
-                            "tags": [
+                            "learningTags": [
                                 {
                                     "id": 1,
                                     "urlSlug": "project-management",
@@ -164,7 +164,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "blended",
                             "duration": 300,
-                            "tags": [
+                            "learningTags": [
                                 {
                                     "id": 1,
                                     "urlSlug": "project-management",
@@ -256,7 +256,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "face-to-face",
                             "duration": 14400,
-                            "tags": [
+                            "learningTags": [
                                 {
                                     "id": 1,
                                     "urlSlug": "project-management",

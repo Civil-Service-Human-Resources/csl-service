@@ -52,7 +52,7 @@ public class LearningOverviewService {
                 learningPlan = getIsInLearningPlan(uid, courseId, collection.isHasFaceToFace());
             }
             return new CourseOverview(course.getId(), course.getTitle(), course.getDescription(), course.getLearningOutcomes(), learningPlan,
-                    course.getCourseType(), course.getDurationInSeconds(), course.getTags(), course.getGrades(), course.getAreasOfWork(), course.getCost(), collection);
+                    course.getCourseType(), course.getDurationInSeconds(), course.getLearningTags(), course.getGrades(), course.getAreasOfWork(), course.getCost(), collection);
         } else {
             throw new ValidationException("Course overview cannot be displayed.");
         }

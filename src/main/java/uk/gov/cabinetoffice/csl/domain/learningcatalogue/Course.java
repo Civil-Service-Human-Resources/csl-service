@@ -32,7 +32,7 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     private String shortDescription;
     private String description;
     private String learningOutcomes;
-    private Collection<LearningTagOverview> tags = Collections.emptyList();
+    private Collection<LearningTagOverview> learningTags = Collections.emptyList();
     private CourseStatus status;
     private CourseVisibility visibility;
     private Collection<Module> modules = Collections.emptyList();

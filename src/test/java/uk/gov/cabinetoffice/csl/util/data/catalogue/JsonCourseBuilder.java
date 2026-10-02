@@ -68,7 +68,7 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
     }
 
     public JsonCourseBuilder addLearningTag(Long tagId, String tagName, String tagUrl) {
-        ArrayNode aud = getOrCreateArray("tags");
+        ArrayNode aud = getOrCreateArray("learningTags");
         ObjectNode item = aud.addObject();
         item.put("id", tagId)
                 .put("name", tagName)
