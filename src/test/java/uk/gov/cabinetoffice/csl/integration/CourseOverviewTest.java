@@ -303,7 +303,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
         cslStubService.getLearningCatalogue().getCourses(List.of("course1"), course);
         mockMvc.perform(get("/courses/course1/overview")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError())
+                .andExpect(status().isOk())
                 .andExpect(content().json("""
                         {
                             "id": "course1",
