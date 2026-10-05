@@ -49,7 +49,7 @@ public class ModuleService {
                 )).getLaunchLink();
             }
         }
-        return new LaunchLinkResponse(url, courseWithModule.getModule().getTitle());
+        return new LaunchLinkResponse(url, module.getTitle(), module.getModuleType());
     }
 
     public ModuleResponse completeModule(String userId, String courseId, String moduleId) {

@@ -92,7 +92,8 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 .andExpect(content().json("""
                         {
                           "launchLink": "http://launch.link",
-                          "moduleTitle":"Test Module"
+                          "moduleTitle":"Test Module",
+                          "moduleType":"elearning"
                         }
                         """, true));
     }
@@ -144,7 +145,8 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 .andExpect(content().json("""
                         {
                           "launchLink": "http://launch.link",
-                          "moduleTitle":"Test Module"
+                          "moduleTitle":"Test Module",
+                          "moduleType":"file"
                         }
                         """, true));
     }
@@ -244,7 +246,8 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 .andExpect(content().json("""
                         {
                           "launchLink": "http://launch.link",
-                          "moduleTitle":"Test Module"
+                          "moduleTitle":"Test Module",
+                          "moduleType":"file"
                         }
                         """, true));
         cslStubService.assertStubbedRequests(stubs);
@@ -325,7 +328,8 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 .andExpect(content().json("""
                         {
                           "launchLink": "http://launch.link",
-                          "moduleTitle":"Test Module"
+                          "moduleTitle":"Test Module",
+                          "moduleType":"file"
                         }
                         """, true));
         cslStubService.assertStubbedRequests(stubs);
@@ -436,7 +440,8 @@ public class ModuleLaunchTest extends IntegrationTestBase {
                 .andExpect(content().json("""
                         {
                           "launchLink": "http://launch.link",
-                          "moduleTitle":"Test Module"
+                          "moduleTitle":"Test Module",
+                          "moduleType":"file"
                         }
                         """, true));
         cslStubService.assertStubbedRequests(stubs);
