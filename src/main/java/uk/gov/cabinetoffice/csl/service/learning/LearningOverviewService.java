@@ -8,6 +8,7 @@ import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecord;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.LearningPeriod;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.overview.CourseOverview;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.overview.LearningPlan;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.overview.ModuleOverviewCollection;
@@ -15,9 +16,7 @@ import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction.COMPLETE_COURSE;
@@ -52,8 +51,9 @@ public class LearningOverviewService {
                 learningPlan = getIsInLearningPlan(uid, courseId, collection.isHasFaceToFace());
             }
         }
+        List<LearningTagOverview> orderedTags = course.getLearningTags().stream().sorted(Comparator.comparing(LearningTagOverview::getName, String::compareToIgnoreCase)).toList();
         return new CourseOverview(course.getId(), course.getTitle(), course.getDescription(), course.getLearningOutcomes(), course.getStatus(), learningPlan,
-                course.getCourseType(), course.getDurationInSeconds(), course.getLearningTags(), course.getGrades(), course.getAreasOfWork(), course.getCost(), collection,
+                course.getCourseType(), course.getDurationInSeconds(), orderedTags, course.getGrades(), course.getAreasOfWork(), course.getCost(), collection,
                 collection.getMandatoryCount());
     }
 
