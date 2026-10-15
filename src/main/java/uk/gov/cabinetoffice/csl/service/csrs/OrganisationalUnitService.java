@@ -115,6 +115,7 @@ public class OrganisationalUnitService {
         List<Long> organisationalUnitIdsToBeRemoved = organisationalUnitMap.delete(organisationalUnitId);
         organisationalUnitMapCache.put(organisationalUnitMap);
         deleteFromReportingData(organisationalUnitIdsToBeRemoved);
+        identityAPIService.clearAllowlistCache();
         return new DeleteOrganisationResponse(organisationalUnitIdsToBeRemoved);
     }
 
