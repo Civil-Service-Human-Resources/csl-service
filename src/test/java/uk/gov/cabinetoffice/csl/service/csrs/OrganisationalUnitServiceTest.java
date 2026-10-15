@@ -13,6 +13,7 @@ import uk.gov.cabinetoffice.csl.domain.csrs.FormattedOrganisationalUnitName;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnitFactory;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnitMap;
+import uk.gov.cabinetoffice.csl.service.IdentityAPIService;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 
@@ -44,6 +45,9 @@ class OrganisationalUnitServiceTest extends CsrsServiceTestBase {
     @Mock
     private ICSRSClient csrs;
 
+    @Mock
+    private IdentityAPIService identityAPIService;
+
     @InjectMocks
     private OrganisationalUnitService organisationalUnitService;
 
@@ -52,7 +56,7 @@ class OrganisationalUnitServiceTest extends CsrsServiceTestBase {
         organisationalUnitMap = OrganisationalUnitMap.buildFromList(getAllOrganisationalUnits());
         when(organisationalUnitMapCache.get()).thenReturn(organisationalUnitMap);
         organisationalUnitService = new OrganisationalUnitService(organisationalUnitMapCache, organisationalUnitFactory, csrs,
-                new MessageMetadataFactory(), messagingClient);
+                new MessageMetadataFactory(), messagingClient, identityAPIService);
     }
 
     @Test

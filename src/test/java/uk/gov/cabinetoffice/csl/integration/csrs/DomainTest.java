@@ -52,6 +52,7 @@ public class DomainTest extends IntegrationTestBase {
                     "updatedChildOrganisationIds": [2,3,4]
                 }
                 """);
+        cslStubService.getIdentityAPIServiceStubService().bustAllowlistCache();
         mockMvc.perform(post("/organisations/1/domains")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -84,6 +85,7 @@ public class DomainTest extends IntegrationTestBase {
                     "updatedChildOrganisationIds": [2,3,4]
                 }
                 """);
+        cslStubService.getIdentityAPIServiceStubService().bustAllowlistCache();
         mockMvc.perform(delete("/organisations/1/domains/1")
                         .param("includeSubOrgs", "true"))
                 .andExpect(jsonPath("$.updatedChildIds").isArray())

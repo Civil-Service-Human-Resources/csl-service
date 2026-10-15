@@ -8,6 +8,7 @@ import uk.gov.cabinetoffice.csl.controller.csrs.model.*;
 import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
+import uk.gov.cabinetoffice.csl.service.IdentityAPIService;
 import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerOrganisationDeleteMessage;
@@ -28,6 +29,7 @@ public class OrganisationalUnitService {
     private final ICSRSClient civilServantRegistryClient;
     private final MessageMetadataFactory messageMetadataFactory;
     private final IMessagingClient messagingClient;
+    private final IdentityAPIService identityAPIService;
 
     public OrganisationalUnitMap getOrganisationalUnitMap() {
         return organisationalUnitMapCache.get();
@@ -113,6 +115,7 @@ public class OrganisationalUnitService {
         List<Long> organisationalUnitIdsToBeRemoved = organisationalUnitMap.delete(organisationalUnitId);
         organisationalUnitMapCache.put(organisationalUnitMap);
         deleteFromReportingData(organisationalUnitIdsToBeRemoved);
+        identityAPIService.clearAllowlistCache();
         return new DeleteOrganisationResponse(organisationalUnitIdsToBeRemoved);
     }
 
@@ -153,6 +156,7 @@ public class OrganisationalUnitService {
             organisationalUnit.addDomainAndSort(response.getDomain());
             return organisationalUnit;
         });
+        identityAPIService.clearAllowlistCache();
         return new DomainResponse(response.getDomain(), response.getUpdatedChildOrganisationIds());
     }
 
@@ -162,6 +166,7 @@ public class OrganisationalUnitService {
             organisationalUnit.removeDomain(domainId);
             return organisationalUnit;
         });
+        identityAPIService.clearAllowlistCache();
         return new DomainResponse(response.getDomain(), response.getUpdatedChildOrganisationIds());
     }
 
