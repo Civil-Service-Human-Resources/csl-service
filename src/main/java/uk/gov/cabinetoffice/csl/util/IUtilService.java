@@ -14,4 +14,6 @@ public interface IUtilService {
     <T> List<List<T>> batchList(List<T> list, Integer batchSize);
 
     String generateUrlSlugFromString(String string, int maxLength);
+
+    TuplePair<String, String> getFilenameAndExt(String path);
 }

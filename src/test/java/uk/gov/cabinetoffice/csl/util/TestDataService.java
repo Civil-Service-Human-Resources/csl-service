@@ -121,6 +121,7 @@ public class TestDataService {
                 new uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course();
         course.setId(courseId);
         course.setTitle(courseTitle);
+        course.setStatus(CourseStatus.PUBLISHED);
         List<Module> modules = new ArrayList<>();
         for (int i = 0; i < moduleCount; i++) {
             Module m = generateModule();

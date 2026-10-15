@@ -3,9 +3,9 @@ package uk.gov.cabinetoffice.csl.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.controller.model.LaunchLinkResponse;
 import uk.gov.cabinetoffice.csl.controller.model.ModuleResponse;
 import uk.gov.cabinetoffice.csl.domain.error.GenericServerException;
-import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.service.ModuleService;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 
@@ -33,10 +33,10 @@ public class ModuleController {
     @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/launch", produces = "application/json")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public LaunchLink createModuleLaunchLink(@PathVariable("courseId") String courseId,
-                                             @PathVariable("moduleId") String moduleId) {
+    public LaunchLinkResponse createModuleLaunchLink(@PathVariable("courseId") String courseId,
+                                                     @PathVariable("moduleId") String moduleId) {
         log.debug("resourceId: {}, moduleId: {}", courseId, moduleId);
-        LaunchLink launchLink = moduleService.launchModule(userAuthService.getUsername(), courseId, moduleId);
+        LaunchLinkResponse launchLink = moduleService.launchModule(userAuthService.getUsername(), courseId, moduleId);
         if (launchLink == null) {
             throw new GenericServerException("Unable to retrieve module launch link for the learnerId: " + userAuthService.getUsername() + ", resourceId: "
                     + courseId + " and moduleId: " + moduleId);

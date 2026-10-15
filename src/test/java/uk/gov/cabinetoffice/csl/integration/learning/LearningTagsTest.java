@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.data.ArrayJsonContentBuilder;
+import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonCourseDtoBuilder;
 import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonLearningTagBuilder;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
@@ -340,6 +341,8 @@ public class LearningTagsTest extends IntegrationTestBase {
                     "failedUpdates": []
                 }
                 """;
+        String courseResponse = ArrayJsonContentBuilder.create(JsonCourseDtoBuilder.create("course1", "Course 1")).getAsPaginatedAndBuild(0, 1, 1);
+        cslStubService.getLearningCatalogue().getCoursesForLearningTag(1L, 0, 2, courseResponse);
         cslStubService.getLearningCatalogue().updateLearningTagState(expectedStateUpdate, response);
         mockMvc.perform(put("/learning-tags/1/state")
                         .contentType(MediaType.APPLICATION_JSON)

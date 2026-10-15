@@ -34,5 +34,10 @@ public class JsonModuleBuilder extends BaseJsonBuilder {
         return this;
     }
 
+    public JsonModuleBuilder addUrlAndSize(String url, Integer size) {
+        root.put("url", url);
+        root.put("fileSize", size);
+        return this;
+    }
 
 }
