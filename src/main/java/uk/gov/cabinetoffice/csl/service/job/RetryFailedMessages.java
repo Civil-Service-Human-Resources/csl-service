@@ -28,7 +28,7 @@ public class RetryFailedMessages {
     }
 
     @Scheduled(cron = "${jobs.retry-failed-messages.cron-schedule}")
-    @SchedulerLock(name = "retryFailedMessagesJob", lockAtMostFor = "jobs.retry-failed-messages.lock-at-most-for")
+    @SchedulerLock(name = "retryFailedMessagesJob", lockAtMostFor = "${jobs.retry-failed-messages.lock-at-most-for}")
     public void scheduleJob() {
         if (!enabled) {
             log.info("Job is not enabled");
@@ -37,7 +37,7 @@ public class RetryFailedMessages {
         runJob();
     }
 
-    @SchedulerLock(name = "retryFailedMessagesJob", lockAtMostFor = "jobs.retry-failed-messages.lock-at-most-for")
+    @SchedulerLock(name = "retryFailedMessagesJob", lockAtMostFor = "${jobs.retry-failed-messages.lock-at-most-for}")
     public JobResult<FailedMessagesResult> runJob() {
         LockAssert.assertLocked();
         LocalDateTime start = utilService.getNowDateTime();
