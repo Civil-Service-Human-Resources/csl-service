@@ -14,8 +14,8 @@ import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnitFactory;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnitMap;
 import uk.gov.cabinetoffice.csl.service.IdentityAPIService;
-import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
+import uk.gov.cabinetoffice.csl.service.messaging.RegisteredLearnersMessagingClient;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +40,7 @@ class OrganisationalUnitServiceTest extends CsrsServiceTestBase {
     OrganisationalUnitMapService organisationalUnitMapCache;
 
     @Mock
-    private IMessagingClient messagingClient;
+    private RegisteredLearnersMessagingClient messagingClient;
 
     @Mock
     private ICSRSClient csrs;

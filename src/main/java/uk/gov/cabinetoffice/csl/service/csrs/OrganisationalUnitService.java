@@ -9,8 +9,8 @@ import uk.gov.cabinetoffice.csl.domain.csrs.*;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyTree;
 import uk.gov.cabinetoffice.csl.domain.taxonomy.FormattedTaxonomyItems;
 import uk.gov.cabinetoffice.csl.service.IdentityAPIService;
-import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
+import uk.gov.cabinetoffice.csl.service.messaging.RegisteredLearnersMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerOrganisationDeleteMessage;
 
 import java.util.*;
@@ -28,7 +28,7 @@ public class OrganisationalUnitService {
     private final OrganisationalUnitFactory organisationalUnitFactory;
     private final ICSRSClient civilServantRegistryClient;
     private final MessageMetadataFactory messageMetadataFactory;
-    private final IMessagingClient messagingClient;
+    private final RegisteredLearnersMessagingClient messagingClient;
     private final IdentityAPIService identityAPIService;
 
     public OrganisationalUnitMap getOrganisationalUnitMap() {
