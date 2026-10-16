@@ -52,7 +52,7 @@ public class MessagingRetryService {
                 return 0;
             }
         }).reduce(0, Integer::sum);
-        return new FailedMessagesResult(processed, messages.size());
+        return new FailedMessagesResult(messages.size(), processed);
     }
 
     public Integer getFailedMessagesCount() {
