@@ -25,6 +25,7 @@ public class JmsQueueClient implements IQueueClient {
         } catch (Exception e) {
             log.error("Message {} failed to send to queue {}. Error: {}", message, message.getQueue(), e.toString());
             queueFailoverClient.storeFailedMessage(message);
+            throw e;
         }
     }
 

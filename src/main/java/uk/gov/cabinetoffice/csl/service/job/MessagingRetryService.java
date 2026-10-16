@@ -41,11 +41,16 @@ public class MessagingRetryService {
 
     private FailedMessagesResult processFailedMessages(Collection<Message> messages) {
         Integer processed = messages.stream().map(m -> {
-            jmsClient.sendMessage(m);
-            if (client.clearFailedMessage(m.getMessageId())) {
-                return 1;
+            try {
+                jmsClient.sendMessage(m);
+                if (client.clearFailedMessage(m.getMessageId())) {
+                    return 1;
+                }
+                return 0;
+            } catch (Exception e) {
+                log.error("Exception when attempting to re-send message. Not clearing from queue.");
+                return 0;
             }
-            return 0;
         }).reduce(0, Integer::sum);
         return new FailedMessagesResult(processed, messages.size());
     }
