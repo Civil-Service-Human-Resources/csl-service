@@ -28,7 +28,6 @@ public class RetryFailedMessages {
     }
 
     @Scheduled(cron = "${jobs.retry-failed-messages.cron-schedule}")
-    @SchedulerLock(name = "retryFailedMessagesJob", lockAtMostFor = "${jobs.retry-failed-messages.lock-at-most-for}")
     public void scheduleJob() {
         if (!enabled) {
             log.info("Job is not enabled");
