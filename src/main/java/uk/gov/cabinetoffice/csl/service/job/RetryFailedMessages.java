@@ -36,7 +36,7 @@ public class RetryFailedMessages {
         runJob();
     }
 
-    @SchedulerLock(name = "retryFailedMessagesJob", lockAtMostFor = "${jobs.retry-failed-messages.lock-at-most-for}")
+    @SchedulerLock(name = "retryFailedMessagesJob", lockAtMostFor = "PT1H")
     public JobResult<FailedMessagesResult> runJob() {
         LockAssert.assertLocked();
         LocalDateTime start = utilService.getNowDateTime();
