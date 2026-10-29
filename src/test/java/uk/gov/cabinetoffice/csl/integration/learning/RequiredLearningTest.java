@@ -6,16 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventQuery;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
+import uk.gov.cabinetoffice.csl.util.data.ArrayJsonContentBuilder;
+import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonCourseBuilder;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class RequiredLearningTest extends IntegrationTestBase {
 
@@ -936,43 +936,116 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.courses[0].dueBy").value("2023-06-01"));
     }
 
-    @Test
-    public void testGetRequiredLearningMapForOrganisations() throws Exception {
-        Course course1 = testDataService.generateCourse(false, false);
-        course1.setTitle("course 1");
-        course1.setId("course1");
-        Course course2 = testDataService.generateCourse(false, false);
-        course2.setTitle("course 2");
-        course2.setId("course2");
-        Course course3 = testDataService.generateCourse(false, false);
-        course3.setTitle("course 3");
-        course3.setId("course3");
-        cslStubService.getCsrsStubService().getOrganisations(testDataService.generateOrganisationalUnitsPagedResponse());
+    private ArrayJsonContentBuilder<JsonCourseBuilder> getCoursesForMapTests() {
+        return ArrayJsonContentBuilder.create(
+                JsonCourseBuilder.create("course1", "course 1")
+                        .addDepartmentRequiredLearning("ON1", "2024-02-01T00:00:00Z", "P1Y")
+                        .addDepartmentRequiredLearning("ON2", "2023-01-31T00:00:00Z", "P1Y"),
+                JsonCourseBuilder.create("course2", "course 2")
+                        .addDepartmentRequiredLearning("ON1", "2024-05-01T00:00:00Z", "P1Y")
+                        .addDepartmentRequiredLearning("ON5", "2024-08-15T00:00:00Z", "P1Y")
+                        .addDepartmentRequiredLearning("ON3", "2023-01-01T00:00:00Z", "P1Y"),
+                JsonCourseBuilder.create("course3", "course 3")
+                        .addDepartmentRequiredLearning("ON1", "2024-01-01T00:00:00Z", "P1Y")
+                        .addDepartmentRequiredLearning("ON5", "2024-07-01T00:00:00Z", "P1Y")
+        );
+    }
+
+    private void mockForRequiredLearningMapTest() {
         cslStubService.getLearningCatalogue().getMandatoryLearningMap("""
                 {
                     "departmentCodeMap": {
                         "ON1": ["course1", "course2"],
-                        "ON5": ["course3"]
+                        "ON5": ["course2", "course3"],
+                        "ON2": ["course1"],
+                        "ON3": ["course2"]
                     }
                 }
                 """);
-        cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course2", "course3"),
-                List.of(course1, course2, course3));
+        cslStubService.getLearningCatalogue().getCourses(List.of("course1", "course2", "course3"), getCoursesForMapTests().build());
+    }
+
+    @Test
+    public void testGetRequiredLearningMapForOrganisations() throws Exception {
+        mockForRequiredLearningMapTest();
+        cslStubService.getCsrsStubService().getOrganisations(testDataService.generateOrganisationalUnitsPagedResponse());
         mockMvc.perform(get("/learning/required/for-departments")
                         .param("organisationIds", "1")
                         .param("organisationIds", "5")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.departmentMap.1[0].id").value("course1"))
-                .andExpect(jsonPath("$.departmentMap.1[0].title").value("course 1"))
-                .andExpect(jsonPath("$.departmentMap.1[1].id").value("course2"))
-                .andExpect(jsonPath("$.departmentMap.1[1].title").value("course 2"))
-                .andExpect(jsonPath("$.departmentMap.5[0].id").value("course3"))
-                .andExpect(jsonPath("$.departmentMap.5[0].title").value("course 3"))
-                .andExpect(jsonPath("$.departmentMap.5[1].id").value("course1"))
-                .andExpect(jsonPath("$.departmentMap.5[1].title").value("course 1"))
-                .andExpect(jsonPath("$.departmentMap.5[2].id").value("course2"))
-                .andExpect(jsonPath("$.departmentMap.5[2].title").value("course 2"));
+                .andExpect(content().json("""
+                        {
+                            "departmentMap": {
+                                "1": [
+                                    {
+                                        "id": "course1",
+                                        "title": "course 1",
+                                        "learningPeriodStartTimestamp": "2022-02-02T00:00:00",
+                                        "learningPeriodEndTimestamp": "2023-02-02T23:59:59.999999999"
+                                    },
+                                    {
+                                        "id": "course2",
+                                        "title": "course 2",
+                                        "learningPeriodStartTimestamp": "2022-05-02T00:00:00",
+                                        "learningPeriodEndTimestamp": "2023-05-02T23:59:59.999999999"
+                                    }
+                                ],
+                                "5": [
+                                    {
+                                        "id": "course2",
+                                        "title": "course 2",
+                                        "learningPeriodStartTimestamp": "2022-08-16T00:00:00",
+                                        "learningPeriodEndTimestamp": "2023-08-16T23:59:59.999999999"
+                                    },
+                                    {
+                                        "id": "course3",
+                                        "title": "course 3",
+                                        "learningPeriodStartTimestamp": "2022-07-02T00:00:00",
+                                        "learningPeriodEndTimestamp": "2023-07-02T23:59:59.999999999"
+                                    },
+                                    {
+                                        "id": "course1",
+                                        "title": "course 1",
+                                        "learningPeriodStartTimestamp": "2022-02-02T00:00:00",
+                                        "learningPeriodEndTimestamp": "2023-02-02T23:59:59.999999999"
+                                    }
+                                ]
+                            }
+                        }
+                        """, true));
+    }
+
+    @Test
+    public void testGetRequiredLearningMapForOrganisationsDueBy() throws Exception {
+        cslStubService.getCsrsStubService().getOrganisations(testDataService.generateOrganisationalUnitsPagedResponse());
+        mockForRequiredLearningMapTest();
+        mockMvc.perform(get("/learning/required/for-departments")
+                        .param("dueBy", "2023-01-01")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().json("""
+                        {
+                            "departmentMap": {
+                                "3": [
+                                    {
+                                        "id": "course2",
+                                        "title": "course 2",
+                                        "learningPeriodStartTimestamp": "2022-01-02T00:00:00",
+                                        "learningPeriodEndTimestamp": "2023-01-01T23:59:59.999999999"
+                                    }
+                                ],
+                                "4": [
+                                    {
+                                        "id": "course2",
+                                        "title": "course 2",
+                                        "learningPeriodStartTimestamp": "2022-01-02T00:00:00",
+                                        "learningPeriodEndTimestamp": "2023-01-01T23:59:59.999999999"
+                                    }
+                                ]
+                            }
+                        }
+                        """, true));
     }
 
 }

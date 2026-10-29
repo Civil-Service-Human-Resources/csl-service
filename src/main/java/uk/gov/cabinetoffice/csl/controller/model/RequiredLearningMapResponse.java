@@ -12,6 +12,6 @@ import java.util.Map;
 @Getter
 public class RequiredLearningMapResponse {
 
-    private Map<Long, List<CourseWithTitle>> departmentMap;
+    private Map<Long, List<RequiredCoursePartial>> departmentMap;
 
 }

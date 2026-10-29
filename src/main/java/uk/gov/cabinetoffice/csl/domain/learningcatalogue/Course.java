@@ -15,6 +15,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.util.Cacheable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -73,6 +74,12 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     }
 
     @JsonIgnore
+    public Collection<LearningPeriod> getLearningPeriodsForDate(LocalDate date) {
+        return audiences.stream().map(Audience::getLearningPeriod)
+                .filter(lp -> lp != null && lp.getEndDate().equals(date)).toList();
+    }
+
+    @JsonIgnore
     public Module getModule(String moduleId) {
         List<Module> modules = this.modules.stream().filter(m -> m.getId().equals(moduleId)).toList();
         if (modules.size() != 1) {
@@ -81,6 +88,7 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
             return modules.get(0);
         }
     }
+
 
     @JsonIgnore
     public boolean isMandatoryLearningForUser(User user) {
@@ -137,18 +145,23 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
 
     @JsonIgnore
     public Collection<String> getRemainingModuleIdsForCompletion(Map<String, ModuleRecord> moduleRecordMap, User user) {
-        log.debug(String.format("Getting learning period for course %s and department codes %s", this.getId(), user.getDepartmentCodes()));
+        log.debug("Getting learning period for course {} and department codes {}", this.getId(), user.getDepartmentCodes());
         LearningPeriod learningPeriod = getLearningPeriodForDepartmentHierarchy(user.getDepartmentCodes()).orElse(null);
-        log.debug(String.format("Selected learning period: %s", learningPeriod));
+        log.debug("Selected learning period: {}", learningPeriod);
         Map<String, State> realModuleStates = new HashMap<>();
         moduleRecordMap.forEach((moduleId, moduleRecord) -> {
             State moduleRecordState = moduleRecord.getStateForLearningPeriod(learningPeriod);
             realModuleStates.put(moduleId, moduleRecordState);
         });
-        return getRequiredModulesForCompletion().stream().filter(mod -> {
-            State moduleState = realModuleStates.getOrDefault(mod.getId(), State.NULL);
+        return getRequiredModulesForCompletion().stream().map(Module::getId).filter(modId -> {
+            State moduleState = realModuleStates.getOrDefault(modId, State.NULL);
             return !moduleState.equals(State.COMPLETED);
-        }).map(Module::getId).collect(Collectors.toSet());
+        }).collect(Collectors.toSet());
+    }
+
+    @JsonIgnore
+    public boolean hasMatchingLearningPeriod(LocalDate dueBy) {
+        return !getLearningPeriodsForDate(dueBy).isEmpty();
     }
 
     @Override

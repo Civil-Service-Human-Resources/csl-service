@@ -23,4 +23,7 @@ public class LearningPeriod implements Serializable {
         return startDate == null ? LocalDateTime.MIN : startDate.atTime(LocalTime.MIN).plusDays(1L);
     }
 
+    public LocalDateTime getEndDateAsDateTime() {
+        return endDate == null ? null : endDate.atTime(LocalTime.MAX);
+    }
 }

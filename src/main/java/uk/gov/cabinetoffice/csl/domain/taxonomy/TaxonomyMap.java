@@ -101,6 +101,12 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTax
         return hierarchy;
     }
 
+    public Map<Long, List<T>> getHierarchies() {
+        Map<Long, List<T>> hierarchies = new HashMap<>();
+        keySet().forEach(id -> hierarchies.put(id, getHierarchy(id)));
+        return hierarchies;
+    }
+
     public Map<Long, List<T>> getHierarchies(List<Long> ids) {
         Map<Long, List<T>> hierarchies = new HashMap<>();
         ids.forEach(id -> hierarchies.put(id, getHierarchy(id)));

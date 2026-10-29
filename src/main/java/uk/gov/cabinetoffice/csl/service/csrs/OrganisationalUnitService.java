@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.service.csrs;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.csrs.ICSRSClient;
 import uk.gov.cabinetoffice.csl.controller.csrs.model.*;
@@ -104,8 +105,8 @@ public class OrganisationalUnitService {
         return response;
     }
 
-    public Map<Long, List<OrganisationalUnit>> getHierarchies(List<Long> organisationIds) {
-        return getOrganisationalUnitMap().getHierarchies(organisationIds);
+    public Map<Long, List<OrganisationalUnit>> getHierarchies(@Nullable List<Long> organisationIds) {
+        return isNullOrEmpty(organisationIds) ? getOrganisationalUnitMap().getHierarchies() : getOrganisationalUnitMap().getHierarchies(organisationIds);
     }
 
     public DeleteOrganisationResponse deleteOrganisationalUnit(Long organisationalUnitId) {

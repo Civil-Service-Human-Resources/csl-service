@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.controller.learning.model.*;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
+import uk.gov.cabinetoffice.csl.controller.model.RequiredCoursePartial;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
@@ -119,23 +120,34 @@ public class LearningCatalogueService {
         return this.getCourses(getRequiredLearningIdsForDepartments(departmentCodes));
     }
 
-    public Map<String, List<Course>> getRequiredLearningForDepartmentsMap(Collection<String> departmentCodes) {
-        Map<String, ArrayList<String>> map = getRequiredLearningMap().getPartialMap(departmentCodes);
-        Map<String, List<Course>> result = new HashMap<>();
+    public Map<String, List<RequiredCoursePartial>> getRequiredLearningForDepartmentsMap(RequiredLearningMapFilters filters) {
+        RequiredLearningMap requiredLearningMap = getRequiredLearningMap();
+        Map<String, ArrayList<String>> map = filters.getDepartmentCodes() == null ? requiredLearningMap.getDepartmentCodeMap() : requiredLearningMap.getPartialMap(filters.getDepartmentCodes());
+        Map<String, List<RequiredCoursePartial>> result = new HashMap<>();
         Map<String, Course> courseMap = getCourses(
-                new HashSet<>(map.entrySet().stream().flatMap(entry -> entry.getValue().stream()).collect(Collectors.toSet()))
+                map.entrySet().stream().flatMap(entry -> entry.getValue().stream()).collect(Collectors.toSet())
         ).stream().collect(Collectors.toMap(Course::getId, Function.identity()));
-        departmentCodes.forEach(departmentCode -> {
+        Collection<String> departmentCodes = filters.getDepartmentCodes() == null ? map.keySet() : filters.getDepartmentCodes();
+        for (String departmentCode : departmentCodes) {
             List<String> courseIdsForDep = map.get(departmentCode);
-            if (courseIdsForDep != null) {
-                courseIdsForDep.forEach(courseId -> {
-                    Course course = courseMap.get(courseId);
-                    List<Course> courses = result.getOrDefault(departmentCode, new ArrayList<>());
-                    courses.add(course);
+            if (courseIdsForDep == null) continue;
+            for (String courseId : courseIdsForDep) {
+                Course course = courseMap.get(courseId);
+                if (course == null) continue;
+                LearningPeriod lp = course.getLearningPeriodForDepartmentHierarchy(List.of(departmentCode))
+                        .map(learningPeriod -> {
+                            if (filters.getDueBy() != null && !filters.getDueBy().equals(learningPeriod.getEndDate())) {
+                                return null;
+                            }
+                            return learningPeriod;
+                        }).orElse(null);
+                if (lp != null) {
+                    List<RequiredCoursePartial> courses = result.getOrDefault(departmentCode, new ArrayList<>());
+                    courses.add(new RequiredCoursePartial(courseId, course.getTitle(), lp.getStartDateAsDateTime(), lp.getEndDateAsDateTime()));
                     result.put(departmentCode, courses);
-                });
+                }
             }
-        });
+        }
         return result;
     }
 
