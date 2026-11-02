@@ -7,12 +7,12 @@ import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.integration.IntegrationTestBase;
 import uk.gov.cabinetoffice.csl.util.TestDataService;
 import uk.gov.cabinetoffice.csl.util.data.ArrayJsonContentBuilder;
+import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonCourseDtoBuilder;
 import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonLearningTagBuilder;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class LearningTagsTest extends IntegrationTestBase {
 
@@ -341,6 +341,8 @@ public class LearningTagsTest extends IntegrationTestBase {
                     "failedUpdates": []
                 }
                 """;
+        String courseResponse = ArrayJsonContentBuilder.create(JsonCourseDtoBuilder.create("course1", "Course 1")).getAsPaginatedAndBuild(0, 1, 1);
+        cslStubService.getLearningCatalogue().getCoursesForLearningTag(1L, 0, 2, courseResponse);
         cslStubService.getLearningCatalogue().updateLearningTagState(expectedStateUpdate, response);
         mockMvc.perform(put("/learning-tags/1/state")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -670,5 +672,69 @@ public class LearningTagsTest extends IntegrationTestBase {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testCreateHyperlinkBackendValidationErrorResponse() throws Exception {
+        Long tagId = 10L;
+        String request = """
+                {
+                  "title": "Sky news 42",
+                  "url": "https://news.sky.com/uk/42",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        String backendErrorResponse = """
+                {
+                    "timestamp": "2026-09-14T12:57:09.605Z",
+                    "errors": [
+                        "Field title is invalid: A link with this title already exists for the tag",
+                        "Field url is invalid: A link with this URL already exists for the tag"
+                    ],
+                    "status": 400,
+                    "message": "Validation error"
+                }
+                """;
+        cslStubService.getLearningCatalogue().createHyperlink(tagId, request, backendErrorResponse, 400);
+
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").value("2026-09-14T12:57:09.605Z"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation error"))
+                .andExpect(jsonPath("$.errors[0]").value("Field title is invalid: A link with this title already exists for the tag"))
+                .andExpect(jsonPath("$.errors[1]").value("Field url is invalid: A link with this URL already exists for the tag"));
+    }
+
+    @Test
+    public void testCreateHyperlinkBackendNonMatchingErrorResponse() throws Exception {
+        Long tagId = 10L;
+        String request = """
+                {
+                  "title": "Sky news 42",
+                  "url": "https://news.sky.com/uk/42",
+                  "description": "Lorem ipsum..."
+                }
+                """;
+        String backendErrorResponse = """
+                {
+                    "timestamp": "2026-09-11T15:11:03.503Z",
+                    "status": 400,
+                    "error": "Bad Request"
+                }
+                """;
+        cslStubService.getLearningCatalogue().createHyperlink(tagId, request, backendErrorResponse, 400);
+
+        mockMvc.perform(post("/learning-tags/{tagId}/hyperlinks", tagId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.title").value("Validation exception"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.instance").value("/learning-tags/10/hyperlinks"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 }

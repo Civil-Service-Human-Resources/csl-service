@@ -1,5 +1,8 @@
 package uk.gov.cabinetoffice.csl.client;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.client.model.PagedResponse;
+import uk.gov.cabinetoffice.csl.controller.model.ErrorDto;
 import uk.gov.cabinetoffice.csl.domain.error.GenericServerException;
 import uk.gov.cabinetoffice.csl.domain.error.NotFoundException;
 import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
@@ -26,6 +30,10 @@ import java.util.Map;
 @AllArgsConstructor
 @Getter
 public class HttpClient implements IHttpClient {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private final RestTemplate restTemplate;
 
@@ -78,9 +86,27 @@ public class HttpClient implements IHttpClient {
         if (e.getStatusCode().equals(HttpStatusCode.valueOf(404))) {
             throw new NotFoundException(msg);
         } else if (e.getStatusCode().equals(HttpStatusCode.valueOf(400))) {
-            throw new ValidationException(msg);
+            ErrorDto errorDto = parseErrorDto(e.getResponseBodyAsString());
+            throw new ValidationException(msg, errorDto);
         }
         throw new GenericServerException(msg);
+    }
+
+    private ErrorDto parseErrorDto(String responseBody) {
+        if (responseBody == null || responseBody.isBlank()) {
+            return null;
+        }
+        try {
+            ErrorDto errorDto = OBJECT_MAPPER.readValue(responseBody, ErrorDto.class);
+            if (errorDto.getMessage() != null && !errorDto.getMessage().isBlank()
+                    && errorDto.getErrors() != null && !errorDto.getErrors().isEmpty()
+                    && errorDto.getStatus() != 0) {
+                return errorDto;
+            }
+        } catch (Exception ex) {
+            log.debug("Could not parse error response body as ErrorDto: {}", ex.getMessage());
+        }
+        return null;
     }
 
     @Override

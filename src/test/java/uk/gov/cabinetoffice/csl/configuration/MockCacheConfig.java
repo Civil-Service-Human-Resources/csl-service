@@ -18,5 +18,4 @@ public class MockCacheConfig {
         ITtlCache cache = mock(ITtlCache.class);
         return new TtlObjectCache<>(cache, Course.class);
     }
-
 }

@@ -25,6 +25,8 @@ public class IdentityAPIClient implements IIdentityAPIClient {
     private String identitiesUrl;
     @Value("${identity.UidMapUrl}")
     private String uidMapUrl;
+    @Value("${identity.clearAllowlistDomainsUrl}")
+    private String clearAllowlistDomainsUrl;
 
     public IdentityAPIClient(@Qualifier("identityOAuthHttpClient") IHttpClient oauthClient) {
         this.oauthClient = oauthClient;
@@ -50,6 +52,12 @@ public class IdentityAPIClient implements IIdentityAPIClient {
         RequestEntity<Void> request = RequestEntity.get(url).build();
         return oauthClient.executeMapRequest(request, new ParameterizedTypeReference<>() {
         });
+    }
+
+    @Override
+    public void clearAllowlistCache() {
+        RequestEntity<Void> request = RequestEntity.get(clearAllowlistDomainsUrl).build();
+        oauthClient.executeRequest(request, Void.class);
     }
 
 }

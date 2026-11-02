@@ -10,7 +10,7 @@ public class MessageFactory {
 
     private final IUtilService utilService;
 
-    public Message<IMessageMetadata> generateFullMessage(IMessageMetadata metadata) {
-        return new Message<>(utilService.generateUUID(), utilService.getNowDateTime(), metadata);
+    public Message generateFullMessage(String queue, Object metadata) {
+        return new Message(utilService.generateUUID(), utilService.getNowDateTime(), metadata, queue);
     }
 }

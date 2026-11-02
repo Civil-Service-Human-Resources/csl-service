@@ -72,7 +72,8 @@ public class SecurityConfig {
                         "/course_records/**",
                         "/admin/**",
                         "/user/**",
-                        "/reset-cache/**")
+                        "/reset-cache/**",
+                        "/jobs/**")
                 .cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeHttpRequests(requests -> requests.anyRequest().authenticated())

@@ -3,6 +3,7 @@ package uk.gov.cabinetoffice.csl.util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.time.Clock;
 import java.time.Duration;
@@ -64,5 +65,18 @@ public class UtilService implements IUtilService {
         }
 
         return slug;
+    }
+
+    @Override
+    public TuplePair<String, String> getFilenameAndExt(String path) {
+        String filename = null;
+        String extension = null;
+        if (path != null) {
+            String fullName = Paths.get(path).getFileName().toString();
+            int lastDotIndex = fullName.lastIndexOf('.');
+            filename = (lastDotIndex == -1) ? fullName : fullName.substring(0, lastDotIndex);
+            extension = (lastDotIndex == -1) ? "" : fullName.substring(lastDotIndex + 1);
+        }
+        return new TuplePair<>(filename, extension);
     }
 }

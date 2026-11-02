@@ -12,10 +12,12 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Venue;
 import uk.gov.cabinetoffice.csl.util.Cacheable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Data
@@ -35,8 +37,16 @@ public class Event implements IChildLearningResource, Cacheable {
         return dateRanges.get(0).getDate();
     }
 
+    public LocalDateTime getStartDateTime() {
+        return dateRanges.get(0).getFullStartTime();
+    }
+
     public Integer getDurationInSeconds() {
         return dateRanges.stream().mapToInt(DateRange::getDurationInSeconds).sum();
+    }
+
+    public EventStatus getStatus() {
+        return Objects.requireNonNullElse(status, EventStatus.ACTIVE);
     }
 
     @JsonIgnore

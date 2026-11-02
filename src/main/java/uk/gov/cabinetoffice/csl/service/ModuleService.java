@@ -4,15 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.frontend.IFrontendClient;
+import uk.gov.cabinetoffice.csl.controller.model.LaunchLinkResponse;
 import uk.gov.cabinetoffice.csl.controller.model.ModuleResponse;
 import uk.gov.cabinetoffice.csl.domain.User;
+import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.module.ModuleRecordAction;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseWithModule;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 import uk.gov.cabinetoffice.csl.domain.rustici.CSLRusticiProps;
-import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLink;
 import uk.gov.cabinetoffice.csl.domain.rustici.RegistrationInput;
 import uk.gov.cabinetoffice.csl.domain.rustici.RusticiRollupData;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
@@ -29,21 +31,25 @@ public class ModuleService {
     private final RusticiService rusticiService;
     private final UserDetailsService userDetailsService;
 
-    public LaunchLink launchModule(String userId, String courseId, String moduleId) {
+    public LaunchLinkResponse launchModule(String userId, String courseId, String moduleId) {
         CourseWithModule courseWithModule = learningCatalogueService.getCourseWithModule(courseId, moduleId);
+        if (courseWithModule.getCourse().getStatus().equals(CourseStatus.ARCHIVED)) {
+            throw new ValidationException("Course with id " + courseId + " is archived");
+        }
         Module module = courseWithModule.getModule();
+        String url = module.getUrl();
         if (module.isType(ModuleType.link) || module.isType(ModuleType.file)) {
             moduleActionService.completeModule(courseWithModule, userId);
         } else {
             ModuleRecord moduleRecord = moduleActionService.launchModule(courseWithModule, userId);
             if (module.isType(ModuleType.elearning)) {
                 User user = userDetailsService.getUserWithUid(userId);
-                return rusticiService.createLaunchLink(RegistrationInput.from(
+                url = rusticiService.createLaunchLink(RegistrationInput.from(
                         user, moduleId, moduleRecord.getUid(), courseId
-                ));
+                )).getLaunchLink();
             }
         }
-        return new LaunchLink(courseWithModule.getModule().getUrl());
+        return new LaunchLinkResponse(url, module.getTitle(), module.getModuleType());
     }
 
     public ModuleResponse completeModule(String userId, String courseId, String moduleId) {

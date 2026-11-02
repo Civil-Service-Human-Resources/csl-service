@@ -15,7 +15,7 @@ public class SearchForCoursesParams {
     String query;
 
     Collection<CourseStatus> status;
-    String visibility;
+    Collection<String> visibility;
     Collection<String> types;
     String cost;
 

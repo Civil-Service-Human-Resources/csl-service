@@ -12,8 +12,8 @@ import uk.gov.cabinetoffice.csl.domain.taxonomy.BasicTaxonomyNode;
 import uk.gov.cabinetoffice.csl.service.CachedTaxonomyMapService;
 import uk.gov.cabinetoffice.csl.service.ITaxonomyItemFactory;
 import uk.gov.cabinetoffice.csl.service.ITaxonomyMapCacheClient;
-import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
+import uk.gov.cabinetoffice.csl.service.messaging.RegisteredLearnersMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerOrganisationUpdateMessage;
 
 import java.util.List;
@@ -24,11 +24,11 @@ import java.util.Objects;
 public class OrganisationalUnitMapService extends CachedTaxonomyMapService<OrganisationalUnit, BasicTaxonomyNode, OrganisationalUnitMap, OrganisationalUnitDto, OrganisationalUnitOverview> {
 
     private final MessageMetadataFactory messageMetadataFactory;
-    private final IMessagingClient messagingClient;
+    private final RegisteredLearnersMessagingClient messagingClient;
 
     public OrganisationalUnitMapService(@Qualifier("organisations") Cache cache, ITaxonomyItemFactory<OrganisationalUnit,
             OrganisationalUnitOverview> taxonomyItemFactory, ITaxonomyMapCacheClient<OrganisationalUnit, BasicTaxonomyNode,
-            OrganisationalUnitMap, OrganisationalUnitDto> client, MessageMetadataFactory messageMetadataFactory, IMessagingClient messagingClient) {
+            OrganisationalUnitMap, OrganisationalUnitDto> client, MessageMetadataFactory messageMetadataFactory, RegisteredLearnersMessagingClient messagingClient) {
         super(cache, "organisationalUnitMap", OrganisationalUnitMap.class, taxonomyItemFactory, client);
         this.messageMetadataFactory = messageMetadataFactory;
         this.messagingClient = messagingClient;

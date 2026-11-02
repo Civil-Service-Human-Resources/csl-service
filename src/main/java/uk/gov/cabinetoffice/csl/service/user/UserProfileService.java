@@ -5,11 +5,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.AreaOfWork;
 import uk.gov.cabinetoffice.csl.domain.csrs.Grade;
-import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnitIdDto;
+import uk.gov.cabinetoffice.csl.domain.csrs.PatchCivilServantDto;
 import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
-import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
+import uk.gov.cabinetoffice.csl.service.messaging.RegisteredLearnersMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.CompleteProfileMessage;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.UpdateProfileMessage;
 
@@ -23,10 +23,10 @@ public class UserProfileService {
     private final MessageMetadataFactory messageMetadataFactory;
     private final UserDetailsService userDetailsService;
     private final CivilServantRegistryService civilServantRegistryService;
-    private final IMessagingClient messagingClient;
+    private final RegisteredLearnersMessagingClient messagingClient;
 
     public UserProfileService(MessageMetadataFactory messageMetadataFactory, UserDetailsService userDetailsService,
-                              CivilServantRegistryService civilServantRegistryService, IMessagingClient messagingClient) {
+                              CivilServantRegistryService civilServantRegistryService, RegisteredLearnersMessagingClient messagingClient) {
         this.messageMetadataFactory = messageMetadataFactory;
         this.userDetailsService = userDetailsService;
         this.civilServantRegistryService = civilServantRegistryService;

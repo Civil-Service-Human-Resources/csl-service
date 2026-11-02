@@ -1,8 +1,8 @@
 package uk.gov.cabinetoffice.csl.service.user;
 
 import org.springframework.stereotype.Service;
-import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.MessageMetadataFactory;
+import uk.gov.cabinetoffice.csl.service.messaging.RegisteredLearnersMessagingClient;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerAccountActivateMessage;
 import uk.gov.cabinetoffice.csl.service.messaging.model.registeredLearners.RegisteredLearnerEmailUpdateMessage;
 
@@ -13,11 +13,11 @@ public class UserAccountService {
 
     private final UserDetailsService userDetailsService;
     private final MessageMetadataFactory messageMetadataFactory;
-    private final IMessagingClient messagingClient;
+    private final RegisteredLearnersMessagingClient messagingClient;
 
     public UserAccountService(UserDetailsService userDetailsService,
                               MessageMetadataFactory messageMetadataFactory,
-                              IMessagingClient messagingClient) {
+                              RegisteredLearnersMessagingClient messagingClient) {
         this.userDetailsService = userDetailsService;
         this.messageMetadataFactory = messageMetadataFactory;
         this.messagingClient = messagingClient;

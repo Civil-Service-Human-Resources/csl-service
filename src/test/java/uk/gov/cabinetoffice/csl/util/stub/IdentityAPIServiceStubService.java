@@ -56,4 +56,14 @@ public class IdentityAPIServiceStubService {
                         .withBody(response));
         return stubFor(request);
     }
+
+    public StubMapping bustAllowlistCache() {
+        MappingBuilder request =
+                WireMock.get(urlPathEqualTo("/identity/reset-cache/allowlist-domains"))
+                        .withHeader("Authorization", equalTo("Bearer token"));
+        request
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json"));
+        return stubFor(request);
+    }
 }

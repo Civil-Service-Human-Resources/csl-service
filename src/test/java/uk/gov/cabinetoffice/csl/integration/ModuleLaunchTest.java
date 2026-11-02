@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -89,7 +89,13 @@ public class ModuleLaunchTest extends IntegrationTestBase {
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
         mockMvc.perform(post(url))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
+                .andExpect(content().json("""
+                        {
+                          "launchLink": "http://launch.link",
+                          "moduleTitle":"Test Module",
+                          "moduleType":"elearning"
+                        }
+                        """, true));
     }
 
     @Test
@@ -136,7 +142,13 @@ public class ModuleLaunchTest extends IntegrationTestBase {
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId0);
         mockMvc.perform(post(url))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
+                .andExpect(content().json("""
+                        {
+                          "launchLink": "http://launch.link",
+                          "moduleTitle":"Test Module",
+                          "moduleType":"file"
+                        }
+                        """, true));
     }
 
     @Test
@@ -231,7 +243,13 @@ public class ModuleLaunchTest extends IntegrationTestBase {
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
         mockMvc.perform(post(url))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
+                .andExpect(content().json("""
+                        {
+                          "launchLink": "http://launch.link",
+                          "moduleTitle":"Test Module",
+                          "moduleType":"file"
+                        }
+                        """, true));
         cslStubService.assertStubbedRequests(stubs);
     }
 
@@ -307,7 +325,13 @@ public class ModuleLaunchTest extends IntegrationTestBase {
         String url = String.format("/courses/%s/modules/%s/launch", courseId, moduleId);
         mockMvc.perform(post(url))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
+                .andExpect(content().json("""
+                        {
+                          "launchLink": "http://launch.link",
+                          "moduleTitle":"Test Module",
+                          "moduleType":"file"
+                        }
+                        """, true));
         cslStubService.assertStubbedRequests(stubs);
     }
 
@@ -413,7 +437,13 @@ public class ModuleLaunchTest extends IntegrationTestBase {
         String url = String.format("/courses/%s/modules/%s/launch", courseId, module1);
         mockMvc.perform(post(url))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.launchLink").value("http://launch.link"));
+                .andExpect(content().json("""
+                        {
+                          "launchLink": "http://launch.link",
+                          "moduleTitle":"Test Module",
+                          "moduleType":"file"
+                        }
+                        """, true));
         cslStubService.assertStubbedRequests(stubs);
     }
 

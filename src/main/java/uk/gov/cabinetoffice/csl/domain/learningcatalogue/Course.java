@@ -12,6 +12,7 @@ import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ModuleRecord;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagOverview;
 import uk.gov.cabinetoffice.csl.util.Cacheable;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,9 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     private String id;
     private String title;
     private String shortDescription;
+    private String description;
+    private String learningOutcomes;
+    private Collection<LearningTagOverview> learningTags = Collections.emptyList();
     private CourseStatus status;
     private CourseVisibility visibility;
     private Collection<Module> modules = Collections.emptyList();
@@ -184,5 +188,15 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     @JsonIgnore
     public Integer getCost() {
         return getModules().stream().mapToInt(m -> m.getCost().intValue()).sum();
+    }
+
+    @JsonIgnore
+    public Set<String> getGrades() {
+        return audiences.stream().flatMap(a -> a.getGrades().stream()).collect(Collectors.toSet());
+    }
+
+    @JsonIgnore
+    public Set<String> getAreasOfWork() {
+        return audiences.stream().flatMap(a -> a.getAreasOfWork().stream()).collect(Collectors.toSet());
     }
 }

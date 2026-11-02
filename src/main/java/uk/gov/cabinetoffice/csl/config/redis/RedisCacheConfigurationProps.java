@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.lang.Nullable;
 
 import static java.time.Duration.ofSeconds;
 import static org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig;
@@ -14,9 +15,14 @@ import static org.springframework.data.redis.cache.RedisCacheConfiguration.defau
 @NoArgsConstructor
 public class RedisCacheConfigurationProps {
     private String name;
+    @Nullable
     private Integer ttl;
 
     public RedisCacheConfiguration getAsDefaultConfig() {
-        return defaultCacheConfig().entryTtl(ofSeconds(ttl));
+        RedisCacheConfiguration redisCacheConfiguration = defaultCacheConfig();
+        if (ttl != null) {
+            redisCacheConfiguration.entryTtl(ofSeconds(ttl));
+        }
+        return redisCacheConfiguration;
     }
 }
