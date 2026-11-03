@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.controller.model.CourseWithTitle;
 import uk.gov.cabinetoffice.csl.controller.model.GetRequiredLearningForDepartmentsParams;
+import uk.gov.cabinetoffice.csl.controller.model.RequiredLearningCourseMapResponse;
 import uk.gov.cabinetoffice.csl.controller.model.RequiredLearningMapResponse;
 import uk.gov.cabinetoffice.csl.domain.User;
 import uk.gov.cabinetoffice.csl.domain.csrs.OrganisationalUnit;
@@ -22,6 +23,7 @@ import uk.gov.cabinetoffice.csl.service.learningResources.course.CourseRecordSer
 import uk.gov.cabinetoffice.csl.service.user.CourseCompletionService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -173,16 +175,27 @@ public class RequiredLearningService {
         return requiredLearningResponse;
     }
 
+    public RequiredLearningCourseMapResponse getRequiredLearningMapForCourses(LocalDate dueDate) {
+        RequiredLearningCourseMapResponse response = learningCatalogueService.getRequiredLearningForDueByDate(dueDate);
+        organisationalUnitService.getHierarchiesCodes().values().forEach(response::checkAndStoreOrganisationHierarchy);
+        return response;
+    }
+
     public RequiredLearningMapResponse getRequiredLearningMapForOrganisations(GetRequiredLearningForDepartmentsParams params) {
         Map<Long, List<CourseWithTitle>> result = new HashMap<>();
         Map<Long, List<OrganisationalUnit>> orgHierarchies = organisationalUnitService.getHierarchies(params.getOrganisationIds());
         Map<String, List<Course>> courseMap = learningCatalogueService.getRequiredLearningForDepartmentsMap(orgHierarchies.values().stream().flatMap(organisationalUnits -> organisationalUnits.stream().map(OrganisationalUnit::getCode)).collect(Collectors.toSet()));
         orgHierarchies.forEach((key, value) -> {
+            List<String> courseIds = new ArrayList<>();
             List<CourseWithTitle> courses = new ArrayList<>();
             value.forEach(organisationalUnit -> {
                 List<Course> coursesForOrgCode = courseMap.get(organisationalUnit.getCode());
                 if (coursesForOrgCode != null) {
-                    courses.addAll(coursesForOrgCode.stream().map(c -> new CourseWithTitle(c.getId(), c.getTitle())).toList());
+                    for (Course course : coursesForOrgCode) {
+                        if (courseIds.contains(course.getId())) continue;
+                        courses.add(new CourseWithTitle(course.getId(), course.getTitle()));
+                        courseIds.add(course.getId());
+                    }
                 }
             });
             result.put(key, courses);

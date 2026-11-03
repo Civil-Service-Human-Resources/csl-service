@@ -5,6 +5,7 @@ import uk.gov.cabinetoffice.csl.domain.error.ValidationException;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTaxonomyNode> extends HashMap<Long, T> {
@@ -101,10 +102,14 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTax
         return hierarchy;
     }
 
-    public Map<Long, List<T>> getHierarchies(List<Long> ids) {
+    public Map<Long, List<T>> getHierarchies(Collection<Long> ids) {
         Map<Long, List<T>> hierarchies = new HashMap<>();
         ids.forEach(id -> hierarchies.put(id, getHierarchy(id)));
         return hierarchies;
+    }
+
+    public Map<String, List<T>> getHierarchiesCodes() {
+        return values().stream().collect(Collectors.toMap(ITaxonomyItem::getCode, i -> getHierarchy(i.getId())));
     }
 
     public List<T> rebuildHierarchy(T root) {
@@ -146,5 +151,4 @@ public abstract class TaxonomyMap<T extends ITaxonomyItem, Node extends BasicTax
                 });
         return object;
     }
-
 }

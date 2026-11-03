@@ -13,7 +13,6 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.EventStatus;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
-import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagsPagedResponse;
 import uk.gov.cabinetoffice.csl.domain.rustici.Course;
 import uk.gov.cabinetoffice.csl.domain.rustici.LaunchLinkRequest;
 import uk.gov.cabinetoffice.csl.domain.rustici.Learner;
@@ -149,7 +148,7 @@ public class TestDataService {
     }
 
     public Audience generateRequiredAudience(String departmentCode) {
-        return new Audience("audience", List.of(), List.of(departmentCode), List.of(), "P1M", Audience.Type.REQUIRED_LEARNING,
+        return new Audience("audId", "audience", new ArrayList<>(), new ArrayList<>(List.of(departmentCode)), new ArrayList<>(), "P1M", Audience.Type.REQUIRED_LEARNING,
                 LocalDate.now().plusDays(1L), null);
     }
 
@@ -264,17 +263,6 @@ public class TestDataService {
         organisationalUnits.add(organisationalUnits9);
 
         return organisationalUnits;
-    }
-
-    public LearningTagsPagedResponse generateLearningTagsPagedResponse() {
-        LearningTagsPagedResponse learningTagsPagedResponse = new LearningTagsPagedResponse();
-        learningTagsPagedResponse.setContent(createLearningTagList());
-        learningTagsPagedResponse.setLast(true);
-        learningTagsPagedResponse.setNumber(0);
-        learningTagsPagedResponse.setTotalPages(1);
-        learningTagsPagedResponse.setTotalElements(5);
-        learningTagsPagedResponse.setSize(10);
-        return learningTagsPagedResponse;
     }
 
     public List<LearningTag> createLearningTagList() {

@@ -4,11 +4,14 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.controller.model.GetRequiredLearningForDepartmentsParams;
+import uk.gov.cabinetoffice.csl.controller.model.RequiredLearningCourseMapResponse;
 import uk.gov.cabinetoffice.csl.controller.model.RequiredLearningMapResponse;
 import uk.gov.cabinetoffice.csl.domain.learning.Learning;
 import uk.gov.cabinetoffice.csl.domain.learning.requiredLearning.RequiredLearning;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 import uk.gov.cabinetoffice.csl.service.learning.RequiredLearningService;
+
+import java.time.LocalDate;
 
 @Slf4j
 @RestController
@@ -21,6 +24,11 @@ public class RequiredLearningController {
     public RequiredLearningController(RequiredLearningService requiredLearningService, IUserAuthService userAuthService) {
         this.requiredLearningService = requiredLearningService;
         this.userAuthService = userAuthService;
+    }
+
+    @GetMapping("/courses")
+    public RequiredLearningCourseMapResponse getRequiredLearningForOrganisations(@RequestParam LocalDate dueBy) {
+        return requiredLearningService.getRequiredLearningMapForCourses(dueBy);
     }
 
     @GetMapping("/for-departments")

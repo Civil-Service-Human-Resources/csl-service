@@ -19,6 +19,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Audience implements Serializable {
+
     public enum Type {
         OPEN,
         CLOSED_COURSE,
@@ -27,6 +28,7 @@ public class Audience implements Serializable {
         NULL
     }
 
+    private String id;
     private String name;
     private List<String> areasOfWork = Collections.emptyList();
     private List<String> departments = Collections.emptyList();

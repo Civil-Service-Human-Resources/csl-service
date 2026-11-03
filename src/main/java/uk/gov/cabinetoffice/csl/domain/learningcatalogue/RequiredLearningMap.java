@@ -27,4 +27,8 @@ public class RequiredLearningMap implements Serializable {
                 .filter(e -> departmentCodes.contains(e.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
+
+    public Set<String> getCourseIds() {
+        return departmentCodeMap.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
+    }
 }
