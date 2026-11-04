@@ -153,7 +153,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                 "status": "Published",
                 "cost": 0.0
             }]""";
-    
+
     String learnerRecordEventsResponseWithNoContent = """
             {
                 "content": [],
@@ -1028,6 +1028,18 @@ public class RequiredLearningTest extends IntegrationTestBase {
                                     }
                                 }
                             },
+                            "course2": {
+                                "title": "course 2",
+                                "learningPeriods": {
+                                    "aud2": {
+                                        "learningPeriodStartTimestamp": "2022-01-02T00:00:00",
+                                        "learningPeriodEndTimestamp": "2023-01-01T23:59:59.999999999",
+                                        "organisationIds": [
+                                            6
+                                        ]
+                                    }
+                                }
+                            },
                             "course1": {
                                 "title": "course 1",
                                 "learningPeriods": {
@@ -1046,6 +1058,13 @@ public class RequiredLearningTest extends IntegrationTestBase {
                                             1,
                                             2,
                                             5
+                                        ]
+                                    },
+                                    "aud2": {
+                                        "learningPeriodStartTimestamp": "2022-01-02T00:00:00",
+                                        "learningPeriodEndTimestamp": "2023-01-01T23:59:59.999999999",
+                                        "organisationIds": [
+                                            6
                                         ]
                                     }
                                 }

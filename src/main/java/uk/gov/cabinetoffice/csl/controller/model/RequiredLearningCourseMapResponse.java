@@ -14,6 +14,7 @@ import java.util.*;
 @Getter
 public class RequiredLearningCourseMapResponse extends HashMap<String, CourseWithLearningPeriods> {
 
+    @JsonIgnore
     private final Map<String, Collection<TuplePair<String, String>>> orgCodeToCourseAudienceIdMap;
 
     @JsonIgnore

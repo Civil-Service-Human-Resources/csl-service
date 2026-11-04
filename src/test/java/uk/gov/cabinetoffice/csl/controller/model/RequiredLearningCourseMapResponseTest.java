@@ -63,7 +63,7 @@ class RequiredLearningCourseMapResponseTest extends TestDataService {
         assertEquals(List.of(new TuplePair<>("course-1", "audId")), coCollection);
 
         List<TuplePair<String, String>> codCollection = new ArrayList<>(orgMap.get("COD"));
-        assertEquals(List.of(new TuplePair<>("course-1", "audId"), new TuplePair<>("course-1", "audId2"), new TuplePair<>("course-2", "audId3")), codCollection);
+        assertEquals(List.of(new TuplePair<>("course-1", "audId2"), new TuplePair<>("course-2", "audId3")), codCollection);
 
         List<TuplePair<String, String>> hmrcCollection = new ArrayList<>(orgMap.get("HMRC"));
         assertEquals(List.of(new TuplePair<>("course-1", "audId2"), new TuplePair<>("course-2", "audId3")), hmrcCollection);
