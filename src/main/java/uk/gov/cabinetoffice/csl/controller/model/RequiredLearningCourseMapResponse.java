@@ -34,10 +34,8 @@ public class RequiredLearningCourseMapResponse extends HashMap<String, CourseWit
                 Optional.ofNullable(orgCodeToCourseAudienceIdMap.get(organisation.getCode()))
                         .ifPresent(courseAudienceIds -> courseAudienceIds.forEach(courseAudienceId -> {
                             String courseId = courseAudienceId.a();
-                            if (!courseIdsForOrg.contains(courseId)) {
-                                if (addOrganisationToLearningPeriodIfPresent(courseId, courseAudienceId.b(), orgHierarchy.get(0).getId().intValue())) {
-                                    courseIdsForOrg.add(courseId);
-                                }
+                            if (!courseIdsForOrg.contains(courseId) && addOrganisationToLearningPeriodIfPresent(courseId, courseAudienceId.b(), orgHierarchy.get(0).getId().intValue())) {
+                                courseIdsForOrg.add(courseId);
                             }
                         }))
         );
