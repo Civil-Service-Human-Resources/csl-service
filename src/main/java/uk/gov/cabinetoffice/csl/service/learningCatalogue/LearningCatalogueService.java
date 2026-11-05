@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.client.courseCatalogue.ILearningCatalogueClient;
 import uk.gov.cabinetoffice.csl.controller.learning.model.*;
 import uk.gov.cabinetoffice.csl.controller.model.CancelEventDto;
+import uk.gov.cabinetoffice.csl.controller.model.RequiredLearningCourseMapResponse;
 import uk.gov.cabinetoffice.csl.domain.error.LearningCatalogueResourceNotFoundException;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.*;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
@@ -23,6 +24,7 @@ import uk.gov.cabinetoffice.csl.util.CacheGetMultipleOp;
 import uk.gov.cabinetoffice.csl.util.IUtilService;
 import uk.gov.cabinetoffice.csl.util.TtlObjectCache;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
@@ -117,6 +119,21 @@ public class LearningCatalogueService {
 
     public List<Course> getRequiredLearningForDepartments(Collection<String> departmentCodes) {
         return this.getCourses(getRequiredLearningIdsForDepartments(departmentCodes));
+    }
+
+    public RequiredLearningCourseMapResponse getRequiredLearningForDueByDate(LocalDate dueDate) {
+        RequiredLearningCourseMapResponse response = new RequiredLearningCourseMapResponse(new HashMap<>());
+        RequiredLearningMap map = getRequiredLearningMap();
+        getCourses(map.getCourseIds())
+                .forEach(course -> {
+                    Collection<Audience> lpAudiences = course.getAudiences()
+                            .stream()
+                            .filter(a -> a.getLearningPeriod() != null && a.getLearningPeriod().getEndDate().equals(dueDate)).toList();
+                    if (!lpAudiences.isEmpty()) {
+                        response.addAudiences(course.getId(), course.getTitle(), lpAudiences);
+                    }
+                });
+        return response;
     }
 
     public Map<String, List<Course>> getRequiredLearningForDepartmentsMap(Collection<String> departmentCodes) {
@@ -246,4 +263,5 @@ public class LearningCatalogueService {
         request.getCourseIds().forEach(cache::evict);
         return bulkLearningTagUpdateResponse;
     }
+
 }

@@ -7,6 +7,8 @@ import java.util.Collection;
 public interface ITaxonomyItem {
     Collection<Long> getChildIds();
 
+    String getCode();
+
     String getName();
 
     Long getId();
