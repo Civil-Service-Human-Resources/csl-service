@@ -1019,7 +1019,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                                 "learningPeriods": {
                                     "aud2": {
                                         "learningPeriodStartTimestamp": "2022-01-02T00:00:00",
-                                        "learningPeriodEndTimestamp": "2023-01-01T23:59:59.999999999",
+                                        "learningPeriodEnd": "2023-01-01",
                                         "organisationIds": [
                                             2,
                                             3,
@@ -1033,7 +1033,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                                 "learningPeriods": {
                                     "aud2": {
                                         "learningPeriodStartTimestamp": "2022-01-02T00:00:00",
-                                        "learningPeriodEndTimestamp": "2023-01-01T23:59:59.999999999",
+                                        "learningPeriodEnd": "2023-01-01",
                                         "organisationIds": [
                                             6
                                         ]
@@ -1045,7 +1045,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                                 "learningPeriods": {
                                     "aud1": {
                                         "learningPeriodStartTimestamp": "2022-12-02T00:00:00",
-                                        "learningPeriodEndTimestamp": "2023-01-01T23:59:59.999999999",
+                                        "learningPeriodEnd": "2023-01-01",
                                         "organisationIds": [
                                             3,
                                             4
@@ -1053,7 +1053,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                                     },
                                     "aud0": {
                                         "learningPeriodStartTimestamp": "2022-01-02T00:00:00",
-                                        "learningPeriodEndTimestamp": "2023-01-01T23:59:59.999999999",
+                                        "learningPeriodEnd": "2023-01-01",
                                         "organisationIds": [
                                             1,
                                             2,
@@ -1062,7 +1062,7 @@ public class RequiredLearningTest extends IntegrationTestBase {
                                     },
                                     "aud2": {
                                         "learningPeriodStartTimestamp": "2022-01-02T00:00:00",
-                                        "learningPeriodEndTimestamp": "2023-01-01T23:59:59.999999999",
+                                        "learningPeriodEnd": "2023-01-01",
                                         "organisationIds": [
                                             6
                                         ]

@@ -19,7 +19,7 @@ public class CourseWithLearningPeriods {
 
     public void addAudience(Audience audience) {
         LearningPeriod lp = audience.getLearningPeriod();
-        LearningPeriodWithOrgs learningPeriodWithOrgs = new LearningPeriodWithOrgs(lp.getStartDateAsDateTime(), lp.getEndDateAsDateTime(), new HashSet<>());
+        LearningPeriodWithOrgs learningPeriodWithOrgs = new LearningPeriodWithOrgs(lp.getStartDateAsDateTime(), lp.getEndDate(), new HashSet<>());
         learningPeriods.put(audience.getId(), learningPeriodWithOrgs);
     }
 }
