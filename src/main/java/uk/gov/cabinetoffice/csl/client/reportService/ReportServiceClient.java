@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cabinetoffice.csl.client.IHttpClient;
 import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
@@ -30,6 +31,22 @@ public class ReportServiceClient implements IReportServiceClient {
                                ReportServiceConfiguration config) {
         this.httpClient = httpClient;
         this.config = config;
+    }
+
+    @Override
+    public ResponseEntity<byte[]> getLearnerRecordExportForUserId(String userId) {
+        String url = config.getLearnerRecordExportForUserIdUrl(userId);
+        log.debug("Fetching learner record export for user {} from url {}", userId, url);
+        RequestEntity<Void> request = RequestEntity.get(url).build();
+        return httpClient.executeRequestWithResponse(request, byte[].class);
+    }
+
+    @Override
+    public ResponseEntity<byte[]> getLearnerRecordExportForLoggedInUser() {
+        String url = config.getLearnerRecordExportUrl();
+        log.debug("Fetching learner record export from url {}", url);
+        RequestEntity<Void> request = RequestEntity.get(url).build();
+        return httpClient.executeRequestWithResponse(request, byte[].class);
     }
 
     public AggregationResponse<Aggregation> getCourseCompletionAggregations(OrganisationIdsCourseCompletionsParams body) {

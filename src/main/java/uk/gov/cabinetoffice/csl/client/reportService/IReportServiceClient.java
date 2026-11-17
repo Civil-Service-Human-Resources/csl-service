@@ -1,5 +1,6 @@
 package uk.gov.cabinetoffice.csl.client.reportService;
 
+import org.springframework.http.ResponseEntity;
 import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.controller.model.OrganisationIdsCourseCompletionsParams;
 import uk.gov.cabinetoffice.csl.domain.reportservice.AddReportRequestResponse;
@@ -14,6 +15,10 @@ import uk.gov.cabinetoffice.csl.service.report.params.IOrganisationalReportReque
 import java.util.List;
 
 public interface IReportServiceClient {
+
+    ResponseEntity<byte[]> getLearnerRecordExportForUserId(String userId);
+
+    ResponseEntity<byte[]> getLearnerRecordExportForLoggedInUser();
 
     AggregationResponse<Aggregation> getCourseCompletionAggregations(OrganisationIdsCourseCompletionsParams body);
 

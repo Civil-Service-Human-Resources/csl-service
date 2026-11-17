@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.integration.learning;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import uk.gov.cabinetoffice.csl.domain.csrs.CivilServant;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.LearnerRecordEventQuery;
@@ -12,14 +13,25 @@ import uk.gov.cabinetoffice.csl.util.data.catalogue.DateRangeJsonValues;
 import uk.gov.cabinetoffice.csl.util.data.catalogue.JsonCourseBuilder;
 import uk.gov.cabinetoffice.csl.util.stub.CSLStubService;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class LearningRecordTest extends IntegrationTestBase {
+
+    private static final String ZIP_FILE_NAME = "learner_record_2026-11-13_15-43-26.zip";
+    private static final String CSV_FILE_NAME = "learner_record_2026-11-13_15-46-20.csv";
+    private static final String CSV_HEADER = "\"userId\",\"userEmail\",\"courseId\",\"courseTitle\",\"eventTimestamp\",\"organisationId\",\"organisationName\",\"professionId\",\"professionName\",\"gradeId\",\"gradeName\"";
 
     @Autowired
     private CSLStubService cslStubService;
@@ -28,6 +40,17 @@ public class LearningRecordTest extends IntegrationTestBase {
     private TestDataService testDataService;
 
     private CivilServant civilServant;
+
+    private byte[] createZipBytes(String csvContent) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+            ZipEntry entry = new ZipEntry(CSV_FILE_NAME);
+            zos.putNextEntry(entry);
+            zos.write(csvContent.getBytes(StandardCharsets.UTF_8));
+            zos.closeEntry();
+        }
+        return baos.toByteArray();
+    }
 
     String requiredLearningMap = """
             {
@@ -101,5 +124,32 @@ public class LearningRecordTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.otherLearning[0].duration").value(7200))
                 .andExpect(jsonPath("$.otherLearning[0].completionDate").value("2023-01-01T00:00:00"));
 
+    }
+
+    @Test
+    public void testGetLearnerRecordExportForUserId() throws Exception {
+        String csvData = CSV_HEADER + "\n\"user123\",\"user123@example.com\",\"course1\",\"Course 1\",\"2026-11-13T15:46:20Z\",\"org1\",\"Org 1\",\"prof1\",\"Prof 1\",\"g1\",\"Grade 1\"\n";
+        byte[] zipBytes = createZipBytes(csvData);
+        cslStubService.getReportServiceStubService().exportLearnerRecordForUserId("user123", zipBytes, ZIP_FILE_NAME);
+
+        mockMvc.perform(get("/learning/record/export/user123"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/zip"))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + ZIP_FILE_NAME + "\""))
+                .andExpect(content().bytes(zipBytes));
+    }
+
+    @Test
+    public void testGetLearnerRecordExportForLoggedInUser() throws Exception {
+        String csvData = CSV_HEADER + "\n\"user123\",\"user123@example.com\",\"course1\",\"Course 1\",\"2026-11-13T15:46:20Z\",\"org1\",\"Org 1\",\"prof1\",\"Prof 1\",\"g1\",\"Grade 1\"\n"
+                + "\"user456\",\"user456@example.com\",\"course2\",\"Course 2\",\"2026-11-13T15:46:20Z\",\"org2\",\"Org 2\",\"prof2\",\"Prof 2\",\"g2\",\"Grade 2\"\n";
+        byte[] zipBytes = createZipBytes(csvData);
+        cslStubService.getReportServiceStubService().exportLearnerRecordForLoggedInUser(zipBytes, ZIP_FILE_NAME);
+
+        mockMvc.perform(get("/learning/record/export"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/zip"))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + ZIP_FILE_NAME + "\""))
+                .andExpect(content().bytes(zipBytes));
     }
 }
