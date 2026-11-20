@@ -32,6 +32,7 @@ public class AdminManagementTest extends IntegrationTestBase {
     @BeforeEach
     public void before() {
         jsonCourse = ArrayJsonContentBuilder.create(JsonCourseBuilder.create("course1", "A Course 1")
+                        .level("EXPERT")
                         .addModule("link", "module1", "module 1", false, 0)
                         .addModule("elearning", "module2", "module 2", true, 100)
                         .addFileModule("module3", "module 3", false, 200)
@@ -151,144 +152,145 @@ public class AdminManagementTest extends IntegrationTestBase {
                 .andExpect(content().json(
                         """
                                 {
-                                    "id": "course1",
-                                    "title": "A Course 1",
-                                    "description": "A Course 1",
-                                    "learningOutcomes": "A Course 1 learning outcomes",
-                                    "status": "PUBLISHED",
-                                    "visibility": "PUBLIC",
-                                    "type": "blended",
-                                    "duration": 14700,
-                                    "learningTags": [
-                                        {
-                                            "id": 1,
-                                            "urlSlug": "project-management",
-                                            "name": "Project Management"
-                                        }
-                                    ],
-                                    "grades": [
-                                        "AA",
-                                        "G7",
-                                        "AO"
-                                    ],
-                                    "areasOfWork": [
-                                        "Commercial",
-                                        "Finance"
-                                    ],
-                                    "costInPounds": 100,
-                                    "modules": [
-                                        {
-                                            "id": "module1",
-                                            "title": "module 1",
-                                            "description": "module 1",
-                                            "mandatory": true,
-                                            "associatedLearning": false,
-                                            "type": "link",
-                                            "duration": 0,
-                                            "costInPounds": 0,
-                                            "state": null,
-                                            "mustConfirmBooking": false
-                                        },
-                                        {
-                                            "id": "module2",
-                                            "title": "module 2",
-                                            "description": "module 2",
-                                            "mandatory": false,
-                                            "associatedLearning": false,
-                                            "type": "elearning",
-                                            "duration": 100,
-                                            "costInPounds": 0,
-                                            "state": null,
-                                            "mustConfirmBooking": false
-                                        },
-                                        {
-                                            "id": "module3",
-                                            "title": "module 3",
-                                            "description": "module 3",
-                                            "mandatory": true,
-                                            "associatedLearning": false,
-                                            "type": "file",
-                                            "duration": 200,
-                                            "costInPounds": 0,
-                                            "state": null,
-                                            "mustConfirmBooking": false
-                                        },
-                                        {
-                                            "id": "module4",
-                                            "title": "Face to face module",
-                                            "description": "Face to face module",
-                                            "mandatory": true,
-                                            "associatedLearning": false,
-                                            "type": "face-to-face",
-                                            "duration": 14400,
-                                            "costInPounds": 100,
-                                            "state": null,
-                                            "mustConfirmBooking": false
-                                        }
-                                    ],
-                                    "mandatoryModuleCount": 0,
-                                    "nextAvailableDate": "1 Jan 2023",
-                                    "faceToFaceModuleOverviews": [
-                                        {
-                                            "id": "module4",
-                                            "title": "Face to face module",
-                                            "description": "Face to face module",
-                                            "mandatory": true,
-                                            "associatedLearning": false,
-                                            "type": "face-to-face",
-                                            "duration": 14400,
-                                            "costInPounds": 100,
-                                            "mustConfirmBooking": false,
-                                            "earliestDate": "2023-01-01T09:00:00",
-                                            "events": [
-                                                {
-                                                    "id": "event1",
-                                                    "venue": {
-                                                        "location": "London",
-                                                        "address": "1 London Road",
-                                                        "capacity": 10,
-                                                        "minCapacity": 5,
-                                                        "availability": null
-                                                    },
-                                                    "dates": [
-                                                        "01 Jan 2023",
-                                                        "01 Mar 2023"
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ],
-                                    "audiences": [
-                                        {
-                                            "audienceName": "Blank audience name",
-                                            "audienceType": "OPEN",
-                                            "organisations": [],
-                                            "grades": [
-                                                "Administrative assistant",
-                                                "Administrative officer"
-                                            ],
-                                            "areasOfWork": [
-                                                "Commercial",
-                                                "Finance"
-                                            ],
-                                            "interests": [
-                                                "EU and International"
-                                            ],
-                                            "requiredBy": ""
-                                        },
-                                        {
-                                            "audienceName": "Required audience name",
-                                            "audienceType": "REQUIRED_LEARNING",
-                                            "organisations": [
-                                                "OrgName1 (OName1) | OrgName2"
-                                            ],
-                                            "grades": [],
-                                            "areasOfWork": [],
-                                            "interests": [],
-                                            "requiredBy": "5 May 2023"
-                                        }
-                                    ]
-                                }
+                                     "id": "course1",
+                                     "title": "A Course 1",
+                                     "description": "A Course 1",
+                                     "learningOutcomes": "A Course 1 learning outcomes",
+                                     "status": "PUBLISHED",
+                                     "visibility": "PUBLIC",
+                                     "level": "EXPERT",
+                                     "type": "blended",
+                                     "duration": 14700,
+                                     "learningTags": [
+                                         {
+                                             "id": 1,
+                                             "urlSlug": "project-management",
+                                             "name": "Project Management"
+                                         }
+                                     ],
+                                     "grades": [
+                                         "AA",
+                                         "G7",
+                                         "AO"
+                                     ],
+                                     "areasOfWork": [
+                                         "Commercial",
+                                         "Finance"
+                                     ],
+                                     "costInPounds": 100,
+                                     "modules": [
+                                         {
+                                             "id": "module1",
+                                             "title": "module 1",
+                                             "description": "module 1",
+                                             "mandatory": true,
+                                             "associatedLearning": false,
+                                             "type": "link",
+                                             "duration": 0,
+                                             "costInPounds": 0,
+                                             "state": null,
+                                             "mustConfirmBooking": false
+                                         },
+                                         {
+                                             "id": "module2",
+                                             "title": "module 2",
+                                             "description": "module 2",
+                                             "mandatory": false,
+                                             "associatedLearning": false,
+                                             "type": "elearning",
+                                             "duration": 100,
+                                             "costInPounds": 0,
+                                             "state": null,
+                                             "mustConfirmBooking": false
+                                         },
+                                         {
+                                             "id": "module3",
+                                             "title": "module 3",
+                                             "description": "module 3",
+                                             "mandatory": true,
+                                             "associatedLearning": false,
+                                             "type": "file",
+                                             "duration": 200,
+                                             "costInPounds": 0,
+                                             "state": null,
+                                             "mustConfirmBooking": false
+                                         },
+                                         {
+                                             "id": "module4",
+                                             "title": "Face to face module",
+                                             "description": "Face to face module",
+                                             "mandatory": true,
+                                             "associatedLearning": false,
+                                             "type": "face-to-face",
+                                             "duration": 14400,
+                                             "costInPounds": 100,
+                                             "state": null,
+                                             "mustConfirmBooking": false
+                                         }
+                                     ],
+                                     "mandatoryModuleCount": 0,
+                                     "nextAvailableDate": "1 Jan 2023",
+                                     "faceToFaceModuleOverviews": [
+                                         {
+                                             "id": "module4",
+                                             "title": "Face to face module",
+                                             "description": "Face to face module",
+                                             "mandatory": true,
+                                             "associatedLearning": false,
+                                             "type": "face-to-face",
+                                             "duration": 14400,
+                                             "costInPounds": 100,
+                                             "mustConfirmBooking": false,
+                                             "earliestDate": "2023-01-01T09:00:00",
+                                             "events": [
+                                                 {
+                                                     "id": "event1",
+                                                     "venue": {
+                                                         "location": "London",
+                                                         "address": "1 London Road",
+                                                         "capacity": 10,
+                                                         "minCapacity": 5,
+                                                         "availability": null
+                                                     },
+                                                     "dates": [
+                                                         "01 Jan 2023",
+                                                         "01 Mar 2023"
+                                                     ]
+                                                 }
+                                             ]
+                                         }
+                                     ],
+                                     "audiences": [
+                                         {
+                                             "audienceName": "Blank audience name",
+                                             "audienceType": "OPEN",
+                                             "organisations": [],
+                                             "grades": [
+                                                 "Administrative assistant",
+                                                 "Administrative officer"
+                                             ],
+                                             "areasOfWork": [
+                                                 "Commercial",
+                                                 "Finance"
+                                             ],
+                                             "interests": [
+                                                 "EU and International"
+                                             ],
+                                             "requiredBy": ""
+                                         },
+                                         {
+                                             "audienceName": "Required audience name",
+                                             "audienceType": "REQUIRED_LEARNING",
+                                             "organisations": [
+                                                 "OrgName1 (OName1) | OrgName2"
+                                             ],
+                                             "grades": [],
+                                             "areasOfWork": [],
+                                             "interests": [],
+                                             "requiredBy": "5 May 2023"
+                                         }
+                                     ]
+                                 }
                                 """, true
                 ));
     }

@@ -28,6 +28,7 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
         return builder;
     }
 
+
     private ObjectNode createRequiredAudience(String departmentCode, String requiredBy) {
         ArrayNode aud = getOrCreateArray("audiences");
         ObjectNode item = aud.addObject();
@@ -83,6 +84,11 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
 
     public JsonCourseBuilder addDepartmentRequiredLearning(String departmentCode, String requiredBy) {
         createRequiredAudience(departmentCode, requiredBy);
+        return this;
+    }
+
+    public JsonCourseBuilder level(String level) {
+        root.put("level", level);
         return this;
     }
 
