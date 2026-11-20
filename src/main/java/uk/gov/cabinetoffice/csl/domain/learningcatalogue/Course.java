@@ -52,6 +52,11 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     }
 
     @JsonIgnore
+    public List<LearningTagOverview> getOrderedLearningTags() {
+        return getLearningTags().stream().sorted(Comparator.comparing(LearningTagOverview::getName, String::compareToIgnoreCase)).toList();
+    }
+
+    @JsonIgnore
     public Integer getDurationInSeconds() {
         return modules.stream().mapToInt(Module::getDurationInSeconds).sum();
     }

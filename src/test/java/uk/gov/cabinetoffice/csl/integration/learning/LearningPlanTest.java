@@ -44,7 +44,7 @@ public class LearningPlanTest extends IntegrationTestBase {
             .addFileModule("module3", "Module 3", false, 0);
 
     JsonCourseBuilder course5 = JsonCourseBuilder.create("course5", "Course 5")
-            .addFaceToFaceModule("module4", "Module 4", false, 0, "event1", BigDecimal.valueOf(0L),
+            .addFaceToFaceModule("module4", "Module 4", 0, "event1", BigDecimal.valueOf(0L),
                     new DateRangeJsonValues("12:00", "14:00", "2022-01-02"),
                     new DateRangeJsonValues("09:00", "11:00", "2022-01-01"));
 
@@ -55,7 +55,7 @@ public class LearningPlanTest extends IntegrationTestBase {
             .addElearningModule("module6", "Module 6", false, 0);
 
     JsonCourseBuilder course8 = JsonCourseBuilder.create("course8", "Course 8")
-            .addFaceToFaceModule("module7", "Module 7", false, 0, "event2", BigDecimal.valueOf(0L),
+            .addFaceToFaceModule("module7", "Module 7", 0, "event2", BigDecimal.valueOf(0L),
                     new DateRangeJsonValues("12:00", "14:00", "2022-01-02"),
                     new DateRangeJsonValues("09:00", "11:00", "2022-01-01"))
             .addElearningModule("module8", "Module 8", false, 0);

@@ -182,4 +182,8 @@ public class OrganisationalUnitService {
         return organisationalUnitMapCache.create(organisationalUnitDto);
     }
 
+    public Collection<OrganisationalUnit> getOrganisationalUnitsWithCodes(Set<String> departments) {
+        return organisationalUnitMapCache.get().values().stream().filter(o -> departments.contains(o.getCode())).toList();
+
+    }
 }

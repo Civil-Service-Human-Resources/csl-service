@@ -16,7 +16,10 @@ import uk.gov.cabinetoffice.csl.service.LearnerRecordService;
 import uk.gov.cabinetoffice.csl.service.learningCatalogue.LearningCatalogueService;
 import uk.gov.cabinetoffice.csl.service.user.UserDetailsService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction.COMPLETE_COURSE;
@@ -51,7 +54,7 @@ public class LearningOverviewService {
                 learningPlan = getIsInLearningPlan(uid, courseId, collection.isHasFaceToFace());
             }
         }
-        List<LearningTagOverview> orderedTags = course.getLearningTags().stream().sorted(Comparator.comparing(LearningTagOverview::getName, String::compareToIgnoreCase)).toList();
+        List<LearningTagOverview> orderedTags = course.getOrderedLearningTags();
         return new CourseOverview(course.getId(), course.getTitle(), course.getDescription(), course.getLearningOutcomes(), course.getStatus(), learningPlan,
                 course.getCourseType(), course.getDurationInSeconds(), orderedTags, course.getGrades(), course.getAreasOfWork(), course.getCost(), collection,
                 collection.getMandatoryCount());

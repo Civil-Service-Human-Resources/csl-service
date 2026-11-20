@@ -16,10 +16,9 @@ public class FaceToFaceModuleOverview extends ModuleOverview {
     private boolean canBeCancelled;
 
     public FaceToFaceModuleOverview(String id, String title, String description, boolean mandatory,
-                                    boolean associatedLearning, ModuleType type, Integer duration, Integer costInPounds,
-                                    State state, boolean mustConfirmBooking, String eventId, boolean canBeBooked,
-                                    boolean canBeCancelled) {
-        super(id, title, description, mandatory, associatedLearning, type, duration, costInPounds, state, mustConfirmBooking);
+                                    Integer duration, Integer costInPounds, State state, Boolean mustConfirmBooking,
+                                    String eventId, boolean canBeBooked, boolean canBeCancelled) {
+        super(id, title, description, mandatory, false, ModuleType.facetoface, duration, costInPounds, state, mustConfirmBooking);
         this.eventId = eventId;
         this.canBeBooked = canBeBooked;
         this.canBeCancelled = canBeCancelled;

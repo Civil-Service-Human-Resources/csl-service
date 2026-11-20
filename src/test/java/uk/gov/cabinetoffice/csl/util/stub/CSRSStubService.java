@@ -62,6 +62,64 @@ public class CSRSStubService {
         );
     }
 
+    public StubMapping getGradesDefaultResponse() {
+        return stubFor(
+                WireMock.get(urlPathEqualTo("/csrs/grades"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody("""
+                                        {
+                                             "_embedded": {
+                                                 "grades": [
+                                                     {
+                                                         "code": "AA",
+                                                         "name": "Administrative assistant",
+                                                         "_links": {
+                                                             "self": {
+                                                                 "href": "https://hostname/grades/1"
+                                                             },
+                                                             "grade": {
+                                                                 "href": "https://hostname/grades/1"
+                                                             },
+                                                             "organisationalUnit": {
+                                                                 "href": "https://hostname/grades/1/organisationalUnit"
+                                                             }
+                                                         }
+                                                     },
+                                                     {
+                                                         "code": "AO",
+                                                         "name": "Administrative officer",
+                                                         "_links": {
+                                                             "self": {
+                                                                 "href": "https://hostname/grades/2"
+                                                             },
+                                                             "grade": {
+                                                                 "href": "https://hostname/grades/2"
+                                                             },
+                                                             "organisationalUnit": {
+                                                                 "href": "https://hostname/grades/2/organisationalUnit"
+                                                             }
+                                                         }
+                                                     }
+                                                 ]
+                                             },
+                                             "_links": {
+                                                 "self": {
+                                                     "href": "https://hostname/grades"
+                                                 },
+                                                 "profile": {
+                                                     "href": "https://hostname/profile/grades"
+                                                 },
+                                                 "search": {
+                                                     "href": "https://hostname/grades/search"
+                                                 }
+                                             }
+                                         }
+                                        """))
+        );
+    }
+
     public StubMapping getGrades(String response) {
         return stubFor(
                 WireMock.get(urlPathEqualTo("/csrs/grades"))

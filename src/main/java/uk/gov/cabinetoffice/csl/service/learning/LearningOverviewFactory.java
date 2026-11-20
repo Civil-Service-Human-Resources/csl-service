@@ -37,7 +37,7 @@ public class LearningOverviewFactory {
         } else {
             canBeBooked = module.canBeBooked(utilService.getNowDateTime());
         }
-        return new FaceToFaceModuleOverview(module.getId(), module.getTitle(), module.getDescription(), !module.isOptional(), module.isAssociatedLearning(), module.getModuleType(),
+        return new FaceToFaceModuleOverview(module.getId(), module.getTitle(), module.getDescription(), !module.isOptional(),
                 module.getDurationInSeconds(), module.getCost().intValue(), state, false, bookedEventId, canBeBooked, canBeCancelled);
     }
 
@@ -63,9 +63,7 @@ public class LearningOverviewFactory {
                     yield getFaceToFaceModuleOverview(module, eventId, state);
                 }
                 case file -> getFileModuleOverview(module, state);
-                default ->
-                        new ModuleOverview(module.getId(), module.getTitle(), module.getDescription(), !module.isOptional(), module.isAssociatedLearning(), module.getModuleType(),
-                                module.getDurationInSeconds(), module.getCost().intValue(), state, module.isAssociatedLearning());
+                default -> ModuleOverview.build(module, state);
             };
             collection.add(o);
             if (!module.isOptional()) collection.setMandatoryCount(collection.getMandatoryCount() + 1);

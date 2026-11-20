@@ -65,7 +65,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "id": "course1",
                             "title": "A Course 1",
                             "description": "A Course 1",
-                            "learningOutcomes": null,
+                            "learningOutcomes": "A Course 1 learning outcomes",
                             "status": "PUBLISHED",
                             "isInLearningPlan": "IS_IN_LEARNING_PLAN",
                             "type": "blended",
@@ -162,7 +162,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "id": "course1",
                             "title": "A Course 1",
                             "description": "A Course 1",
-                            "learningOutcomes": null,
+                            "learningOutcomes": "A Course 1 learning outcomes",
                             "status": "PUBLISHED",
                             "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "blended",
@@ -233,7 +233,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
     @Test
     public void testCourseOverviewForBookedCourse() throws Exception {
         String course = ArrayJsonContentBuilder.create(JsonCourseBuilder.create("course1", "A Course 1")
-                .addFaceToFaceModule("module1", "Module 1", false, 100, "event1", BigDecimal.valueOf(100L),
+                .addFaceToFaceModule("module1", "Module 1", 100, "event1", BigDecimal.valueOf(100L),
                         new DateRangeJsonValues("12:00", "14:00", "2022-01-02"),
                         new DateRangeJsonValues("09:00", "11:00", "2022-01-01"))
                 .addLearningTag(1L, "Project Management", "project-management")
@@ -256,7 +256,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "id": "course1",
                             "title": "A Course 1",
                             "description": "A Course 1",
-                            "learningOutcomes": null,
+                            "learningOutcomes": "A Course 1 learning outcomes",
                             "status": "PUBLISHED",
                             "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "face-to-face",
@@ -309,7 +309,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "id": "course1",
                             "title": "A Course 1",
                             "description": "A Course 1",
-                            "learningOutcomes": null,
+                            "learningOutcomes": "A Course 1 learning outcomes",
                             "status": "ARCHIVED",
                             "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "blended",

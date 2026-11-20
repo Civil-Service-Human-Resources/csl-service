@@ -19,6 +19,7 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
         builder.root.put("id", courseId);
         builder.root.put("title", title);
         builder.root.put("description", title);
+        builder.root.put("learningOutcomes", String.format("%s learning outcomes", title));
         builder.root.put("shortDescription", String.format("%s short description", title));
         builder.root.put("visibility", "PUBLIC");
         builder.root.put("status", "Published");
@@ -31,14 +32,37 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
         ArrayNode aud = getOrCreateArray("audiences");
         ObjectNode item = aud.addObject();
         item.putArray("departments").add(departmentCode);
-        item.put("requiredBy", requiredBy)
+        item.put("name", "Required audience name")
+                .put("requiredBy", requiredBy)
                 .put("type", "REQUIRED_LEARNING");
         return item;
     }
 
-    public JsonCourseBuilder createBlankAudience() {
+    public ObjectNode createBlankAudience() {
         ArrayNode aud = getOrCreateArray("audiences");
-        aud.addObject().put("type", "OPEN");
+        return aud.addObject().put("type", "OPEN")
+                .put("name", "Blank audience name");
+    }
+
+    public JsonCourseBuilder addBlankAudience() {
+        createBlankAudience();
+        return this;
+    }
+
+    public JsonCourseBuilder addAudience(String[] grades, String[] areasOfWork, String[] interests) {
+        ObjectNode item = createBlankAudience();
+        ArrayNode gradesArray = item.putArray("grades");
+        for (String grade : grades) {
+            gradesArray.add(grade);
+        }
+        ArrayNode areasOfWorkArray = item.putArray("areasOfWork");
+        for (String aow : areasOfWork) {
+            areasOfWorkArray.add(aow);
+        }
+        ArrayNode interestsArray = item.putArray("interests");
+        for (String interest : interests) {
+            interestsArray.add(interest);
+        }
         return this;
     }
 
@@ -82,15 +106,19 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
         return this;
     }
 
+    public JsonCourseBuilder addModule(ObjectNode module) {
+        getOrCreateArray("modules").add(module);
+        return this;
+    }
+
     public JsonCourseBuilder addModule(String type, String id, String title, boolean optional, int duration) {
         getOrCreateArray("modules").add(JsonModuleBuilder.create(type, id, courseId, title, optional, duration).get());
         return this;
     }
 
-    public JsonCourseBuilder addFaceToFaceModule(String id, String title, boolean optional, int duration,
+    public JsonCourseBuilder addFaceToFaceModule(String id, String title, int duration,
                                                  String eventId, BigDecimal cost, DateRangeJsonValues... dateRanges) {
-        getOrCreateArray("modules").add(JsonModuleBuilder.create("face-to-face", id, courseId, title, optional, duration)
-                .addEvent(eventId, cost, dateRanges).get());
+        addModule(JsonModuleBuilder.buildFaceToFace(id, courseId, title, duration, cost, eventId, dateRanges).get());
         return this;
     }
 

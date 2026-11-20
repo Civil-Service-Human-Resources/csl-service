@@ -1,7 +1,8 @@
-package uk.gov.cabinetoffice.csl.controller;
+package uk.gov.cabinetoffice.csl.controller.course;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cabinetoffice.csl.controller.ActionWithIdFactory;
 import uk.gov.cabinetoffice.csl.controller.model.CourseResponse;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.actions.course.CourseRecordAction;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.ActionWithId;

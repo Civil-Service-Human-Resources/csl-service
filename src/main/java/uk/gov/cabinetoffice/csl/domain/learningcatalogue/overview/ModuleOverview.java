@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.State;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Module;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.ModuleType;
 
 @AllArgsConstructor
@@ -22,4 +23,9 @@ public class ModuleOverview {
     private Integer costInPounds;
     private State state;
     private boolean mustConfirmBooking;
+
+    public static ModuleOverview build(Module module, State state) {
+        return new ModuleOverview(module.getId(), module.getTitle(), module.getDescription(), !module.isOptional(), module.isAssociatedLearning(), module.getModuleType(),
+                module.getDurationInSeconds(), module.getCost().intValue(), state, module.isAssociatedLearning());
+    }
 }

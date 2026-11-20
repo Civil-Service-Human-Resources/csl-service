@@ -48,8 +48,8 @@ public class LearningRecordTest extends IntegrationTestBase {
             .addDepartmentRequiredLearning("CO", "2024-01-01T00:00:00Z", "P1Y");
 
     JsonCourseBuilder course3 = JsonCourseBuilder.create("course3", "Course 3")
-            .addFaceToFaceModule("module1", "module1", false, 0, "eventId", BigDecimal.valueOf(0L), new DateRangeJsonValues("09:00", "11:00", "2025-01-01"))
-            .createBlankAudience();
+            .addFaceToFaceModule("module1", "module1", 0, "eventId", BigDecimal.valueOf(0L), new DateRangeJsonValues("09:00", "11:00", "2025-01-01"))
+            .addBlankAudience();
 
     String courses = ArrayJsonContentBuilder.create(course1, course2, course3).build();
 

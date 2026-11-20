@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,7 @@ public class Audience implements Serializable {
     private List<String> areasOfWork = Collections.emptyList();
     private List<String> departments = Collections.emptyList();
     private List<String> grades = Collections.emptyList();
+    private List<String> interests = Collections.emptyList();
     private String frequency;
     private Type type;
     private LocalDate requiredBy;
@@ -38,6 +40,11 @@ public class Audience implements Serializable {
 
     public Type getType() {
         return Optional.ofNullable(this.type).orElse(Type.NULL);
+    }
+
+    @JsonIgnore
+    public String getRequiredByAsDateString() {
+        return requiredBy == null ? "" : requiredBy.format(DateTimeFormatter.ofPattern("d MMMM yyyy"));
     }
 
     @JsonIgnore
