@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.Course;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseStatus;
+import uk.gov.cabinetoffice.csl.domain.learningcatalogue.CourseVisibility;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTagOverview;
 
 import java.util.Collection;
@@ -20,6 +21,7 @@ public class CourseOverview {
     private String description;
     private String learningOutcomes;
     private CourseStatus status;
+    private CourseVisibility visibility;
     private LearningPlan isInLearningPlan;
     private String type;
     private Integer duration;
@@ -32,8 +34,8 @@ public class CourseOverview {
 
     public CourseOverview(Course course, List<LearningTagOverview> orderedTags, LearningPlan learningPlan,
                           Collection<? extends ModuleOverview> modules, Integer mandatoryCount) {
-        this(course.getId(), course.getTitle(), course.getDescription(), course.getLearningOutcomes(), course.getStatus(), learningPlan,
-                course.getCourseType(), course.getDurationInSeconds(), orderedTags, course.getGrades(), course.getAreasOfWork(), course.getCost(), modules,
-                mandatoryCount);
+        this(course.getId(), course.getTitle(), course.getDescription(), course.getLearningOutcomes(), course.getStatus(),
+                course.getVisibility(), learningPlan, course.getCourseType(), course.getDurationInSeconds(), orderedTags,
+                course.getGrades(), course.getAreasOfWork(), course.getCost(), modules, mandatoryCount);
     }
 }

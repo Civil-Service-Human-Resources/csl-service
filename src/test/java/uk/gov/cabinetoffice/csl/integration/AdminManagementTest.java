@@ -156,6 +156,7 @@ public class AdminManagementTest extends IntegrationTestBase {
                                     "description": "A Course 1",
                                     "learningOutcomes": "A Course 1 learning outcomes",
                                     "status": "PUBLISHED",
+                                    "visibility": "PUBLIC",
                                     "type": "blended",
                                     "duration": 14700,
                                     "learningTags": [
@@ -226,6 +227,7 @@ public class AdminManagementTest extends IntegrationTestBase {
                                         }
                                     ],
                                     "mandatoryModuleCount": 0,
+                                    "nextAvailableDate": "1 Jan 2023",
                                     "faceToFaceModuleOverviews": [
                                         {
                                             "id": "module4",
@@ -237,6 +239,7 @@ public class AdminManagementTest extends IntegrationTestBase {
                                             "duration": 14400,
                                             "costInPounds": 100,
                                             "mustConfirmBooking": false,
+                                            "earliestDate": "2023-01-01T09:00:00",
                                             "events": [
                                                 {
                                                     "id": "event1",
@@ -286,7 +289,7 @@ public class AdminManagementTest extends IntegrationTestBase {
                                         }
                                     ]
                                 }
-                                """
+                                """, true
                 ));
     }
 }

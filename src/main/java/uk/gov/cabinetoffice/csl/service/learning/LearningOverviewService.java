@@ -55,9 +55,7 @@ public class LearningOverviewService {
             }
         }
         List<LearningTagOverview> orderedTags = course.getOrderedLearningTags();
-        return new CourseOverview(course.getId(), course.getTitle(), course.getDescription(), course.getLearningOutcomes(), course.getStatus(), learningPlan,
-                course.getCourseType(), course.getDurationInSeconds(), orderedTags, course.getGrades(), course.getAreasOfWork(), course.getCost(), collection,
-                collection.getMandatoryCount());
+        return new CourseOverview(course, orderedTags, learningPlan, collection, collection.getMandatoryCount());
     }
 
     private LearningPlan getIsInLearningPlan(String uid, String courseId, boolean hasFaceToFaceModule) {

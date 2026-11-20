@@ -21,13 +21,16 @@ public class AdminCourseOverview extends CourseOverview {
     public AdminCourseOverview(Course course,
                                List<LearningTagOverview> tags,
                                List<ModuleOverview> modules,
+                               String nextAvailableDate,
                                Collection<AdminFaceToFaceModuleOverview> faceToFaceModuleOverviews,
                                Collection<AdminAudienceOverview> audiences) {
         super(course, tags, null, modules, 0);
+        this.nextAvailableDate = nextAvailableDate;
         this.faceToFaceModuleOverviews = faceToFaceModuleOverviews;
         this.audiences = audiences;
     }
 
+    private String nextAvailableDate;
     private Collection<AdminFaceToFaceModuleOverview> faceToFaceModuleOverviews;
     private Collection<AdminAudienceOverview> audiences;
 }

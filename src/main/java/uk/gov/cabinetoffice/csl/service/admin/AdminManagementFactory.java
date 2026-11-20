@@ -12,7 +12,10 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.event.Event;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.overview.ModuleOverview;
 import uk.gov.cabinetoffice.csl.service.csrs.CivilServantRegistryService;
 import uk.gov.cabinetoffice.csl.service.csrs.OrganisationalUnitService;
+import uk.gov.cabinetoffice.csl.util.IUtilService;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,10 +24,12 @@ public class AdminManagementFactory {
 
     private final OrganisationalUnitService organisationalUnitService;
     private final CivilServantRegistryService civilServantRegistryService;
+    private final IUtilService utilService;
 
-    public AdminManagementFactory(OrganisationalUnitService organisationalUnitService, CivilServantRegistryService civilServantRegistryService) {
+    public AdminManagementFactory(OrganisationalUnitService organisationalUnitService, CivilServantRegistryService civilServantRegistryService, IUtilService utilService) {
         this.organisationalUnitService = organisationalUnitService;
         this.civilServantRegistryService = civilServantRegistryService;
+        this.utilService = utilService;
     }
 
     public EventOverview createEventOverview(CourseWithModuleWithEvent courseWithModuleWithEvent, EventDto eventDto, Map<String, String> uidsToEmails) {
@@ -45,14 +50,24 @@ public class AdminManagementFactory {
     }
 
     private AdminFaceToFaceModuleOverview createAdminFaceToFaceModuleOverview(Module faceToFaceModule) {
-        Collection<EventOverview> eventOverviews = faceToFaceModule.getEvents()
-                .stream().map(e -> EventOverview.builder()
-                        .venue(e.getVenue())
-                        .dates(e.getDateRangesAsStrings())
-                        .id(e.getId()).build()).toList();
+        LocalDateTime earliestEventDate = null;
+        Collection<EventOverview> eventOverviews = new ArrayList<>();
+        for (Event e : faceToFaceModule.getEvents()) {
+            Collection<String> dateRangesAsStrings = new ArrayList<>();
+            EventOverview.EventOverviewBuilder builder = EventOverview.builder()
+                    .venue(e.getVenue())
+                    .id(e.getId());
+            for (DateRange dr : e.getDateRanges()) {
+                if (earliestEventDate == null || dr.getFullStartTime().isBefore(earliestEventDate)) {
+                    earliestEventDate = dr.getFullStartTime();
+                }
+                dateRangesAsStrings.add(dr.getAsDateString());
+            }
+            eventOverviews.add(builder.dates(dateRangesAsStrings).build());
+        }
         return new AdminFaceToFaceModuleOverview(faceToFaceModule.getId(), faceToFaceModule.getTitle(), faceToFaceModule.getDescription(),
                 !faceToFaceModule.isOptional(), faceToFaceModule.getDurationInSeconds(), faceToFaceModule.getCost().intValue(),
-                eventOverviews);
+                earliestEventDate, eventOverviews);
     }
 
     private Collection<AdminAudienceOverview> createAdminAudienceOverviews(Collection<Audience> audiences) {
@@ -76,13 +91,21 @@ public class AdminManagementFactory {
     public AdminCourseOverview createCourseOverview(Course course) {
         List<ModuleOverview> modules = new ArrayList<>();
         List<AdminFaceToFaceModuleOverview> faceToFaceModules = new ArrayList<>();
-        course.getModules().forEach(m -> {
+        LocalDateTime now = utilService.getNowDateTime();
+        LocalDateTime nextAvailableDate = null;
+        for (Module m : course.getModules()) {
             if (m.getModuleType().equals(ModuleType.facetoface)) {
-                faceToFaceModules.add(createAdminFaceToFaceModuleOverview(m));
+                AdminFaceToFaceModuleOverview adminFaceToFaceModuleOverview = createAdminFaceToFaceModuleOverview(m);
+                if (nextAvailableDate == null || adminFaceToFaceModuleOverview.getEarliestDate().isAfter(now)) {
+                    nextAvailableDate = adminFaceToFaceModuleOverview.getEarliestDate();
+                }
+                faceToFaceModules.add(adminFaceToFaceModuleOverview);
             }
             modules.add(ModuleOverview.build(m, null));
-        });
+        }
         Collection<AdminAudienceOverview> adminAudienceOverviews = createAdminAudienceOverviews(course.getAudiences());
-        return new AdminCourseOverview(course, course.getOrderedLearningTags(), modules, faceToFaceModules, adminAudienceOverviews);
+        return new AdminCourseOverview(course, course.getOrderedLearningTags(), modules,
+                nextAvailableDate == null ? null : nextAvailableDate.toLocalDate().format(DateTimeFormatter.ofPattern("d MMM uuuu")),
+                faceToFaceModules, adminAudienceOverviews);
     }
 }
