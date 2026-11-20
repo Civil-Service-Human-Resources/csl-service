@@ -12,8 +12,9 @@ import java.util.Collection;
 @Getter
 public class AdminAudienceOverview {
 
-    private String audienceName;
-    private Type audienceType;
+    private String id;
+    private String Name;
+    private Type type;
     private Collection<String> organisations;
     private Collection<String> grades;
     private Collection<String> areasOfWork;

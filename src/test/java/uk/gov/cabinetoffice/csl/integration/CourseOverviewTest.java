@@ -62,75 +62,76 @@ public class CourseOverviewTest extends IntegrationTestBase {
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().json("""
                         {
-                            "id": "course1",
-                            "title": "A Course 1",
-                            "description": "A Course 1",
-                            "learningOutcomes": "A Course 1 learning outcomes",
-                            "status": "PUBLISHED",
-                            "visibility":"PUBLIC",
-                            "isInLearningPlan": "IS_IN_LEARNING_PLAN",
-                            "type": "blended",
-                            "duration": 300,
-                            "learningTags": [
-                                {
-                                    "id": 1,
-                                    "urlSlug": "project-management",
-                                    "name": "Project Management"
-                                }
-                            ],
-                            "grades": [
-                                "AA",
-                                "G7",
-                                "AO"
-                            ],
-                            "areasOfWork": [
-                                "Commercial",
-                                "Finance"
-                            ],
-                            "costInPounds": 0,
-                            "modules": [
-                                {
-                                    "id": "module1",
-                                    "title": "module 1",
-                                    "description": "module 1",
-                                    "mandatory": true,
-                                    "associatedLearning": false,
-                                    "type": "link",
-                                    "duration": 0,
-                                    "costInPounds": 0,
-                                    "state": "IN_PROGRESS",
-                                    "mustConfirmBooking": false
-                                },
-                                {
-                                    "id": "module2",
-                                    "title": "module 2",
-                                    "description": "module 2",
-                                    "mandatory": false,
-                                    "associatedLearning": false,
-                                    "type": "elearning",
-                                    "duration": 100,
-                                    "costInPounds": 0,
-                                    "state": "COMPLETED",
-                                    "mustConfirmBooking": false
-                                },
-                                {
-                                    "id": "module3",
-                                    "title": "module 3",
-                                    "description": "module 3",
-                                    "mandatory": true,
-                                    "associatedLearning": false,
-                                    "type": "file",
-                                    "duration": 200,
-                                    "costInPounds": 0,
-                                    "state": "NULL",
-                                    "mustConfirmBooking": false,
-                                    "filename": "file",
-                                    "extension": "txt",
-                                    "sizeInKb": 1000
-                                }
-                            ],
-                            "mandatoryModuleCount": 2
-                        }
+                             "id": "course1",
+                             "title": "A Course 1",
+                             "description": "A Course 1",
+                             "learningOutcomes": "A Course 1 learning outcomes",
+                             "status": "PUBLISHED",
+                             "visibility": "PUBLIC",
+                             "level": null,
+                             "isInLearningPlan": "IS_IN_LEARNING_PLAN",
+                             "type": "blended",
+                             "duration": 300,
+                             "learningTags": [
+                                 {
+                                     "id": 1,
+                                     "urlSlug": "project-management",
+                                     "name": "Project Management"
+                                 }
+                             ],
+                             "grades": [
+                                 "AA",
+                                 "G7",
+                                 "AO"
+                             ],
+                             "areasOfWork": [
+                                 "Commercial",
+                                 "Finance"
+                             ],
+                             "costInPounds": 0,
+                             "modules": [
+                                 {
+                                     "id": "module1",
+                                     "title": "module 1",
+                                     "description": "module 1",
+                                     "mandatory": true,
+                                     "associatedLearning": false,
+                                     "type": "link",
+                                     "duration": 0,
+                                     "costInPounds": 0,
+                                     "state": "IN_PROGRESS",
+                                     "mustConfirmBooking": false
+                                 },
+                                 {
+                                     "id": "module2",
+                                     "title": "module 2",
+                                     "description": "module 2",
+                                     "mandatory": false,
+                                     "associatedLearning": false,
+                                     "type": "elearning",
+                                     "duration": 100,
+                                     "costInPounds": 0,
+                                     "state": "COMPLETED",
+                                     "mustConfirmBooking": false
+                                 },
+                                 {
+                                     "id": "module3",
+                                     "title": "module 3",
+                                     "description": "module 3",
+                                     "mandatory": true,
+                                     "associatedLearning": false,
+                                     "type": "file",
+                                     "duration": 200,
+                                     "costInPounds": 0,
+                                     "state": "NULL",
+                                     "mustConfirmBooking": false,
+                                     "filename": "file",
+                                     "extension": "txt",
+                                     "sizeInKb": 1000
+                                 }
+                             ],
+                             "mandatoryModuleCount": 2
+                         }
                         """, true));
     }
 
@@ -165,7 +166,8 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "description": "A Course 1",
                             "learningOutcomes": "A Course 1 learning outcomes",
                             "status": "PUBLISHED",
-                            "visibility":"PUBLIC",
+                            "visibility": "PUBLIC",
+                            "level": null,
                             "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "blended",
                             "duration": 300,
@@ -260,7 +262,8 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "description": "A Course 1",
                             "learningOutcomes": "A Course 1 learning outcomes",
                             "status": "PUBLISHED",
-                            "visibility":"PUBLIC",
+                            "visibility": "PUBLIC",
+                            "level": null,
                             "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "face-to-face",
                             "duration": 14400,

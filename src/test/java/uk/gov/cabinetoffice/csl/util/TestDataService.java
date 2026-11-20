@@ -149,7 +149,7 @@ public class TestDataService {
     }
 
     public Audience generateRequiredAudience(String departmentCode) {
-        return new Audience("audience", List.of(), List.of(departmentCode), List.of(), List.of(), "P1M", Audience.Type.REQUIRED_LEARNING,
+        return new Audience("audienceID", "audience", List.of(), List.of(departmentCode), List.of(), List.of(), "P1M", Audience.Type.REQUIRED_LEARNING,
                 LocalDate.now().plusDays(1L), null);
     }
 

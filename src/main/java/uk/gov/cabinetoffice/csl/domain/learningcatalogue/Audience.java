@@ -28,6 +28,7 @@ public class Audience implements Serializable {
         NULL
     }
 
+    private String id;
     private String name;
     private List<String> areasOfWork = Collections.emptyList();
     private List<String> departments = Collections.emptyList();

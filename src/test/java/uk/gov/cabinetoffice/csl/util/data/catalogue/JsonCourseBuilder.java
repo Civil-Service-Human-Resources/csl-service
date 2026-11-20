@@ -35,13 +35,15 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
         item.putArray("departments").add(departmentCode);
         item.put("name", "Required audience name")
                 .put("requiredBy", requiredBy)
-                .put("type", "REQUIRED_LEARNING");
+                .put("type", "REQUIRED_LEARNING")
+                .put("id", "requiredAudId");
         return item;
     }
 
     public ObjectNode createBlankAudience() {
         ArrayNode aud = getOrCreateArray("audiences");
         return aud.addObject().put("type", "OPEN")
+                .put("id", "blankAudId")
                 .put("name", "Blank audience name");
     }
 
