@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
@@ -45,6 +46,10 @@ public class DateRange implements Serializable {
 
     public Integer getDurationInSeconds() {
         return Math.toIntExact(SECONDS.between(startTime, endTime));
+    }
+
+    public LocalDateTime getFullStartTime() {
+        return date.atTime(startTime);
     }
 
 }

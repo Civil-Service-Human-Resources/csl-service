@@ -34,5 +34,9 @@ public class RedisCaches {
         return cacheManager.getCache("organisations");
     }
 
+    @Bean(name = "messagingQueueFailover")
+    public Cache messagingQueueFailoverCache(CacheManager cacheManager) {
+        return cacheManager.getCache("messaging-failover");
+    }
 
 }

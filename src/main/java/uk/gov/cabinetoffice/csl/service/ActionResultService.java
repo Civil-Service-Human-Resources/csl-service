@@ -3,7 +3,7 @@ package uk.gov.cabinetoffice.csl.service;
 import org.springframework.stereotype.Service;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.ID.ITypedLearnerRecordResourceID;
 import uk.gov.cabinetoffice.csl.domain.learnerrecord.record.ActionResult;
-import uk.gov.cabinetoffice.csl.service.messaging.IMessagingClient;
+import uk.gov.cabinetoffice.csl.service.messaging.CourseCompletionsMessagingClient;
 import uk.gov.cabinetoffice.csl.service.notification.INotificationService;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -12,10 +12,10 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 public class ActionResultService {
 
     private final LearnerRecordService learnerRecordService;
-    private final IMessagingClient messagingClient;
+    private final CourseCompletionsMessagingClient messagingClient;
     private final INotificationService notificationService;
 
-    public ActionResultService(LearnerRecordService learnerRecordService, IMessagingClient messagingClient,
+    public ActionResultService(LearnerRecordService learnerRecordService, CourseCompletionsMessagingClient messagingClient,
                                INotificationService notificationService) {
         this.learnerRecordService = learnerRecordService;
         this.messagingClient = messagingClient;

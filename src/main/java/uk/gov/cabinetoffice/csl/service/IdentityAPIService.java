@@ -17,4 +17,8 @@ public class IdentityAPIService {
     public Integer getCapacityUsedForAgencyToken(String uid) {
         return identityAPIClient.getCapacityUsedForAgencyToken(uid).getCapacityUsed();
     }
+
+    public void clearAllowlistCache() {
+        identityAPIClient.clearAllowlistCache();
+    }
 }

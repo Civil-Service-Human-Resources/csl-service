@@ -14,10 +14,7 @@ import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkDto;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.HyperlinkSearchResults;
 import uk.gov.cabinetoffice.csl.domain.learningcatalogue.learningTag.LearningTag;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class LearningCategoryFactory {
@@ -31,8 +28,10 @@ public class LearningCategoryFactory {
     }
 
     public LearningTagSubCategories buildSubCategories(LearningTagTaxonomy taxonomy) {
-        Collection<Link> parentLinks = taxonomy.parents().stream()
-                .map(lt -> new Link(lt.getUrlSlug(), lt.getName())).toList();
+        List<Link> parentLinks = new ArrayList<>(taxonomy.parents().stream()
+                .map(lt -> new Link(lt.getUrlSlug(), lt.getName()))
+                .toList());
+        Collections.reverse(parentLinks);
         Collection<LearningTagCategory> categories = taxonomy.children()
                 .stream().map(lt -> new LearningTagCategory(lt.category().getName(), lt.category().getDescription(), lt.category().getUrlSlug(),
                         lt.children().stream().map(descLt -> new Link(descLt.category().getUrlSlug(), descLt.category().getName()))
@@ -41,7 +40,7 @@ public class LearningCategoryFactory {
                 .sorted(Comparator.comparing(LearningTagCategory::getTitle))
                 .toList();
         return new LearningTagSubCategories(categories, taxonomy.category().getName(),
-                taxonomy.category().getDescription(), parentLinks, taxonomy.category().getCourseCount(), PagedResults.emptyResults(),
+                taxonomy.category().getDescription(), taxonomy.category().getUrlSlug(), parentLinks, taxonomy.category().getCourseCount(), PagedResults.emptyResults(),
                 taxonomy.category().getLinkCount(), PagedResults.emptyResults());
     }
 

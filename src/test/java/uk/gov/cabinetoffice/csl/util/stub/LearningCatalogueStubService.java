@@ -156,13 +156,17 @@ public class LearningCatalogueStubService {
     }
 
     public StubMapping createHyperlink(Long tagId, String expectedInput, String response) {
+        return createHyperlink(tagId, expectedInput, response, 201);
+    }
+
+    public StubMapping createHyperlink(Long tagId, String expectedInput, String response, int status) {
         return stubFor(
                 WireMock.post(urlPathEqualTo(String.format("/learning_catalogue/learning-tags/%s/hyperlinks", tagId)))
                         .withRequestBody(equalToJson(expectedInput, true, true))
                         .withHeader("Authorization", equalTo("Bearer token"))
                         .willReturn(aResponse()
                                 .withHeader("Content-Type", "application/json")
-                                .withStatus(201)
+                                .withStatus(status)
                                 .withBody(response))
         );
     }

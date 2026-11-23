@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,9 +28,9 @@ public class Audience implements Serializable {
     }
 
     private String name;
-    private List<String> areasOfWork;
-    private List<String> departments;
-    private List<String> grades;
+    private List<String> areasOfWork = Collections.emptyList();
+    private List<String> departments = Collections.emptyList();
+    private List<String> grades = Collections.emptyList();
     private String frequency;
     private Type type;
     private LocalDate requiredBy;
