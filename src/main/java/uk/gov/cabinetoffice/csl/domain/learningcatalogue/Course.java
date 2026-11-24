@@ -36,6 +36,7 @@ public class Course implements IParentLearningResource<Module>, Cacheable {
     private CourseStatus status;
     private CourseLevel level;
     private CourseVisibility visibility;
+    private Boolean hasBeenPublished;
     private Collection<Module> modules = Collections.emptyList();
     private List<Audience> audiences = Collections.emptyList();
 

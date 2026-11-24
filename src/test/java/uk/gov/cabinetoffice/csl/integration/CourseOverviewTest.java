@@ -72,6 +72,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                              "isInLearningPlan": "IS_IN_LEARNING_PLAN",
                              "type": "blended",
                              "duration": 300,
+                             "hasBeenPublished":null,
                              "learningTags": [
                                  {
                                      "id": 1,
@@ -171,6 +172,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "blended",
                             "duration": 300,
+                            "hasBeenPublished":null,
                             "learningTags": [
                                 {
                                     "id": 1,
@@ -267,6 +269,7 @@ public class CourseOverviewTest extends IntegrationTestBase {
                             "isInLearningPlan": "CANNOT_BE_ADDED_TO_LEARNING_PLAN",
                             "type": "face-to-face",
                             "duration": 14400,
+                            "hasBeenPublished":null,
                             "learningTags": [
                                 {
                                     "id": 1,

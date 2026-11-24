@@ -27,6 +27,7 @@ public class CourseOverview {
     private LearningPlan isInLearningPlan;
     private String type;
     private Integer duration;
+    private Boolean hasBeenPublished;
     private Collection<LearningTagOverview> learningTags;
     private Set<String> grades;
     private Set<String> areasOfWork;
@@ -37,7 +38,7 @@ public class CourseOverview {
     public CourseOverview(Course course, List<LearningTagOverview> orderedTags, LearningPlan learningPlan,
                           Collection<? extends ModuleOverview> modules, Integer mandatoryCount) {
         this(course.getId(), course.getTitle(), course.getDescription(), course.getLearningOutcomes(), course.getStatus(),
-                course.getVisibility(), course.getLevel(), learningPlan, course.getCourseType(), course.getDurationInSeconds(), orderedTags,
-                course.getGrades(), course.getAreasOfWork(), course.getCost(), modules, mandatoryCount);
+                course.getVisibility(), course.getLevel(), learningPlan, course.getCourseType(), course.getDurationInSeconds(),
+                course.getHasBeenPublished(), orderedTags, course.getGrades(), course.getAreasOfWork(), course.getCost(), modules, mandatoryCount);
     }
 }
