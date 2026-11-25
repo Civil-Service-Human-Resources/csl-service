@@ -20,4 +20,5 @@ public class AdminAudienceOverview {
     private Collection<String> areasOfWork;
     private Collection<String> interests;
     private String requiredBy;
+    private String frequency;
 }

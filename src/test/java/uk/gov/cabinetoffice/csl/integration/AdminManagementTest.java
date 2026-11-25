@@ -42,7 +42,7 @@ public class AdminManagementTest extends IntegrationTestBase {
                                 new DateRangeJsonValues("09:00", "11:00", "2023-03-01")).get())
                         .addLearningTag(1L, "Project Management", "project-management")
                         .addAudience(new String[]{"AA", "AO", "G7"}, new String[]{"Commercial", "Finance"}, new String[]{"EU and International"})
-                        .addDepartmentRequiredLearning("ON2", "2023-05-05"))
+                        .addDepartmentRequiredLearning("ON2", "2023-05-05", "P1Y"))
                 .build();
     }
 
@@ -277,6 +277,7 @@ public class AdminManagementTest extends IntegrationTestBase {
                                                   "EU and International"
                                               ],
                                               "requiredBy": "",
+                                              "frequency": "None",
                                               "name": "Blank audience name"
                                           },
                                           {
@@ -289,6 +290,7 @@ public class AdminManagementTest extends IntegrationTestBase {
                                               "areasOfWork": [],
                                               "interests": [],
                                               "requiredBy": "5 May 2023",
+                                              "frequency": "1 years, 0 months",
                                               "name": "Required audience name"
                                           }
                                       ]

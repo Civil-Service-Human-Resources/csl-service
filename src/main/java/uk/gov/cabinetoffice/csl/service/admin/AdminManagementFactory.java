@@ -84,7 +84,8 @@ public class AdminManagementFactory {
         return audiences.stream().map(a -> {
             List<String> orgNames = a.getDepartments().stream().map(organisationCodeToNameMap::get).filter(Objects::nonNull).sorted().toList();
             List<String> gradeNames = a.getGrades().stream().map(gradeCodeToNameMap::get).filter(Objects::nonNull).sorted().toList();
-            return new AdminAudienceOverview(a.getId(), a.getName(), a.getType(), orgNames, gradeNames, a.getAreasOfWork(), a.getInterests(), a.getRequiredByAsDateString());
+            return new AdminAudienceOverview(a.getId(), a.getName(), a.getType(), orgNames, gradeNames,
+                    a.getAreasOfWork(), a.getInterests(), a.getRequiredByAsDateString(), a.getFrequencyAsString());
         }).toList();
     }
 
