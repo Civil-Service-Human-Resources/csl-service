@@ -275,7 +275,7 @@ public class AdminManagementTest extends IntegrationTestBase {
                                                   "EU and International"
                                               ],
                                               "requiredBy": "",
-                                              "frequency": "None",
+                                              "frequency": null,
                                               "name": "Blank audience name"
                                           },
                                           {

@@ -61,7 +61,7 @@ public class Audience implements Serializable {
     @JsonIgnore
     public String getFrequencyAsString() {
         return getFrequencyAsPeriod().map(f -> String.format("%s years, %s months", f.getYears(), f.getMonths()))
-                .orElse("None");
+                .orElse(null);
     }
 
     @JsonIgnore

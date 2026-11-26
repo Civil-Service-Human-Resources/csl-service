@@ -19,7 +19,8 @@ public class DisplayAudienceFactory {
         if (optionalAudience.isPresent()) {
             Audience audience = optionalAudience.get();
             LearningPeriod learningPeriod = audience.getLearningPeriod();
-            return new DisplayAudience(audience.getName(), audience.getFrequencyAsString(), learningPeriod);
+            String frequency = audience.getFrequencyAsString();
+            return new DisplayAudience(audience.getName(), frequency == null ? "None" : frequency, learningPeriod);
         }
         return null;
     }
