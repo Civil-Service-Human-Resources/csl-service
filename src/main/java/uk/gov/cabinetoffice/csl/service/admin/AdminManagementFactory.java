@@ -78,7 +78,7 @@ public class AdminManagementFactory {
             gradeCodes.addAll(a.getGrades());
         });
         Map<String, String> organisationCodeToNameMap = organisationalUnitService.getOrganisationalUnitsWithCodes(departmentCodes)
-                .stream().collect(Collectors.toMap(OrganisationalUnit::getCode, OrganisationalUnit::getFormattedName));
+                .stream().collect(Collectors.toMap(OrganisationalUnit::getCode, OrganisationalUnit::getNameWithAbbreviation));
         Map<String, String> gradeCodeToNameMap = civilServantRegistryService.getGrades()
                 .stream().filter(g -> gradeCodes.contains(g.getCode())).collect(Collectors.toMap(Grade::getCode, Grade::getName));
         return audiences.stream().map(a -> {

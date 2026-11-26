@@ -282,7 +282,7 @@ public class AdminManagementTest extends IntegrationTestBase {
                                               "id": "requiredAudId",
                                               "type": "REQUIRED_LEARNING",
                                               "organisations": [
-                                                  "OrgName1 (OName1) | OrgName2"
+                                                  "OrgName2"
                                               ],
                                               "grades": [],
                                               "areasOfWork": [],
