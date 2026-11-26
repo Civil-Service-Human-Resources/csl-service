@@ -107,8 +107,8 @@ public class AdminManagementTest extends IntegrationTestBase {
                                         "availability": 7
                                     },
                                     "dates": [
-                                        "01 Jan 2023",
-                                        "01 Mar 2023"
+                                        "1 January 2023",
+                                        "1 March 2023"
                                     ],
                                     "status": "Active",
                                     "moduleId": "module4",
@@ -251,8 +251,8 @@ public class AdminManagementTest extends IntegrationTestBase {
                                                           "availability": null
                                                       },
                                                       "dates": [
-                                                          "01 Jan 2023",
-                                                          "01 Mar 2023"
+                                                          "1 January 2023",
+                                                          "1 March 2023"
                                                       ]
                                                   }
                                               ]

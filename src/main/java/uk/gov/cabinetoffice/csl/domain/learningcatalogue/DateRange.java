@@ -41,7 +41,7 @@ public class DateRange implements Serializable {
     LocalTime endTime;
 
     public String getAsDateString() {
-        return this.date.format(DateTimeFormatter.ofPattern("dd MMM uuuu"));
+        return this.date.format(DateTimeFormatter.ofPattern("d MMMM uuuu"));
     }
 
     public Integer getDurationInSeconds() {
