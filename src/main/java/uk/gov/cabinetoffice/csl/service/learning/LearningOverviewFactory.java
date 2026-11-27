@@ -59,7 +59,7 @@ public class LearningOverviewFactory {
             ModuleOverview o = switch (module.getModuleType()) {
                 case facetoface -> {
                     collection.setHasFaceToFace(true);
-                    String eventId = moduleRecord == null ? null : moduleRecord.getEventId();
+                    String eventId = moduleRecord == null ? null : moduleRecord.getBookedEventId();
                     yield getFaceToFaceModuleOverview(module, eventId, state);
                 }
                 case file -> getFileModuleOverview(module, state);
