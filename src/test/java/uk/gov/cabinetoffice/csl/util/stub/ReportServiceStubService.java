@@ -104,4 +104,26 @@ public class ReportServiceStubService {
         );
     }
 
+    public void exportLearnerRecordForUserId(String userId, byte[] response, String fileName) {
+        stubFor(
+                WireMock.get(urlPathEqualTo(String.format("/report-service/learner-record/export/%s", userId)))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader(HttpHeaders.CONTENT_TYPE, "application/zip")
+                                .withHeader(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", fileName))
+                                .withBody(response))
+        );
+    }
+
+    public void exportLearnerRecordForLoggedInUser(byte[] response, String fileName) {
+        stubFor(
+                WireMock.get(urlPathEqualTo("/report-service/learner-record/export"))
+                        .withHeader("Authorization", equalTo("Bearer token"))
+                        .willReturn(aResponse()
+                                .withHeader(HttpHeaders.CONTENT_TYPE, "application/zip")
+                                .withHeader(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", fileName))
+                                .withBody(response))
+        );
+    }
+
 }

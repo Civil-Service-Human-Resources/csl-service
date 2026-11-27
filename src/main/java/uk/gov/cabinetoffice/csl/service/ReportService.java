@@ -1,9 +1,9 @@
 package uk.gov.cabinetoffice.csl.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
@@ -38,7 +38,6 @@ import java.util.List;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class ReportService {
 
@@ -103,5 +102,13 @@ public class ReportService {
                 .excludeIds(requiredLearningIds)
                 .size(config.getCourseCompletionsAggregationsForCourseMaxResults()).build();
         return reportServiceClient.getCourseCompletionAggregationsForCourse(params);
+    }
+
+    public ResponseEntity<byte[]> getLearnerRecordExportForUserId(String userId) {
+        return reportServiceClient.getLearnerRecordExportForUserId(userId);
+    }
+
+    public ResponseEntity<byte[]> getLearnerRecordExportForLoggedInUser() {
+        return reportServiceClient.getLearnerRecordExportForLoggedInUser();
     }
 }

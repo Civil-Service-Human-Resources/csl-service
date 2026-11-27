@@ -13,6 +13,8 @@ import uk.gov.cabinetoffice.csl.domain.reportservice.ReportType;
 @Validated
 public class ReportServiceConfiguration {
     @NotNull
+    private String learnerRecordExportUrl;
+    @NotNull
     private String courseCompletionsAggregationsByOrganisationUrl;
     @NotNull
     private String courseCompletionsAggregationsForCourseUrl;
@@ -26,6 +28,10 @@ public class ReportServiceConfiguration {
     private String requestRegisteredLearnerReportUrl;
     @NotNull
     private Integer courseCompletionsAggregationsForCourseMaxResults;
+
+    public String getLearnerRecordExportForUserIdUrl(String userId) {
+        return String.format("%s/%s", learnerRecordExportUrl, userId);
+    }
 
     public String getReportRequestUrl(ReportType reportType) {
         return switch (reportType) {

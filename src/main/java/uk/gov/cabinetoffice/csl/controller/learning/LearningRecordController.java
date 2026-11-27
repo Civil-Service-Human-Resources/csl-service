@@ -1,30 +1,43 @@
 package uk.gov.cabinetoffice.csl.controller.learning;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cabinetoffice.csl.domain.learning.learningRecord.LearningRecord;
+import uk.gov.cabinetoffice.csl.service.ReportService;
 import uk.gov.cabinetoffice.csl.service.auth.IUserAuthService;
 import uk.gov.cabinetoffice.csl.service.learning.LearningRecordService;
 
-@Slf4j
 @RestController
 @RequestMapping("learning/record")
 public class LearningRecordController {
 
     private final LearningRecordService learningRecordService;
     private final IUserAuthService userAuthService;
+    private final ReportService reportService;
 
-    public LearningRecordController(LearningRecordService learningRecordService, IUserAuthService userAuthService) {
+    public LearningRecordController(LearningRecordService learningRecordService, IUserAuthService userAuthService, ReportService reportService) {
         this.learningRecordService = learningRecordService;
         this.userAuthService = userAuthService;
+        this.reportService = reportService;
     }
 
     @GetMapping
     @ResponseBody
     public LearningRecord getLearningRecordForUser() {
         String loggedInUserId = userAuthService.getUsername();
-        LearningRecord learningRecord = learningRecordService.getLearningRecord(loggedInUserId);
-        return learningRecord;
+        return learningRecordService.getLearningRecord(loggedInUserId);
+    }
+
+    @GetMapping(path = {"/export/{userId}", "/download/{userId}"})
+    @ResponseBody
+    public ResponseEntity<byte[]> getLearnerRecordExportForUserId(@PathVariable("userId") String userId) {
+        return reportService.getLearnerRecordExportForUserId(userId);
+    }
+
+    @GetMapping(path = {"/export", "/download"})
+    @ResponseBody
+    public ResponseEntity<byte[]> getLearnerRecordExportForLoggedInUser() {
+        return reportService.getLearnerRecordExportForLoggedInUser();
     }
 
 }

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.cabinetoffice.csl.controller.model.ErrorDto;
@@ -127,5 +128,20 @@ public class HttpClientTest {
         assertThrows(GenericServerException.class, () ->
                 httpClient.executeRequest(request, String.class)
         );
+    }
+
+    @Test
+    public void testExecuteRequestWithResponse() {
+        RequestEntity<Void> request = RequestEntity.get(URI.create("http://localhost/test")).build();
+        byte[] body = "response data".getBytes(StandardCharsets.UTF_8);
+        ResponseEntity<byte[]> responseEntity = ResponseEntity.ok().header("Content-Type", "text/csv").body(body);
+        when(restTemplate.exchange(eq(request), eq(byte[].class))).thenReturn(responseEntity);
+
+        ResponseEntity<byte[]> result = httpClient.executeRequestWithResponse(request, byte[].class);
+
+        assertNotNull(result);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("text/csv", result.getHeaders().getFirst("Content-Type"));
+        assertArrayEquals(body, result.getBody());
     }
 }

@@ -115,6 +115,11 @@ public class HttpClient implements IHttpClient {
     }
 
     @Override
+    public <T, R> ResponseEntity<T> executeRequestWithResponse(RequestEntity<R> request, Class<T> responseClass) {
+        return executeRawRequest(request, responseClass);
+    }
+
+    @Override
     public <T, R> T executeTypeReferenceRequest(RequestEntity<R> request, ParameterizedTypeReference<T> parameterizedTypeReference) {
         try {
             log.debug("Sending request: {}", request);

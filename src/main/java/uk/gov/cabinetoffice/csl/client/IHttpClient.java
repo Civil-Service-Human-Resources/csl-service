@@ -2,6 +2,7 @@ package uk.gov.cabinetoffice.csl.client;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cabinetoffice.csl.client.model.DownloadableFile;
 import uk.gov.cabinetoffice.csl.client.model.PagedResponse;
@@ -19,4 +20,6 @@ public interface IHttpClient {
     <T, R extends PagedResponse<T>> List<T> getPaginatedRequest(Class<R> pagedResponseClass, UriComponentsBuilder url, Integer maxPageSize);
 
     <T, R> Map<String, T> executeMapRequest(RequestEntity<R> request, ParameterizedTypeReference<Map<String, T>> parameterizedTypeReference);
+
+    <T, R> ResponseEntity<T> executeRequestWithResponse(RequestEntity<R> request, Class<T> responseClass);
 }
