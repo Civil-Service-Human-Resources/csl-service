@@ -85,6 +85,11 @@ public class ModuleRecord implements Cacheable {
     }
 
     @JsonIgnore
+    public String getBookedEventId() {
+        return equalsStates(State.UNREGISTERED) ? null : eventId;
+    }
+
+    @JsonIgnore
     public State getStateForLearningPeriod(@Nullable LearningPeriod learningPeriod) {
         State state = getState();
         if (learningPeriod != null) {
