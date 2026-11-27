@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 public class JsonCourseBuilder extends BaseJsonBuilder {
 
     private final String courseId;
+    private Integer audId = 0;
 
     public JsonCourseBuilder(String courseId) {
         this.courseId = courseId;
@@ -27,9 +28,16 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
         return builder;
     }
 
-    private ObjectNode createRequiredAudience(String departmentCode, String requiredBy) {
+    private ObjectNode createAudience() {
         ArrayNode aud = getOrCreateArray("audiences");
         ObjectNode item = aud.addObject();
+        item.put("id", "aud" + audId);
+        audId++;
+        return item;
+    }
+
+    private ObjectNode createRequiredAudience(String departmentCode, String requiredBy) {
+        ObjectNode item = createAudience();
         item.putArray("departments").add(departmentCode);
         item.put("requiredBy", requiredBy)
                 .put("type", "REQUIRED_LEARNING");
@@ -37,14 +45,13 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
     }
 
     public JsonCourseBuilder createBlankAudience() {
-        ArrayNode aud = getOrCreateArray("audiences");
-        aud.addObject().put("type", "OPEN");
+        ObjectNode item = createAudience();
+        item.put("type", "OPEN");
         return this;
     }
 
     public JsonCourseBuilder addAudience(String[] grades, String[] areasOfWork) {
-        ArrayNode aud = getOrCreateArray("audiences");
-        ObjectNode item = aud.addObject();
+        ObjectNode item = createAudience();
         item.put("type", "OPEN");
         ArrayNode gradesArray = item.putArray("grades");
         for (String grade : grades) {
@@ -54,11 +61,7 @@ public class JsonCourseBuilder extends BaseJsonBuilder {
         for (String aow : areasOfWork) {
             areasOfWorkArray.add(aow);
         }
-        return this;
-    }
-
-    public JsonCourseBuilder addDepartmentRequiredLearning(String departmentCode, String requiredBy) {
-        createRequiredAudience(departmentCode, requiredBy);
+        audId++;
         return this;
     }
 

@@ -108,6 +108,10 @@ public class OrganisationalUnitService {
         return getOrganisationalUnitMap().getHierarchies(organisationIds);
     }
 
+    public Map<String, List<OrganisationalUnit>> getHierarchiesCodes() {
+        return getOrganisationalUnitMap().getHierarchiesCodes();
+    }
+
     public DeleteOrganisationResponse deleteOrganisationalUnit(Long organisationalUnitId) {
         log.info("Deleting organisational unit for id: {}", organisationalUnitId);
         civilServantRegistryClient.deleteOrganisationalUnit(organisationalUnitId);
